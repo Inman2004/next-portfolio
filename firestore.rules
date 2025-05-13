@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth.token.email == "rvimman@gmail.com";
+    }
+
+    // Allow public read access to comments
+    match /comments/{commentId} {
+      allow read: if true;
+      
+      // Allow create if user is authenticated and document is properly formatted
+      allow create: if request.auth != null 
+        && request.resource.data.keys().hasAll(['uid', 'displayName', 'photoURL', 'content', 'timestamp', 'upvotes', 'downvotes'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.content is string
+        && request.resource.data.upvotes == 0
+        && request.resource.data.downvotes == 0;
+      
+      // Allow updates for voting and pinning
+      allow update: if request.auth != null && (
+        // Allow vote updates
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes']))
+        ||
+        // Allow admin to pin/unpin
+        (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPinned']))
+      );
+      
+      // Allow delete if user is admin or comment author
+      allow delete: if request.auth != null && (
+        isAdmin() || resource.data.uid == request.auth.uid
+      );
+    }
+  }
+} 

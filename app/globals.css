@@ -1,26 +1,154 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.625rem;
+  
+  /* Theme Colors in RGB format */
+  --background: 255 255 255;  /* white */
+  --foreground: 10 10 10;    /* near black */
+  --card: 255 255 255;       /* white */
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 59 130 246;     /* blue-500 */
+  --primary-foreground: 0 0% 98%;
+  --secondary: 229 231 235;  /* gray-200 */
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 229 231 235;      /* gray-200 */
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 99 102 241;      /* indigo-500 */
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 229 231 235;     /* gray-200 */
+  --input: 240 5.9% 90%;
+  --ring: 59 130 246;        /* blue-500 */
+
+  /* Gradient Variables - Dark Mode */
+--dark-main-gradient:radial-gradient(circle, #522377, #401c62, #2f154d, #200e39, #150026);
+--dark-accent-gradient: radial-gradient(circle at 50% 50%, #080B38 0%, #133155 100%);
+--darker-gradient:radial-gradient(circle at 50% 50%, #1500267f 0%, #36164c 100%);
+--light-primary-dark: #007955;
+
+/* Gradient Variables - Light Mode */
+--light-main-gradient: radial-gradient(circle, #a46fb3, #a05cb4, #9b48b5, #952fb6, #8f00b7);
+--light-accent-gradient: radial-gradient(circle at 50% 50%, #E6F1FD 0%, #B8D4F9 100%);
+--red-main-gradient: radial-gradient(circle, #b36f9b, #b65c8b, #b84779, #b92e63, #b7004b);
+
+/* Color Stops */
+--gradient-stop-1: #522377;
+--gradient-stop-2: #36195B;
+--gradient-stop-3: #080B38;
+--gradient-stop-4: #133155;
+/* Dark Mode Colors */
+--dark-primary: #522377;
+--dark-secondary: #36195B;
+--dark-accent: #080B38;
+--dark-bg: #133155;
+--dark-text: #ffffff;
+
+/* Light Mode Colors */
+--light-primary: #A46FB3;
+--light-secondary: #7D5B9A;
+--light-accent: #383A8C;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: 17 24 39;    /* gray-900 */
+  --foreground: 243 244 246; /* gray-100 */
+  --card: 31 41 55;         /* gray-800 */
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 96 165 250;    /* blue-400 */
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 55 65 81;    /* gray-700 */
+  --secondary-foreground: 0 0% 98%;
+  --muted: 75 85 99;        /* gray-600 */
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 129 140 248;    /* indigo-400 */
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 75 85 99;       /* gray-600 */
+  --input: 240 3.7% 15.9%;
+  --ring: 96 165 250;       /* blue-400 */
+  --chart-1:oklch(0.488 0.243 264.376);
+  --chart-2:oklch(0.696 0.17 162.48);
+  --chart-3:oklch(0.769 0.188 70.08);
+  --chart-4:oklch(0.627 0.265 303.9);
+  --chart-5:oklch(0.645 0.246 16.439);
+  --sidebar:oklch(0.205 0 0);
+  --sidebar-foreground:oklch(0.985 0 0);
+  --sidebar-primary:oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground:oklch(0.985 0 0);
+  --sidebar-accent:oklch(0.269 0 0);
+  --sidebar-accent-foreground:oklch(0.985 0 0);
+  --sidebar-border:oklch(1 0 0 / 10%);
+  --sidebar-ring:oklch(0.556 0 0);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply m-0 p-0 border-border;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    transition: background-color 0.5s ease, color 0.3s ease;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Background Patterns */
+.bg-grid-pattern {
+  background-size: 30px 30px;
+  background-image: linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+}
+
+.bg-gradient-radial {
+  background-image: radial-gradient(circle at center, var(--tw-gradient-from) 0%, var(--tw-gradient-via) 50%, var(--tw-gradient-to) 100%);
+}
+
+/* Text Rotation Animation Classes */
+.text-rotate {
+  display: flex;
+  flex-wrap: wrap;
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.text-rotate-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-rotate-word {
+  display: inline-flex;
+}
+
+.text-rotate-lines {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.text-rotate-element {
+  display: inline-block;
+}
+
+.text-rotate-space {
+  white-space: pre;
 }

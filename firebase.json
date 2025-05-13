@@ -1,0 +1,20 @@
+{
+  "firestore": {
+    "indexes": [
+      {
+        "collectionGroup": "comments",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "isPinned",
+            "order": "DESCENDING"
+          },
+          {
+            "fieldPath": "timestamp",
+            "order": "DESCENDING"
+          }
+        ]
+      }
+    ]
+  }
+} 
