@@ -1,18 +1,18 @@
 "use client"
-
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { LogOut, User, HomeIcon, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <li>
+    <li className="text-center md:text-left">
       <Link
         href={href}
-        className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/10"
+        className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/10 block w-full md:w-auto"
       >
         {children}
       </Link>
@@ -23,6 +23,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
 export default function Header() {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === '/';
 
@@ -55,9 +56,22 @@ export default function Header() {
           transition={{ delay: 0.3 }}
           className="flex items-center gap-4"
         >
-          <ul className="flex items-center space-x-2">
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden text-gray-300 hover:text-white"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
+
+          {/* Navigation Links */}
+          <ul
+            className={`${
+              menuOpen ? 'block' : 'hidden'
+            } absolute top-20 left-0 w-full bg-black/90 md:bg-transparent md:static md:flex md:items-center md:space-x-2 transition-all duration-300 ease-in-out`}
+          >
             {isHome ? (
-              <>
+              <div className="flex flex-col md:flex-row md:items-center">
                 <NavItem href="#home">
                   <HomeIcon className="w-5 h-5" />
                 </NavItem>
@@ -65,7 +79,7 @@ export default function Header() {
                 <NavItem href="#skills">Skills</NavItem>
                 <NavItem href="#about">About</NavItem>
                 <NavItem href="#contact">Contact</NavItem>
-              </>
+              </div>
             ) : (
               <NavItem href="/">
                 <HomeIcon className="w-5 h-5" />
@@ -73,21 +87,24 @@ export default function Header() {
             )}
           </ul>
 
+          {/* User Authentication */}
           {!user ? (
-            <div className="flex items-center gap-2">
-              <Link 
-                href="/signin"
-                className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/10"
-              >
-                Sign In
-              </Link>
-              <Link 
-                href="/signup"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
-              >
-                Sign Up
-              </Link>
-            </div>
+            <ul
+              className={`${
+                menuOpen ? 'block' : 'hidden'
+              } absolute top-20 left-0 w-full bg-black/90 md:bg-transparent md:static md:flex md:items-center md:space-x-2 transition-all duration-300 ease-in-out`}
+            >
+              <NavItem href="/signin">
+                <span className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/10 block text-center">
+                  Sign In
+                </span>
+              </NavItem>
+              <NavItem href="/signup">
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity block text-center">
+                  Sign Up
+                </span>
+              </NavItem>
+            </ul>
           ) : (
             <div className="relative">
               <motion.button
@@ -97,16 +114,19 @@ export default function Header() {
                 className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white"
               >
                 {user.photoURL ? (
-                  <img 
-                    src={user.photoURL} 
-                    alt={user.email || 'User avatar'} 
+                  <Image
+                    src={user.photoURL}
+                    alt={user.email || 'User avatar'}
                     className="w-full h-full rounded-full object-cover"
+                    width={32}
+                    height={32}
+                    priority
+                    quality={100}
                   />
                 ) : (
                   <User className="w-5 h-5" />
                 )}
               </motion.button>
-
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg py-1 border border-gray-700">
                   <div className="px-4 py-2 border-b border-gray-700">
