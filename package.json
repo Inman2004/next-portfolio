@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "vercel-build": "CI=false DISABLE_ESLINT_PLUGIN=true next build"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
