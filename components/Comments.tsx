@@ -499,10 +499,12 @@ const Comments = () => {
                       }) && (
                         <div className="absolute -top-4 -right-4 flex items-center justify-center">
                           <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-yellow-500">
-                            <img
+                            <Image
                               src={comments.find(c => c.email === ADMIN_EMAIL)?.photoURL || '/default-avatar.png'}
                               alt="Admin vote"
                               className="w-full h-full object-cover"
+                              width={24}
+                              height={24}
                             />
                           </div>
                           <Heart className="w-3 h-3 text-amber-500 absolute -bottom-1 -right-1" fill="currentColor" />
