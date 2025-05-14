@@ -77,13 +77,13 @@ export function Testimonials() {
       </div>
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden mb-20">
       <InlineMarquee pauseOnHover className="[--duration:20s]">
-        {firstRow.map((review) => (
-          <ReviewCard key={review.username} {...review} />
+        {firstRow.map((award) => (
+          <ReviewCard key={award.name} {...award} />
         ))}
       </InlineMarquee>
       <InlineMarquee pauseOnHover className="[--duration:20s]">
-        {secondRow.map((review) => (
-          <ReviewCard key={review.username} {...review} />
+        {secondRow.map((award) => (
+          <ReviewCard key={award.name} {...award} />
         ))}
       </InlineMarquee>
       <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-black-to-r from-black"></div>
