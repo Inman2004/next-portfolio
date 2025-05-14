@@ -1,159 +1,147 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 /**
- *  DotPattern Component Props
- *
- * @param {number} [width=16] - The horizontal spacing between dots
- * @param {number} [height=16] - The vertical spacing between dots
- * @param {number} [x=0] - The x-offset of the entire pattern
- * @param {number} [y=0] - The y-offset of the entire pattern
- * @param {number} [cx=1] - The x-offset of individual dots
- * @param {number} [cy=1] - The y-offset of individual dots
- * @param {number} [cr=1] - The radius of each dot
- * @param {string} [className] - Additional CSS classes to apply to the SVG container
- * @param {boolean} [glow=false] - Whether dots should have a glowing animation effect
+ * CssDotPattern Component Props with glow support
  */
-interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
+interface CssDotPatternProps {
   width?: number;
   height?: number;
-  x?: number;
-  y?: number;
-  cx?: number;
-  cy?: number;
-  cr?: number;
+  dotSize?: number;
+  color?: string;
   className?: string;
+  style?: React.CSSProperties;
   glow?: boolean;
+  glowColor?: string;
+  glowDotsPercentage?: number;
   [key: string]: unknown;
 }
 
 /**
- * DotPattern Component
+ * CssDotPattern Component with optional glow effect
  *
- * A React component that creates an animated or static dot pattern background using SVG.
- * The pattern automatically adjusts to fill its container and can optionally display glowing dots.
+ * A highly optimized dot pattern implementation using CSS backgrounds
+ * with an optional glow effect that maintains good performance.
  *
  * @component
  *
- * @see DotPatternProps for the props interface.
- *
  * @example
- * // Basic usage
- * <DotPattern />
- *
- * // With glowing effect and custom spacing
- * <DotPattern
- *   width={20}
- *   height={20}
+ * // With glow effect
+ * <CssDotPattern 
+ *   width={24} 
+ *   height={24} 
  *   glow={true}
- *   className="opacity-50"
+ *   glowDotsPercentage={15}
  * />
- *
- * @notes
- * - The component is client-side only ("use client")
- * - Automatically responds to container size changes
- * - When glow is enabled, dots will animate with random delays and durations
- * - Uses Motion for animations
- * - Dots color can be controlled via the text color utility classes
  */
-
-export function DotPattern({
+export function CssDotPattern({
   width = 16,
   height = 16,
-  x = 0,
-  y = 0,
-  cx = 1,
-  cy = 1,
-  cr = 1,
+  dotSize = 1,
+  color = "rgba(163, 163, 163, 0.8)",
   className,
+  style,
   glow = false,
+  glowColor = "rgba(163, 163, 163, 0.5)",
+  glowDotsPercentage = 10,
   ...props
-}: DotPatternProps) {
-  const id = useId();
-  const containerRef = useRef<SVGSVGElement>(null);
+}: CssDotPatternProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [glowDots, setGlowDots] = useState<{left: string, top: string}[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
+  // Handle resize and calculate dimensions
   useEffect(() => {
+    if (!glow) return;
+    
     const updateDimensions = () => {
       if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
+        const { width: containerWidth, height: containerHeight } = 
+          containerRef.current.getBoundingClientRect();
+        
+        // Only update if dimensions actually changed
+        if (dimensions.width !== containerWidth || dimensions.height !== containerHeight) {
+          setDimensions({ width: containerWidth, height: containerHeight });
+        }
       }
     };
 
     updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
+    
+    // Throttled resize handler
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(updateDimensions, 100);
+    };
+    
+    window.addEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(resizeTimeout);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [glow, dimensions.width, dimensions.height]);
 
-  const dots = Array.from(
-    {
-      length:
-        Math.ceil(dimensions.width / width) *
-        Math.ceil(dimensions.height / height),
-    },
-    (_, i) => {
-      const col = i % Math.ceil(dimensions.width / width);
-      const row = Math.floor(i / Math.ceil(dimensions.width / width));
-      return {
-        x: col * width + cx,
-        y: row * height + cy,
-        delay: Math.random() * 5,
-        duration: Math.random() * 3 + 2,
-      };
-    },
-  );
+  // Calculate glow dots positions
+  useEffect(() => {
+    if (!glow || dimensions.width === 0 || dimensions.height === 0) return;
+
+    const cols = Math.ceil(dimensions.width / width);
+    const rows = Math.ceil(dimensions.height / height);
+    const totalDots = cols * rows;
+    const glowDotsCount = Math.floor(totalDots * (glowDotsPercentage / 100));
+    
+    const newGlowDots = [];
+    
+    // Generate random positions for glow dots
+    for (let i = 0; i < glowDotsCount; i++) {
+      const col = Math.floor(Math.random() * cols);
+      const row = Math.floor(Math.random() * rows);
+      
+      newGlowDots.push({
+        left: `${col * width + width/2}px`,
+        top: `${row * height + height/2}px`
+      });
+    }
+    
+    setGlowDots(newGlowDots);
+  }, [dimensions, width, height, glow, glowDotsPercentage]);
 
   return (
-    <svg
+    <div
       ref={containerRef}
-      aria-hidden="true"
       className={cn(
         "pointer-events-none absolute inset-0 h-full w-full",
         className,
       )}
+      style={{
+        backgroundImage: `radial-gradient(${color} ${dotSize}px, transparent 0)`,
+        backgroundSize: `${width}px ${height}px`,
+        backgroundPosition: `${width/2}px ${height/2}px`,
+        ...style
+      }}
+      aria-hidden="true"
       {...props}
     >
-      <defs>
-        <radialGradient id={`${id}-gradient`}>
-          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      {dots.map((dot) => (
-        <motion.circle
-          key={`${dot.x}-${dot.y}`}
-          cx={dot.x}
-          cy={dot.y}
-          r={cr}
-          fill={glow ? `url(#${id}-gradient)` : "currentColor"}
-          className="text-neutral-400/80"
-          initial={glow ? { opacity: 0.4, scale: 1 } : {}}
-          animate={
-            glow
-              ? {
-                  opacity: [0.4, 1, 0.4],
-                  scale: [1, 1.9, 1],
-                }
-              : {}
-          }
-          transition={
-            glow
-              ? {
-                  duration: dot.duration,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  delay: dot.delay,
-                  ease: "easeInOut",
-                }
-              : {}
-          }
+      {/* Render glow effect dots */}
+      {glow && glowDots.map((dot, index) => (
+        <div
+          key={index}
+          className="absolute rounded-full"
+          style={{
+            width: `${dotSize * 2}px`,
+            height: `${dotSize * 2}px`,
+            backgroundColor: glowColor,
+            boxShadow: `0 0 ${dotSize * 2}px ${dotSize}px ${glowColor}`,
+            transform: 'translate(-50%, -50%)',
+            left: dot.left,
+            top: dot.top,
+            opacity: 0.8,
+          }}
         />
       ))}
-    </svg>
+    </div>
   );
 }

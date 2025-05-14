@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { MorphingText } from '@/components/magicui/morphing-text';
+import { AuroraText } from "@/components/magicui/aurora-text";
 import { 
   FaGithub,
   FaLinkedin,
@@ -43,7 +44,7 @@ export default function Hero() {
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-2">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-                Hi, I&apos;m Immanuvel
+                Hi, I&apos;m <AuroraText>Immanuvel</AuroraText>
               </span>
             </h1>
 

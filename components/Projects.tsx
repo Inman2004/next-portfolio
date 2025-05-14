@@ -24,7 +24,7 @@ const projects: Project[] = [
   {
     title: "MoviesDB",
     description: "A modern, responsive React application for browsing movies, powered by TMDB API. Built with React, TypeScript, and Tailwind CSS.",
-    technologies: ["React", "TypeScript", "Tailwind CSS", "TMDB API"],
+    technologies: ["React", "TypeScript", "Tailwind CSS", "TMDB API", "Framer Motion"],
     github: "https://github.com/Inman2004/moviesdb",
     live: "https://moviesdb-nine.vercel.app",
     images: ["/images/projects/mdb.png", "/images/projects/mdb2.png", "/images/projects/mdb3.png"]

@@ -39,7 +39,7 @@ interface Comment {
 
 const ADMIN_EMAIL = "rvimman@gmail.com";
 
-const Comments = () => {
+  const Comments = () => {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState({
