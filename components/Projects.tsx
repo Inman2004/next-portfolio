@@ -14,9 +14,9 @@ interface Project {
 
 const projects: Project[] = [
   {
-    title: "Portfolio Website",
-    description: "A modern portfolio website built with Next.js, Framer Motion, and TailwindCSS.",
-    technologies: ["Next.js", "React", "TailwindCSS", "Framer Motion"],
+    title: "HR AI",
+    description: "A mock interview platform powered by VAPI voice agent",
+    technologies: ["Next.js", "React", "TailwindCSS", "TypeScript", "Framer Motion", "VAPI API"],
     github: "https://github.com/Inman2004/hr-ai",
     live: "https://Mocker.vercel-app",
     images: ["/images/projects/hr1.png", "/images/projects/hr2.png", "/images/projects/hr3.png"]
@@ -26,20 +26,20 @@ const projects: Project[] = [
     description: "A modern, responsive React application for browsing movies, powered by TMDB API. Built with React, TypeScript, and Tailwind CSS.",
     technologies: ["React", "TypeScript", "Tailwind CSS", "TMDB API"],
     github: "https://github.com/Inman2004/moviesdb",
-    live: "https://moviesdb-app.com",
+    live: "https://moviesdb-nine.vercel.app",
     images: ["/images/projects/mdb.png", "/images/projects/mdb2.png", "/images/projects/mdb3.png"]
   },
   {
     title: "E-commerce Platform",
     description: "A modern e-commerce platform with advanced filtering, search, and payment integration.",
-    technologies: ["Next.js", "Stripe", "PostgreSQL", "Redux"],
+    technologies: ["React.js", "PHP", "MySql", "Styled Components"],
     github: "https://github.com/Inman2004/ecommerce",
-    live: "https://shop-app.com",
+    live: "https://nykaa-immanuvel.vercel.app",
     images: ["/images/projects/ecommerce-1.png", "/images/projects/ecommerce-2.png", "/images/projects/ecommerce-3.png", "/images/projects/ecommerce-4.png"]
   },
   {
     title: "Data Handler",
-    description: "A full-stack web interface that Allows users to Uploads and displays a CSV file. Filters by date and restaurant name.Displays data in a responsive table. Has a mock email send feature for recruiters to see.Includes download and delete features.",
+    description: "A full-stack web interface that allows users to upload and display a CSV file. Features include filtering by date and restaurant name, displaying data in a responsive table, a mock email send feature for recruiters, and download and delete functionalities.",
     technologies: ["Next.js", "Python", "Flask", "Pandas"],
     github: "https://github.com/Inman2004/assinment-data-handler",
     live: "https://data-handler.vercel.app",
