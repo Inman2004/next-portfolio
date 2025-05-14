@@ -2,7 +2,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { CssDotPattern } from "@/components/magicui/dot-pattern";
-import { InlineMarquee  } from "@/components/magicui/marquee";
 import { cn } from "@/lib/utils";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
