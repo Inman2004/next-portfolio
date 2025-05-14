@@ -37,16 +37,16 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-black/50 h-20">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-black/30 h-20">
       <nav className="max-w-[1400px] h-full mx-auto px-6 flex items-center justify-between">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent"
+          className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent"
         >
-          <Link href="/">
-            Immanuvel.
+          <Link href="/" >
+            Immanuvel.<span className='text-white text-xl'>dev</span>
           </Link>
         </motion.div>
 
@@ -95,13 +95,13 @@ export default function Header() {
               } absolute top-20 left-0 w-full bg-black/90 md:bg-transparent md:static md:flex md:items-center md:space-x-2 transition-all duration-300 ease-in-out`}
             >
               <NavItem href="/signin">
-                <span className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/10 block text-center">
-                  Sign In
+                <span className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg block text-center">
+                  Sign&nbsp;In
                 </span>
               </NavItem>
               <NavItem href="/signup">
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity block text-center">
-                  Sign Up
+                  Sign&nbsp;Up
                 </span>
               </NavItem>
             </ul>

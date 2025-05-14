@@ -7,13 +7,13 @@ const awards = [
   {
     name: "Full Stack Developer",
     provider: "@OneRoadMap",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
+    body: "Completed Full Course on Full Stack Development Conducted by OneRoadMap",
     img: "/images/docs/fullstack.png",
   },
   {
-    name: "React",
+    name: "React.js developer",
     provider: "@OneRoadMap",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
+    body: "Completed Full Course on React Conducted by OneRoadMap",
     img: "/images/docs/react.png",
   },
   {
@@ -21,8 +21,25 @@ const awards = [
     provider: "@Growth School",
     body: "Completed Full Course on UI/UX Conducted by Anudeep Ayyagari",
     img: "/images/docs/ux.png",
-
-  }
+  },
+  {
+    name: "Big Data",
+    provider: "@Infosys",
+    body: "Completed Full Course on Big Data Conducted by Infosys",
+    img: "/images/docs/bd201.jpg",
+  },
+  {
+    name: "Internship",
+    provider: "@InfoTech",
+    body: "Attended Internship at InfoTech during 2023",
+    img: "/images/docs/internship.png",
+  },
+  {
+    name: "Frontend Developer",
+    provider: "@OneRoadMap",
+    body: "Completed Full Course on Frontend Development Conducted by OneRoadMap",
+    img: "/images/docs/frontend.png",
+  },
 ];
 
 const firstRow = awards.slice(0, awards.length / 2);
@@ -81,7 +98,7 @@ export function Testimonials() {
           <ReviewCard key={award.name} {...award} />
         ))}
       </InlineMarquee>
-      <InlineMarquee pauseOnHover className="[--duration:20s]">
+      <InlineMarquee direction="right" pauseOnHover className="[--duration:20s]">
         {secondRow.map((award) => (
           <ReviewCard key={award.name} {...award} />
         ))}
