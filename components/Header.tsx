@@ -6,6 +6,7 @@ import { LogOut, User, HomeIcon, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { ShineBorder } from './magicui/shine-border';
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -38,13 +39,14 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-black/30 h-20">
+      
       <nav className="max-w-[1400px] h-full mx-auto px-6 flex items-center justify-between">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
           className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent"
-        >
+        ><ShineBorder />
           <Link href="/" >
             Immanuvel.<span className='text-white text-xl'>dev</span>
           </Link>

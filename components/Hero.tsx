@@ -10,10 +10,30 @@ import {
   FaXTwitter
 } from 'react-icons/fa6';
 import { SiGmail } from 'react-icons/si';
+import React from 'react';
+import { Quote } from 'lucide-react';
 
 export default function Hero() {
+  const [quote, setQuote] = React.useState<{quote: string, author: string} | null>(null);
+  
+    React.useEffect(() => {
+      const fetchQuotes = async () => {
+        try {
+          const response = await fetch("https://dummyjson.com/quotes/random");
+          const data = await response.json();
+          setQuote(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchQuotes();
+    }, []);
+  
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center relative w-full py-24 overflow-hidden">
+    <section
+      id="home"
+      className="min-h-screen flex items-center justify-center relative w-full py-24 overflow-hidden"
+    >
       {/* Background Elements */}
       <div className="absolute inset-0 w-full h-full">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-purple-500/10 to-transparent" />
@@ -54,16 +74,20 @@ export default function Hero() {
                   "UI/UX Designer",
                   "Full Stack Developer",
                   "Graphic Designer",
-                  "3D Artist"
+                  "3D Artist",
                 ]}
                 className="text-center lg:text-left !h-[160px]"
               />
             </div>
 
-            <p className="text-base sm:text-lg text-gray-400 mb-10 max-w-2xl mx-auto lg:mx-0">
-              I craft beautiful, responsive, and user-friendly digital experiences 
-              that combine creativity with technical excellence.
-            </p>
+              <p className="italic text-base text-stone-400 sm:text-lg mb-10 max-w-2xl mx-auto lg:mx-0">
+                <Quote className="text-zinc-100 animate-pulse" />
+                {quote?.quote}
+                <Quote className="text-zinc-100 animate-pulse" />
+              </p>
+              <p className="mt-2 text-right text-stone-200 font-light font-sans m-4">
+                - {quote?.author}
+              </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <motion.a
@@ -135,12 +159,12 @@ export default function Hero() {
             <div className="relative w-full aspect-square">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
               <div className="relative w-full h-full rounded-full overflow-hidden border border-blue-500/20 bg-gradient-to-b from-blue-500/10 to-purple-500/10">
-                <Image 
-                  src="/images/avatar.png" 
-                  alt="Immanuvel" 
-                  width={500} 
-                  height={500} 
-                  className="object-cover w-full h-full" 
+                <Image
+                  src="/images/avatar.png"
+                  alt="Immanuvel"
+                  width={500}
+                  height={500}
+                  className="object-cover w-full h-full"
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-purple-500/10 to-transparent" />
