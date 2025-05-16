@@ -40,7 +40,7 @@ export function CssDotPattern({
   width = 16,
   height = 16,
   dotSize = 1,
-  color = "rgba(163, 163, 163, 0.8)",
+  color = "rgba(163, 63, 163, 0.8)",
   className,
   style,
   glow = false,
@@ -138,7 +138,7 @@ export function CssDotPattern({
             transform: 'translate(-50%, -50%)',
             left: dot.left,
             top: dot.top,
-            opacity: 0.8,
+            opacity: 1,
           }}
         />
       ))}

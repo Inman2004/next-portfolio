@@ -32,7 +32,7 @@ export default function Home() {
       dotSize={1.2}           
       glow={true}             
       glowDotsPercentage={1} 
-      glowColor="rgba(163, 163, 3, 0.5)" // Glow color
+      glowColor="rgba(63, 13, 163, 0.5)" // Glow color
 />
       {/* <DotPattern
         className={cn(

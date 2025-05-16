@@ -1,34 +1,37 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { MorphingText } from '@/components/magicui/morphing-text';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { MorphingText } from "@/components/magicui/morphing-text";
 import { AuroraText } from "@/components/magicui/aurora-text";
-import { 
-  FaGithub,
-  FaLinkedin,
-  FaXTwitter
-} from 'react-icons/fa6';
-import { SiGmail } from 'react-icons/si';
-import React from 'react';
-import { Quote } from 'lucide-react';
+import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { SiGmail } from "react-icons/si";
+import React from "react";
+import { Quote } from "lucide-react";
 
 export default function Hero() {
   const [quote, setQuote] = React.useState<{quote: string, author: string} | null>(null);
-  
-    React.useEffect(() => {
-      const fetchQuotes = async () => {
-        try {
-          const response = await fetch("https://dummyjson.com/quotes/random");
-          const data = await response.json();
-          setQuote(data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      fetchQuotes();
-    }, []);
-  
+
+  React.useEffect(() => {
+    // Only fetch if not already in sessionStorage
+    const storedQuote = sessionStorage.getItem("hero_quote");
+    if (storedQuote) {
+      setQuote(JSON.parse(storedQuote));
+      return;
+    }
+    const fetchQuotes = async () => {
+      try {
+        const response = await fetch("https://dummyjson.com/quotes/random");
+        const data = await response.json();
+        setQuote(data);
+        sessionStorage.setItem("hero_quote", JSON.stringify(data));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchQuotes();
+  }, []);
+
   return (
     <section
       id="home"
@@ -79,16 +82,15 @@ export default function Hero() {
                 className="text-center lg:text-left !h-[160px]"
               />
             </div>
-
-              <p className="italic text-base text-stone-400 sm:text-lg mb-10 max-w-2xl mx-auto lg:mx-0">
-                <Quote className="text-zinc-100 animate-pulse" />
-                {quote?.quote}
-                <Quote className="text-zinc-100 animate-pulse" />
+            <div className="flex">
+              <Quote className="lg:text-4xl text-pink-400 animate-pulse sm:text-lg max-w-2xl mx-auto lg:mx-0" />
+              <p className="px-4 py-2 italic lg:text-xl rounded-full bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-300 sm:text-sm my-2 max-w-2xl mx-auto lg:mx-0">
+                {quote?.quote || "Hard work is worthless for those that don't believe in themselves."}
               </p>
-              <p className="mt-2 text-right text-stone-200 font-light font-sans m-4">
-                - {quote?.author}
-              </p>
-
+            </div>
+            <p className=" text-right relative text-md text-pink-300/60 italic mb-4 mx-9">
+              - {quote?.author || "Naruto Uzumaki"}
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <motion.a
                 href="#projects"
@@ -195,4 +197,4 @@ export default function Hero() {
       </motion.div>
     </section>
   );
-} 
+}
