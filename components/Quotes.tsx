@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion';
+import { Quote } from 'lucide-react';
 
 
 
@@ -33,7 +34,7 @@ const Quotes = () => {
           </h2>
           {quote ? (
             <div className="mt-4 text-gray-400 max-w-2xl mx-auto">
-              <p className="italic">"{quote.quote}"</p>
+              <p className="italic"><Quote />{quote.quote}<Quote /></p>
               <p className="mt-2 text-right">- {quote.author}</p>
             </div>
           ) : (
