@@ -6,7 +6,14 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 
-export default async function BlogPostPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
   const post = await getBlogPostById(params.id);
   const user = auth.currentUser;
 
