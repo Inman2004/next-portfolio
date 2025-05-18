@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getBlogPostById } from '@/lib/blog';
 import { formatDate } from '@/lib/utils';
 import { notFound } from 'next/navigation';
@@ -31,6 +32,7 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({
   params,
+  searchParams,
 }: PageProps) {
   const post = await getBlogPostById(params.id);
   const user = auth.currentUser;
