@@ -6,14 +6,29 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 
-interface PageProps {
-  params: {
-    id: string;
+import type { Metadata } from 'next';
+
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = await getBlogPostById(params.id);
+  
+  if (!post) {
+    return {
+      title: 'Post Not Found',
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
   };
-  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function BlogPostPage({ params }: PageProps) {
+export default async function BlogPostPage({ params }: Props) {
   const post = await getBlogPostById(params.id);
   const user = auth.currentUser;
 
