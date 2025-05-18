@@ -31,7 +31,6 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({
   params,
-  searchParams,
 }: PageProps) {
   const post = await getBlogPostById(params.id);
   const user = auth.currentUser;
