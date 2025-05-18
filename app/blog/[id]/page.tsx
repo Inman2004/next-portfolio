@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getBlogPostById } from '@/lib/blog';
 import { formatDate } from '@/lib/utils';
 import { notFound } from 'next/navigation';
@@ -8,14 +7,11 @@ import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
 import type { Metadata } from 'next';
 
-type PageProps = {
-  params: { id: string };
-  searchParams: Record<string, string | string[] | undefined>;
-};
-
 export async function generateMetadata({
   params,
-}: PageProps): Promise<Metadata> {
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
   const post = await getBlogPostById(params.id);
   
   if (!post) {
@@ -32,8 +28,9 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({
   params,
-  searchParams,
-}: PageProps) {
+}: {
+  params: { id: string };
+}) {
   const post = await getBlogPostById(params.id);
   const user = auth.currentUser;
 
