@@ -10,7 +10,6 @@ import {
   query, 
   orderBy, 
   serverTimestamp, 
-  Timestamp 
 } from 'firebase/firestore';
 import { BlogPost } from '@/types/blog';
 
