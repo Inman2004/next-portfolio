@@ -31,20 +31,28 @@ export default function CreateBlogPost() {
       setIsSubmitting(true);
       setError('');
       
-      await createBlogPost({
-        title,
-        content,
-        author: user.displayName || 'Anonymous',
+      const postData = {
+        title: title.trim(),
+        content: content.trim(),
+        author: user.displayName?.trim() || 'Anonymous',
         authorId: user.uid,
-        authorPhotoURL: user.photoURL || '',
-        createdAt: new Date(),
-        published: true
-      });
+        authorPhotoURL: user.photoURL || undefined,
+        published: true,
+        excerpt: content.trim().substring(0, 160) + (content.length > 160 ? '...' : ''),
+      };
       
+      await createBlogPost(postData);
+      
+      // Redirect to blog page after successful creation
       router.push('/blog');
+      router.refresh(); // Ensure the latest posts are loaded
     } catch (err) {
       console.error('Error creating post:', err);
-      setError('Failed to create post. Please try again.');
+      setError(
+        err instanceof Error 
+          ? `Failed to create post: ${err.message}`
+          : 'Failed to create post. Please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }

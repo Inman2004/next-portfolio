@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { Timestamp } from 'firebase/firestore';
 
 export default async function BlogPostPage({ params }: { params: { id: string } }) {
   const post = await getBlogPostById(params.id);
@@ -45,13 +46,16 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
                         src={post.authorPhotoURL} 
                         alt={post.author}
                         className="w-full h-full object-cover"
+                        width={40}
+                        height={40}
                       />
                     </div>
                   )}
                   <div>
-                    <p className="text-white">{post.author}</p>
-                    <time dateTime={post.createdAt.toISOString()}>
-                      {formatDate(post.createdAt)}
+                    <span className="block font-medium text-white">{post.author}</span>
+                    <time dateTime={post.createdAt instanceof Date ? post.createdAt.toISOString() : 
+                          post.createdAt instanceof Timestamp ? post.createdAt.toDate().toISOString() : ''}>
+                      {formatDate(post.createdAt instanceof Timestamp ? post.createdAt.toDate() : post.createdAt)}
                     </time>
                   </div>
                 </div>
