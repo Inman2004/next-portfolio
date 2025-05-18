@@ -74,13 +74,14 @@ export default function Header() {
           >
             {isHome ? (
               <div className="flex flex-col md:flex-row md:items-center">
-                <NavItem href="#home">
-                  <HomeIcon className="w-5 h-5" />
-                </NavItem>
-                <NavItem href="#projects">Projects</NavItem>
-                <NavItem href="#skills">Skills</NavItem>
-                <NavItem href="#about">About</NavItem>
-                <NavItem href="#contact">Contact</NavItem>
+                <ul className="hidden md:flex items-center space-x-1">
+                  <NavItem href="/">Home</NavItem>
+                  <NavItem href="#about">About</NavItem>
+                  <NavItem href="#skills">Skills</NavItem>
+                  <NavItem href="#projects">Projects</NavItem>
+                  <NavItem href="#contact">Contact</NavItem>
+                  <NavItem href="/blog">Blog</NavItem>
+                </ul>
               </div>
             ) : (
               <NavItem href="/">
