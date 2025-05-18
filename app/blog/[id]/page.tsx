@@ -5,15 +5,16 @@ import { auth } from '@/lib/firebase';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Timestamp } from 'firebase/firestore';
-
 import type { Metadata } from 'next';
 
-type Props = {
+type PageProps = {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Record<string, string | string[] | undefined>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const post = await getBlogPostById(params.id);
   
   if (!post) {
@@ -28,7 +29,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({
+  params,
+  searchParams,
+}: PageProps) {
   const post = await getBlogPostById(params.id);
   const user = auth.currentUser;
 
