@@ -1,76 +1,121 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, Firestore } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, Auth } from 'firebase/auth';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY as string,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN as string,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID as string,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Validate required environment variables
-const requiredEnvVars = [
-  'NEXT_PUBLIC_FIREBASE_API_KEY',
-  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-  'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-  'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-  'NEXT_PUBLIC_FIREBASE_APP_ID',
-];
-
-if (process.env.NODE_ENV !== 'test') {
-  requiredEnvVars.forEach((envVar) => {
-    if (!process.env[envVar]) {
-      throw new Error(`Missing required environment variable: ${envVar}`);
-    }
-  });
-}
-
-// Debug logging
-if (process.env.NODE_ENV === 'development') {
-  console.log('Firebase Config:', {
-    apiKey: firebaseConfig.apiKey ? 'Set' : 'Missing',
-    authDomain: firebaseConfig.authDomain ? 'Set' : 'Missing',
-    projectId: firebaseConfig.projectId ? 'Set' : 'Missing',
-    storageBucket: firebaseConfig.storageBucket ? 'Set' : 'Missing',
-    messagingSenderId: firebaseConfig.messagingSenderId ? 'Set' : 'Missing',
-    appId: firebaseConfig.appId ? 'Set' : 'Missing',
-  });
-}
-
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let firebaseApp: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
+let storage: FirebaseStorage;
+let googleProvider: GoogleAuthProvider;
 
-// Configure Google Provider
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: 'select_account'
-});
+// Initialize Firebase only on the client-side
+const initializeFirebase = () => {
+  if (typeof window === 'undefined') {
+    return; // Don't initialize on server-side
+  }
 
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+  if (firebaseApp) {
+    return; // Already initialized
+  }
 
-// Test Firestore connection
-const testConnection = async () => {
+  // Debug logging in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Initializing Firebase with config:', {
+      ...firebaseConfig,
+      apiKey: firebaseConfig.apiKey ? '***' : 'MISSING',
+    });
+  }
+
   try {
-    const querySnapshot = await getDocs(collection(db, 'comments'));
-    console.log('Successfully connected to Firestore. Found', querySnapshot.size, 'comments');
-    querySnapshot.forEach((doc) => {
-      console.log('Comment:', doc.id, doc.data());
+    firebaseApp = initializeApp(firebaseConfig);
+    auth = getAuth(firebaseApp);
+    db = getFirestore(firebaseApp);
+    storage = getStorage(firebaseApp);
+    
+    // Configure Google Provider
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({
+      prompt: 'select_account'
     });
   } catch (error) {
-    console.error('Error connecting to Firestore:', error);
+    console.error('Firebase initialization error:', error);
   }
 };
 
-// Run the test when in development
-if (process.env.NODE_ENV === 'development') {
-  testConnection();
+// Initialize Firebase when this module is imported
+initializeFirebase();
+
+// Export initialized services
+export { auth, db, storage, googleProvider };
+
+// Test Firestore connection
+async function testConnection() {
+  try {
+    if (!db) {
+      console.error('Firestore not initialized');
+      return;
+    }
+
+    // Ensure we have a valid db instance
+    const firestoreDb = db || getFirestore();
+    
+    const querySnapshot = await getDocs(collection(firestoreDb, 'comments'));
+    console.log('Successfully connected to Firestore. Found', querySnapshot.size, 'comments');
+    
+    if (process.env.NODE_ENV === 'development') {
+      querySnapshot.forEach((doc) => {
+        console.log('Comment:', doc.id, doc.data());
+      });
+    }
+    return true;
+  } catch (error) {
+    console.error('Error connecting to Firestore:', error);
+    return false;
+  }
 }
 
-export default app; 
+// Run test connection in development mode
+if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+  // Small delay to ensure Firebase is initialized
+  setTimeout(() => {
+    testConnection().then(success => {
+      if (!success) {
+        console.log('Retrying Firestore connection...');
+        setTimeout(() => testConnection(), 1000);
+      }
+    });
+  }, 1000);
+}
+
+// Export a function to ensure Firebase is initialized when needed
+export function getFirebase() {
+  if (!firebaseApp) {
+    if (typeof window === 'undefined') {
+      throw new Error('Firebase cannot be initialized on the server side');
+    }
+    firebaseApp = initializeApp(firebaseConfig);
+  }
+  return {
+    app: firebaseApp,
+    auth: auth || getAuth(firebaseApp),
+    db: db || getFirestore(firebaseApp),
+    storage: storage || getStorage(firebaseApp),
+    googleProvider: googleProvider || (() => {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      return provider;
+    })()
+  };
+}

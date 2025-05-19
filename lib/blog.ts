@@ -90,13 +90,29 @@ export async function createBlogPost(postData: Omit<BlogPost, 'id' | 'createdAt'
   return docRef.id;
 }
 
-export async function updateBlogPost(id: string, postData: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'authorId'>>) {
+export async function updateBlogPost(
+  id: string, 
+  postData: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'authorId'>>
+): Promise<void> {
+  if (!id) {
+    throw new Error('Post ID is required for update');
+  }
+
   const docRef = doc(db, BLOG_POSTS_COLLECTION, id);
   
-  await updateDoc(docRef, {
-    ...postData,
+  // Only include fields that are defined in the update
+  const updateData: Record<string, any> = {
     updatedAt: serverTimestamp(),
+  };
+
+  // Add only the fields that are defined in postData
+  Object.entries(postData).forEach(([key, value]) => {
+    if (value !== undefined) {
+      updateData[key] = value;
+    }
   });
+
+  await updateDoc(docRef, updateData);
 }
 
 export async function deleteBlogPost(id: string) {
