@@ -6,26 +6,10 @@ service cloud.firestore {
       return request.auth.token.email == "rvimman@gmail.com";
     }
 
-    // Users collection rules
-    match /users/{userId} {
-      // Allow read access to any user's profile
-      allow read: if true;
-      
-      // Only allow users to update their own profile
-      allow update: if request.auth != null && request.auth.uid == userId;
-      
-      // Only allow users to create their own profile
-      allow create: if request.auth != null && request.auth.uid == userId;
-    }
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return request.auth.token.email == "rvimman@gmail.com";
-    }
-
     // Blog posts collection rules
     match /blog-posts/{postId} {
-      // Allow public read access to blog posts
-      allow read: if true;
+      // Allow read access to all authenticated users
+      allow read: if request.auth != null;
       
       // Only authenticated users can create posts
       allow create: if request.auth != null 
@@ -43,23 +27,36 @@ service cloud.firestore {
       );
     }
 
-    // Comments collection rules
+    // Users collection rules
+    match /users/{userId} {
+      // Allow read access to authenticated users
+      allow read: if request.auth != null;
+      
+      // Only allow writing if:
+      // 1. Creating a new user (request.resource.data.id is null)
+      // 2. Updating your own profile
+      allow write: if request.auth != null && (
+        request.resource.data.id == null ||
+        request.auth.uid == userId
+      );
+    }
+
+    // Allow public read access to comments
     match /comments/{commentId} {
       allow read: if true;
       
       // Allow create if user is authenticated and document is properly formatted
       allow create: if request.auth != null 
+        && request.resource.data.keys().hasAll(['uid', 'displayName', 'photoURL', 'content', 'timestamp', 'upvotes', 'downvotes'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.content is string
-        && request.resource.data.upvotes is int
-        && request.resource.data.downvotes is int
-        && request.resource.data.upvotes <= 0
-        && request.resource.data.downvotes <= 0;
+        && request.resource.data.upvotes == 0
+        && request.resource.data.downvotes == 0;
       
       // Allow updates for voting and pinning
       allow update: if request.auth != null && (
         // Allow vote updates
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes', 'upvoters', 'downvoters']))
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes']))
         ||
         // Allow admin to pin/unpin
         (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPinned']))

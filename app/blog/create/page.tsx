@@ -111,8 +111,8 @@ export default function CreateBlogPost() {
         content: content.trim(),
         author: user.displayName?.trim() || 'Anonymous',
         authorId: user.uid,
-        authorPhotoURL: user.photoURL || undefined,
-        coverImage: coverImage || undefined,
+        authorPhotoURL: user.photoURL || null,
+        coverImage: coverImage || null,
         published: true,
         excerpt: content.trim().substring(0, 160) + (content.length > 160 ? '...' : ''),
       };

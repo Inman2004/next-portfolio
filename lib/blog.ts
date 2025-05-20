@@ -1,4 +1,4 @@
-import { db } from './firebase';
+import { db, storage } from './firebase';
 import { 
   collection, 
   doc, 
@@ -11,7 +11,9 @@ import {
   orderBy, 
   serverTimestamp, 
 } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
 import { BlogPost } from '@/types/blog';
+import { auth } from './firebase';
 
 const BLOG_POSTS_COLLECTION = 'blog-posts';
 
@@ -25,6 +27,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => {
       const data = doc.data();
+      const isAdmin = data.authorId === auth.currentUser?.uid;
       return {
         id: doc.id,
         title: data.title,
@@ -37,7 +40,8 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         slug: data.slug,
         excerpt: data.excerpt,
         coverImage: data.coverImage,
-        published: data.published ?? true
+        published: data.published ?? true,
+        isAdmin
       } as BlogPost;
     });
   } catch (error) {
@@ -58,9 +62,9 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
     if (!docSnap.exists()) {
       return null;
     }
-    
+
     const data = docSnap.data();
-    return {
+    const post: BlogPost = {
       id: docSnap.id,
       title: data.title,
       content: data.content,
@@ -72,8 +76,20 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
       slug: data.slug,
       excerpt: data.excerpt,
       coverImage: data.coverImage,
-      published: data.published ?? true
-    } as BlogPost;
+      published: data.published ?? true,
+      isAdmin: false // Default to false
+    };
+
+    // If authorId exists, check if it's an admin
+    if (post.authorId) {
+      const userDoc = await getDoc(doc(db, 'users', post.authorId));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        post.isAdmin = userData?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      }
+    }
+
+    return post;
   } catch (error) {
     console.error(`Error fetching blog post ${id}:`, error);
     throw new Error(`Failed to fetch blog post: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -116,6 +132,37 @@ export async function updateBlogPost(
 }
 
 export async function deleteBlogPost(id: string) {
-  const docRef = doc(db, BLOG_POSTS_COLLECTION, id);
-  await deleteDoc(docRef);
+  try {
+    if (!id) {
+      throw new Error('Post ID is required for deletion');
+    }
+
+    // Get the post document to get the cover image URL
+    const docRef = doc(db, BLOG_POSTS_COLLECTION, id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) {
+      throw new Error('Post not found');
+    }
+
+    const data = docSnap.data();
+    const coverImage = data?.coverImage;
+
+    // Delete the cover image from Cloud Storage if it exists
+    if (coverImage) {
+      const storageRef = ref(storage, coverImage);
+      try {
+        await deleteObject(storageRef);
+      } catch (error) {
+        console.error('Error deleting cover image:', error);
+        // Don't throw error if image deletion fails - continue with post deletion
+      }
+    }
+
+    // Delete the blog post document
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error('Error deleting blog post:', error);
+    throw new Error(`Failed to delete blog post: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

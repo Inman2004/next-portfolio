@@ -18,7 +18,8 @@ import {
   where,
   getDocs,
   arrayRemove,
-  arrayUnion
+  arrayUnion,
+  limit
 } from 'firebase/firestore';
 import Image from 'next/image';
 
@@ -77,6 +78,39 @@ const ADMIN_EMAIL = "rvimman@gmail.com";
       });
     }
   }, [user?.displayName, user?.photoURL]);
+
+  // Initialize comments collection if needed and subscribe
+  useEffect(() => {
+    const initializeComments = async () => {
+      try {
+        // Check if comments collection exists
+        const commentsRef = collection(db, 'comments');
+        const q = query(commentsRef, limit(1));
+        const snapshot = await getDocs(q);
+        
+        // If no documents exist, create a dummy document to initialize the collection
+        if (snapshot.empty) {
+          await addDoc(commentsRef, {
+            uid: 'system',
+            displayName: 'System',
+            photoURL: '',
+            content: 'Comments collection initialized',
+            timestamp: serverTimestamp(),
+            upvotes: 0,
+            downvotes: 0,
+            isPinned: false,
+            email: 'system@comments.com',
+            upvoters: [],
+            downvoters: []
+          });
+        }
+      } catch (error) {
+        console.error('Error initializing comments:', error);
+      }
+    };
+
+    initializeComments();
+  }, []);
 
   // Subscribe to comments collection
   useEffect(() => {
@@ -149,9 +183,9 @@ const ADMIN_EMAIL = "rvimman@gmail.com";
     try {
       await addDoc(collection(db, 'comments'), {
         uid: user.uid,
-        displayName: user.displayName || '',
+        displayName: user.displayName ? user.displayName : 'Anonymous',
         photoURL: user.photoURL || '',
-        email: user.email || '',
+        email: user.email ? user.email : 'anonymous@example.com',
         content: newComment.content.trim(),
         timestamp: serverTimestamp(),
         upvotes: 0,

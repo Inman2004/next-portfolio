@@ -6,14 +6,16 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { getBlogPosts } from '@/lib/blog';
 import { auth } from '@/lib/firebase';
+import { Crown } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import type { BlogPost } from '@/types/blog';
-import { Timestamp } from 'firebase/firestore';
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState(auth.currentUser);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -28,7 +30,7 @@ export default function BlogPage() {
         setError(null);
       } catch (err) {
         console.error('Error fetching blog posts:', err);
-        setError('Failed to load blog posts. Please try again later.');
+        toast.error('Failed to fetch blog posts. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -180,22 +182,43 @@ export default function BlogPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           {post.authorPhotoURL ? (
-                            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-500/30">
+                            <div className={`w-10 h-10 rounded-full overflow-hidden ${post.isAdmin ? 'border-4 border-yellow-500 ring-4 ring-yellow-500/30' : 'border-2 border-blue-500/30'}`}>
+                              {post.isAdmin && (
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500/20 rounded-full p-1 z-10">
+                                  <Crown className="w-5 h-5 text-yellow-500" />
+                                </div>
+                              )}
                               <img 
                                 src={post.authorPhotoURL} 
                                 alt={post.author || 'Author'}
                                 className="w-full h-full object-cover"
                               />
+                              {post.isAdmin && (
+                                <div className="absolute inset-0 bg-yellow-500/10" />
+                              )}
                             </div>
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                            <div className={`w-10 h-10 rounded-full ${isAdmin ? 'border-4 border-yellow-500 ring-4 ring-yellow-500/30' : 'bg-gradient-to-br from-blue-500 to-purple-600'} flex items-center justify-center text-white font-medium`}>
+                              {isAdmin && (
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500/20 rounded-full p-1 z-10">
+                                  <Crown className="w-5 h-5 text-yellow-500" />
+                                </div>
+                              )}
                               {(post.author || 'U')[0].toUpperCase()}
+                              {isAdmin && (
+                                <div className="absolute inset-0 bg-yellow-500/10" />
+                              )}
                             </div>
                           )}
                           <div>
-                            <p className="text-sm font-medium text-white">
-                              {post.author || 'Unknown Author'}
-                            </p>
+                            <div className="flex items-center gap-1">
+                              <p className="text-sm font-medium text-white">
+                                {post.author || 'Unknown Author'}
+                              </p>
+                              {isAdmin && (
+                                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-400">Admin</span>
+                              )}
+                            </div>
                             <time 
                               dateTime={getPostDateTime(post.createdAt)}
                               className="text-xs text-gray-400"
