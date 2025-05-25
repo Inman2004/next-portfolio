@@ -1,10 +1,11 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { PageLoading } from '../ui/page-loading';
 
-export function PageLoadingProvider({ children }: { children: React.ReactNode }) {
+// Client-side only component that uses useSearchParams
+function LoadingContent({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -50,15 +51,40 @@ export function PageLoadingProvider({ children }: { children: React.ReactNode })
     };
   }, [isClient, pathname, searchParams]);
 
+  return (
+    <>
+      <PageLoading isLoading={isLoading} />
+      {children}
+    </>
+  );
+}
+
+export function PageLoadingProvider({ children }: { children: React.ReactNode }) {
+  // Check if we're on the 404 page
+  const pathname = usePathname();
+  const is404 = pathname === '/404';
+
   // Don't render anything on the server
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   if (!isClient) {
     return <>{children}</>;
   }
 
+  if (is404) {
+    return <>{children}</>;
+  }
+
+
   return (
-    <>
-      {children}
-      <PageLoading isLoading={isLoading} />
-    </>
+    <Suspense fallback={<PageLoading isLoading={true} />}>
+      <LoadingContent>
+        {children}
+      </LoadingContent>
+    </Suspense>
   );
 }
