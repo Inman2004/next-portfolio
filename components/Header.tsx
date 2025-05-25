@@ -99,7 +99,6 @@ export default function Header() {
                 <ul className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-1 w-full md:w-auto">
                   <NavItem href="#home">Home</NavItem>
                   <NavItem href="#projects">Projects</NavItem>
-                  <NavItem href="#skills">Skills</NavItem>
                   <NavItem href="#experience">Experience</NavItem>
                   <NavItem href="#services">Services</NavItem>
                   <NavItem href="#testimonials">Testimonials</NavItem>

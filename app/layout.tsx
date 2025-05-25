@@ -6,6 +6,10 @@ import { PageLoadingProvider } from "@/components/providers/page-loading-provide
 import Header from "@/components/Header";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Toaster } from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+
+// Import the client component directly
+import WelcomePopup from '@/components/WelcomePopupClient';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,29 +56,19 @@ export default function RootLayout({
       <head>
         <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-b from-gray-950 to-black text-white`}>
-        <Providers>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} font-sans bg-gray-950 text-white min-h-screen`}>
+        <ErrorBoundary>
           <PageLoadingProvider>
-            <ErrorBoundary>
+            <Providers>
               <Header />
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#1f2937',
-                    color: '#fff',
-                    borderRadius: '0.5rem',
-                    padding: '1rem',
-                  },
-                }}
-              />
               <main className="min-h-screen">
                 {children}
               </main>
-            </ErrorBoundary>
+              <WelcomePopup />
+              <Toaster position="bottom-center" />
+            </Providers>
           </PageLoadingProvider>
-        </Providers>
+        </ErrorBoundary>
       </body>
     </html>
   );

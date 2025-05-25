@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to My Portfolio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      line-height: 1.6;
+      color: #e2e8f0;
+      background-color: #0f0f1a;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .header {
+      background: radial-gradient(circle, #522377 0%, #36195B 50%, #080B38 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .content {
+      background-color: #0f0f1a;
+      padding: 30px;
+      border: 1px solid #1e1e2d;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+    .greeting {
+      font-size: 18px;
+      color: #e2e8f0;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .message {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 3px solid #3b82f6;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 5px 5px 0;
+    }
+    .features {
+      margin: 25px 0;
+      padding: 0;
+      list-style: none;
+    }
+    .features li {
+      padding: 10px 0 10px 30px;
+      margin-bottom: 10px;
+      position: relative;
+      color: #cbd5e1;
+    }
+    .features li:before {
+      content: '→';
+      color: #8b5cf6;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(45deg, #8b5cf6, #3b82f6);
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      margin: 25px 0;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #1e1e2d;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+    }
+    .footer a {
+      color: #8b5cf6;
+      text-decoration: none;
+      margin: 0 5px;
+      transition: color 0.2s ease;
+    }
+    .footer a:hover {
+      color: #3b82f6;
+      text-decoration: underline;
+    }
+    .logo {
+      font-weight: 700;
+      color: #8b5cf6;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to My Portfolio</h1>
+    </div>
+    <div class="content">
+      <p class="greeting">Hello <strong>{{to_name}}</strong>,</p>
+      
+      <div class="message">
+        {{message}}
+      </div>
+      
+      <p>I'm thrilled to have you here! Here's what you can do now:</p>
+      
+      <ul class="features">
+        <li>Explore my latest projects and case studies</li>
+        <li>Read and engage with my blog posts</li>
+        <li>Stay updated with my latest work and insights</li>
+        <li>Connect with me directly through the contact form</li>
+      </ul>
+
+      <div style="text-align: center;">
+        <a href="{{website_url}}" class="button">Visit My Portfolio</a>
+      </div>
+
+      <p>If you have any questions or just want to say hi, feel free to reply to this email.</p>
+      
+      <p>Best regards,<br>Rohit Vimmananeni</p>
+      
+      <div class="footer">
+        <p>© {{year}} <a href="{{website_url}}" class="logo">Rohit Vimmananeni</a>. All rights reserved.</p>
+        <p>
+          <a href="{{website_url}}/privacy">Privacy Policy</a> • 
+          <a href="{{website_url}}/unsubscribe?email={{to_email}}">Unsubscribe</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
