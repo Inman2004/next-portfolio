@@ -3,67 +3,117 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Helper function to check if user is admin
     function isAdmin() {
-      return request.auth.token.email == "rvimman@gmail.com";
+      return request.auth != null && request.auth.token.email == "rvimman@gmail.com";
     }
-
+    
     // Users collection rules
     match /users/{userId} {
       // Allow read access to any user's profile
       allow read: if true;
       
-      // Only allow users to update their own profile
-      allow update: if request.auth != null && request.auth.uid == userId;
+      // Only allow users to update their own profile or admin can update any
+      allow update: if request.auth != null && (
+        request.auth.uid == userId || isAdmin()
+      );
       
       // Only allow users to create their own profile
       allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Only allow users to delete their own profile or admin can delete any
+      allow delete: if request.auth != null && (
+        request.auth.uid == userId || isAdmin()
+      );
     }
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return request.auth.token.email == "rvimman@gmail.com";
-    }
-
+    
     // Blog posts collection rules
-    match /blog-posts/{postId} {
-      // Allow public read access to blog posts
+    match /blogPosts/{postId} {
+      // Allow read access to all
       allow read: if true;
       
-      // Only authenticated users can create posts
-      allow create: if request.auth != null 
-        && request.resource.data.keys().hasAll(['title', 'content', 'author', 'authorId', 'createdAt'])
-        && request.resource.data.authorId == request.auth.uid;
+      // Only allow authenticated users to create posts
+      allow create: if request.auth != null;
       
-      // Only the post author or admin can update
-      allow update: if request.auth != null && (
-        resource.data.authorId == request.auth.uid || isAdmin()
+      // Only allow post authors or admins to update/delete
+      allow update, delete: if request.auth != null && (
+        request.auth.uid == resource.data.authorId || isAdmin()
       );
+    }
+    
+    // Post views collection rules
+    match /post_views/{postId} {
+      // Allow read access to all
+      allow read: if true;
       
-      // Only the post author or admin can delete
-      allow delete: if request.auth != null && (
-        resource.data.authorId == request.auth.uid || isAdmin()
-      );
+      // Only allow server-side updates to increment view counts
+      allow write: if request.auth != null && request.auth.uid == 'firebase';
+      
+      // For development, allow all writes
+      // TODO: Remove in production
+      allow write: if true;
     }
 
     // Comments collection rules
     match /comments/{commentId} {
+      // Allow public read access to all comments
       allow read: if true;
       
       // Allow create if user is authenticated and document is properly formatted
       allow create: if request.auth != null 
+        && request.resource.data.keys().hasAll(['uid', 'displayName', 'content', 'email'])
         && request.resource.data.uid == request.auth.uid
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 100
         && request.resource.data.content is string
+        && request.resource.data.content.size() >= 1
+        && request.resource.data.content.size() <= 5000
+        && (request.resource.data.photoURL == null || request.resource.data.photoURL is string)
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.timestamp <= request.time
         && request.resource.data.upvotes is int
         && request.resource.data.downvotes is int
-        && request.resource.data.upvotes <= 0
-        && request.resource.data.downvotes <= 0;
+        && request.resource.data.upvoters is list
+        && request.resource.data.downvoters is list
+        && request.resource.data.email is string
+        && (request.resource.data.isPinned == null || 
+            (request.resource.data.isPinned is bool && isAdmin()))
+        && request.resource.data.upvotes == 0
+        && request.resource.data.downvotes == 0
+        && request.resource.data.upvoters.size() == 0
+        && request.resource.data.downvoters.size() == 0;
       
-      // Allow updates for voting and pinning
-      allow update: if request.auth != null && (
-        // Allow vote updates
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes', 'upvoters', 'downvoters']))
-        ||
-        // Allow admin to pin/unpin
-        (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPinned']))
-      );
+      // Allow users to update their own comment content
+      allow update: if request.auth != null 
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['content', 'displayName', 'photoURL'])
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 1
+        && request.resource.data.content.size() <= 5000
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 100
+        && (request.resource.data.photoURL == null || request.resource.data.photoURL is string);
+      
+      // Allow voting updates
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes', 'upvoters', 'downvoters'])
+        && request.resource.data.upvotes is int
+        && request.resource.data.downvotes is int
+        && request.resource.data.upvoters is list
+        && request.resource.data.downvoters is list
+        && request.resource.data.upvotes >= 0
+        && request.resource.data.downvotes >= 0
+        && request.resource.data.upvotes == request.resource.data.upvoters.size()
+        && request.resource.data.downvotes == request.resource.data.downvoters.size()
+        && request.resource.data.upvotes - resource.data.upvotes >= -1
+        && request.resource.data.upvotes - resource.data.upvotes <= 1
+        && request.resource.data.downvotes - resource.data.downvotes >= -1
+        && request.resource.data.downvotes - resource.data.downvotes <= 1;
+      
+      // Allow admin to pin/unpin comments
+      allow update: if isAdmin() 
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPinned'])
+        && request.resource.data.isPinned is bool;
       
       // Allow delete if user is admin or comment author
       allow delete: if request.auth != null && (

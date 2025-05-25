@@ -226,8 +226,8 @@ const Contact = () => {
                 Location
               </h3>
               <p className="text-gray-400">
-                Based in <b className='text-violet-500'>Bangalore, Chennai, India</b><br />
-                Available for <b className='text-violet-500'>remote</b> work worldwide
+                Based in <b className='text-blue-500 font-thin'>Bangalore, Chennai, India</b><br />
+                Available for <b className='text-blue-500 font-thin'>remote</b> work worldwide
               </p>
             </div>
           </motion.div>

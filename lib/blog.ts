@@ -15,7 +15,7 @@ import { ref, deleteObject } from 'firebase/storage';
 import { BlogPost } from '@/types/blog';
 import { auth } from './firebase';
 
-const BLOG_POSTS_COLLECTION = 'blog-posts';
+const BLOG_POSTS_COLLECTION = 'blogPosts';
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
@@ -25,25 +25,53 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     );
     
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      const isAdmin = data.authorId === auth.currentUser?.uid;
-      return {
-        id: doc.id,
-        title: data.title,
-        content: data.content,
-        author: data.author,
-        authorId: data.authorId,
-        authorPhotoURL: data.authorPhotoURL,
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'rvimman@gmail.com';
+    const posts: BlogPost[] = [];
+    
+    // Process each post to check if the author is admin
+    for (const postDoc of querySnapshot.docs) {
+      const data = postDoc.data();
+      let isAdminPost = false;
+      
+      // Check if this is the admin's post by user ID or email
+      if (data.authorId) {
+        try {
+          // Direct check for known admin user ID
+          if (data.authorId === 'ksHyBhNWEdUUIizl2qs42KwoR3D2') {
+            isAdminPost = true;
+          } else {
+            // Fallback to email check
+            const authorDoc = await getDoc(doc(db, 'users', data.authorId));
+            if (authorDoc.exists()) {
+              const authorData = authorDoc.data() as { email?: string };
+              isAdminPost = authorData?.email === adminEmail;
+            }
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+        }
+      }
+      
+      const post: BlogPost = {
+        id: postDoc.id,
+        title: data.title || '',
+        content: data.content || '',
+        author: data.author || '',
+        authorId: data.authorId || '',
+        authorPhotoURL: data.authorPhotoURL || '',
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate(),
-        slug: data.slug,
-        excerpt: data.excerpt,
-        coverImage: data.coverImage,
+        slug: data.slug || '',
+        excerpt: data.excerpt || '',
+        coverImage: data.coverImage || '',
         published: data.published ?? true,
-        isAdmin
-      } as BlogPost;
-    });
+        isAdmin: isAdminPost
+      };
+      
+      posts.push(post);
+    }
+    
+    return posts;
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     throw new Error('Failed to fetch blog posts');
@@ -97,13 +125,41 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
 }
 
 export async function createBlogPost(postData: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>) {
-  const docRef = await addDoc(collection(db, BLOG_POSTS_COLLECTION), {
-    ...postData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  console.log('createBlogPost called with data:', { 
+    ...postData, 
+    content: postData.content ? `${postData.content.substring(0, 30)}...` : 'empty' 
   });
   
-  return docRef.id;
+  try {
+    console.log('Initializing Firestore collection...');
+    const postsCollection = collection(db, BLOG_POSTS_COLLECTION);
+    console.log('Collection initialized:', postsCollection);
+    
+    const postWithTimestamps = {
+      ...postData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+    
+    console.log('Attempting to add document with data:', {
+      ...postWithTimestamps,
+      content: postWithTimestamps.content ? `${postWithTimestamps.content.substring(0, 30)}...` : 'empty'
+    });
+    
+    const docRef = await addDoc(postsCollection, postWithTimestamps);
+    console.log('Document created with ID:', docRef.id);
+    
+    return { id: docRef.id, success: true };
+  } catch (error) {
+    console.error('Error in createBlogPost:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      code: (error as any)?.code,
+      status: (error as any)?.status
+    });
+    throw new Error(`Failed to create blog post: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateBlogPost(

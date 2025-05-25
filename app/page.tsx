@@ -11,6 +11,7 @@ import Comments from "@/components/Comments";
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
 import { Testimonials } from "@/components/Testimonials";
+import Experience from "@/components/Experience";
 
 
 
@@ -46,6 +47,7 @@ export default function Home() {
           <Hero />
           <Projects />
           <Skills />
+          <Experience />
           <Services />
           <Testimonials />
           <Comments />

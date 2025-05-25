@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 
@@ -15,12 +15,14 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signInWithGoogle, user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams?.get('callbackUrl') || '/';
 
   useEffect(() => {
     if (user) {
-      router.push('/');
+      router.push(callbackUrl);
     }
-  }, [user, router]);
+  }, [user, router, callbackUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ export default function SignIn() {
       setError('');
       setIsLoading(true);
       await signIn(email, password);
-      router.push('/');
+      router.push(callbackUrl);
     } catch (err: any) {
       let errorMessage = 'Failed to sign in';
       if (err?.code === 'auth/invalid-credential') {
@@ -52,7 +54,7 @@ export default function SignIn() {
       setError('');
       setIsLoading(true);
       await signInWithGoogle();
-      router.push('/');
+      router.push(callbackUrl);
     } catch (err: any) {
       let errorMessage = 'Failed to sign in with Google';
       if (err?.code === 'auth/popup-closed-by-user') {

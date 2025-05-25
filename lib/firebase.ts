@@ -58,7 +58,7 @@ const initializeFirebase = () => {
 initializeFirebase();
 
 // Export initialized services
-export { auth, db, storage, googleProvider };
+export { auth, db, storage, googleProvider, firebaseApp as app };
 
 // Test Firestore connection
 async function testConnection() {

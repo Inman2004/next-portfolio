@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { SessionProvider } from 'next-auth/react';
 import { AuthProvider } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import emailjs from '@emailjs/browser';
@@ -27,11 +28,13 @@ export default function Providers({
   }, []);
 
   return (
-    <AuthProvider>
-      <Header />
-      <main>
-        {children}
-      </main>
-    </AuthProvider>
+    <SessionProvider>
+      <AuthProvider>
+        <Header />
+        <main>
+          {children}
+        </main>
+      </AuthProvider>
+    </SessionProvider>
   );
-} 
+}

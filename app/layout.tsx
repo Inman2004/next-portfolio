@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Pacifico } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import { PageLoadingProvider } from "@/components/providers/page-loading-provider";
 import Header from "@/components/Header";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +15,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const pacifico = Pacifico({
+  weight: '400',
+  subsets: ["latin"],
+  variable: '--font-pacifico',
 });
 
 export const metadata: Metadata = {
@@ -39,14 +48,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} antialiased`} suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
       </head>
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-gradient-to-b from-gray-950 to-black text-white`}>
         <Providers>
-          <Header />
-          {children}
+          <PageLoadingProvider>
+            <ErrorBoundary>
+              <Header />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: '#1f2937',
+                    color: '#fff',
+                    borderRadius: '0.5rem',
+                    padding: '1rem',
+                  },
+                }}
+              />
+              <main className="min-h-screen">
+                {children}
+              </main>
+            </ErrorBoundary>
+          </PageLoadingProvider>
         </Providers>
       </body>
     </html>

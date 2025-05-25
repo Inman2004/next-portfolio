@@ -3,6 +3,55 @@ import { useState, useEffect } from 'react';
 import { Github, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
+// Technology to color mapping
+const getTechColor = (tech: string) => {
+  const techLower = tech.toLowerCase();
+  
+  // Frontend
+  if (techLower.includes('html')) return { bg: 'bg-orange-500/10', text: 'text-orange-300' };
+  if (techLower.includes('css')) return { bg: 'bg-blue-500/10', text: 'text-blue-400' };
+  
+  // Frontend Frameworks
+  if (techLower.includes('react')) return { bg: 'bg-cyan-500/10', text: 'text-cyan-400' };
+  if (techLower.includes('next') || techLower.includes('next.js')) return { bg: 'bg-zinc-500/10 dark:bg-white/10', text: 'text-zinc-200 dark:text-white' };
+  if (techLower.includes('vue')) return { bg: 'bg-green-500/10', text: 'text-green-400' };
+  if (techLower.includes('angular')) return { bg: 'bg-red-500/10', text: 'text-red-400' };
+  if (techLower.includes('svelte')) return { bg: 'bg-orange-500/10', text: 'text-orange-400' };
+  if (techLower.includes('tailwind')) return { bg: 'bg-sky-500/10', text: 'text-sky-400' };
+  
+  // Backend
+  if (techLower.includes('node')) return { bg: 'bg-lime-500/10', text: 'text-lime-400' };
+  if (techLower.includes('express')) return { bg: 'bg-gray-500/10', text: 'text-gray-300' };
+  if (techLower.includes('php')) return { bg: 'bg-purple-500/10', text: 'text-purple-400' };
+  if (techLower.includes('laravel')) return { bg: 'bg-red-500/10', text: 'text-red-400' };
+  if (techLower.includes('django')) return { bg: 'bg-emerald-500/10', text: 'text-emerald-400' };
+  if (techLower.includes('flask')) return { bg: 'bg-pink-500/10', text: 'text-pink-400' };
+  if (techLower.includes('firebase')) return { bg: 'bg-amber-600/10', text: 'text-amber-600' };
+  
+  
+  
+  // Databases
+  if (techLower.includes('mysql') || techLower.includes('postgres')) return { bg: 'bg-yellow-500/10', text: 'text-yellow-400' };
+  if (techLower.includes('mongo')) return { bg: 'bg-green-500/10', text: 'text-green-400' };
+  if (techLower.includes('redis')) return { bg: 'bg-red-500/10', text: 'text-red-400' };
+  
+  // Languages
+  if (techLower.includes('typescript') || techLower.includes('ts')) return { bg: 'bg-blue-600/10', text: 'text-blue-600' };
+  if (techLower.includes('javascript') || techLower.includes('js')) return { bg: 'bg-yellow-500/10', text: 'text-yellow-400' };
+  if (techLower.includes('python')) return { bg: 'bg-yellow-500/10', text: 'text-yellow-400' };
+  if (techLower.includes('java')) return { bg: 'bg-orange-500/10', text: 'text-orange-400' };
+  
+  // Tools & Others
+  if (techLower.includes('docker')) return { bg: 'bg-blue-500/10', text: 'text-blue-400' };
+  if (techLower.includes('git')) return { bg: 'bg-rose-500/10', text: 'text-rose-400' };
+  if (techLower.includes('vapi') || techLower.includes('api')) return { bg: 'bg-emerald-500/10', text: 'text-emerald-400' };
+  if (techLower.includes('framer')) return { bg: 'bg-pink-500/10', text: 'text-pink-400' };
+  if (techLower.includes('vercel')) return { bg: 'bg-zinc-500/10', text: 'text-zinc-300' };
+  
+  // Default
+  return { bg: 'bg-gray-500/10', text: 'text-gray-400' };
+};
+
 interface Project {
   title: string;
   description: string;
@@ -34,17 +83,33 @@ const projects: Project[] = [
     description: "A modern e-commerce platform with advanced filtering, search, and payment integration.",
     technologies: ["React.js", "PHP", "MySql", "Styled Components"],
     github: "https://github.com/Inman2004/ecommerce",
-    live: "https://nykaa-immanuvel.vercel.app",
+    live: "",
     images: ["/images/projects/ecommerce-1.png", "/images/projects/ecommerce-2.png", "/images/projects/ecommerce-3.png", "/images/projects/ecommerce-4.png"]
   },
   {
     title: "Data Handler",
     description: "A full-stack web interface that allows users to upload and display a CSV file. Features include filtering by date and restaurant name, displaying data in a responsive table, a mock email send feature for recruiters, and download and delete functionalities.",
-    technologies: ["Next.js", "Python", "Flask", "Pandas"],
+    technologies: ["Next.js", "Python", "Flask", "Pandas","MongoDB"],
     github: "https://github.com/Inman2004/assinment-data-handler",
-    live: "https://data-handler.vercel.app",
+    live: "",
     images: ["/images/projects/dh.png", "/images/projects/dh2.png", "/images/projects/dh3.png"]
-  }
+  },
+  {
+    title: "A Slot Machine Game",
+    description: "A slot machine game built with HTML, CSS, and JavaScript. simple playground for me to practice my js skills",
+    technologies: ["HTML", "CSS", "JavaScript"],
+    github: "https://github.com/Inman2004/slot-machine-js",
+    live: "https://slot-machine-js.vercel.app",
+    images: ["/images/projects/sl.png", "/images/projects/sl2.png", "/images/projects/sl3.png"]
+  },
+  {
+    title: "My First Portfolio",
+    description: "My first personal portfolio built using HTML, CSS, and JavaScript. It showcases my projects, skills, and contact information with a clean, responsive design. Firebase powers the backend functionalities, including contact form submissions and hosting.",
+    technologies: ["HTML", "CSS", "JavaScript", "Firebase","Vercel","Git","CI/CD"],
+    github: "https://github.com/Inman2004/My-Portfolio",
+    live: "https://rvimman.vercel.app",
+    images: ["/images/projects/port.png", "/images/projects/port2.png", "/images/projects/port3.png"]
+  },
 ];
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
@@ -184,14 +249,17 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           </p>
           
           <div className="flex flex-wrap gap-2">
-            {project.technologies.map((tech, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 text-sm font-medium bg-blue-500/10 text-blue-400 rounded-full"
-              >
-                {tech}
-              </span>
-            ))}
+            {project.technologies.map((tech, i) => {
+              const { bg, text } = getTechColor(tech);
+              return (
+                <span
+                  key={i}
+                  className={`px-3 py-1 text-sm font-medium rounded-full ${bg} ${text}`}
+                >
+                  {tech}
+                </span>
+              );
+            })}
           </div>
 
           <div className="flex gap-4 pt-2">
@@ -205,6 +273,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                 whileTap={{ scale: 0.95 }}
               >
                 <Github className="w-6 h-6" />
+                <span className="sr-only">GitHub</span>
               </motion.a>
             )}
             {project.live && (
@@ -217,6 +286,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                 whileTap={{ scale: 0.95 }}
               >
                 <ExternalLink className="w-6 h-6" />
+                <span className="sr-only">Live</span>
               </motion.a>
             )}
           </div>

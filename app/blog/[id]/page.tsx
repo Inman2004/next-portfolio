@@ -1,25 +1,21 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
-import { useParams, notFound, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Fragment } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { User } from 'firebase/auth';
 import { PostData } from '@/types';
-import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Crown, Edit } from 'lucide-react';
+import { Crown, Edit, Eye, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { auth } from '@/lib/firebase';
-
-interface Author {
-  id: string;
-  name: string;
-  photoURL?: string;
-}
+import Image from 'next/image';
+import { incrementViewCount, getViewCount } from '@/lib/views';
+import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface PostPageProps {
   params: Promise<{
@@ -37,22 +33,23 @@ export default function PostPage({ params }: PostPageProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [paramsResolved, setParamsResolved] = useState(false);
+  const [postId, setPostId] = useState<string | null>(null);
+  const [views, setViews] = useState<number>(0);
 
+  // Resolve the async params
   useEffect(() => {
     const resolveParams = async () => {
       try {
         const resolvedParams = await params;
+        setPostId(resolvedParams.id);
         setParamsResolved(true);
-        return resolvedParams.id;
-      } catch (error) {
+      } catch (err) {
         setError('Failed to load post parameters');
-        return null;
+        setLoading(false);
       }
     };
     resolveParams();
   }, [params]);
-
-  const id = paramsResolved ? use(params).id : null;
 
   const handleDelete = () => {
     if (!post) {
@@ -73,8 +70,8 @@ export default function PostPage({ params }: PostPageProps) {
       await deleteDoc(doc(db, 'blogPosts', post.id));
       toast.success('Post deleted successfully');
       router.push('/blog');
-    } catch (error) {
-      console.error('Error deleting post:', error);
+    } catch (err) {
+      console.error('Error deleting post:', err);
       toast.error('Failed to delete post');
     } finally {
       setIsDeleting(false);
@@ -85,26 +82,67 @@ export default function PostPage({ params }: PostPageProps) {
     setIsConfirmOpen(false);
   };
 
+  // Track views
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
+    if (!postId) return;
+    
+    const trackView = async () => {
+      try {
+        const newViewCount = await incrementViewCount(postId);
+        setViews(prev => prev || newViewCount);
+      } catch (error) {
+        console.error('Error tracking view:', error);
+      }
+    };
+    
+    // Track view when component mounts
+    trackView();
+    
+    // Set up real-time updates for view count
+    const viewRef = doc(db, 'post_views', postId);
+    const unsubscribeView = onSnapshot(viewRef, (doc) => {
+      if (doc.exists()) {
+        setViews(doc.data().count || 0);
+      }
     });
-
-    return () => unsubscribe();
-  }, []);
-
+    
+    // Initial view count fetch
+    const fetchInitialViews = async () => {
+      try {
+        const initialViews = await getViewCount(postId);
+        setViews(initialViews);
+      } catch (error) {
+        console.error('Error fetching initial view count:', error);
+      }
+    };
+    
+    fetchInitialViews();
+    
+    return () => {
+      unsubscribeView();
+    };
+  }, [postId]);
+  
+  // Single effect for auth state and post fetching
   useEffect(() => {
-    if (!id) {
-      setError('Invalid post ID');
-      return;
-    }
+    if (!postId) return;
+    
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      setUser(currentUser);
+      
+      if (currentUser) {
+        // Set admin status based on user email
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
+        if (currentUser.email === adminEmail) {
+          setIsAdmin(true);
+        }
+      }
 
-    const fetchPost = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const postRef = doc(db, 'blogPosts', id);
+        const postRef = doc(db, 'blogPosts', postId);
         const postDoc = await getDoc(postRef);
 
         if (!postDoc.exists()) {
@@ -113,52 +151,29 @@ export default function PostPage({ params }: PostPageProps) {
         }
 
         const postData: PostData = {
-          id: id,
+          id: postDoc.id,
           title: postDoc.data().title || '',
           content: postDoc.data().content || '',
           author: {
-            id: postDoc.data().author?.id || '',
-            name: postDoc.data().author?.name || '',
-            photoURL: postDoc.data().author?.photoURL || '',
+            id: postDoc.data().authorId || postDoc.data().author?.id || '',
+            name: postDoc.data().author || postDoc.data().author?.name || '',
+            photoURL: postDoc.data().authorPhotoURL || postDoc.data().author?.photoURL || '',
           },
           createdAt: postDoc.data().createdAt,
-          image: postDoc.data().image
+          coverImage: postDoc.data().coverImage || postDoc.data().image
         };
 
         setPost(postData);
-      } catch (error) {
-        console.error('Error fetching post:', error);
+      } catch (err) {
+        console.error('Error fetching post:', err);
         setError('Failed to load post');
       } finally {
         setLoading(false);
       }
-    };
+    });
 
-    fetchPost();
-  }, [id, user]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-red-500 text-center">
-          <h2 className="text-2xl mb-4">Error</h2>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!post) {
-    return null;
-  }
+    return () => unsubscribe();
+  }, [postId]);
 
   // Format date for display
   const formatCreatedAt = (date: Date | { toDate: () => Date } | undefined) => {
@@ -167,136 +182,11 @@ export default function PostPage({ params }: PostPageProps) {
     return format(dateObj, 'MMMM d, yyyy');
   };
 
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!id) {
-      setError('Invalid post ID');
-      return;
-    }
-
-    const fetchPost = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const postRef = doc(db, 'blogPosts', id);
-        const postDoc = await getDoc(postRef);
-
-        if (!postDoc.exists()) {
-          setError('Post not found');
-          return;
-        }
-
-        const postData: PostData = {
-          id: id,
-          title: postDoc.data().title || '',
-          content: postDoc.data().content || '',
-          author: {
-            id: postDoc.data().author?.id || '',
-            name: postDoc.data().author?.name || '',
-            photoURL: postDoc.data().author?.photoURL || '',
-          },
-          createdAt: postDoc.data().createdAt,
-          image: postDoc.data().image
-        };
-
-        setPost(postData);
-      } catch (error) {
-        console.error('Error fetching post:', error);
-        setError('Failed to load post');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id, user]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-red-500 text-center">
-          <h2 className="text-2xl mb-4">Error</h2>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!post) {
-    return null;
-  }
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!id) {
-      setError('Invalid post ID');
-      return;
-    }
-
-    const fetchPost = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const postRef = doc(db, 'blogPosts', id);
-        const postDoc = await getDoc(postRef);
-
-        if (!postDoc.exists()) {
-          setError('Post not found');
-          return;
-        }
-
-        const postData: PostData = {
-          id: id,
-          title: postDoc.data().title || '',
-          content: postDoc.data().content || '',
-          author: {
-            id: postDoc.data().author?.id || '',
-            name: postDoc.data().author?.name || '',
-            photoURL: postDoc.data().author?.photoURL || '',
-          },
-          createdAt: postDoc.data().createdAt,
-          image: postDoc.data().image
-        };
-        
-        setPost(postData);
-        setIsAdmin(user?.email === 'your-admin-email@example.com');
-
-        setPost(postData);
-      } catch (error) {
-        console.error('Error fetching post:', error);
-        setError('Failed to load post');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id, user]);
+  const getPostDateTime = (date: Date | { toDate: () => Date } | undefined) => {
+    if (!date) return '';
+    const dateObj = date instanceof Date ? date : date.toDate();
+    return dateObj.toISOString();
+  };
 
   if (loading) {
     return (
@@ -322,25 +212,44 @@ export default function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-x-hidden">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-x-hidden w-full">
+      <div className="pt-24 px-6 max-w-4xl mx-auto">
+        <Link 
+          href="/blog" 
+          className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Blog
+        </Link>
         <motion.article 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-gray-700/50"
+          className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-700/50"
         >
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
             <div className="flex items-center gap-4">
-              <img
-                src={post.author.photoURL || '/default-avatar.png'}
-                alt={`${post.author.name}'s avatar`}
-                className="w-12 h-12 rounded-full object-cover"
-              />
+              <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                <Image
+                  src={post.author.photoURL || '/default-avatar.png'}
+                  alt={`${post.author.name}'s avatar`}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                  priority
+                />
+              </div>
               <div>
                 <h1 className="text-3xl font-bold mb-1">{post.title}</h1>
-                <p className="text-gray-400">
-                  By {post.author.name} • {formatCreatedAt(post.createdAt)}
-                </p>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                  <span>By {post.author.name}</span>
+                  <span>•</span>
+                  <span>{formatCreatedAt(post.createdAt)}</span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    {views.toLocaleString()} {views === 1 ? 'view' : 'views'}
+                  </span>
+                </div>
               </div>
             </div>
             {user?.uid === post.author.id && (
@@ -373,19 +282,24 @@ export default function PostPage({ params }: PostPageProps) {
             )}
           </div>
 
-          {post.image && (
-            <div className="relative mb-6">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full rounded-lg shadow-xl"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+          {post.coverImage && (
+            <div className="relative mb-8 -mx-6 md:-mx-8 -mt-6 md:-mt-8">
+              <div className="relative w-full h-64 md:h-96">
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  fill
+                  className="object-cover rounded-t-lg md:rounded-t-2xl shadow-xl"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  priority
+                />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent" />
             </div>
           )}
 
-          <div className="prose prose-invert max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div className="mt-8">
+            <MarkdownViewer content={post.content || ''} className="max-w-4xl mx-auto" />
           </div>
         </motion.article>
       </div>
@@ -397,7 +311,7 @@ export default function PostPage({ params }: PostPageProps) {
         message="Are you sure you want to delete this post? This action cannot be undone."
       />
       <motion.div
-        className="mt-16 pt-8 border-t border-gray-700/50 flex justify-between items-center"
+        className="mt-16 pt-8 pb-12 px-4 border-t border-gray-700/50 flex flex-col sm:flex-row justify-between items-center gap-4 max-w-4xl mx-auto"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}

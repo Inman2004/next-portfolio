@@ -40,7 +40,7 @@ export function CssDotPattern({
   width = 16,
   height = 16,
   dotSize = 1,
-  color = "rgba(163, 13, 163, 0.9)",
+  color = "rgba(163, 13, 163, 0.3)",
   className,
   style,
   glow = false,

@@ -84,7 +84,7 @@ export default function Hero() {
             </div>
             <div className="flex">
               <Quote className="lg:text-4xl text-pink-400 animate-pulse sm:text-lg max-w-2xl mx-auto lg:mx-0" />
-              <p className="px-4 py-2 italic lg:text-lg rounded-full bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-300 sm:text-sm my-2 max-w-2xl mx-auto lg:mx-0">
+              <p className="px-4 py-2 font-pacifico lg:text-lg rounded-full bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-300 sm:text-sm my-2 max-w-2xl mx-auto lg:mx-0" style={{ fontFamily: 'var(--font-pacifico)', fontWeight: 100, filter: 'contrast(0.9) brightness(1.1)' }}>
                 {quote?.quote || "Hard work is worthless for those that don't believe in themselves."}
               </p>
             </div>
