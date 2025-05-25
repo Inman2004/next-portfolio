@@ -11,25 +11,43 @@ import { Quote } from "lucide-react";
 
 export default function Hero() {
   const [quote, setQuote] = React.useState<{quote: string, author: string} | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     // Only fetch if not already in sessionStorage
-    const storedQuote = sessionStorage.getItem("hero_quote");
+    const storedQuote = sessionStorage.getItem("motivational_quote");
     if (storedQuote) {
       setQuote(JSON.parse(storedQuote));
+      setIsLoading(false);
       return;
     }
-    const fetchQuotes = async () => {
+    
+    const fetchQuote = async () => {
       try {
-        const response = await fetch("https://dummyjson.com/quotes/random");
+        const response = await fetch("https://api.quotable.io/random?tags=technology|famous-quotes|inspirational");
+        if (!response.ok) throw new Error('Failed to fetch quote');
+        
         const data = await response.json();
-        setQuote(data);
-        sessionStorage.setItem("hero_quote", JSON.stringify(data));
+        const formattedQuote = {
+          quote: data.content,
+          author: data.author
+        };
+        
+        setQuote(formattedQuote);
+        sessionStorage.setItem("motivational_quote", JSON.stringify(formattedQuote));
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching quote:", error);
+        // Fallback to default quote
+        setQuote({
+          quote: "The only way to learn a new programming language is by writing programs in it.",
+          author: "Dennis Ritchie"
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchQuotes();
+    
+    fetchQuote();
   }, []);
 
   return (
@@ -82,15 +100,24 @@ export default function Hero() {
                 className="text-center lg:text-left !h-[160px]"
               />
             </div>
-            <div className="flex">
-              <Quote className="lg:text-4xl text-pink-400 animate-pulse sm:text-lg max-w-2xl mx-auto lg:mx-0" />
-              <p className="px-4 py-2 font-pacifico lg:text-lg rounded-full bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-300 sm:text-sm my-2 max-w-2xl mx-auto lg:mx-0" style={{ fontFamily: 'var(--font-pacifico)', fontWeight: 100, filter: 'contrast(0.9) brightness(1.1)' }}>
-                {quote?.quote || "Hard work is worthless for those that don't believe in themselves."}
+            <div className="mb-2">
+              <p className="text-sm text-blue-300/80 mb-1 ml-2 font-livvic" style={{ fontFamily: 'var(--font-livvic)' }}>
+                A quote for you
+              </p>
+              <div className="flex">
+                <Quote className="lg:text-4xl text-pink-400 animate-pulse sm:text-lg max-w-2xl mx-auto lg:mx-0" />
+                <p className="px-4 py-2 font-livvic text-2xl lg:text-3xl font-medium tracking-tight rounded-full bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-200 my-2 max-w-2xl mx-auto lg:mx-0" style={{ fontFamily: 'var(--font-livvic)', filter: 'contrast(0.9) brightness(1.1)' }}>
+                  {isLoading ? (
+                    <span className="inline-block h-6 w-full animate-pulse bg-purple-700/20 rounded"></span>
+                  ) : quote?.quote || "The only way to learn a new programming language is by writing programs in it."}
+                </p>
+              </div>
+              <p className="text-right relative text-md text-pink-300/60 mb-4 mx-9" style={{ fontFamily: 'var(--font-livvic)', fontWeight: 500, filter: 'contrast(0.9) brightness(1.1)' }}>
+                - {isLoading ? (
+                    <span className="inline-block h-4 w-24 bg-purple-700/20 rounded animate-pulse"></span>
+                  ) : quote?.author || "Dennis Ritchie"}
               </p>
             </div>
-            <p className=" text-right relative text-md text-pink-300/60 italic mb-4 mx-9">
-              - {quote?.author || "Naruto Uzumaki"}
-            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <motion.a
                 href="#projects"

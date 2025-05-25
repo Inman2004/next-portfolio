@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Pacifico } from "next/font/google";
+import { Geist, Geist_Mono, Livvic } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { PageLoadingProvider } from "@/components/providers/page-loading-provider";
 import Header from "@/components/Header";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Toaster } from 'react-hot-toast';
-import dynamic from 'next/dynamic';
+// Local font imports
+import { stoicScript } from './fonts';
 
 // Import the client component directly
 import WelcomePopup from '@/components/WelcomePopupClient';
@@ -21,11 +22,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const pacifico = Pacifico({
-  weight: '400',
-  subsets: ["latin"],
-  variable: '--font-pacifico',
+const livvic = Livvic({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-livvic',
 });
+
+// Stoic Script font is imported from local files
 
 export const metadata: Metadata = {
   title: "Immanuvel",
@@ -52,11 +55,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} antialiased`} suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} font-sans bg-gray-950 text-white min-h-screen`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} font-sans bg-gray-950 text-white min-h-screen`}>
         <ErrorBoundary>
           <PageLoadingProvider>
             <Providers>
