@@ -49,11 +49,29 @@ export const metadata: Metadata = {
   },
 };
 
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  // This component will be rendered on the client side
+  return (
+    <PageLoadingProvider>
+      <Providers>
+        <Header />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <WelcomePopup />
+        <Toaster position="bottom-center" />
+      </Providers>
+    </PageLoadingProvider>
+  );
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isNotFound = typeof window !== 'undefined' && window.location.pathname === '/404';
+  
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} antialiased`} suppressHydrationWarning>
       <head>
@@ -61,16 +79,19 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} font-sans bg-gray-950 text-white min-h-screen`}>
         <ErrorBoundary>
-          <PageLoadingProvider>
+          {isNotFound ? (
             <Providers>
               <Header />
               <main className="min-h-screen">
                 {children}
               </main>
-              <WelcomePopup />
               <Toaster position="bottom-center" />
             </Providers>
-          </PageLoadingProvider>
+          ) : (
+            <LayoutContent>
+              {children}
+            </LayoutContent>
+          )}
         </ErrorBoundary>
       </body>
     </html>
