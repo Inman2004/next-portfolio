@@ -1,54 +1,134 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { MorphingText } from "@/components/magicui/morphing-text";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { SiGmail } from "react-icons/si";
-import React from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Quote } from "lucide-react";
 
-export default function Hero() {
-  const [quote, setQuote] = React.useState<{quote: string, author: string} | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+interface QuoteType {
+  quote: string;
+  author: string;
+}
 
-  React.useEffect(() => {
-    // Only fetch if not already in sessionStorage
-    const storedQuote = sessionStorage.getItem("motivational_quote");
-    if (storedQuote) {
-      setQuote(JSON.parse(storedQuote));
-      setIsLoading(false);
-      return;
-    }
+export default function Hero() {
+  const [localQuotes, setLocalQuotes] = useState<QuoteType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [quote, setQuote] = useState<QuoteType | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const quoteRef = useRef<HTMLDivElement>(null);
+  const hasFetchedRef = useRef(false);
+
+  const fetchQuotes = useCallback(async () => {
+    // Prevent multiple simultaneous fetches
+    if (hasFetchedRef.current) return;
     
-    const fetchQuote = async () => {
-      try {
-        const response = await fetch("https://api.quotable.io/random?tags=technology|famous-quotes|inspirational");
-        if (!response.ok) throw new Error('Failed to fetch quote');
-        
-        const data = await response.json();
-        const formattedQuote = {
-          quote: data.content,
-          author: data.author
-        };
-        
-        setQuote(formattedQuote);
-        sessionStorage.setItem("motivational_quote", JSON.stringify(formattedQuote));
-      } catch (error) {
-        console.error("Error fetching quote:", error);
-        // Fallback to default quote
-        setQuote({
-          quote: "The only way to learn a new programming language is by writing programs in it.",
-          author: "Dennis Ritchie"
-        });
-      } finally {
-        setIsLoading(false);
+    try {
+      hasFetchedRef.current = true;
+      const response = await fetch('/api/quotes');
+      if (!response.ok) throw new Error('Failed to fetch quotes');
+      const data = await response.json();
+      
+      setLocalQuotes(prevQuotes => {
+        // Only update if quotes have changed
+        if (JSON.stringify(prevQuotes) === JSON.stringify(data)) {
+          return prevQuotes;
+        }
+        return data;
+      });
+      
+      // Set initial quote if not set or if quotes changed
+      if (data.length > 0 && (!quote || !localQuotes.some(q => q.quote === quote.quote && q.author === quote.author))) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        setQuote(data[randomIndex]);
       }
-    };
+      
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to load quotes:", error);
+      // Fallback to local quotes in case of error
+      const fallbackQuotes = [
+        {
+          quote: "The only way to do great work is to love what you do.",
+          author: "Steve Jobs"
+        },
+        {
+          quote: "Innovation distinguishes between a leader and a follower.",
+          author: "Steve Jobs"
+        }
+      ];
+      
+      setLocalQuotes(prevQuotes => 
+        prevQuotes.length > 0 ? prevQuotes : fallbackQuotes
+      );
+      
+      if (!quote && fallbackQuotes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * fallbackQuotes.length);
+        setQuote(fallbackQuotes[randomIndex]);
+      }
+      
+      setIsLoading(false);
+    } finally {
+      hasFetchedRef.current = false;
+    }
+  }, [quote, localQuotes]);
+
+  useEffect(() => {
+    fetchQuotes();
+  }, [fetchQuotes]);
+
+  // Function to get a new random quote
+  const getNewQuote = useCallback(() => {
+    if (localQuotes.length === 0 || isAnimating) return;
     
-    fetchQuote();
-  }, []);
+    setIsAnimating(true);
+    
+    // Wait for the fade-out animation to complete
+    const timer = setTimeout(() => {
+      const currentIndex = localQuotes.findIndex(q => 
+        q.quote === quote?.quote && q.author === quote?.author
+      );
+      
+      let newIndex;
+      // Ensure we get a different quote if there are multiple quotes
+      if (localQuotes.length > 1) {
+        do {
+          newIndex = Math.floor(Math.random() * localQuotes.length);
+        } while (newIndex === currentIndex);
+      } else {
+        newIndex = 0;
+      }
+      
+      setQuote(localQuotes[newIndex]);
+      // Small delay before allowing next animation
+      setTimeout(() => setIsAnimating(false), 100);
+    }, 500); // Match this with your CSS transition time
+    
+    return () => clearTimeout(timer);
+  }, [localQuotes, quote?.quote, quote?.author, isAnimating]);
+
+  // Set up interval for quote rotation
+  useEffect(() => {
+    if (localQuotes.length === 0 || !quote) return;
+    
+    const interval = setInterval(() => {
+      getNewQuote();
+    }, 30000); // 30 seconds between quotes
+    
+    return () => clearInterval(interval);
+  }, [getNewQuote]);
+  
+  // Set initial quote when localQuotes is loaded
+  useEffect(() => {
+    if (localQuotes.length > 0 && !quote) {
+      const randomIndex = Math.floor(Math.random() * localQuotes.length);
+      setQuote(localQuotes[randomIndex]);
+      setIsLoading(false);
+    }
+  }, [localQuotes, quote]);
 
   return (
     <section
@@ -104,19 +184,54 @@ export default function Hero() {
               <p className="text-sm text-blue-300/80 mb-1 ml-2 font-livvic" style={{ fontFamily: 'var(--font-livvic)' }}>
                 A quote for you
               </p>
-              <div className="flex">
-                <Quote className="lg:text-4xl text-pink-400 animate-pulse sm:text-lg max-w-2xl mx-auto lg:mx-0" />
-                <p className="px-4 py-2 font-livvic text-2xl lg:text-3xl font-medium tracking-tight rounded-full bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-200 my-2 max-w-2xl mx-auto lg:mx-0" style={{ fontFamily: 'var(--font-livvic)', filter: 'contrast(0.9) brightness(1.1)' }}>
-                  {isLoading ? (
-                    <span className="inline-block h-6 w-full animate-pulse bg-purple-700/20 rounded"></span>
-                  ) : quote?.quote || "The only way to learn a new programming language is by writing programs in it."}
-                </p>
+              <div className="w-full max-w-3xl mx-auto space-y-3" ref={quoteRef}>
+                <div className="relative">
+                  <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={quote?.quote || 'loading'}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="flex items-start gap-3"
+                    >
+                      <Quote className="text-pink-400 flex-shrink-0 mt-1" size={24} />
+                      <p className="px-5 py-3 text-lg lg:text-xl leading-relaxed font-medium tracking-normal rounded-xl bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-200 w-full whitespace-normal break-words" 
+                        style={{ 
+                          fontFamily: 'var(--font-pacifico), cursive', 
+                          filter: 'contrast(0.9) brightness(1.1)',
+                          wordSpacing: '0.1em',
+                          letterSpacing: '0.01em'
+                        }}>
+                        {isLoading ? (
+                          <span className="inline-block h-7 w-full animate-pulse bg-purple-700/20 rounded"></span>
+                        ) : quote?.quote || "The only way to learn a new programming language is by writing programs in it."}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                <div className="pr-3">
+                  <AnimatePresence mode="wait">
+                    <motion.p 
+                      key={`author-${quote?.author || 'loading'}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      className="text-right text-pink-300/60 text-sm lg:text-base" 
+                      style={{ 
+                        fontFamily: 'var(--font-pacifico), cursive', 
+                        fontWeight: 500, 
+                        filter: 'contrast(0.9) brightness(1.1)' 
+                      }}
+                    >
+                      - {isLoading ? (
+                        <span className="inline-block h-4 w-24 bg-purple-700/20 rounded animate-pulse"></span>
+                      ) : quote?.author || "Dennis Ritchie"}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
               </div>
-              <p className="text-right relative text-md text-pink-300/60 mb-4 mx-9" style={{ fontFamily: 'var(--font-livvic)', fontWeight: 500, filter: 'contrast(0.9) brightness(1.1)' }}>
-                - {isLoading ? (
-                    <span className="inline-block h-4 w-24 bg-purple-700/20 rounded animate-pulse"></span>
-                  ) : quote?.author || "Dennis Ritchie"}
-              </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <motion.a

@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Toaster } from 'react-hot-toast';
 // Local font imports
-import { stoicScript } from './fonts';
+import { elegantScript, pacifico } from './fonts';
 
 // Import the client component directly
 import WelcomePopup from '@/components/WelcomePopupClient';
@@ -27,8 +27,6 @@ const livvic = Livvic({
   subsets: ['latin'],
   variable: '--font-livvic',
 });
-
-// Stoic Script font is imported from local files
 
 export const metadata: Metadata = {
   title: "Immanuvel",
@@ -55,23 +53,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} ${pacifico.variable} antialiased`} suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} font-sans bg-gray-950 text-white min-h-screen`}>
-        <ErrorBoundary>
-          <PageLoadingProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} ${elegantScript.variable} bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100 min-h-screen flex flex-col`}>
+        <PageLoadingProvider>
+          <ErrorBoundary>
             <Providers>
               <Header />
-              <main className="min-h-screen">
+              <main className="flex-1">
                 {children}
               </main>
               <WelcomePopup />
               <Toaster position="bottom-center" />
             </Providers>
-          </PageLoadingProvider>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </PageLoadingProvider>
       </body>
     </html>
   );
