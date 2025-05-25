@@ -9,7 +9,7 @@ import { formatDate } from '@/lib/utils';
 import { getBlogPosts } from '@/lib/blog';
 import { auth } from '@/lib/firebase';
 import { Crown, Eye, Flame, Clock, ArrowUpDown, Plus } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+// Firebase Auth is already imported via auth from '@/lib/firebase'
 import { toast } from 'react-hot-toast';
 import type { BlogPost } from '@/types/blog';
 import { getViewCount } from '@/lib/views';
@@ -25,16 +25,22 @@ export default function BlogPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const { data: session, status } = useSession();
+  // Firebase auth state is already handled by the user state
   const router = useRouter();
   
   // Redirect to sign-in if not authenticated when trying to access /blog/new
+  // Handle authentication state changes
   useEffect(() => {
-    const currentPath = window.location.pathname;
-    if (status === 'unauthenticated' && currentPath === '/blog/new') {
-      router.push(`/signin?callbackUrl=${encodeURIComponent(currentPath)}`);
-    }
-  }, [status, router]);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      const currentPath = window.location.pathname;
+      if (!user && currentPath === '/blog/new') {
+        router.push(`/signin?callbackUrl=${encodeURIComponent(currentPath)}`);
+      }
+    });
+    
+    return () => unsubscribe();
+  }, [router]);
 
   // Format date for display
   const formatCreatedAt = (date: Date | { toDate: () => Date } | undefined) => {
@@ -85,17 +91,15 @@ export default function BlogPage() {
     const checkAdmin = async () => {
       try {
         if (user) {
-          // Check if user is authenticated with session
-          if (session?.user) {
-            // Example: Check if user's email is in admin list
-            const adminEmails = ['admin@example.com'];
-            const isUserAdmin = adminEmails.includes(session.user.email || '');
-            setIsAdmin(isUserAdmin);
-          } else {
-            // Fallback to Firebase user
-            const token = await user.getIdTokenResult();
-            setIsAdmin(!!token.claims.admin);
-          }
+          // Check if user's email is in admin list
+          const adminEmails = [process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''];
+          const isUserAdmin = adminEmails.includes(user.email || '');
+          
+          // Also check custom claims if needed
+          const token = await user.getIdTokenResult();
+          setIsAdmin(isUserAdmin || !!token.claims.admin);
+        } else {
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error('Error checking admin status:', error);
@@ -103,12 +107,12 @@ export default function BlogPage() {
       }
     };
     
-    if (user || session) {
+    if (user) {
       checkAdmin();
     } else {
       setIsAdmin(false);
     }
-  }, [user, session]);
+  }, [user]);
 
   // Fetch posts and set up auth listener
   useEffect(() => {
@@ -186,7 +190,7 @@ export default function BlogPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100">
       {/* Create Post Button - Floating */}
       <div className="fixed bottom-6 right-6 z-50">
-        {status === 'authenticated' || user ? (
+        {user ? (
           <Link
             href="/blog/new"
             className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors hover:shadow-blue-500/30"
@@ -243,7 +247,7 @@ export default function BlogPage() {
             <p className="text-gray-400 mt-1">Discover the latest articles and tutorials</p>
           </div>
           
-          {(session?.user || user) && (
+          {user && (
             <Link
               href="/blog/new"
               className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"

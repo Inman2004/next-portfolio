@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import type { BlogPost } from '@/types/blog';
@@ -12,31 +11,28 @@ import BlogPostForm from '@/components/BlogPostForm';
 
 const NewBlogPostPage = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
-  const [firebaseUser, setFirebaseUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle both NextAuth and Firebase auth
+  // Handle Firebase auth state
   useEffect(() => {
     const auth = getAuth(app);
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setFirebaseUser(user);
+      setCurrentUser(user);
       setIsLoading(false);
+      
+      // Redirect to sign-in if not authenticated
+      if (!user) {
+        router.push('/signin?callbackUrl=' + encodeURIComponent('/blog/new'));
+      }
     });
 
     return () => unsubscribe();
-  }, []);
-
-  // Redirect to sign-in if not authenticated
-  useEffect(() => {
-    if ((!session && !firebaseUser) && !isLoading) {
-      router.push('/signin?callbackUrl=' + encodeURIComponent('/blog/new'));
-    }
-  }, [session, firebaseUser, isLoading, router]);
+  }, [router]);
 
   // Show loading state while checking authentication
-  if (isLoading || status === 'loading') {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
         <div className="text-center">
@@ -48,18 +44,15 @@ const NewBlogPostPage = () => {
   }
 
   // If not authenticated, show nothing (will be redirected by useEffect)
-  if (!session && !firebaseUser) {
+  if (!currentUser) {
     return null;
   }
-
-  // Get the current user (either from NextAuth or Firebase)
-  const currentUser = session?.user || firebaseUser;
   
   if (!currentUser) {
     return null; // Should be handled by the redirect above, but just in case
   }
 
-  const handleSubmit = async (postData: any) => {
+  const handleSubmit = async (postData: BlogPost) => {
     console.log('=== Starting post creation ===');
     console.log('Current user:', currentUser);
     
@@ -73,15 +66,7 @@ const NewBlogPostPage = () => {
       console.log('Setting isSubmitting to true');
       setIsSubmitting(true);
       
-      // Parse tags from string to array
-      const tags = postData.tags 
-        ? postData.tags
-            .split(',')
-            .map((tag: string) => tag.trim())
-            .filter((tag: string) => tag.length > 0)
-        : [];
-
-      console.log('Parsed tags:', tags);
+      console.log('Post data received:', postData);
 
       // Create a clean post data object with all required fields
       const newPost: Omit<BlogPost, 'id'> = {
@@ -90,12 +75,12 @@ const NewBlogPostPage = () => {
         excerpt: postData.excerpt || '',
         coverImage: postData.coverImage || null,
         author: currentUser.displayName || currentUser.name || 'Anonymous',
-        authorId: currentUser.uid || currentUser.id || 'anonymous',
-        authorPhotoURL: currentUser.photoURL || currentUser.image || null,
+        authorId: currentUser.uid || 'anonymous',
+        authorPhotoURL: currentUser.photoURL || null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         published: postData.published ?? true,
-        tags: tags,
+        tags: Array.isArray(postData.tags) ? postData.tags : [],
         slug: postData.title
           .toLowerCase()
           .replace(/[^\w\s-]/g, '')
