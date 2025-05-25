@@ -1,114 +1,158 @@
 "use client";
-import React, { useState } from "react";
 
-interface MarqueeProps {
-  children: React.ReactNode;
-  className?: string;
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Whether to pause the marquee on hover
+   * @default false
+   */
   pauseOnHover?: boolean;
-  direction?: "left" | "right";
-  speed?: number;
+  /**
+   * Whether to reverse the animation direction
+   * @default false
+   */
+  reverse?: boolean;
+  /**
+   * Optional class name for the marquee container
+   */
+  className?: string;
+  /**
+   * Optional children to render in the marquee
+   */
+  children: React.ReactNode;
 }
 
 /**
- * InlineMarquee Component
- * 
- * A marquee component that uses a global style tag and inline styles
- * for maximum compatibility with any framework.
+ * Marquee component that smoothly scrolls its children horizontally
  */
-export function InlineMarquee({
-  children,
-  className = "",
+export function Marquee({
+  className,
   pauseOnHover = false,
-  direction = "left",
-  speed = 1,
+  reverse = false,
+  children,
+  ...props
 }: MarqueeProps) {
-  const [isPaused, setIsPaused] = useState(false);
-  
-  // Create a unique ID for this instance
-  const id = React.useId().replace(/:/g, "");
-  
-  // Calculate the duration based on speed (inverse relationship)
-  const duration = 25 / speed;
-  
-  // Handle mouse events for pausing
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [contentWidth, setContentWidth] = React.useState(0);
+  const [containerWidth, setContainerWidth] = React.useState(0);
+
+  // Set mounted state to prevent hydration issues
+  React.useEffect(() => {
+    setIsMounted(true);
+    
+    const updateSizes = () => {
+      if (contentRef.current) {
+        setContentWidth(contentRef.current.scrollWidth);
+      }
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    updateSizes();
+    window.addEventListener('resize', updateSizes);
+    
+    return () => {
+      window.removeEventListener('resize', updateSizes);
+    };
+  }, []);
+
   const handleMouseEnter = () => {
     if (pauseOnHover) {
       setIsPaused(true);
     }
   };
-  
+
   const handleMouseLeave = () => {
     if (pauseOnHover) {
       setIsPaused(false);
     }
   };
 
-  // Global style with keyframes
-  const globalStyle = `
-    @keyframes marquee-scroll-left-${id} {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-    
-    @keyframes marquee-scroll-right-${id} {
-      from { transform: translateX(-50%); }
-      to { transform: translateX(0); }
-    }
-  `;
-  
-  // Container and content styles
-  const containerStyle: React.CSSProperties = {
-    position: "relative",
-    overflow: "hidden",
-    width: "100%",
-    maskImage: "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-    WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-    minWidth: "100%",
-    maskSize: "100% 100%",
-    WebkitMaskSize: "100% 100%",
-  };
-  
-  const scrollerStyle: React.CSSProperties = {
-    display: "flex",
-    whiteSpace: "nowrap",
-    padding: "0.75rem 0",
-    willChange: "transform",
-    animation: `marquee-scroll-${direction === "left" ? "left" : "right"}-${id} ${duration}s linear infinite`,
-    animationPlayState: isPaused ? "paused" : "running",
-  };
-  
-  const contentStyle: React.CSSProperties = {
-    display: "flex",
-    flexShrink: 0,
-    gap: "1rem",
-    paddingRight: "1rem",
-    minWidth: "100%",
-    justifyContent: "space-around",
-    textWrap: "wrap",
-  };
+  // Calculate duration based on content and container width
+  const duration = React.useMemo(() => {
+    if (contentWidth === 0 || containerWidth === 0) return 20;
+    const speed = 100; // pixels per second
+    return Math.max(10, (contentWidth + containerWidth) / speed);
+  }, [contentWidth, containerWidth]);
+
+  // Only render the marquee content if mounted to prevent hydration issues
+  if (!isMounted) {
+    return <div ref={containerRef} className={cn("relative overflow-hidden w-full", className)} />;
+  }
 
   return (
-    <>
-      {/* Global style tag with keyframes */}
-      <style dangerouslySetInnerHTML={{ __html: globalStyle }} />
-      
-      <div 
-        className={className}
-        style={containerStyle}
+    <div
+      ref={containerRef}
+      className={cn("relative overflow-hidden w-full", className)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      {...props}
+    >
+      <div
+        ref={contentRef}
+        className={cn(
+          "flex flex-nowrap gap-8 w-max",
+          reverse ? "animate-marquee-reverse" : "animate-marquee",
+          isPaused && "[animation-play-state:paused]"
+        )}
+        style={{
+          '--duration': `${duration}s`,
+          transition: 'all 0.3s ease-in-out',
+        } as React.CSSProperties}
       >
-        <div
-          style={scrollerStyle}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div style={contentStyle}>
-            {children}
+        {React.Children.map(children, (child, i) => (
+          <div key={`item-${i}`} className="flex-shrink-0">
+            {child}
           </div>
-          <div style={contentStyle}>
-            {children}
+        ))}
+        {React.Children.map(children, (child, i) => (
+          <div key={`item-${i}-duplicate`} className="flex-shrink-0" aria-hidden="true">
+            {child}
           </div>
-        </div>
+        ))}
       </div>
-    </>
+    </div>
   );
 }
+
+// Add global styles for the marquee animations
+const MarqueeStyles = () => (
+  <style jsx global>{`
+    @keyframes marquee {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(calc(-50% - 2rem));
+      }
+    }
+    @keyframes marquee-reverse {
+      0% {
+        transform: translateX(calc(-50% - 2rem));
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+    .animate-marquee {
+      animation: marquee var(--duration, 60s) linear infinite;
+      animation-play-state: running;
+    }
+    .animate-marquee-reverse {
+      animation: marquee-reverse var(--duration, 60s) linear infinite;
+      animation-play-state: running;
+    }
+    [animation-play-state="paused"] {
+      animation-play-state: paused !important;
+    }
+  `}</style>
+);
+
+// Export the Marquee component and its styles
+export { Marquee as InlineMarquee, MarqueeStyles };

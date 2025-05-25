@@ -301,7 +301,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
 
 const Projects = () => {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
+    <div id="projects" className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 -mt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

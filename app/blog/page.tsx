@@ -6,10 +6,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatDate } from '@/lib/utils';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 import { getBlogPosts } from '@/lib/blog';
-import { auth } from '@/lib/firebase';
 import { Crown, Eye, Flame, Clock, ArrowUpDown, Plus } from 'lucide-react';
-// Firebase Auth is already imported via auth from '@/lib/firebase'
 import { toast } from 'react-hot-toast';
 import type { BlogPost } from '@/types/blog';
 import { getViewCount } from '@/lib/views';
@@ -21,26 +21,44 @@ export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState(auth.currentUser);
+  const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  // Firebase auth state is already handled by the user state
   const router = useRouter();
+  const auth = getAuth(app);
   
-  // Redirect to sign-in if not authenticated when trying to access /blog/new
-  // Handle authentication state changes
+  // Handle authentication state changes and admin check
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       const currentPath = window.location.pathname;
+      
+      // Redirect to sign-in if not authenticated when trying to access /blog/new
       if (!user && currentPath === '/blog/new') {
         router.push(`/signin?callbackUrl=${encodeURIComponent(currentPath)}`);
+      }
+      
+      // Check if user is admin
+      if (user) {
+        // Replace with your admin check logic (e.g., check custom claims)
+        const checkAdmin = async () => {
+          try {
+            const idTokenResult = await user.getIdTokenResult();
+            setIsAdmin(!!idTokenResult.claims.admin);
+          } catch (error) {
+            console.error('Error checking admin status:', error);
+            setIsAdmin(false);
+          }
+        };
+        checkAdmin();
+      } else {
+        setIsAdmin(false);
       }
     });
     
     return () => unsubscribe();
-  }, [router]);
+  }, [auth, router]);
 
   // Format date for display
   const formatCreatedAt = (date: Date | { toDate: () => Date } | undefined) => {
@@ -159,7 +177,7 @@ export default function BlogPage() {
     return dateObj.toISOString();
   };
 
-  if (status === 'loading' || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen pt-24 px-6">
         <div className="max-w-4xl mx-auto flex flex-col items-center justify-center">
@@ -341,7 +359,7 @@ export default function BlogPage() {
             <div className="text-6xl mb-4">📝</div>
             <h3 className="text-2xl font-semibold text-gray-200 mb-2">No Posts Yet</h3>
             <p className="text-gray-400 max-w-md mx-auto mb-6">Be the first to share your thoughts and start the conversation!</p>
-            {(session?.user || user) ? (
+            {user ? (
               <Link 
                 href="/blog/new"
                 className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors"

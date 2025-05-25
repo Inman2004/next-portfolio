@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { InlineMarquee } from "@/components/magicui/marquee";
+import { InlineMarquee, MarqueeStyles } from "@/components/magicui/marquee";
 import Image from "next/image";
 import { motion } from 'framer-motion';
 
@@ -82,29 +82,34 @@ const ReviewCard = ({
   );
 };
 
-export function Testimonials() {
-  return (<>
-    <div className="flex flex-col items-center justify-center mb-10">
-      <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-        Certifications
-      </h2>
-      <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
-        This showcase my certifications and skills.
-      </p>
+export default function Testimonials() {
+  return (
+    <div id="testimonials" className="py-16 -mt-20 pt-32">
+      <MarqueeStyles />
+      <div className="flex flex-col items-center justify-center mb-10">
+        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+          Certifications
+        </h2>
+        <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
+          This showcase my certifications and skills.
+        </p>
       </div>
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden mb-20">
-      <InlineMarquee pauseOnHover className="[--duration:20s]">
-        {firstRow.map((award) => (
-          <ReviewCard key={award.name} {...award} />
-        ))}
-      </InlineMarquee>
-      <InlineMarquee direction="right" pauseOnHover className="[--duration:20s]">
-        {secondRow.map((award) => (
-          <ReviewCard key={award.name} {...award} />
-        ))}
-      </InlineMarquee>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-black-to-r from-black"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-black-to-l from-black"></div>
+      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden mb-20">
+        <div className="w-full">
+          <InlineMarquee pauseOnHover className="[--duration:60s] py-4">
+            {firstRow.map((award, index) => (
+              <ReviewCard key={`${award.name}-${index}`} {...award} />
+            ))}
+          </InlineMarquee>
+          <InlineMarquee reverse pauseOnHover className="[--duration:60s] py-4">
+            {secondRow.map((award, index) => (
+              <ReviewCard key={`${award.name}-${index}-2`} {...award} />
+            ))}
+          </InlineMarquee>
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent z-10"></div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent z-10"></div>
+      </div>
     </div>
-  </>);
+  );
 }

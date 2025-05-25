@@ -133,7 +133,7 @@ const SkillCard = ({ skill, index }: { skill: Skill; index: number }) => {
 
 const Skills = () => {
   return (
-    <div>
+    <div id="skills" className="py-16 -mt-20 pt-32">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
