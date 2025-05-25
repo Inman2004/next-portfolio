@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 
 export default function AuthTestPage() {
-  const { data: session, status } = useSession();
   const [firebaseUser, setFirebaseUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +18,7 @@ export default function AuthTestPage() {
     return () => unsubscribe();
   }, []);
 
-  if (isLoading || status === 'loading') {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -35,13 +33,6 @@ export default function AuthTestPage() {
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Auth Test Page</h1>
       
-      <div className="bg-gray-900 p-6 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4">NextAuth Session</h2>
-        <pre className="bg-gray-800 p-4 rounded overflow-auto text-sm">
-          {JSON.stringify({ status, session }, null, 2)}
-        </pre>
-      </div>
-
       <div className="bg-gray-900 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Firebase Auth</h2>
         <pre className="bg-gray-800 p-4 rounded overflow-auto text-sm">

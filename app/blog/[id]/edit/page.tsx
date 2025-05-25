@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getAuth } from 'firebase/auth';
+import { db, app } from '@/lib/firebase';
 import { toast } from 'sonner';
 import BlogPostForm from '@/components/BlogPostForm';
 import { BlogPost } from '@/types/blog';
@@ -17,10 +17,25 @@ interface PageProps {
 const EditBlogPostPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const { id } = params;
-  const { data: session } = useSession();
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [post, setPost] = useState<BlogPost | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Set up auth state listener
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+      
+      // Redirect to sign-in if not authenticated
+      if (!user) {
+        router.push(`/signin?callbackUrl=${encodeURIComponent(`/blog/${id}/edit`)}`);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [id, router]);
 
   // Fetch the post data
   useEffect(() => {
@@ -32,10 +47,19 @@ const EditBlogPostPage = ({ params }: { params: { id: string } }) => {
         const postSnap = await getDoc(postRef);
         
         if (postSnap.exists()) {
+          const postData = postSnap.data() as BlogPost;
+          
+          // Check if the current user is the author
+          if (currentUser && postData.authorId !== currentUser.uid) {
+            toast.error('You are not authorized to edit this post');
+            router.push(`/blog/${id}`);
+            return;
+          }
+          
           setPost({
             id: postSnap.id,
-            ...postSnap.data(),
-          } as BlogPost);
+            ...postData,
+          });
         } else {
           toast.error('Post not found');
           router.push('/blog');
@@ -50,10 +74,10 @@ const EditBlogPostPage = ({ params }: { params: { id: string } }) => {
     };
 
     fetchPost();
-  }, [id, router]);
+  }, [id, router, currentUser]);
 
-  const handleSubmit = async (postData: any) => {
-    if (!session?.user || !id) {
+  const handleSubmit = async (postData: BlogPost) => {
+    if (!currentUser || !id) {
       toast.error('You must be logged in to edit a post');
       return;
     }
