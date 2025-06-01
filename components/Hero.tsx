@@ -312,14 +312,19 @@ export default function Hero() {
             </div>
             
             <div className="space-y-2">
-              <motion.p 
-                className="text-purple-300 font-medium"
+              <motion.a 
+                className="text-purple-300 font-medium cursor-pointer hover:opacity-80 transition-opacity"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{ delay: 0.8, duration: 0.5 }}
+                href="https://instagram.com/rv_imman"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                rvimman
-              </motion.p>
+                @rv_imman
+              </motion.a>
               <div className="flex items-center justify-center gap-2 mt-1 sm:mt-0">
                   <motion.span 
                     className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-yellow-500/30 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 transition-all duration-300 hover:scale-105"

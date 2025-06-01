@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Briefcase, Calendar, MapPin, ExternalLink, ChevronDown } from 'lucide-react';
+import { Briefcase, ExternalLink, MapPin, Calendar, ChevronDown } from 'lucide-react';
+import { experiences } from '@/data/experiences';
 import { useState } from 'react';
 
 type ExperienceType = {
@@ -16,53 +17,6 @@ type ExperienceType = {
   skills: string[];
   logo?: string;
 };
-
-const experiences: ExperienceType[] = [
-  {
-    id: 1,
-    role: 'Full Stack Developer',
-    company: 'Mann hospitality',
-    companyUrl: 'https://mannhospitality.com/',
-    location: 'Bengalore, India',
-    startDate: 'May 2025',
-    endDate: 'Present',
-    description: [
-      'Led the development of full-stack web applications using modern technologies like Next.js, React, TypeScript, FastAPI, Flask, etc..',
-      'Collaborated with organization to understand requirements and deliver scalable solutions',
-      'Implemented responsive designs and optimized applications for performance',
-    ],
-    skills: ['Next.js', 'React', 'Node.js', 'TypeScript', 'TailwindCSS', 'MongoDB', 'Docker', 'Vercel', 'VPS', 'AWS', 'Python', 'Flask', 'CI/CD', 'FastAPI'],
-  },
-  {
-    id: 2,
-    role: 'Indie Web Developer',
-    company: 'Self',
-    location: 'Tamil Nadu, India',
-    startDate: 'Jun 2022',
-    endDate: 'Dec 2024',
-    description: [
-      'Developed and deployed web applications using modern technologies like Next.js, React, and Node.js,',
-      'Collaborated with the team to implement new features and fix bugs',
-      'Participated in code reviews and team meetings',
-    ],
-    skills: ['Next.js', 'React', 'Node.js', 'TypeScript', 'TailwindCSS', 'MongoDB', 'Docker', 'Vercel', 'VPS', 'AWS', 'Python', 'Flask', 'CI/CD', 'FastAPI'],
-  },
-  {
-    id: 3,
-    role: 'Open Source Contributor',
-    company: 'GitHub',
-    companyUrl: 'https://github.com/Inman2004',
-    location: 'Remote',
-    startDate: '2021',
-    endDate: '2025',
-    description: [
-      'Contributed to various open source projects on GitHub',
-      'Fixed bugs and implemented new features',
-      'Documented code and improved project documentation',
-    ],
-    skills: ['Git', 'GitHub', 'Open Source', 'Documentation'],
-  },
-];
 
 const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean }) => {
   const [isExpanded, setIsExpanded] = useState(false);
