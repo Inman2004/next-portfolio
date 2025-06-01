@@ -283,7 +283,7 @@ export default function PostPage({ params }: PostPageProps) {
           </div>
 
           {post.coverImage && (
-            <div className="relative mb-8 -mx-6 md:-mx-8 -mt-6 md:-mt-8">
+            <div className="relative mb-8 -mx-6 md:-mx-8 lg:-mt-6 md:-mt-8 border-b-2 border-indigo-500">
               <div className="relative w-full h-64 md:h-96">
                 <Image
                   src={post.coverImage}

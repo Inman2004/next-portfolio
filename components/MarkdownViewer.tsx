@@ -21,9 +21,10 @@ const CustomLink = ({ node, children, ...props }: CustomLinkProps) => (
     {...props} 
     target="_blank" 
     rel="noopener noreferrer"
-    className="text-blue-400 hover:text-blue-300 underline"
+    className="relative text-blue-400 hover:text-blue-300 hover:scale-110 group transition-colors duration-300"
   >
     {children}
+    <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300 ease-in-out"></span>
   </a>
 );
 
@@ -100,25 +101,34 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
           code: CustomCode,
           a: CustomLink,
           h1: (props) => (
-            <h1 className="text-4xl font-bold mt-8 mb-4 text-gray-900 dark:text-white" {...props} />
+            <h1 
+              className="text-4xl font-bold mt-8 mb-4 bg-clip-text text-transparent bg-gradient-to-b from-indigo-400 via-indigo-500 to-gray-200 dark:from-indigo-300 dark:via-indigo-200 dark:to-white"
+              {...props} 
+            />
           ),
           h2: (props) => (
-            <h2 className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2" {...props} />
+            <h2 
+              className="text-3xl font-bold mt-8 mb-4 bg-clip-text text-transparent bg-gradient-to-b from-indigo-200 via-indigo-300 to-white dark:from-indigo-300 dark:via-indigo-200 dark:to-white"
+              {...props} 
+            />
           ),
           h3: (props) => (
-            <h3 className="text-2xl font-bold mt-6 mb-3 text-gray-900 dark:text-white" {...props} />
+            <h3 
+              className="text-2xl font-bold mt-6 mb-3 bg-clip-text text-transparent bg-gradient-to-b from-indigo-200 via-indigo-300 to-white dark:from-indigo-300 dark:via-indigo-200 dark:to-white"
+              {...props} 
+            />
           ),
           p: (props) => (
-            <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...props} />
+            <p className="my-4 text-gray-400 dark:text-gray-400 leading-relaxed" {...props} />
           ),
           ul: (props) => (
-            <ul className="list-disc pl-6 my-4 space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+            <ul className="list-disc pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" {...props} />
           ),
           ol: (props) => (
-            <ol className="list-decimal pl-6 my-4 space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+            <ol className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" {...props} />
           ),
           li: (props) => (
-            <li className="my-1" {...props} />
+            <li className="my-1 pl-1 text-gray-300 dark:text-gray-400" {...props} />
           ),
           blockquote: (props) => (
             <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic my-4 text-gray-600 dark:text-gray-400" {...props} />
@@ -129,7 +139,7 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
             </div>
           ),
           thead: (props) => (
-            <thead className="bg-gray-800/50" {...props} />
+            <thead className="bg-indigo-800/30" {...props} />
           ),
           tbody: (props) => (
             <tbody className="divide-y divide-gray-700" {...props} />

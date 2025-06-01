@@ -9,10 +9,18 @@ import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import { getBlogPosts } from '@/lib/blog';
-import { Crown, Eye, Flame, Clock, ArrowUpDown, Plus } from 'lucide-react';
+import { Crown, Eye, Flame, Clock, ArrowUpDown, Plus, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import type { BlogPost } from '@/types/blog';
 import { getViewCount } from '@/lib/views';
+import { deleteBlogPost } from '@/app/actions/blog';
+import dynamic from 'next/dynamic';
+
+// Dynamically import MarkdownViewer with no SSR to avoid hydration issues
+const MarkdownViewer = dynamic(
+  () => import('@/components/MarkdownViewer'),
+  { ssr: false }
+);
 
 type SortOption = 'newest' | 'oldest' | 'popular';
 
@@ -25,6 +33,7 @@ export default function BlogPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
   const auth = getAuth(app);
   
@@ -175,6 +184,79 @@ export default function BlogPage() {
     if (!date) return '';
     const dateObj = date instanceof Date ? date : date.toDate();
     return dateObj.toISOString();
+  };
+
+  const handleDelete = async (postId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const toastId = toast.custom((t) => (
+      <div className={`${
+        t.visible ? 'animate-enter' : 'animate-leave'
+      } max-w-md w-full bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex flex-col border border-gray-700 overflow-hidden`}>
+        <div className="p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 pt-0.5">
+              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-400" />
+              </div>
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-medium text-white">Delete Post</p>
+              <p className="mt-1 text-sm text-gray-400">Are you sure you want to delete this post? This action cannot be undone.</p>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end space-x-3">
+            <button
+              onClick={() => {
+                toast.dismiss(toastId);
+              }}
+              className="px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                toast.dismiss(toastId);
+                try {
+                  if (!user?.uid) {
+                    throw new Error('You must be logged in to delete posts');
+                  }
+                  
+                  setDeletingId(postId);
+                  const result = await deleteBlogPost(postId, user.uid);
+                  
+                  if (result.success) {
+                    toast.success('Post deleted successfully', { id: 'delete-success' });
+                    // Remove the deleted post from the UI
+                    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+                  } else {
+                    throw new Error(result.error || 'Failed to delete post');
+                  }
+                } catch (error) {
+                  console.error('Error deleting post:', error);
+                  toast.error(error instanceof Error ? error.message : 'Failed to delete post', { id: 'delete-error' });
+                } finally {
+                  setDeletingId(null);
+                }
+              }}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+            >
+              {deletingId === postId ? (
+                <span className="flex items-center">
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  Deleting...
+                </span>
+              ) : 'Delete'}
+            </button>
+          </div>
+        </div>
+      </div>
+    ), {
+      id: 'delete-confirmation',
+      duration: 10000, // 10 seconds
+      position: 'bottom-center',
+    });
   };
 
   if (loading) {
@@ -401,12 +483,28 @@ export default function BlogPage() {
                       : 'border-gray-700/50 bg-gradient-to-br from-gray-800/50 to-gray-900/50 hover:border-blue-500/50'
                   }`}
                 >
-                  {post.isAdmin && (
-                    <div className="absolute top-3 right-3 bg-yellow-500/90 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center z-10">
-                      <Crown className="w-3 h-3 mr-1" />
-                      Admin
-                    </div>
-                  )}
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                    {post.isAdmin && (
+                      <div className="bg-yellow-500/90 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Admin
+                      </div>
+                    )}
+                    {isAdmin && (
+                      <button
+                        onClick={(e) => handleDelete(postId, e)}
+                        disabled={deletingId === postId}
+                        className="p-1.5 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Delete post"
+                      >
+                        {deletingId === postId ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
                   <Link href={`/blog/${postId}`} className="flex flex-col h-full">
                     {/* Cover Image */}
                     <div className={`h-48 relative overflow-hidden ${
@@ -446,7 +544,9 @@ export default function BlogPage() {
                       <div className="flex-1">
                         <h2 className="text-xl font-bold text-white mb-2 line-clamp-2">{post.title}</h2>
                         {post.excerpt && (
-                          <p className="text-gray-400 text-sm line-clamp-3 mb-4">{post.excerpt}</p>
+                          <div className="text-gray-400 text-sm line-clamp-3 mb-4 prose prose-invert prose-sm max-w-none">
+                            <MarkdownViewer content={post.excerpt} />
+                          </div>
                         )}
                       </div>
                       

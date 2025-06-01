@@ -5,7 +5,6 @@ import Providers from "./providers";
 import { PageLoadingProvider } from "@/components/providers/page-loading-provider";
 import Header from "@/components/Header";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { Toaster } from 'react-hot-toast';
 // Local font imports
 import { elegantScript, pacifico } from './fonts';
 
@@ -66,7 +65,6 @@ export default function RootLayout({
                 {children}
               </main>
               <WelcomePopup />
-              <Toaster position="bottom-center" />
             </Providers>
           </ErrorBoundary>
         </PageLoadingProvider>
