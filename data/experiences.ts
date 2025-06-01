@@ -18,7 +18,7 @@ export const experiences: ExperienceType[] = [
     company: 'Mann hospitality',
     companyUrl: 'https://mannhospitality.com/',
     location: 'Bengalore, India',
-    startDate: 'TBD',
+    startDate: 'May 2025',
     endDate: 'Present',
     description: [
       'TBD',

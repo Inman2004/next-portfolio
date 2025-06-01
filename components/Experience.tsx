@@ -1,22 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Briefcase, ExternalLink, MapPin, Calendar, ChevronDown } from 'lucide-react';
-import { experiences } from '@/data/experiences';
-import { useState } from 'react';
-
-type ExperienceType = {
-  id: number;
-  role: string;
-  company: string;
-  companyUrl?: string;
-  location: string;
-  startDate: string;
-  endDate: string;
-  description: string[];
-  skills: string[];
-  logo?: string;
-};
+import { Briefcase, ExternalLink, MapPin, Calendar, ChevronDown, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { ExperienceType } from '@/data/experiences';
+import { useState, useEffect } from 'react';
+import { fetchExperiences } from '@/lib/api';
 
 const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -44,8 +33,19 @@ const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean 
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className="p-2 bg-white/5 rounded-lg flex-shrink-0">
-                <Briefcase className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 bg-white/5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+                {exp.logo ? (
+                  <Image 
+                    src={exp.logo} 
+                    alt={`${exp.company} logo`} 
+                    width={40} 
+                    height={40} 
+                    className="object-contain w-10 h-10"
+                    unoptimized={exp.logo.startsWith('http')}
+                  />
+                ) : (
+                  <Briefcase className="w-6 h-6 text-blue-400" />
+                )}
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-white">{exp.role}</h3>
@@ -93,7 +93,7 @@ const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean 
             <div className="pt-4 border-t border-white/5">
               <ul className="space-y-2 text-gray-300">
                 {exp.description.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2">
+                  <li key={`${exp.id}-desc-${i}`} className="flex items-start gap-2">
                     <span className="text-blue-400 mt-1">•</span>
                     <span>{item}</span>
                   </li>
@@ -101,9 +101,9 @@ const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean 
               </ul>
               
               <div className="mt-4 flex flex-wrap gap-2">
-                {exp.skills.map((skill) => (
+                {exp.skills.map((skill, i) => (
                   <span 
-                    key={skill} 
+                    key={`${exp.id}-skill-${i}-${skill.replace(/\s+/g, '-')}`} 
                     className="px-3 py-1 text-xs rounded-full bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 transition-colors"
                   >
                     {skill}
@@ -118,7 +118,46 @@ const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean 
   );
 };
 
-const Experience = () => {
+export default function Experience() {
+  const [experiences, setExperiences] = useState<ExperienceType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadExperiences = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching experiences...');
+        const data = await fetchExperiences();
+        console.log('Fetched experiences data:', JSON.stringify(data, null, 2));
+        
+        // Ensure data is an array before setting it
+        if (Array.isArray(data)) {
+          setExperiences(data);
+        } else {
+          console.error('Invalid data format received:', data);
+          throw new Error('Invalid data format');
+        }
+      } catch (err) {
+        console.error('Failed to load experiences:', err);
+        setError('Failed to load experiences. Using fallback data.');
+        
+        // Try to load from local data as fallback
+        try {
+          const localData = await import('@/data/experiences');
+          console.log('Using local experiences data as fallback');
+          setExperiences(localData.experiences);
+        } catch (e) {
+          console.error('Failed to load fallback experiences:', e);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExperiences();
+  }, []);
+  
   return (
     <section id="experience" className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
       <motion.div
@@ -137,19 +176,32 @@ const Experience = () => {
       </motion.div>
 
       <div className="relative">
-        <div className="space-y-12">
-          {experiences.map((exp, index) => (
-            <motion.div
-              key={exp.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <ExperienceCard exp={exp} isLast={index === experiences.length - 1} />
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-400">
+            {error}
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {experiences.map((exp, index) => (
+              <motion.div
+                key={`exp-${exp.id}-${index}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <ExperienceCard 
+                  exp={exp} 
+                  isLast={index === experiences.length - 1} 
+                />
+              </motion.div>
+            ))}
+          </div>
+        )}
         
         {/* Decorative elements */}
         <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/10 rounded-full filter blur-3xl -z-10"></div>
@@ -157,6 +209,4 @@ const Experience = () => {
       </div>
     </section>
   );
-};
-
-export default Experience;
+}
