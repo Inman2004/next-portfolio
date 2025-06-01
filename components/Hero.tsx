@@ -110,16 +110,7 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, [localQuotes, quote?.quote, quote?.author, isAnimating]);
 
-  // Set up interval for quote rotation
-  useEffect(() => {
-    if (localQuotes.length === 0 || !quote) return;
-    
-    const interval = setInterval(() => {
-      getNewQuote();
-    }, 30000); // 30 seconds between quotes
-    
-    return () => clearInterval(interval);
-  }, [getNewQuote]);
+  // Removed the interval for quote rotation to show only one quote per session
   
   // Set initial quote when localQuotes is loaded
   useEffect(() => {
@@ -196,7 +187,7 @@ export default function Hero() {
                       className="flex items-start gap-3"
                     >
                       <Quote className="text-pink-400 flex-shrink-0 mt-1" size={24} />
-                      <p className="px-5 py-3 text-lg lg:text-xl leading-relaxed font-medium tracking-normal rounded-xl bg-gradient-to-r from-blue-400/10 to-pink-500/10 border border-yellow-200/10 text-purple-200 w-full whitespace-normal break-words" 
+                      <p className="px-5 py-3 text-lg lg:text-xl leading-relaxed font-medium tracking-normal rounded-xl text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-teal-400 w-full whitespace-normal break-words" 
                         style={{ 
                           fontFamily: 'var(--font-pacifico), cursive', 
                           filter: 'contrast(0.9) brightness(1.1)',
@@ -204,7 +195,7 @@ export default function Hero() {
                           letterSpacing: '0.01em'
                         }}>
                         {isLoading ? (
-                          <span className="inline-block h-7 w-full animate-pulse bg-purple-700/20 rounded"></span>
+                          <span className="inline-block h-7 w-full animate-pulse bg-purple-700/20 rounded">wait let me pick a quote for you...</span>
                         ) : quote?.quote || "The only way to learn a new programming language is by writing programs in it."}
                       </p>
                     </motion.div>
@@ -295,24 +286,66 @@ export default function Hero() {
 
           {/* Right Content - 3D or Image Element */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="flex-1 relative w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]"
+            className="flex flex-col items-center text-center space-y-6 mt-4"
           >
-            <div className="relative w-full aspect-square">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl" />
-              <div className="relative w-full h-full rounded-full overflow-hidden border border-blue-500/20 bg-gradient-to-b from-blue-500/10 to-purple-500/10">
-                <Image
-                  src="/images/avatar.png"
-                  alt="Immanuvel"
-                  width={500}
-                  height={500}
-                  className="object-cover w-full h-full"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-radial from-blue-500/10 via-purple-500/10 to-transparent" />
+            <div className="relative w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
+              <div className="relative w-full aspect-square">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -z-20" />
+                <div className="relative w-full h-full rounded-full overflow-hidden border border-blue-500/20">
+                  <div className="absolute inset-0 w-full h-full">
+                    <Image
+                      src="/images/avatar1.png"
+                      alt="Immanuvel"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-radial from-purple-500/30 via-blue-800/90 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 via-blue-800/40 to-blue-950/95" />
+                </div>
               </div>
+            </div>
+            
+            <div className="space-y-2">
+              <motion.p 
+                className="text-purple-300 font-medium"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+              >
+                rvimman
+              </motion.p>
+              <div className="flex items-center justify-center gap-2 mt-1 sm:mt-0">
+                  <motion.span 
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-yellow-500/30 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 transition-all duration-300 hover:scale-105"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.9, duration: 0.5 }}
+                  >
+                    Author
+                  </motion.span>
+                  <motion.span 
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 border border-purple-500/30 shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.8, duration: 0.5 }}
+                  >
+                    Admin
+                  </motion.span>
+                </div>
+              <motion.p 
+                className="text-gray-300 max-w-md text-sm sm:text-base px-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9, duration: 0.5 }}
+              >
+                Crafting seamless digital experiences with modern web technologies and creative problem-solving.
+              </motion.p>
             </div>
           </motion.div>
         </div>

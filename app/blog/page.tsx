@@ -312,21 +312,38 @@ export default function BlogPage() {
       <div className="relative overflow-hidden py-20 md:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <motion.h1 
-            className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Blog
-          </motion.h1>
+          <div className="relative">
+            <motion.span 
+              className="absolute inset-0 mx-auto py-4 flex items-center justify-center w-full blur-xl bg-gradient-to-r from-indigo-900 via-indigo-500 to-blue-500 bg-clip-text text-4xl md:text-6xl font-extrabold text-transparent"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Blogs
+            </motion.span>
+            <motion.h1 
+              className="relative z-10 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-indigo-600 p-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Blogs
+            </motion.h1>
+          </div>
           <motion.p 
             className="text-xl text-gray-300 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            Thoughts, stories, and ideas about web development, design, and more.
+          ><h1 className="text-xl font-thin tracking-tight text-gray-400 sm:text-2xl">
+          <span className="block">
+              Use the power of social proof
+              <span className="text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-teal-400">
+                  &nbsp;thoughts, stories, and ideas about your development, design,
+              </span>
+              &nbsp;to inspire others
+          </span>
+      </h1>
           </motion.p>
         </div>
       
