@@ -9,6 +9,14 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "Pneumoscan",
+    description: "Automated Pneumonia Screening via X-Ray Imaging and Deep Neural Networks, This project proposes an AI system to detect pneumonia using CNNs and chest X-rays.",
+    technologies: ["HTML", "CSS", "JavaScript", "Python", "Flask", "Pandas", "Tensorflow", "Keras"],
+    github: "https://github.com/Inman2004/pneumoscan",
+    live: "https://pneumoscan-b9wv.onrender.com/",
+    images: ["/images/projects/pneumoscan.png", "/images/projects/pneumoscan2.png", "/images/projects/pneumoscan3.png"]
+  },
+  {
     title: "HR AI",
     description: "A mock interview platform powered by VAPI voice agent",
     technologies: ["Next.js", "React", "TailwindCSS", "TypeScript", "Framer Motion", "VAPI API"],
@@ -55,13 +63,5 @@ export const projects: Project[] = [
     github: "https://github.com/Inman2004/My-Portfolio",
     live: "https://rvimman.vercel.app",
     images: ["/images/projects/port.png", "/images/projects/port2.png", "/images/projects/port3.png"]
-  },
-  {
-    title: "Pneumoscan",
-    description: "Automated Pneumonia Screening via X-Ray Imaging and Deep Neural Networks, This project proposes an AI system to detect pneumonia using CNNs and chest X-rays.",
-    technologies: ["HTML", "CSS", "JavaScript", "Python", "Flask", "Pandas", "Tensorflow", "Keras"],
-    github: "https://github.com/Inman2004/pneumoscan",
-    live: "https://pneumoscan-b9wv.onrender.com/",
-    images: ["/images/projects/pneumoscan.png", "/images/projects/pneumoscan2.png", "/images/projects/pneumoscan3.png"]
   }
 ];
