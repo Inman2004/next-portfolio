@@ -12,14 +12,23 @@ export const dynamic = 'force-dynamic';
 
 // Helper function to parse CSV with proper handling of quoted fields
 function parseCSV(csvText: string) {
+  console.log('Raw CSV data:', csvText);
+  
   const lines = csvText.split('\n').filter(line => line.trim() !== '');
-  if (lines.length < 2) return [];
+  if (lines.length < 2) {
+    console.log('Not enough lines in CSV');
+    return [];
+  }
   
   const headers = lines[0].split(',').map(h => h.trim());
+  console.log('CSV Headers:', headers);
+  
   const result = [];
   
   for (let i = 1; i < lines.length; i++) {
     const currentLine = lines[i];
+    console.log(`Processing line ${i}:`, currentLine);
+    
     const values: string[] = [];
     let inQuotes = false;
     let currentValue = '';
@@ -43,6 +52,11 @@ function parseCSV(csvText: string) {
     // Create an object with the values
     const obj: Record<string, any> = {};
     headers.forEach((header, index) => {
+      if (index >= values.length) {
+        console.warn(`Missing value for header '${header}' at line ${i+1}`);
+        return;
+      }
+      
       let value = values[index] || '';
       
       // Clean up any remaining quotes
@@ -59,6 +73,8 @@ function parseCSV(csvText: string) {
         obj[header] = value;
       }
     });
+    
+    console.log(`Parsed object ${i}:`, obj);
     
     // Only add non-empty rows
     if (obj.id !== 0 || Object.values(obj).some(v => v !== '' && v !== 0)) {
@@ -100,11 +116,27 @@ export async function GET() {
       exp.id && exp.role && exp.company
     );
     
+    console.log('Valid experiences:', JSON.stringify(validExperiences, null, 2));
+    
     // Update cache
     cachedExperiences = validExperiences;
     lastFetchTime = now;
     
-    return NextResponse.json(validExperiences);
+    // Always return a consistent response format
+    const responseData = {
+      success: true,
+      data: validExperiences,
+      // Include debug info in development
+      ...(process.env.NODE_ENV === 'development' && {
+        debug: {
+          headers: Array.from(new Headers(response.headers).entries()),
+          status: response.status,
+          sheetUrl: SHEET_URL
+        }
+      })
+    };
+    
+    return NextResponse.json(responseData);
     
   } catch (error) {
     console.error('Error in experiences API:', error);

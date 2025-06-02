@@ -330,21 +330,22 @@ export default function BlogPage() {
               Blogs
             </motion.h1>
           </div>
-          <motion.p 
+          <motion.div 
             className="text-xl text-gray-300 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-          ><h1 className="text-xl font-thin tracking-tight text-gray-400 sm:text-2xl">
-          <span className="block">
-              Use the power of social proof
-              <span className="text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-teal-400">
+          >
+            <h1 className="text-xl font-thin tracking-tight text-gray-400 sm:text-2xl">
+              <span className="block">
+                Use the power of social proof
+                <span className="text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-teal-400">
                   &nbsp;thoughts, stories, and ideas about your development, design,
+                </span>
+                &nbsp;to inspire others
               </span>
-              &nbsp;to inspire others
-          </span>
-      </h1>
-          </motion.p>
+            </h1>
+          </motion.div>
         </div>
       
 

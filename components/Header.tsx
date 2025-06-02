@@ -102,7 +102,11 @@ export default function Header() {
                   <NavItem href="#experience">Experience</NavItem>
                   <NavItem href="#services">Services</NavItem>
                   <NavItem href="#testimonials">Testimonials</NavItem>
-                  <NavItem href="#contact">Get in touch</NavItem>
+                  {!user ? (
+                    <NavItem href="#contact">Get in touch</NavItem>
+                  ) : (
+                    <NavItem href="#contact">Contact</NavItem>
+                  )}
                   <NavItem href="/blog">
                     <div className="relative group">
                       <span className="text-blue-600 hover:text-blue-300 transition-colors px-4 py-2 rounded-lg block text-center">

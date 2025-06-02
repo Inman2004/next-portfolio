@@ -32,8 +32,61 @@ interface CustomCodeProps extends HTMLAttributes<HTMLElement> {
   node?: unknown;
   inline?: boolean;
   className?: string;
-  children: ReactNode;
+  children?: ReactNode;  // Made children optional to match ReactMarkdown's expected type
 }
+
+// Map of common file extensions to language names
+const languageMap: Record<string, string> = {
+  // Programming Languages
+  js: 'javascript',
+  jsx: 'javascript',
+  ts: 'typescript',
+  tsx: 'typescript',
+  py: 'python',
+  rb: 'ruby',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  h: 'cpp',
+  hpp: 'cpp',
+  cs: 'csharp',
+  go: 'go',
+  rs: 'rust',
+  php: 'php',
+  swift: 'swift',
+  kt: 'kotlin',
+  
+  // Web Technologies
+  html: 'htmlbars',
+  css: 'css',
+  scss: 'scss',
+  sass: 'sass',
+  less: 'less',
+  json: 'json',
+  graphql: 'graphql',
+  
+  // Shell & Config
+  sh: 'bash',
+  zsh: 'bash',
+  bash: 'bash',
+  yml: 'yaml',
+  yaml: 'yaml',
+  toml: 'toml',
+  env: 'ini',
+  ini: 'ini',
+  dockerfile: 'dockerfile',
+  gitignore: 'gitignore',
+  
+  // Markup & Data
+  md: 'markdown',
+  mdx: 'markdown',
+  xml: 'xml',
+  sql: 'sql',
+  
+  // Other
+  diff: 'diff',
+  txt: 'text',
+};
 
 const CustomCode = ({ 
   node, 
@@ -43,42 +96,87 @@ const CustomCode = ({
   ...props 
 }: CustomCodeProps) => {
   const match = /language-(\w+)/.exec(className || '');
-  const language = match ? match[1] : '';
+  let language = match ? match[1].toLowerCase() : '';
+  
+  // Map the language to a known one if needed
+  if (language in languageMap) {
+    language = languageMap[language];
+  }
 
   if (inline) {
     return (
-      <code className={`bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono ${className}`} {...props}>
+      <code className={`bg-gray-800/50 rounded px-1.5 py-0.5 text-sm font-mono text-gray-100 border border-gray-700 ${className}`} {...props}>
         {children}
       </code>
     );
   }
 
+  // For code blocks without a specified language
   if (!match) {
     return (
-      <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto my-4">
-        <code className="text-sm font-mono" {...props}>
-          {children}
-        </code>
-      </pre>
+      <div className="my-4 rounded-lg overflow-hidden border border-gray-700 shadow">
+        <pre className="bg-gray-900 p-4 overflow-x-auto m-0">
+          <code className="text-sm font-mono text-gray-100" {...props}>
+            {children}
+          </code>
+        </pre>
+      </div>
     );
   }
 
   return (
-    <div className="my-4 rounded-lg overflow-hidden">
-      <div className="bg-gray-800 text-gray-300 text-xs px-4 py-2 font-mono">
-        {match[1]}
+    <div className="my-6 rounded-lg overflow-hidden border border-gray-700 shadow-lg">
+      <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-700 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="flex space-x-2 mr-3">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          </div>
+          <span className="text-gray-300 font-medium">{language || 'code'}</span>
+        </div>
+        <div className="text-xs text-gray-500">
+          {match[1]} • {String(children).split('\n').length} lines
+        </div>
       </div>
       <SyntaxHighlighter
         style={vscDarkPlus}
-        language={match[1]}
-        className="!m-0 rounded-b-lg"
+        language={language}
+        className="!m-0 !rounded-b-lg !bg-[#1e1e1e]"
         customStyle={{
           margin: 0,
           padding: '1rem',
-          backgroundColor: '#1e1e1e',
-          fontSize: '0.9em',
+          fontSize: '0.875rem',
           lineHeight: 1.5,
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
         }}
+        showLineNumbers={true}
+        wrapLines={true}
+        wrapLongLines={false}
+        lineNumberStyle={{
+          color: '#858585',
+          paddingRight: '1em',
+          userSelect: 'none',
+          minWidth: '2.5em',
+          textAlign: 'right',
+        }}
+        lineProps={{
+          style: {
+            wordBreak: 'break-word',
+            whiteSpace: 'pre-wrap',
+          },
+        }}
+        codeTagProps={{
+          style: {
+            fontFamily: 'inherit',
+            display: 'block',
+          },
+        }}
+        PreTag={({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
+          <pre className="!m-0" {...props}>
+            {children}
+          </pre>
+        )}
       >
         {String(children).replace(/\n$/, '')}
       </SyntaxHighlighter>
@@ -118,9 +216,48 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
               {...props} 
             />
           ),
-          p: (props) => (
-            <p className="my-4 text-gray-400 dark:text-gray-400 leading-relaxed" {...props} />
-          ),
+          p: (props: any) => {
+            const { node, children, ...restProps } = props;
+            
+            // Check if this paragraph contains any block-level elements that shouldn't be in a <p>
+            const hasBlockLevelElements = node?.children?.some(
+              (child: any) => {
+                if (!child) return false;
+                
+                // Common block-level elements
+                const blockElements = [
+                  'div', 'pre', 'figure', 'ul', 'ol', 'table', 'h1', 'h2', 'h3', 
+                  'h4', 'h5', 'h6', 'blockquote', 'hr', 'dl', 'dd', 'dt', 'form', 
+                  'fieldset', 'legend', 'article', 'aside', 'details', 'figcaption',
+                  'footer', 'header', 'main', 'nav', 'section', 'summary', 'img'
+                ];
+                
+                return blockElements.includes(child.tagName);
+              }
+            );
+            
+            // Don't render paragraph wrapper if it contains block-level elements
+            if (hasBlockLevelElements) {
+              return <>{children}</>;
+            }
+            
+            // Check if this paragraph has any meaningful content
+            const hasContent = node?.children?.some(
+              (child: any) => 
+                (child.type === 'text' && child.value.trim() !== '') ||
+                (child.type === 'element' && child.tagName !== 'br')
+            );
+            
+            if (!hasContent) {
+              return null;
+            }
+            
+            return (
+              <p className="my-4 text-gray-400 dark:text-gray-400 leading-relaxed" {...restProps}>
+                {children}
+              </p>
+            );
+          },
           ul: (props) => (
             <ul className="list-disc pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" {...props} />
           ),
@@ -153,21 +290,34 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
           tr: (props) => (
             <tr className="hover:bg-gray-800/30 transition-colors" {...props} />
           ),
-          img: (props) => (
-            <div className="my-6">
+          img: (props) => {
+            const { alt, className = '', ...imgProps } = props;
+            
+            // Create the image with proper styling
+            const image = (
               <img 
-                {...props} 
-                className="rounded-lg shadow-lg w-full max-w-full h-auto"
-                alt={props.alt || 'Image'}
+                {...imgProps}
+                className={`rounded-lg shadow-lg w-full max-w-full h-auto ${className}`}
+                alt={alt || 'Image'}
                 loading="lazy"
               />
-              {props.alt && (
-                <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  {props.alt}
-                </p>
-              )}
-            </div>
-          ),
+            );
+            
+            // If there's an alt text, treat it as a caption using a figure
+            if (alt) {
+              return (
+                <figure className="my-6">
+                  {image}
+                  <figcaption className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    {alt}
+                  </figcaption>
+                </figure>
+              );
+            }
+            
+            // For images without alt text, return the image wrapped in a div
+            return <div className="my-6">{image}</div>;
+          },
         }}
       >
         {content}

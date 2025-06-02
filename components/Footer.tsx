@@ -6,10 +6,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   const socialLinks = [
-    { icon: Github, href: 'https://github.com/Inman2004', label: 'GitHub' },
-    { icon: Linkedin, href: 'https://linkedin.com/in/rv3d', label: 'LinkedIn' },
-    { icon: Twitter, href: 'https://twitter.com/rvimman_', label: 'Twitter' },
-    { icon: Instagram, href: 'https://instagram.com/rv_imman', label: 'Instagram' },
+    { icon: Github, href: 'https://github.com/Inman2004', label: 'GitHub' , color: 'text-gray-400 hover:text-purple-600 transition-all transform hover:scale-110'},
+    { icon: Linkedin, href: 'https://linkedin.com/in/rv3d', label: 'LinkedIn' , color: 'text-gray-400 hover:text-blue-600 transition-all transform hover:scale-110'},
+    { icon: Twitter, href: 'https://twitter.com/rvimman_', label: 'Twitter' , color: 'text-gray-400 hover:text-blue-400 transition-all transform hover:scale-110'},
+    { icon: Instagram, href: 'https://instagram.com/rv_imman', label: 'Instagram' , color: 'text-gray-400 hover:text-pink-600 transition-all transform hover:scale-110'},
   ];
 
   const navLinks = [
@@ -18,6 +18,7 @@ const Footer = () => {
     { href: '#services', label: 'Services' },
     { href: '#projects', label: 'Projects' },
     { href: '#contact', label: 'Contact' },
+    { href: '#experience', label: 'Experience' },
   ];
 
   return (
@@ -37,7 +38,7 @@ const Footer = () => {
           {/* Navigation Links */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Quick Links</h4>
-            <nav className="flex flex-col space-y-2">
+            <nav className="flex flex-row space-x-2">
               {navLinks.map((link) => (
                 <Link 
                   key={link.href} 
@@ -62,7 +63,7 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className={link.color}
                 >
                   <link.icon className="w-6 h-6" />
                 </motion.a>
