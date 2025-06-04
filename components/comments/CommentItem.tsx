@@ -95,7 +95,7 @@ export const CommentItem = memo(({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-white">{comment.displayName}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{comment.displayName}</span>
               {isAdminComment && (
                 <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
                   Admin
