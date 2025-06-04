@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
 
-// Dynamically import the MDX editor to avoid SSR issues
-const MDXEditor = dynamic(
-  () => import('@/components/ui/mdx-editor'),
+// Dynamically import the MD editor to avoid SSR issues
+const MDEditor = dynamic(
+  () => import('@uiw/react-md-editor'),
   { ssr: false }
 );
 
@@ -51,12 +51,12 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
     }));
   };
 
-  const handleContentChange = useCallback((content: string) => {
+  const handleContentChange = useCallback((value: string | undefined) => {
     setFormData(prev => ({
       ...prev,
-      content
+      content: value || ''
     }));
-  }, []);  
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent, publish: boolean = false) => {
     e.preventDefault();
@@ -140,10 +140,14 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
           <div className="space-y-2">
             <Label>Content</Label>
             <div className="rounded-md border">
-              <MDXEditor
-                markdown={formData.content}
-                onChange={handleContentChange}
-              />
+              <div data-color-mode="light">
+                <MDEditor
+                  value={formData.content}
+                  onChange={handleContentChange}
+                  height={500}
+                  className="min-h-[500px] rounded-md border"
+                />
+              </div>
             </div>
           </div>
         </div>
