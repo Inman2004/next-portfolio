@@ -57,9 +57,8 @@ service cloud.firestore {
       // Allow public read access to all comments
       allow read: if true;
       
-      // Allow create if user is authenticated and document is properly formatted
-      allow create: if request.auth != null 
-        && request.resource.data.keys().hasAll(['uid', 'displayName', 'content', 'email'])
+      // Allow any authenticated user to create comments with required fields
+      allow create: if request.auth != null
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() >= 1
@@ -68,23 +67,17 @@ service cloud.firestore {
         && request.resource.data.content.size() >= 1
         && request.resource.data.content.size() <= 5000
         && (request.resource.data.photoURL == null || request.resource.data.photoURL is string)
-        && request.resource.data.timestamp is timestamp
-        && request.resource.data.timestamp <= request.time
-        && request.resource.data.upvotes is int
-        && request.resource.data.downvotes is int
-        && request.resource.data.upvoters is list
-        && request.resource.data.downvoters is list
         && request.resource.data.email is string
-        && (request.resource.data.isPinned == null || 
-            (request.resource.data.isPinned is bool && isAdmin()))
-        && request.resource.data.upvotes == 0
-        && request.resource.data.downvotes == 0
-        && request.resource.data.upvoters.size() == 0
-        && request.resource.data.downvoters.size() == 0;
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.upvotes is number
+        && request.resource.data.downvotes is number
+        && request.resource.data.upvoters is list
+        && request.resource.data.downvoters is list;
       
-      // Allow users to update their own comment content
-      allow update: if request.auth != null 
-        && resource.data.uid == request.auth.uid
+      // Allow users to update their own comments (content, displayName, photoURL)
+      allow update: if request.auth != null && (
+        // User is the comment author
+        (resource.data.uid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['content', 'displayName', 'photoURL'])
         && request.resource.data.content is string
         && request.resource.data.content.size() >= 1
@@ -92,24 +85,20 @@ service cloud.firestore {
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() >= 1
         && request.resource.data.displayName.size() <= 100
-        && (request.resource.data.photoURL == null || request.resource.data.photoURL is string);
-      
-      // Allow voting updates
-      allow update: if request.auth != null
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes', 'upvoters', 'downvoters'])
-        && request.resource.data.upvotes is int
-        && request.resource.data.downvotes is int
+        && (request.resource.data.photoURL == null || request.resource.data.photoURL is string))
+      ) || (
+        // Allow voting updates
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes', 'upvoters', 'downvoters'])
+        && request.resource.data.upvotes is number
+        && request.resource.data.downvotes is number
         && request.resource.data.upvoters is list
         && request.resource.data.downvoters is list
         && request.resource.data.upvotes >= 0
         && request.resource.data.downvotes >= 0
-        && request.resource.data.upvotes == request.resource.data.upvoters.size()
-        && request.resource.data.downvotes == request.resource.data.downvoters.size()
-        && request.resource.data.upvotes - resource.data.upvotes >= -1
-        && request.resource.data.upvotes - resource.data.upvotes <= 1
-        && request.resource.data.downvotes - resource.data.downvotes >= -1
-        && request.resource.data.downvotes - resource.data.downvotes <= 1;
+      );
       
+      // Allow users to delete their own comments
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
       // Allow admin to pin/unpin comments
       allow update: if isAdmin() 
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPinned'])

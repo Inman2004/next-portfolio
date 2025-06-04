@@ -69,6 +69,15 @@ export async function deleteBlogPost(postId: string, currentUserId?: string) {
     // Delete the post from Firestore
     await deleteDoc(postRef);
     
+    // Delete the post's view count
+    try {
+      const viewRef = doc(db, 'post_views', postId);
+      await deleteDoc(viewRef);
+    } catch (error) {
+      console.warn('Failed to delete view count:', error);
+      // Continue even if view count deletion fails
+    }
+    
     revalidatePath('/blog');
     revalidatePath(`/blog/${postId}`);
     

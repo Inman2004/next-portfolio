@@ -7,7 +7,8 @@ import { User } from 'firebase/auth';
 import { PostData } from '@/types';
 import { doc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Crown, Edit, Eye, ArrowLeft } from 'lucide-react';
+import { Crown, Edit, Eye, ArrowLeft, Trash2 } from 'lucide-react';
+import SocialShare from '@/components/SocialShare';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import { incrementViewCount, getViewCount } from '@/lib/views';
+import { formatNumber } from '@/lib/formatNumber';
 import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface PostPageProps {
@@ -190,7 +192,7 @@ export default function PostPage({ params }: PostPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
       </div>
     );
@@ -198,10 +200,16 @@ export default function PostPage({ params }: PostPageProps) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-red-500 text-center">
-          <h2 className="text-2xl mb-4">Error</h2>
-          <p>{error}</p>
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Error</h2>
+          <p className="text-red-600 dark:text-red-400">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -212,70 +220,75 @@ export default function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-x-hidden w-full">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-900 dark:text-white overflow-x-hidden w-full transition-colors duration-200">
       <div className="pt-24 px-6 max-w-4xl mx-auto">
-        <Link 
-          href="/blog" 
-          className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Blog
-        </Link>
         <motion.article 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-2xl border border-gray-700/50"
+          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl dark:shadow-2xl border border-gray-200/70 dark:border-gray-700/50"
         >
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                <Image
-                  src={post.author.photoURL || '/default-avatar.png'}
-                  alt={`${post.author.name}'s avatar`}
-                  fill
-                  className="object-cover"
-                  sizes="48px"
-                  priority
-                />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold mb-1">{post.title}</h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-                  <span>By {post.author.name}</span>
-                  <span>•</span>
-                  <span>{formatCreatedAt(post.createdAt)}</span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Eye className="w-4 h-4" />
-                    {views.toLocaleString()} {views === 1 ? 'view' : 'views'}
-                  </span>
-                </div>
+          <Link 
+            href="/blog" 
+            className="inline-flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Blog
+          </Link>
+          
+          <div className="flex items-center gap-4 mb-8">
+            <div className="flex-shrink-0">
+              <Image
+                src={post.author.photoURL || '/default-avatar.png'}
+                alt={post.author.name}
+                width={48}
+                height={48}
+                className="object-cover rounded-full"
+                sizes="48px"
+                priority
+              />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 truncate">{post.title}</h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                <span>By {post.author.name}</span>
+                <span className="hidden sm:inline">•</span>
+                <span>{formatCreatedAt(post.createdAt)}</span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <Eye className="w-4 h-4 flex-shrink-0" />
+                  <span>{formatNumber(views)} {views === 1 ? 'view' : 'views'}</span>
+                </span>
               </div>
             </div>
+          </div>
+
+          <div className="w-full flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 bg-gray-50/80 dark:bg-gray-900/30 p-4 rounded-xl border border-gray-200/70 dark:border-gray-800">
+            <SocialShare 
+              url={`/blog/${post.id}`}
+              title={post.title}
+              description={post.content?.substring(0, 200) + '...'}
+              isCompact={true}
+            />
             {user?.uid === post.author.id && (
-              <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <span className="h-6 w-px bg-gray-300 dark:bg-gray-700"></span>
                 <Link
                   href={`/blog/edit/${post.id}`}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-200/70 dark:text-gray-300 dark:hover:text-blue-400 dark:hover:bg-gray-700/50 rounded-full transition-colors"
+                  title="Edit post"
                 >
-                  <Edit className="w-4 h-4 inline-block" />
-                  <span className="ml-2">Edit</span>
+                  <Edit className="w-5 h-5" />
                 </Link>
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-200/70 dark:text-gray-300 dark:hover:text-red-400 dark:hover:bg-gray-700/50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Delete post"
                 >
                   {isDeleting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Deleting...
-                    </div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <Crown className="w-4 h-4 inline-block" />
-                      Delete
-                    </div>
+                    <Trash2 className="w-5 h-5" />
                   )}
                 </button>
               </div>
@@ -294,7 +307,7 @@ export default function PostPage({ params }: PostPageProps) {
                   priority
                 />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-gray-900/80 dark:from-black/80 to-transparent" />
             </div>
           )}
 
@@ -302,42 +315,44 @@ export default function PostPage({ params }: PostPageProps) {
             <MarkdownViewer content={post.content || ''} className="max-w-4xl mx-auto" />
           </div>
         </motion.article>
-      </div>
-      <ConfirmationDialog
-        isOpen={isConfirmOpen}
-        onClose={handleCancel}
-        onConfirm={handleConfirm}
-        title="Delete Post"
-        message="Are you sure you want to delete this post? This action cannot be undone."
-      />
-      <motion.div
-        className="mt-16 pt-8 pb-12 px-4 border-t border-gray-700/50 flex flex-col sm:flex-row justify-between items-center gap-4 max-w-4xl mx-auto"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <Link
-          href="/blog"
-          className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors group"
+        
+        <motion.div
+          className="mt-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl dark:shadow-2xl border border-gray-200/70 dark:border-gray-700/50"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to all posts
-        </Link>
-
-        <div className="flex space-x-4">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="p-2 rounded-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors"
-            aria-label="Back to top"
+          <Link
+            href="/blog"
+            className="inline-flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white mb-6 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-          </button>
-        </div>
-      </motion.div>
+            Back to all posts
+          </Link>
+
+          <div className="flex justify-end">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="p-2 rounded-full bg-gray-200/70 hover:bg-gray-300/70 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 transition-colors"
+              aria-label="Back to top"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+
+        <ConfirmationDialog
+          isOpen={isConfirmOpen}
+          onClose={handleCancel}
+          onConfirm={handleConfirm}
+          title="Delete Post"
+          message="Are you sure you want to delete this post? This action cannot be undone."
+        />
+      </div>
     </div>
   );
 }

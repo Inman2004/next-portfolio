@@ -10,21 +10,31 @@ import { elegantScript, pacifico } from './fonts';
 
 // Import the client component directly
 import WelcomePopup from '@/components/WelcomePopupClient';
+import Head from 'next/head';
+import { PerformanceMonitor } from '@/components/PerformanceMonitor';
+import { FontLoader } from '@/components/FontLoader';
 
+// Optimize font loading with display: 'swap' and preload
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap',
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap',
+  preload: true,
 });
 
 const livvic = Livvic({
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '600'],
   subsets: ['latin'],
   variable: '--font-livvic',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -52,11 +62,63 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} ${pacifico.variable} antialiased`} suppressHydrationWarning>
+    <html 
+      lang="en" 
+      className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} ${elegantScript.variable} ${pacifico.variable}`}
+      suppressHydrationWarning
+    >
       <head>
-        <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  // Check for saved theme preference or use system preference
+                  const savedTheme = localStorage.getItem('theme');
+                  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  let theme = savedTheme || 'system';
+                  
+                  // If theme is system, use system preference
+                  if (theme === 'system') {
+                    theme = systemPrefersDark ? 'dark' : 'light';
+                  }
+                  
+                  // Apply the theme class immediately to prevent flash of default theme
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
+                  }
+                  
+                  // Store the resolved theme
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {
+                  console.error('Error setting theme:', e);
+                }
+              })();
+            `,
+          }}
+        />
+        {/* Preconnect to external domains */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Preload critical resources */}
+        <link rel="preload" as="image" href="/favicon.png" />
+        <link 
+          rel="preload" 
+          as="image" 
+          href="/images/avatar1.png"
+          fetchPriority="high"
+        />
+        
+        {/* Add preload for critical images here */}
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} ${elegantScript.variable} bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100 min-h-screen flex flex-col`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} ${elegantScript.variable} bg-white text-gray-900 min-h-screen flex flex-col transition-colors duration-200 dark:bg-gray-950 dark:text-gray-100`}>
+        <FontLoader />
+        <PerformanceMonitor />
         <PageLoadingProvider>
           <ErrorBoundary>
             <Providers>

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { InlineMarquee, MarqueeStyles } from "@/components/magicui/marquee";
+import { InlineMarquee } from "@/components/magicui/marquee";
 import Image from "next/image";
 import { motion } from 'framer-motion';
 
@@ -62,35 +62,36 @@ const ReviewCard = ({
       animate={{ opacity: 1, y: 0 }}
       className="group h-full"
     >
-    <figure
-      className={cn(
-        "relative h-full w-fit flex flex-col items-center gap-2 cursor-pointer overflow-hidden rounded-xl border p-4",
-        "bg-gradient-to-b from-gray-800/70 via-gray-900/50 to-gray-900 border border-gray-800 hover:border-blue-500 transition-all duration-300",
-      )}
-    >
-      <div className="flex flex-row items-center gap-2">
-        <Image className="rounded" width="300" height="300" alt="" src={img} />
-        <div className="flex flex-col w-full">
-          <figcaption className="text-sm font-medium text-white">
-            {name}
-          </figcaption>
-          <p className="text-xs font-medium text-white/40">{provider}</p>
+      <figure
+        className={cn(
+          "relative h-full w-fit flex flex-col items-center gap-2 cursor-pointer overflow-hidden rounded-xl border p-4",
+          "bg-white dark:bg-gray-900/80 dark:backdrop-blur-sm",
+          "border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow-md"
+        )}
+      >
+        <div className="flex flex-row items-center gap-2">
+          <Image className="rounded" width="300" height="300" alt="" src={img} />
+          <div className="flex flex-col w-full">
+            <figcaption className="text-sm font-medium text-gray-900 dark:text-white">
+              {name}
+            </figcaption>
+            <p className="text-xs font-medium text-gray-500 dark:text-white/40">{provider}</p>
+          </div>
         </div>
-      </div>
-      <blockquote className="mt-2 text-sm">{body}</blockquote>
-    </figure></motion.div>
+        <blockquote className="mt-2 text-sm text-gray-600 dark:text-gray-300">{body}</blockquote>
+      </figure>
+    </motion.div>
   );
 };
 
 export default function Testimonials() {
   return (
-    <div id="testimonials" className="py-16 -mt-20 pt-32">
-      <MarqueeStyles />
+    <div id="testimonials" className="py-16 -mt-20 pt-32 bg-white dark:bg-gray-950">
       <div className="flex flex-col items-center justify-center mb-10">
-        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
           Certifications
         </h2>
-        <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
+        <p className="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           This showcase my certifications and skills.
         </p>
       </div>
@@ -107,8 +108,8 @@ export default function Testimonials() {
             ))}
           </InlineMarquee>
         </div>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent z-10"></div>
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent z-10"></div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white to-transparent dark:from-black z-10"></div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white to-transparent dark:from-black z-10"></div>
       </div>
     </div>
   );

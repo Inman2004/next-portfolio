@@ -9,11 +9,11 @@ export default function NotFound() {
         <p className="text-lg text-muted-foreground">
           Oops! The page you're looking for doesn't exist.
         </p>
-        <Button asChild>
-          <Link href="/">
+        <Link href="/">
+          <Button>
             Go back home
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -54,8 +54,8 @@ export default function ProfileSettings() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-md mx-auto"
     >
-      <div className="bg-gray-800/50 rounded-xl p-8 backdrop-blur-sm border border-gray-700/50">
-        <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+      <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl p-8 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-gray-900/20">
+        <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-600 bg-clip-text text-transparent">
           Edit Profile
         </h2>
 
@@ -68,7 +68,7 @@ export default function ProfileSettings() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Display Name
               </label>
               <input
@@ -76,28 +76,28 @@ export default function ProfileSettings() {
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-white/50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Your display name"
                 disabled={isLoading}
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 value={user.email || ''}
-                className="w-full px-4 py-2 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-400"
+                className="w-full px-4 py-2 rounded-lg bg-gray-100/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
                 disabled
               />
             </div>
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm" role="alert">{error}</p>
+            <p className="text-red-600 dark:text-red-400 text-sm" role="alert">{error}</p>
           )}
 
           {success && (

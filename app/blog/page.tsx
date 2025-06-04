@@ -9,7 +9,8 @@ import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import { getBlogPosts } from '@/lib/blog';
-import { Crown, Eye, Flame, Clock, ArrowUpDown, Plus, Trash2, Loader2 } from 'lucide-react';
+import { Eye, Clock, Calendar, Search, Filter, X, Loader2, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight } from 'lucide-react';
+import { formatNumber } from '@/lib/formatNumber';
 import { toast } from 'react-hot-toast';
 import type { BlogPost } from '@/types/blog';
 import { getViewCount } from '@/lib/views';
@@ -287,7 +288,7 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       {/* Create Post Button - Floating */}
       <div className="fixed bottom-6 right-6 z-50">
         {user ? (
@@ -322,7 +323,7 @@ export default function BlogPage() {
               Blogs
             </motion.span>
             <motion.h1 
-              className="relative z-10 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-indigo-600 p-2"
+              className="relative z-10 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-600 from-indigo-600 dark:to-purple-500 dark:from-indigo-500 p-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -331,18 +332,18 @@ export default function BlogPage() {
             </motion.h1>
           </div>
           <motion.div 
-            className="text-xl text-gray-300 max-w-2xl mx-auto"
+            className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h1 className="text-xl font-thin tracking-tight text-gray-400 sm:text-2xl">
+            <h1 className="text-xl font-thin tracking-tight text-gray-600 dark:text-gray-400 sm:text-2xl">
               <span className="block">
-                Use the power of social proof
-                <span className="text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-teal-400">
-                  &nbsp;thoughts, stories, and ideas about your development, design,
+                Use the power of social proof to
+                <span className="text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-teal-400">
+                &nbsp;Create. Share. Belong. Build a space where developers and designers 
                 </span>
-                &nbsp;to inspire others
+                &nbsp;inspire each other.
               </span>
             </h1>
           </motion.div>
@@ -359,16 +360,16 @@ export default function BlogPage() {
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
               Latest Posts
             </h2>
-            <p className="text-gray-400 mt-1">Discover the latest articles and tutorials</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
           </div>
           
           {user && (
             <Link
               href="/blog/new"
-              className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
+              className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Post
@@ -378,7 +379,7 @@ export default function BlogPage() {
 
         {/* Sort Controls */}
         <motion.div 
-          className="flex flex-wrap gap-2 mb-10 bg-gray-800/30 backdrop-blur-sm p-1.5 rounded-xl border border-gray-700/50 max-w-max"
+          className="flex flex-wrap gap-2 mb-10 bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 max-w-max shadow-sm dark:shadow-none"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
@@ -387,8 +388,8 @@ export default function BlogPage() {
             onClick={() => setSortBy('newest')}
             className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               sortBy === 'newest' 
-                ? 'bg-blue-600/90 text-white shadow-lg shadow-blue-500/20' 
-                : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
+                : 'bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <Clock className="w-4 h-4 mr-2" />
@@ -420,18 +421,18 @@ export default function BlogPage() {
 
         {/* Loading State */}
         {loading ? (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white/5 rounded-2xl p-6 border border-white/10 overflow-hidden animate-pulse">
+              <div key={i} className="bg-white/80 dark:bg-gray-800/30 rounded-2xl p-6 border border-gray-200/50 dark:border-white/10 overflow-hidden animate-pulse backdrop-blur-sm">
                 <div className="space-y-4">
-                  <div className="h-6 bg-white/10 rounded w-3/4"></div>
-                  <div className="h-4 bg-white/5 rounded w-1/2"></div>
-                  <div className="h-4 bg-white/5 rounded w-full"></div>
-                  <div className="h-4 bg-white/5 rounded w-5/6"></div>
-                  <div className="h-4 bg-white/5 rounded w-4/6"></div>
-                  <div className="pt-4 flex space-x-2">
+                  <div className="h-7 bg-gray-200/70 dark:bg-white/10 rounded-lg w-3/4"></div>
+                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-full"></div>
+                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-5/6"></div>
+                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-4/6"></div>
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-6 w-20 bg-white/5 rounded-full"></div>
+                      <div key={i} className="h-6 w-20 bg-gray-100/70 dark:bg-white/5 rounded-full"></div>
                     ))}
                   </div>
                 </div>
@@ -451,18 +452,18 @@ export default function BlogPage() {
         {/* No Posts */}
         {!loading && sortedPosts.length === 0 && !error && (
           <motion.div 
-            className="text-center py-16 bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50"
+            className="text-center py-16 bg-white/80 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
             <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-2xl font-semibold text-gray-200 mb-2">No Posts Yet</h3>
-            <p className="text-gray-400 max-w-md mx-auto mb-6">Be the first to share your thoughts and start the conversation!</p>
+            <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No Posts Yet</h3>
+            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">Be the first to share your thoughts and start the conversation!</p>
             {user ? (
               <Link 
                 href="/blog/new"
-                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors shadow-md hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Create Your First Post
@@ -494,17 +495,17 @@ export default function BlogPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileHover={{ y: -5, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
-                  className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border-2 transition-all duration-300 h-full flex flex-col ${
+                  whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
+                  className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col ${
                     post.isAdmin 
-                      ? 'border-yellow-500/50 bg-gradient-to-br from-yellow-900/10 to-gray-900/50 hover:border-yellow-500/80' 
-                      : 'border-gray-700/50 bg-gradient-to-br from-gray-800/50 to-gray-900/50 hover:border-blue-500/50'
+                      ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80' 
+                      : 'border-gray-200/70 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
                   }`}
                 >
                   <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
                     {post.isAdmin && (
-                      <div className="bg-yellow-500/90 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center">
-                        <Crown className="w-3 h-3 mr-1" />
+                      <div className="bg-amber-400/90 dark:bg-yellow-500/90 text-amber-900 dark:text-yellow-900 text-xs font-bold px-2.5 py-1 rounded-full flex items-center shadow-sm">
+                        <Crown className="w-3 h-3 mr-1.5" />
                         Admin
                       </div>
                     )}
@@ -512,7 +513,7 @@ export default function BlogPage() {
                       <button
                         onClick={(e) => handleDelete(postId, e)}
                         disabled={deletingId === postId}
-                        className="p-1.5 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         aria-label="Delete post"
                       >
                         {deletingId === postId ? (
@@ -538,21 +539,24 @@ export default function BlogPage() {
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-500">
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                           <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
                       )}
                       <div className={`absolute inset-0 bg-gradient-to-t ${
-                        post.isAdmin ? 'from-amber-900/80' : 'from-black/70'
+                        post.isAdmin 
+                          ? 'from-amber-900/80 dark:from-amber-900/80' 
+                          : 'from-black/70 dark:from-black/70'
                       } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all ${
                           post.isAdmin 
-                            ? 'bg-yellow-500/90 text-yellow-900' 
-                            : 'bg-blue-500/90 text-white'
+                            ? 'bg-amber-400/90 hover:bg-amber-300 text-amber-900 dark:bg-yellow-500/90 dark:hover:bg-yellow-400/90 dark:text-yellow-900' 
+                            : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500/90 dark:hover:bg-blue-400/90'
                         }`}>
                           Read More
+                          <ArrowRight className="w-3.5 h-3.5 ml-1.5 -mr-0.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                         </span>
                       </div>
                     </div>
@@ -560,16 +564,18 @@ export default function BlogPage() {
                     {/* Post Content */}
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="flex-1">
-                        <h2 className="text-xl font-bold text-white mb-2 line-clamp-2">{post.title}</h2>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {post.title}
+                        </h2>
                         {post.excerpt && (
-                          <div className="text-gray-400 text-sm line-clamp-3 mb-4 prose prose-invert prose-sm max-w-none">
+                          <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 prose prose-sm dark:prose-invert max-w-none">
                             <MarkdownViewer content={post.excerpt} />
                           </div>
                         )}
                       </div>
                       
                       {/* Post Meta */}
-                      <div className="mt-4 pt-4 border-t border-gray-700/50">
+                      <div className="mt-4 pt-4 border-t border-gray-200/70 dark:border-gray-700/50">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             {post.authorPhotoURL ? (
@@ -578,23 +584,23 @@ export default function BlogPage() {
                                 alt={post.author || 'Author'} 
                                 width={32} 
                                 height={32} 
-                                className="rounded-full mr-2"
+                                className="rounded-full mr-2.5 border border-gray-200/50 dark:border-gray-600/50"
                               />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2">
+                              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2.5 shadow-sm">
                                 {post.author?.charAt(0)?.toUpperCase() || 'A'}
                               </div>
                             )}
                             <div>
-                              <p className="text-sm font-medium text-white">{post.author || 'Anonymous'}</p>
-                              <p className="text-xs text-gray-400">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">{post.author || 'Anonymous'}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {formatCreatedAt(post.createdAt)}
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center text-gray-400 text-sm">
-                            <Eye className="w-4 h-4 mr-1" />
-                            <span>{viewCount}</span>
+                          <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+                            <Eye className="w-4 h-4 mr-1.5 opacity-70" />
+                            <span className="font-medium">{formatNumber(viewCount)}</span>
                           </div>
                         </div>
                       </div>

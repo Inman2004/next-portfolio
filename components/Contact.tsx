@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { Send } from 'lucide-react';
@@ -30,13 +32,6 @@ const Contact = () => {
       setIsSubmitting(true);
       setSubmitStatus({ type: null, message: '' });
 
-      // Log the environment variables (without exposing sensitive data)
-      console.log('EmailJS Config:', {
-        hasServiceId: !!process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
-        hasTemplateId: !!process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
-        hasPublicKey: !!process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
-      });
-
       const result = await emailjs.sendForm(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
@@ -51,29 +46,12 @@ const Contact = () => {
         });
         setFormData({ name: '', email: '', message: '' });
       }
-    } catch (error: Error | unknown) {
-      console.error('Error details:', {
-        error: error instanceof Error ? {
-          message: error.message,
-          name: error.name,
-          stack: error.stack
-        } : error
+    } catch (error) {
+      console.error('Error details:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: 'Failed to send message. Please try again later.'
       });
-      
-      // Check if environment variables are properly set
-      if (!process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 
-          !process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 
-          !process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
-        setSubmitStatus({
-          type: 'error',
-          message: 'EmailJS configuration is missing. Please check your environment variables.'
-        });
-      } else {
-        setSubmitStatus({
-          type: 'error',
-          message: error instanceof Error ? error.message : 'Failed to send message. Please try again later.'
-        });
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -82,12 +60,12 @@ const Contact = () => {
   const socialLinks = [
     { icon: FaGithub, href: 'https://github.com/Inman2004', label: 'GitHub', color: '#a930d5' },
     { icon: FaLinkedin, href: 'https://linkedin.com/in/rv3d', label: 'LinkedIn', color: '#0A66C2' },
-    { icon: FaXTwitter, href: 'https://twitter.com/rvimman_', label: 'Twitter', color: '#fff' },
+    { icon: FaXTwitter, href: 'https://twitter.com/rvimman_', label: 'Twitter', color: '#1DA1F2' },
     { icon: SiGmail, href: 'mailto:rvimman@gmail.com', label: 'Email', color: '#cf594e' }
   ];
 
   return (
-    <section id="contact" className="bg-gradient-to-b from-black to-gray-900 mt-20 pb-20">
+    <section id="contact" className="bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-950 py-20">
       <div className="max-w-6xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -95,10 +73,10 @@ const Contact = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
             Get in Touch
           </h2>
-          <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Have a question or want to work together? Feel free to reach out!
           </p>
         </motion.div>
@@ -111,9 +89,9 @@ const Contact = () => {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="space-y-8"
           >
-            <form ref={formRef} onSubmit={handleSubmit} className="mt-8 space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="from_name" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="from_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Name
                 </label>
                 <input
@@ -123,11 +101,11 @@ const Contact = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-800/50 py-2 px-3 text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="reply_to" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="reply_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email
                 </label>
                 <input
@@ -137,11 +115,11 @@ const Contact = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-800/50 py-2 px-3 text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-300">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Message
                 </label>
                 <textarea
@@ -151,14 +129,16 @@ const Contact = () => {
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-800/50 py-2 px-3 text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
 
               {submitStatus.type && (
                 <div
                   className={`p-4 rounded-lg ${
-                    submitStatus.type === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                    submitStatus.type === 'success' 
+                      ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' 
+                      : 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400'
                   }`}
                 >
                   {submitStatus.message}
@@ -170,7 +150,7 @@ const Contact = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 {isSubmitting ? (
                   <>
@@ -199,8 +179,8 @@ const Contact = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="space-y-8"
           >
-            <div className="bg-gradient-to-b from-gray-800 to-gray-900 p-8 rounded-xl border border-gray-800">
-              <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Connect With Me
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -212,22 +192,22 @@ const Contact = () => {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors group"
+                    className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors group border border-gray-200 dark:border-gray-700"
                   >
                     <link.icon className={`w-5 h-5 text-[${link.color}] group-hover:opacity-80 transition-opacity`} />
-                    <span className="text-gray-300">{link.label}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{link.label}</span>
                   </motion.a>
                 ))}
               </div>
             </div>
 
-            <div className="bg-gradient-to-b from-gray-800 to-gray-900 p-8 rounded-xl border border-gray-800">
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Location
               </h3>
-              <p className="text-gray-400">
-                Based in <b className='text-blue-500 font-thin'>Bangalore, Chennai, India</b><br />
-                Available for <b className='text-blue-500 font-thin'>remote</b> work worldwide
+              <p className="text-gray-600 dark:text-gray-400">
+                Based in <b className='text-blue-600 dark:text-blue-400 font-medium'>Bangalore, Chennai, India</b><br />
+                Available for <b className='text-blue-600 dark:text-blue-400 font-medium'>remote</b> work worldwide
               </p>
             </div>
           </motion.div>

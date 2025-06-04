@@ -149,7 +149,7 @@ export default function Hero() {
               transition={{ delay: 0.3 }}
               className="inline-block"
             >
-              <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200/10 text-blue-300 mb-6 inline-block">
+              <span className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200/30 dark:border-blue-200/10 text-blue-700 dark:text-blue-300 mb-6 inline-block backdrop-blur-sm">
                 Welcome to my portfolio
               </span>
             </motion.div>
@@ -160,7 +160,7 @@ export default function Hero() {
               </span>
             </h1>
 
-            <div className="text-lg sm:text-xl md:text-2xl text-indigo-300 mb-8 h-[180px] flex items-center justify-center lg:justify-start">
+            <div className="text-lg sm:text-xl md:text-2xl text-indigo-700 dark:text-indigo-300 mb-8 h-[180px] flex items-center justify-center lg:justify-start">
               <MorphingText
                 texts={[
                   "UI/UX Designer",
@@ -168,12 +168,12 @@ export default function Hero() {
                   "Graphic Designer",
                   "3D Artist",
                 ]}
-                className="text-center lg:text-left !h-[160px]"
+                className="text-center lg:text-left !h-[160px] text-indigo-800/90 dark:text-indigo-300"
               />
             </div>
             <div className="mb-2">
-              <p className="text-sm text-blue-300/80 mb-1 ml-2 font-livvic" style={{ fontFamily: 'var(--font-livvic)' }}>
-                A quote for you
+              <p className="text-sm text-blue-600/80 dark:text-blue-300/80 mb-1 ml-2 font-livvic" style={{ fontFamily: 'var(--font-livvic)' }}>
+                a quote for you
               </p>
               <div className="w-full max-w-3xl mx-auto space-y-3" ref={quoteRef}>
                 <div className="relative">
@@ -186,8 +186,8 @@ export default function Hero() {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                       className="flex items-start gap-3"
                     >
-                      <Quote className="text-pink-400 flex-shrink-0 mt-1" size={24} />
-                      <p className="px-5 py-3 text-lg lg:text-xl leading-relaxed font-medium tracking-normal rounded-xl text-transparent bg-clip-text bg-gradient-to-tr to-purple-500 from-teal-400 w-full whitespace-normal break-words" 
+                      <Quote className="text-pink-400/80 flex-shrink-0 mt-1" size={24} />
+                      <p className="px-5 py-3 text-lg lg:text-xl leading-relaxed font-medium tracking-normal rounded-xl text-transparent bg-clip-text bg-gradient-to-tr to-purple-600/90 from-teal-500/90 dark:to-purple-500/80 dark:from-teal-400/80 w-full whitespace-normal break-words" 
                         style={{ 
                           fontFamily: 'var(--font-pacifico), cursive', 
                           filter: 'contrast(0.9) brightness(1.1)',
@@ -209,7 +209,7 @@ export default function Hero() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3, delay: 0.1 }}
-                      className="text-right text-pink-300/60 text-sm lg:text-base" 
+                      className="text-right text-pink-600/80 dark:text-pink-300/60 text-sm lg:text-base" 
                       style={{ 
                         fontFamily: 'var(--font-pacifico), cursive', 
                         fontWeight: 500, 
@@ -229,7 +229,7 @@ export default function Hero() {
                 href="#projects"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-medium hover:opacity-90 transition-all duration-300 shadow-lg shadow-blue-500/25 text-center"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-medium hover:opacity-90 transition-all duration-300 shadow-lg shadow-blue-500/25 text-white text-center"
               >
                 View My Work
               </motion.a>
@@ -237,7 +237,7 @@ export default function Hero() {
                 href="#contact"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 border border-blue-500/30 rounded-lg text-lg font-medium hover:bg-blue-500/10 transition-all duration-300 text-center"
+                className="px-8 py-4 border border-blue-500/30 dark:border-blue-500/30 rounded-lg text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white"
               >
                 Get in Touch
               </motion.a>
@@ -250,7 +250,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#a930d5] hover:opacity-80 transition-opacity"
+                className="text-[#6d28d9] dark:text-[#a930d5] hover:opacity-80 transition-opacity"
               >
                 <FaGithub className="w-6 h-6" />
               </motion.a>
@@ -259,7 +259,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#0A66C2] hover:opacity-80 transition-opacity"
+                className="text-[#0a5cb4] dark:text-[#0A66C2] hover:opacity-80 transition-opacity"
               >
                 <FaLinkedin className="w-6 h-6" />
               </motion.a>
@@ -268,7 +268,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#fff] hover:opacity-80 transition-opacity"
+                className="text-gray-800 dark:text-[#fff] hover:opacity-80 transition-opacity"
               >
                 <FaXTwitter className="w-6 h-6" />
               </motion.a>
@@ -277,7 +277,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#cf594e] hover:opacity-80 transition-opacity"
+                className="text-[#d93025] dark:text-[#cf594e] hover:opacity-80 transition-opacity"
               >
                 <SiGmail className="w-6 h-6" />
               </motion.a>
@@ -291,29 +291,166 @@ export default function Hero() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="flex flex-col items-center text-center space-y-6 mt-4"
           >
-            <div className="relative w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
-              <div className="relative w-full aspect-square">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -z-20" />
-                <div className="relative w-full h-full rounded-full overflow-hidden border border-blue-500/20">
-                  <div className="absolute inset-0 w-full h-full">
+            <motion.div 
+              className="relative w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="relative w-full aspect-square group">
+                {/* Glow effect with animation */}
+                <motion.div 
+                  className="absolute inset-0 rounded-full -z-10"
+                  initial={{
+                    opacity: 0.3,
+                    scale: 0.9,
+                    background: 'radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15), transparent 60%)',
+                  }}
+                  animate={{
+                    opacity: [0.3, 0.5, 0.3],
+                    scale: [0.9, 1.05, 0.9],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                  style={{
+                    filter: 'blur(30px)',
+                    transform: 'translateZ(0)',
+                  }}
+                />
+                
+                {/* Main image container with shape morphing */}
+                <motion.div 
+                  className="relative w-full h-full overflow-hidden border-2 border-blue-300/40 dark:border-blue-500/30 
+                    shadow-[0_0_25px_-10px_rgba(99,102,241,0.2)] dark:shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)]
+                    bg-white/20 dark:bg-transparent backdrop-blur-sm"
+                  initial={{ borderRadius: '50%' }}
+                  whileHover={{
+                    borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
+                    scale: 1.02,
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    ease: 'easeInOut',
+                    borderRadius: {
+                      duration: 1.5,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                    },
+                    rotate: {
+                      duration: 8,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                    }
+                  }}
+                >
+                  {/* Image with parallax effect */}
+                  <motion.div 
+                    className="absolute inset-0 w-full h-full"
+                    whileHover={{
+                      scale: 1.1,
+                      rotate: [0, 2, -2, 0],
+                    }}
+                    transition={{
+                      duration: 8,
+                      ease: 'easeInOut',
+                      rotate: {
+                        duration: 12,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                      }
+                    }}
+                  >
                     <Image
                       src="/images/avatar1.png"
                       alt="Immanuvel"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
+                      className="object-cover transition-all duration-1000 ease-out"
                       priority
+                      quality={90}
+                      loading="eager"
+                      placeholder="blur"
+                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
                     />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-radial from-purple-500/30 via-blue-800/90 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 via-blue-800/40 to-blue-950/95" />
-                </div>
+                  </motion.div>
+                  
+                  {/* Overlay gradients */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-purple-100/10 to-transparent"
+                    whileHover={{ opacity: 0.7 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-t from-white/50 via-transparent to-blue-100/40 
+                      dark:from-blue-950/90 dark:via-transparent dark:to-blue-900/80"
+                    whileHover={{ opacity: 0.8 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                  />
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-blue-100/20 via-transparent to-purple-100/20 
+                      dark:from-blue-900/20 dark:via-transparent dark:to-purple-900/20"
+                    whileHover={{ opacity: 0.6 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  />
+                  
+                  {/* Animated border effect */}
+                  <motion.div 
+                    className="absolute inset-0 border-2 border-transparent"
+                    animate={{
+                      borderRadius: ['50%', '30% 70% 70% 30% / 30% 30% 70% 70%'],
+                      borderColor: ['rgba(99,102,241,0)', 'rgba(99,102,241,0.5)'],
+                      boxShadow: ['0 0 0 0 rgba(99,102,241,0.1)', '0 0 30px 5px rgba(99,102,241,0.2)'],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                    }}
+                  />
+                </motion.div>
+                
+                {/* Floating elements with staggered animations */}
+                {[...Array(4)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className={`absolute rounded-full ${
+                      i % 2 === 0 
+                        ? 'bg-blue-400/80 dark:bg-blue-300' 
+                        : 'bg-purple-300/80 dark:bg-purple-300'
+                    }`}
+                    style={{
+                      width: `${8 + i * 4}px`,
+                      height: `${8 + i * 4}px`,
+                      top: `${10 + i * 15}%`,
+                      left: i % 2 === 0 ? '10%' : '80%',
+                      opacity: 0,
+                    }}
+                    animate={{
+                      y: [0, -20, 0],
+                      opacity: [0, 0.7, 0],
+                      scale: [0.8, 1.2, 0.8],
+                    }}
+                    transition={{
+                      duration: 4 + i,
+                      delay: i * 0.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                ))}
               </div>
-            </div>
+            </motion.div>
             
             <div className="space-y-2">
               <motion.a 
-                className="text-purple-300 font-medium cursor-pointer hover:opacity-80 transition-opacity"
+                className="text-purple-700 dark:text-purple-300 font-medium cursor-pointer hover:opacity-80 transition-opacity"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.1 }}
@@ -327,7 +464,7 @@ export default function Hero() {
               </motion.a>
               <div className="flex items-center justify-center gap-2 mt-1 sm:mt-0">
                   <motion.span 
-                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-yellow-500/30 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 transition-all duration-300 hover:scale-105"
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/30 to-yellow-500/30 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-700 dark:text-amber-300 border border-yellow-500/40 dark:border-yellow-500/30 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 transition-all duration-300 hover:scale-105"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.9, duration: 0.5 }}
@@ -335,7 +472,7 @@ export default function Hero() {
                     Author
                   </motion.span>
                   <motion.span 
-                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 border border-purple-500/30 shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105"
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/30 to-blue-500/30 dark:from-purple-500/20 dark:to-blue-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 dark:border-purple-500/30 shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
@@ -344,12 +481,18 @@ export default function Hero() {
                   </motion.span>
                 </div>
               <motion.p 
-                className="text-gray-300 max-w-md text-sm sm:text-base px-4"
+                className="text-transparent bg-clip-text bg-gradient-to-t to-blue-600/90 from-gray-800/90 dark:to-blue-300/80 dark:from-gray-900/80 max-w-md text-sm sm:text-base px-4"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9, duration: 0.5 }}
+                style={{ 
+                  fontFamily: 'var(--font-pacifico), cursive', 
+                  filter: 'contrast(0.9) brightness(1.1)',
+                  wordSpacing: '0.1em',
+                  letterSpacing: '0.01em'
+                }}
               >
-                Crafting seamless digital experiences with modern web technologies and creative problem-solving.
+                " Turn your dev journey into a movement—share, connect, and grow together. " 
               </motion.p>
             </div>
           </motion.div>

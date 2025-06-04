@@ -229,22 +229,22 @@ const NewBlogPostPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-x-hidden w-full">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white overflow-x-hidden w-full transition-colors duration-200">
       <div className="pt-24 px-6 max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8"
+          className="relative bg-white/80 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-200/70 dark:border-gray-700/50 p-6 md:p-8 shadow-xl dark:shadow-2xl"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-purple-900/10 -z-10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/70 to-purple-50/70 dark:from-blue-900/10 dark:to-purple-900/10 -z-10 rounded-2xl" />
           
           <div className="mb-8">
             <motion.h1 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-2"
+              className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 mb-2"
             >
               Create New Post
             </motion.h1>
@@ -252,7 +252,7 @@ const NewBlogPostPage = () => {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-gray-400"
+              className="text-gray-600 dark:text-gray-400"
             >
               Share your thoughts and ideas with the world
             </motion.p>
@@ -262,7 +262,7 @@ const NewBlogPostPage = () => {
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg flex items-start"
+              className="mb-6 p-4 bg-red-100 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 rounded-lg flex items-start"
             >
               <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -286,7 +286,7 @@ const NewBlogPostPage = () => {
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+                className="w-full px-4 py-3 bg-white/80 dark:bg-gray-700/30 border border-gray-300/70 dark:border-gray-600/50 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500 shadow-sm"
                 placeholder="Enter a compelling title..."
                 disabled={isSubmitting}
                 required
@@ -300,7 +300,7 @@ const NewBlogPostPage = () => {
               transition={{ delay: 0.35 }}
               className="space-y-2"
             >
-              <label className="block text-sm font-medium text-gray-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Cover Image
                 <span className="text-gray-500 text-xs ml-2">(Optional)</span>
               </label>
@@ -315,9 +315,9 @@ const NewBlogPostPage = () => {
                     coverImage 
                       ? 'border-transparent' 
                       : isCloudinaryReady 
-                        ? 'border-gray-600 hover:border-blue-500' 
-                        : 'border-gray-700 cursor-not-allowed'
-                  } bg-gray-700/30 flex items-center justify-center overflow-hidden transition-colors duration-200`}
+                        ? 'border-gray-300 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-500' 
+                        : 'border-gray-200 dark:border-gray-700 cursor-not-allowed'
+                  } bg-gray-100/50 dark:bg-gray-700/30 flex items-center justify-center overflow-hidden transition-colors duration-200 group`}
                 >
                   {coverImage ? (
                     <>
@@ -326,18 +326,18 @@ const NewBlogPostPage = () => {
                         alt="Cover preview" 
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/50 dark:bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Camera className="w-6 h-6 text-white" />
                       </div>
                     </>
                   ) : (
                     <div className="text-center p-4">
                       {isUploading ? (
-                        <Loader2 className="w-6 h-6 mx-auto text-gray-400 mb-1 animate-spin" />
+                        <Loader2 className="w-6 h-6 mx-auto text-gray-500 dark:text-gray-400 mb-1 animate-spin" />
                       ) : (
-                        <ImageIcon className="w-6 h-6 mx-auto text-gray-400 mb-1" />
+                        <ImageIcon className="w-6 h-6 mx-auto text-gray-400 dark:text-gray-500 mb-1" />
                       )}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {isUploading ? 'Uploading...' : 'Upload Image'}
                       </span>
                     </div>
@@ -347,14 +347,14 @@ const NewBlogPostPage = () => {
                   <button
                     type="button"
                     onClick={() => setCoverImage(null)}
-                    className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                     disabled={isUploading}
                   >
                     Remove
                   </button>
                 )}
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Recommended size: 1200x630px (16:9 aspect ratio)
               </p>
             </motion.div>
@@ -372,7 +372,7 @@ const NewBlogPostPage = () => {
                 id="content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full min-h-[300px] px-4 py-3 bg-gray-700/30 border border-gray-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 resize-none placeholder-gray-500"
+                className="w-full min-h-[300px] px-4 py-3 bg-white/80 dark:bg-gray-700/30 border border-gray-300/70 dark:border-gray-600/50 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 resize-none placeholder-gray-400 dark:placeholder-gray-500 shadow-sm"
                 placeholder="Write your post content here..."
                 disabled={isSubmitting}
                 required
@@ -392,7 +392,7 @@ const NewBlogPostPage = () => {
                   disabled={isSubmitting}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-2.5 text-gray-300 hover:text-white font-medium rounded-xl border border-gray-600 hover:border-gray-500 transition-all duration-200 flex items-center justify-center"
+                  className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-xl border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700/30"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2 -ml-1" />
                   Cancel
@@ -403,7 +403,7 @@ const NewBlogPostPage = () => {
                   disabled={isSubmitting || isUploading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:shadow-blue-500/20 dark:shadow-blue-500/30"
                 >
                   {isSubmitting ? (
                     <>

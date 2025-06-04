@@ -2,6 +2,13 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import styles from "./marquee.module.css";
+
+declare global {
+  interface Window {
+    ResizeObserver: any;
+  }
+}
 
 interface MarqueeProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -37,59 +44,70 @@ export function Marquee({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = React.useState(false);
-  const [isMounted, setIsMounted] = React.useState(false);
-  const [contentWidth, setContentWidth] = React.useState(0);
-  const [containerWidth, setContainerWidth] = React.useState(0);
+  const [duration, setDuration] = React.useState(20);
+  const isMounted = React.useRef(false);
+  const [isClient, setIsClient] = React.useState(false);
 
-  // Set mounted state to prevent hydration issues
+  // Set client-side rendering
   React.useEffect(() => {
-    setIsMounted(true);
+    setIsClient(true);
+  }, []);
+
+  // Handle mount and update
+  React.useEffect(() => {
+    if (isMounted.current) return;
+    isMounted.current = true;
     
-    const updateSizes = () => {
-      if (contentRef.current) {
-        setContentWidth(contentRef.current.scrollWidth);
-      }
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
-      }
+    if (!isClient) return;
+    
+    const updateDuration = () => {
+      if (!contentRef.current) return;
+      
+      const contentWidth = contentRef.current.scrollWidth / 2; // Since we duplicate the content
+      const speed = 50; // pixels per second
+      const calculatedDuration = Math.max(10, Math.min(60, contentWidth / speed));
+      setDuration(calculatedDuration);
     };
 
-    updateSizes();
-    window.addEventListener('resize', updateSizes);
+    // Initial update
+    updateDuration();
+    
+    // Update on window resize
+    const handleResize = () => {
+      updateDuration();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Set up ResizeObserver if available
+    if (typeof window.ResizeObserver !== 'undefined') {
+      const resizeObserver = new ResizeObserver(updateDuration);
+      if (contentRef.current) {
+        resizeObserver.observe(contentRef.current);
+      }
+      
+      return () => {
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', handleResize);
+      };
+    }
     
     return () => {
-      window.removeEventListener('resize', updateSizes);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
-  const handleMouseEnter = () => {
-    if (pauseOnHover) {
-      setIsPaused(true);
-    }
-  };
+  const handleMouseEnter = () => pauseOnHover && setIsPaused(true);
+  const handleMouseLeave = () => pauseOnHover && setIsPaused(false);
 
-  const handleMouseLeave = () => {
-    if (pauseOnHover) {
-      setIsPaused(false);
-    }
-  };
-
-  // Calculate duration based on content and container width
-  const duration = React.useMemo(() => {
-    if (contentWidth === 0 || containerWidth === 0) return 20;
-    const speed = 100; // pixels per second
-    return Math.max(10, (contentWidth + containerWidth) / speed);
-  }, [contentWidth, containerWidth]);
-
-  // Only render the marquee content if mounted to prevent hydration issues
-  if (!isMounted) {
-    return <div ref={containerRef} className={cn("relative overflow-hidden w-full", className)} />;
+  if (!isClient) {
+    return <div className={cn(styles.marquee, className)} {...props} />;
   }
 
   return (
     <div
       ref={containerRef}
-      className={cn("relative overflow-hidden w-full", className)}
+      className={cn(styles.marquee, className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}
@@ -97,13 +115,12 @@ export function Marquee({
       <div
         ref={contentRef}
         className={cn(
-          "flex flex-nowrap gap-8 w-max",
-          reverse ? "animate-marquee-reverse" : "animate-marquee",
-          isPaused && "[animation-play-state:paused]"
+          styles.content,
+          reverse ? styles.animateMarqueeReverse : styles.animateMarquee,
+          isPaused && styles.animatePaused
         )}
         style={{
           '--duration': `${duration}s`,
-          transition: 'all 0.3s ease-in-out',
         } as React.CSSProperties}
       >
         {React.Children.map(children, (child, i) => (
@@ -121,38 +138,5 @@ export function Marquee({
   );
 }
 
-// Add global styles for the marquee animations
-const MarqueeStyles = () => (
-  <style jsx global>{`
-    @keyframes marquee {
-      0% {
-        transform: translateX(0);
-      }
-      100% {
-        transform: translateX(calc(-50% - 2rem));
-      }
-    }
-    @keyframes marquee-reverse {
-      0% {
-        transform: translateX(calc(-50% - 2rem));
-      }
-      100% {
-        transform: translateX(0);
-      }
-    }
-    .animate-marquee {
-      animation: marquee var(--duration, 60s) linear infinite;
-      animation-play-state: running;
-    }
-    .animate-marquee-reverse {
-      animation: marquee-reverse var(--duration, 60s) linear infinite;
-      animation-play-state: running;
-    }
-    [animation-play-state="paused"] {
-      animation-play-state: paused !important;
-    }
-  `}</style>
-);
-
-// Export the Marquee component and its styles
-export { Marquee as InlineMarquee, MarqueeStyles };
+// Export the Marquee component
+export { Marquee as InlineMarquee };
