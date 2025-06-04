@@ -14,8 +14,6 @@ const Footer = () => {
 
   const navLinks = [
     { href: '#home', label: 'Home' },
-    { href: '#skills', label: 'Skills' },
-    { href: '#services', label: 'Services' },
     { href: '#projects', label: 'Projects' },
     { href: '#contact', label: 'Contact' },
     { href: '#experience', label: 'Experience' },
@@ -38,14 +36,17 @@ const Footer = () => {
           {/* Navigation Links */}
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Quick Links</h4>
-            <nav className="flex flex-row space-x-2">
+            <nav className="flex flex-row space-x-4">
               {navLinks.map((link) => (
                 <Link 
                   key={link.href} 
                   href={link.href}
-                  className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white transition-colors"
+                  className="relative inline-block text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white group"
                 >
-                  {link.label}
+                  <span className="relative transition-all">
+                    {link.label}
+                    <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 dark:bg-white transition-all duration-300 group-hover:w-full"></span>
+                  </span>
                 </Link>
               ))}
             </nav>

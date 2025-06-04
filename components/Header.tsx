@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, User, Home, Settings, Menu, X } from 'lucide-react';
+import { LogOut, User, Home, Settings, Menu, X, BriefcaseBusiness, Rss, Mail, AppWindow, PencilLine, Flame, Handshake } from 'lucide-react';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -15,15 +15,22 @@ interface NavLink {
   href: string;
   label: string;
   icon?: React.ReactNode;
+  color?: string;
+  className?: string;
 }
 
 const navigationLinks: NavLink[] = [
-  { href: '#home', label: 'Home', icon: <Home className="w-4 h-4 mr-1.5" /> },
-  { href: '#projects', label: 'Projects' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#services', label: 'Services' },
-  { href: '/blog', label: 'Blog' },
-  { href: '#contact', label: 'Contact' },
+  { href: '#home', label: 'Home', icon: <Home className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+  { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
+  { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
+  { href: '#services', label: 'Services', icon: <Handshake className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
+  {
+    href: '/blog',
+    label: 'Blog',
+    icon: <Flame className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
+    className: 'group/blog',
+  },
+  { href: '#contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
 ];
 
 const dashboardLinks: NavLink[] = [
@@ -36,58 +43,120 @@ interface NavItemProps extends React.HTMLAttributes<HTMLLIElement> {
   className?: string;
   children: React.ReactNode;
   onClick?: () => void;
+  color?: string;
 }
 
-function NavItem({ 
-  href, 
-  children, 
+function NavItem({
+  href,
+  children,
   className = '',
+  color = '',
   onClick,
-  ...props 
+  ...props
 }: NavItemProps) {
   const isAnchor = href.startsWith('#');
   const pathname = usePathname();
   const isActive = pathname === href || (isAnchor && pathname === '/' + href.substring(1));
-  
+
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isAnchor) {
       e.preventDefault();
       const targetId = href.substring(1);
       const targetElement = document.getElementById(targetId);
-      
+
       if (targetElement) {
         targetElement.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
-        
+
         // Update URL without page reload
         window.history.pushState({}, '', `${window.location.pathname}${href}`);
       }
     }
-    
+
     if (onClick) {
       onClick();
     }
   };
 
   return (
-    <li className={cn("text-center md:text-left", className)} {...props}>
+    <li
+      className={cn(
+        "group relative",
+        className,
+        color
+      )}
+      {...props}
+    >
       <Link
         href={href}
         onClick={handleClick}
         className={cn(
-          'px-4 py-2 rounded-lg transition-colors duration-200',
-          'text-foreground/80 hover:text-foreground',
-          'hover:bg-accent/50 dark:hover:bg-accent/30',
+          'px-3 py-2.5 rounded-lg',
+          'text-foreground/80 group-hover:text-foreground',
+          'hover:bg-accent/20 dark:hover:bg-accent/30',
           'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-          isActive ? 'text-primary font-medium' : '',
+          isActive ? 'text-primary' : '',
           'block w-full md:w-auto',
-          'flex items-center'
+          'flex items-center',
+          'transition-all duration-300 ease-out',
+          'relative overflow-hidden',
+          'group-hover:pr-10', // Increased padding for smoother transition
+          'after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5',
+          'after:bg-current after:opacity-0 after:transition-all after:duration-300',
+          'group-hover:after:opacity-30',
+          'after:transform after:scale-x-0 after:group-hover:scale-x-100 after:origin-center'
         )}
         scroll={!isAnchor}
       >
-        {children}
+        {/* Icon */}
+        <span className="flex items-center justify-center w-5 transition-transform duration-300 group-hover:scale-110">
+          {React.Children.map(children, child =>
+            React.isValidElement(child) && child.type !== 'span' ? child : null
+          )}
+        </span>
+
+        {/* Label with hover effect */}
+        <span className="relative group/label">
+          <span className={cn(
+            'ml-3 whitespace-nowrap',
+            'transition-all duration-300 ease-out',
+            'opacity-0 md:group-hover:opacity-100',
+            'w-0 md:group-hover:w-auto',
+            'overflow-hidden',
+            'transform transition-transform duration-300 ease-out',
+            'md:group-hover:translate-x-0 -translate-x-1',
+            isActive ? 'font-medium' : 'font-normal',
+            'text-sm',
+            'md:group-hover:mr-10',
+            'relative inline-block',
+            'after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5',
+            'after:bg-current after:opacity-0 after:transition-all after:duration-300',
+            'group-hover/label:after:w-full group-hover/label:after:opacity-70',
+            isActive ? 'after:opacity-100 after:w-full' : ''
+          )}>
+            {React.Children.map(children, child =>
+              typeof child === 'string' ? child : null
+            )}
+          </span>
+        </span>
+
+        {/* Hover Indicator */}
+        <span className={cn(
+          'absolute right-3 top-1/2 -translate-y-1/2',
+          'opacity-0 md:group-hover:opacity-100',
+          'transition-all duration-300 ease-out',
+          'transform transition-transform duration-300 ease-out',
+          'md:group-hover:translate-x-0 translate-x-2',
+          'text-xs text-muted-foreground',
+          'hidden md:inline-block',
+          'whitespace-nowrap',
+          'px-1.5 py-0.5 rounded',
+          isActive ? 'text-primary' : ''
+        )}>
+          {navigationLinks.find(l => l.href === href)?.label}
+        </span>
       </Link>
     </li>
   );
@@ -106,7 +175,7 @@ export default function Header() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -122,17 +191,17 @@ export default function Header() {
   };
 
   // Filter navigation links based on current page
-  const filteredNavLinks = isHome 
-    ? navigationLinks 
-    : navigationLinks.filter(link => !link.href.startsWith('#'));
+  const filteredNavLinks = isHome
+    ? navigationLinks
+    : navigationLinks.filter(link => !link.href.startsWith('#') && link.href !== '/blog');
 
   return (
-    <header 
+    <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300',
         'backdrop-blur-md border-b',
-        scrolled 
-          ? 'bg-background/95 border-border/10 shadow-sm' 
+        scrolled
+          ? 'bg-background/95 border-border/10 shadow-sm'
           : 'bg-background/80 border-transparent',
       )}
     >
@@ -141,14 +210,52 @@ export default function Header() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex items-center"
+          className="flex items-center gap-4"
         >
-          <Link 
-            href="/" 
-            className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent flex items-center"
+          {!isHome && (
+            <>
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent/50 transition-colors"
+                aria-label="Go back"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-foreground/80"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <div className="h-6 w-px bg-border/50" />
+            </>
+          )}
+          <Link
+            href="/"
+            className={cn(
+              "text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent flex items-center",
+              "transition-opacity hover:opacity-80",
+              !isHome && "text-xl md:text-2xl"
+            )}
             onClick={() => setMenuOpen(false)}
           >
-            Immanuvel.<span className="text-foreground text-xl ml-0.5">dev</span>
+            {isHome ? (
+              <>
+                Immanuvel.<span className="text-foreground text-xl ml-0.5">dev</span>
+              </>
+            ) : (
+              <>
+                <Home className="w-5 h-5 mr-1.5" />
+                <span>Home</span>
+              </>
+            )}
           </Link>
         </motion.div>
 
@@ -162,8 +269,8 @@ export default function Header() {
           <ul className="flex items-center space-x-1">
             {filteredNavLinks.map((link) => (
               <NavItem key={link.href} href={link.href}>
-                {link.icon || null}
-                {link.label}
+                {link.icon}
+                <span>{link.label}</span>
               </NavItem>
             ))}
           </ul>
@@ -202,7 +309,7 @@ export default function Header() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-popover border border-border overflow-hidden z-50"
+                    className="absolute right-0 mt-4 backdrop-blur-sm w-56 rounded-md shadow-lg bg-popover border border-border overflow-hidden z-50 bg-white/80 dark:bg-gray-800/80"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
@@ -283,8 +390,8 @@ export default function Header() {
           >
             <div className="px-4 py-3 space-y-1">
               {filteredNavLinks.map((link) => (
-                <NavItem 
-                  key={link.href} 
+                <NavItem
+                  key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -292,13 +399,13 @@ export default function Header() {
                   {link.label}
                 </NavItem>
               ))}
-              
+
               {user ? (
                 <>
                   <div className="border-t border-border my-2"></div>
                   {dashboardLinks.map((link) => (
-                    <NavItem 
-                      key={link.href} 
+                    <NavItem
+                      key={link.href}
                       href={link.href}
                       onClick={() => setMenuOpen(false)}
                     >

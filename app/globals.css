@@ -80,15 +80,13 @@
   }
 }
 
-/* Remove all underlines globally */
+/* Global base styles */
 @layer base {
   * {
     @apply border-border;
-    /* Disable transitions during initial render */
-    transition: none !important;
-    animation: none !important;
   }
   
+  /* Remove all underlines globally */
   a, a:link, a:visited, a:hover, a:active, a:focus {
     text-decoration: none !important;
   }
@@ -97,9 +95,11 @@
     text-decoration: none !important;
   }
   
-  /* Enable smooth transitions after initial render */
-  .theme-transition * {
-    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, fill 150ms ease, stroke 150ms ease, opacity 150ms ease, box-shadow 150ms ease;
+  /* Enable transitions for specific properties */
+  a, button, input, textarea, select, .transition-all {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
   }
   
   body {
@@ -529,7 +529,8 @@
   to {
     background-position: 0% 0%;
     }
-  }}
+  }
+}
 
 @layer base {
   * {

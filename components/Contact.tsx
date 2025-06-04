@@ -58,10 +58,10 @@ const Contact = () => {
   };
 
   const socialLinks = [
-    { icon: FaGithub, href: 'https://github.com/Inman2004', label: 'GitHub', color: '#a930d5' },
-    { icon: FaLinkedin, href: 'https://linkedin.com/in/rv3d', label: 'LinkedIn', color: '#0A66C2' },
-    { icon: FaXTwitter, href: 'https://twitter.com/rvimman_', label: 'Twitter', color: '#1DA1F2' },
-    { icon: SiGmail, href: 'mailto:rvimman@gmail.com', label: 'Email', color: '#cf594e' }
+    { icon: FaGithub, href: 'https://github.com/Inman2004', label: 'GitHub', color: '#a930d5', darkColor: '#a930d5' },
+    { icon: FaLinkedin, href: 'https://linkedin.com/in/rv3d', label: 'LinkedIn', color: '#0A66C2', darkColor: '#0A66C2' },
+    { icon: FaXTwitter, href: 'https://twitter.com/rvimman_', label: 'Twitter', color: '#000', darkColor: '#fff' },
+    { icon: SiGmail, href: 'mailto:rvimman@gmail.com', label: 'Email', color: '#cf594e', darkColor: '#cf594e' }
   ];
 
   return (
@@ -194,7 +194,13 @@ const Contact = () => {
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors group border border-gray-200 dark:border-gray-700"
                   >
-                    <link.icon className={`w-5 h-5 text-[${link.color}] group-hover:opacity-80 transition-opacity`} />
+                    <link.icon 
+                      style={{
+                        '--icon-color': link.color,
+                        '--icon-dark-color': link.darkColor || link.color,
+                      } as React.CSSProperties}
+                      className="w-5 h-5 group-hover:opacity-80 transition-opacity text-[color:var(--icon-color)] dark:text-[color:var(--icon-dark-color)]"
+                    />
                     <span className="text-gray-700 dark:text-gray-300">{link.label}</span>
                   </motion.a>
                 ))}

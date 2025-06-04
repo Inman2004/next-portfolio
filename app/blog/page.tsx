@@ -369,7 +369,7 @@ export default function BlogPage() {
           {user && (
             <Link
               href="/blog/new"
-              className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-lg hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
+              className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-xl hover:shadow-blue-700/50 shadow-blue-500/10 hover:-translate-y-0.5 transform transition-all duration-200"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Post
@@ -379,7 +379,7 @@ export default function BlogPage() {
 
         {/* Sort Controls */}
         <motion.div 
-          className="flex flex-wrap gap-2 mb-10 bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 max-w-max shadow-sm dark:shadow-none"
+          className="flex flex-wrap gap-2 mb-10 bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 max-w-max shadow-xl dark:shadow-none"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
@@ -389,7 +389,7 @@ export default function BlogPage() {
             className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               sortBy === 'newest' 
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                : 'bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+                : 'bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-600/50 dark:hover:bg-blue-600/50 hover:text-white'
             }`}
           >
             <Clock className="w-4 h-4 mr-2" />
@@ -399,8 +399,8 @@ export default function BlogPage() {
             onClick={() => setSortBy('oldest')}
             className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               sortBy === 'oldest' 
-                ? 'bg-blue-600/90 text-white shadow-lg shadow-blue-500/20' 
-                : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20' 
+                : 'bg-gray-300/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-600/50 dark:hover:bg-blue-600/50 hover:text-white'
             }`}
           >
             <ArrowUpDown className="w-4 h-4 mr-2" />
@@ -410,8 +410,8 @@ export default function BlogPage() {
             onClick={() => setSortBy('popular')}
             className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               sortBy === 'popular' 
-                ? 'bg-blue-600/90 text-white shadow-lg shadow-blue-500/20' 
-                : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20' 
+                : 'bg-gray-300/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-600/50 dark:hover:bg-blue-600/50 hover:text-white'
             }`}
           >
             <Flame className="w-4 h-4 mr-2" />
@@ -496,9 +496,9 @@ export default function BlogPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-                  className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col ${
+                  className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg shadow-blue-500/50 dark:shadow-blue-500/30 ${
                     post.isAdmin 
-                      ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80' 
+                      ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 shadow-amber-500/30 dark:shadow-amber-500/30' 
                       : 'border-gray-200/70 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
                   }`}
                 >

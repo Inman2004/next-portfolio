@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { getFirebase } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 
 type DataItem = {
   id: string;
@@ -25,33 +27,80 @@ export default function AdminDataPage() {
   });
   const [activeTab, setActiveTab] = useState<keyof CollectionData>('users');
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
+  const auth = getAuth(getFirebase().app);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!currentUser) {
+          console.error('User not authenticated');
+          setLoading(false);
+          return;
+        }
+
         const db = getFirestore(getFirebase().app);
-        const collections = ['users', 'blogPosts', 'post_views', 'comments'] as const;
+        const collections = ['blogPosts', 'post_views', 'comments'] as const;
         
-        const newData: CollectionData = { users: [], blogPosts: [], post_views: [], comments: [] };
+        // Initialize data with empty arrays
+        const newData: CollectionData = { 
+          users: [], 
+          blogPosts: [], 
+          post_views: [], 
+          comments: [] 
+        };
+
+        // Fetch all users from Firebase Auth
+        try {
+          const usersResponse = await fetch('/api/admin/users');
+          if (usersResponse.ok) {
+            const usersData = await usersResponse.json();
+            newData.users = usersData;
+          } else {
+            console.error('Failed to fetch users:', await usersResponse.text());
+          }
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        }
         
+        // Fetch other collections
         for (const col of collections) {
-          const querySnapshot = await getDocs(collection(db, col));
-          newData[col] = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+          try {
+            const querySnapshot = await getDocs(collection(db, col));
+            newData[col] = querySnapshot.docs.map(doc => {
+              const data = doc.data();
+              // Format dates for better display
+              const formattedData: any = { id: doc.id };
+              Object.entries(data).forEach(([key, value]) => {
+                if (value?.toDate) {
+                  formattedData[key] = value.toDate().toISOString();
+                } else if (value && typeof value === 'object' && 'toDate' in value) {
+                  formattedData[key] = value.toDate().toISOString();
+                } else {
+                  formattedData[key] = value;
+                }
+              });
+              return formattedData;
+            });
+          } catch (error) {
+            console.error(`Error fetching ${col}:`, error);
+          }
         }
         
         setData(newData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error in fetchData:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []); 
+    if (currentUser) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [currentUser]);
 
   const formatValue = (value: any): string => {
     if (value === null || value === undefined) return 'null';
