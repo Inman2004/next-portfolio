@@ -367,7 +367,7 @@ export default function Hero() {
                     }}
                   >
                     <Image
-                      src="/images/avatar1.png"
+                      src="/images/grammers.gif"
                       alt="Immanuvel"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
