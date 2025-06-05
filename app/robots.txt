@@ -1,0 +1,21 @@
+# Allow all crawlers to access all parts of the site
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://rvinman2004.vercel.app/sitemap.xml
+
+# Crawl-delay parameter to prevent overloading the server
+Crawl-delay: 10
+
+# Disallow admin area
+Disallow: /admin/
+Disallow: /api/
+
+# Allow media files
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.svg$
