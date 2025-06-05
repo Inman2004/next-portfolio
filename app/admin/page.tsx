@@ -113,10 +113,10 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 my-12">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <Button asChild>
+        <Button asChild className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white dark:text-black">
           <Link href="/admin/blog/new">
             <Plus className="mr-2 h-4 w-4" />
             New Post
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
                 <Button
                   key={index}
                   variant="outline"
-                  className="w-full justify-start h-auto p-4"
+                  className="w-full justify-start h-auto p-4 dark:hover:bg-primary/10 dark:hover:text-primary hover:bg-primary/10 hover:text-primary"
                   asChild
                 >
                   <Link href={action.href}>

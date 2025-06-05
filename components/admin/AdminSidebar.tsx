@@ -17,10 +17,10 @@ export function AdminSidebar() {
 
   return (
     <div className="hidden md:flex md:flex-shrink-0">
-      <div className="flex flex-col w-64 border-r border-gray-200 bg-white">
+      <div className="flex flex-col w-64 border-r border-border bg-background">
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
-            <h1 className="text-2xl font-bold text-gray-900">Admin</h1>
+            <h1 className="text-2xl font-bold text-foreground">Admin</h1>
           </div>
           <div className="mt-5 flex-grow flex flex-col">
             <nav className="flex-1 px-2 space-y-1">
@@ -48,7 +48,7 @@ export function AdminSidebar() {
               })}
             </nav>
           </div>
-          <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+          <div className="flex-shrink-0 flex border-t dark:border-gray-700 border-gray-200 p-4">
             <button 
               onClick={async () => {
                 try {
@@ -59,9 +59,9 @@ export function AdminSidebar() {
                   console.error('Error signing out:', error);
                 }
               }}
-              className="flex items-center w-full text-left text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md p-2"
+              className="flex items-center w-full text-left text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md p-2"
             >
-              <LogOut className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+              <LogOut className="mr-3 h-5 w-5 dark:text-gray-500 text-gray-400 group-hover:text-gray-500" />
               Sign out
             </button>
           </div>

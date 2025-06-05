@@ -60,7 +60,7 @@ export default function BlogPostsPage() {
   );
 
   return (
-    <div>
+    <div className="my-12">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Blog Posts</h1>
         <Button asChild>

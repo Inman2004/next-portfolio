@@ -19,8 +19,14 @@ export default function ProjectsAdmin() {
     const loadProjects = async () => {
       console.log('ProjectsPage: Starting to load projects');
       try {
-        // Get the current user
-        const currentUser = auth.currentUser;
+        // Wait for auth state to be loaded
+        const currentUser = await new Promise<import('firebase/auth').User | null>((resolve) => {
+          const unsubscribe = auth.onAuthStateChanged((user) => {
+            unsubscribe();
+            resolve(user);
+          });
+        });
+
         console.log('ProjectsPage: Current user from auth:', currentUser?.email || 'none');
         
         if (!currentUser) {
@@ -29,15 +35,16 @@ export default function ProjectsAdmin() {
           return;
         }
         
-        // Get the ID token
-        console.log('ProjectsPage: Getting ID token...');
-        const token = await currentUser.getIdToken();
+        // Force token refresh to ensure it's valid
+        console.log('ProjectsPage: Refreshing ID token...');
+        const token = await currentUser.getIdToken(true); // Force refresh
         if (!token) {
-          console.error('ProjectsPage: Failed to get ID token');
+          console.error('ProjectsPage: Failed to refresh ID token');
+          await signOut(auth);
           router.push('/signin?callbackUrl=/admin/projects');
           return;
         }
-        console.log('ProjectsPage: Successfully got ID token');
+        console.log('ProjectsPage: Successfully refreshed ID token');
         
         // Fetch projects with the token in the Authorization header
         console.log('ProjectsPage: Fetching projects from API...');
@@ -45,10 +52,11 @@ export default function ProjectsAdmin() {
         console.log('ProjectsPage: Making request to:', apiUrl);
         
         const response = await fetch(apiUrl, {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json' // Explicitly request JSON
+            'Accept': 'application/json'
           },
           credentials: 'same-origin' // Include cookies for session
         });
@@ -222,57 +230,61 @@ export default function ProjectsAdmin() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-12 bg-white dark:bg-gray-900 min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Manage Projects</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Manage Projects</h1>
         <div className="flex gap-4">
-          <Button asChild>
-            <Link href="/admin/projects/new" className="flex items-center gap-2">
+          <Button asChild className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
+            <Link href="/admin/projects/new" className="flex items-center text-white gap-2">
               <Plus size={16} />
               Add Project
             </Link>
           </Button>
-          <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleLogout} 
+            className="flex items-center gap-2 border-gray-300 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+          >
             <LogOut size={16} />
             Logout
           </Button>
         </div>
       </div>
 
-      <div className="bg-background rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-border">
-            <thead className="bg-muted/50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Title
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Technologies
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-background divide-y divide-border">
+            <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
               {projects.map((project) => (
-                <tr key={project.title} className="hover:bg-muted/50">
+                <tr key={project.title} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-foreground">{project.title}</div>
-                    <div className="text-sm text-muted-foreground line-clamp-1">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">{project.title}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
                       {project.description}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      project.status === 'deployed' ? 'bg-green-100 text-green-800' :
-                      project.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                      project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
+                      project.status === 'deployed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      project.status === 'in-progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                      project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                      'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                     }`}>
                       {project.status}
                     </span>
@@ -280,12 +292,12 @@ export default function ProjectsAdmin() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1 max-w-xs">
                       {project.technologies.slice(0, 3).map((tech) => (
-                        <span key={tech} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                        <span key={tech} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                           {tech}
                         </span>
                       ))}
                       {project.technologies.length > 3 && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                           +{project.technologies.length - 3} more
                         </span>
                       )}
@@ -293,13 +305,23 @@ export default function ProjectsAdmin() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="icon" asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                        asChild
+                      >
                         <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`} target="_blank">
                           <Eye className="h-4 w-4" />
                           <span className="sr-only">View</span>
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon" asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-gray-700"
+                        asChild
+                      >
                         <Link href={`/admin/projects/edit/${encodeURIComponent(project.title)}`}>
                           <Edit className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
@@ -308,7 +330,7 @@ export default function ProjectsAdmin() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive/90"
+                        className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700"
                         onClick={() => handleDelete(project.title)}
                       >
                         <Trash2 className="h-4 w-4" />
