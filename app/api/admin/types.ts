@@ -1,6 +1,9 @@
+import { Project as BaseProject } from '@/data/types';
+
 export type ProjectStatus = 'active' | 'completed' | 'abandoned' | 'deployed' | 'outdated' | 'in-progress' | 'on-hold';
 
-export interface Project {
+// Extended Project type that includes all possible fields
+export interface Project extends Omit<BaseProject, 'status'> {
   id: string;
   title: string;
   description: string;

@@ -1,19 +1,7 @@
 import { NextResponse } from 'next/server';
 import { projects } from '@/data/projects';
-import { Project, ProjectStatus, ProjectInput } from '@/data/types';
-
-// Extended Project type that includes all possible fields from both types
-type ProjectWithAllFields = Project & {
-  githubUrl?: string;
-  demoUrl?: string;
-  tags?: string[];
-  image?: string;
-  featured?: boolean;
-};
-import fs from 'fs';
-import path from 'path';
-import admin from '@/lib/firebase-admin';
-import { getAuth } from 'firebase-admin/auth';
+import { auth } from '@/lib/firebase';
+import { Project, ProjectInput, ProjectStatus } from '../types';
 
 // Helper function to create consistent JSON responses
 const jsonResponse = (data: any, status: number = 200) => {
@@ -38,20 +26,39 @@ async function verifyToken(token: string) {
     const idToken = token.replace(/^Bearer\s+/, '');
     console.log('API: Token after removing Bearer prefix:', idToken ? '***' : 'empty');
     
-    const decodedToken = await getAuth(admin).verifyIdToken(idToken);
-    console.log('API: Decoded token:', {
-      email: decodedToken.email,
-      email_verified: decodedToken.email_verified,
-      uid: decodedToken.uid
+    // Verify token using Firebase client SDK
+    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        idToken: idToken
+      })
     });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('API: Error verifying token:', data);
+      return null;
+    }
+    
+    const user = data.users?.[0];
+    if (!user) {
+      console.log('API: No user found for token');
+      return null;
+    }
+    
+    console.log('API: Verified user:', user.email);
     
     // Check if the user is the admin
-    const isAdmin = decodedToken.email === 'rvimman@gmail.com';
-    console.log(`API: Is admin (${decodedToken.email} === 'rvimman@gmail.com'):`, isAdmin);
+    const isAdmin = user.email === 'rvimman@gmail.com';
+    console.log(`API: Is admin (${user.email} === 'rvimman@gmail.com'):`, isAdmin);
     
     if (isAdmin) {
       console.log('API: Token verified successfully for admin user');
-      return decodedToken;
+      return user;
     }
     
     console.log('API: User is not an admin');
@@ -62,51 +69,74 @@ async function verifyToken(token: string) {
   }
 }
 
-// Helper function to format a date for the TypeScript file
-const formatDateForTS = (date: Date | string | 'Present'): string => {
-  if (date === 'Present') return "'Present'";
-  const dateObj = date instanceof Date ? date : new Date(date);
-  return `new Date('${dateObj.toISOString()}')`;
-};
+// Singleton pattern for managing in-memory projects
+class ProjectStore {
+  private static instance: ProjectStore;
+  private projects: Project[];
 
-// Helper function to save projects to the data file
-const saveProjects = (projectsData: ProjectWithAllFields[]) => {
-  const filePath = path.join(process.cwd(), 'data/projects.ts');
-  
-  // Prepare the projects data with proper formatting for the TypeScript file
-  const projectsContent = projectsData.map(project => {
-    const projectData: any = {
-      title: project.title,
-      description: project.description,
+  private constructor() {
+    this.projects = projects.map(project => ({
+      ...project,
+      id: (project as any).id || Math.random().toString(36).substring(2, 11),
+      technologies: (project as any).technologies || [],
+      images: (project as any).images || [],
+      startDate: (project as any).startDate || new Date(),
+      endDate: (project as any).endDate || 'Present',
+      status: ((project as any).status as ProjectStatus) || 'active',
+      createdAt: (project as any).createdAt || new Date(),
+      updatedAt: (project as any).updatedAt || new Date(),
+      githubUrl: (project as any).githubUrl,
+      demoUrl: (project as any).demoUrl,
+      tags: (project as any).tags,
+      featured: (project as any).featured
+    }));
+  }
+
+  public static getInstance(): ProjectStore {
+    if (!ProjectStore.instance) {
+      ProjectStore.instance = new ProjectStore();
+    }
+    return ProjectStore.instance;
+  }
+
+  public getProjects(): Project[] {
+    return [...this.projects];
+  }
+
+  public setProjects(newProjects: Project[]): void {
+    this.projects = newProjects.map(project => ({
+      ...project,
+      // Ensure all required fields are set
+      id: project.id || Math.random().toString(36).substring(2, 11),
+      title: project.title || 'Untitled Project',
+      description: project.description || '',
       technologies: project.technologies || [],
-      github: project.github || project.githubUrl || '',
-      live: project.live || project.demoUrl || '',
-      documentation: project.documentation || '',
       images: project.images || [],
-      startDate: formatDateForTS(project.startDate),
-      endDate: formatDateForTS(project.endDate),
-      status: project.status,
-    };
-    
-    // Remove empty or undefined fields
-    Object.keys(projectData).forEach(key => {
-      if (projectData[key] === undefined || 
-          (Array.isArray(projectData[key]) && !projectData[key].length)) {
-        delete projectData[key];
-      }
-    });
-    
-    return projectData;
-  });
-  
-  const content = `import { Project, ProjectStatus } from './types';
+      startDate: project.startDate || new Date(),
+      endDate: project.endDate || 'Present',
+      status: project.status || 'active',
+      createdAt: project.createdAt || new Date(),
+      updatedAt: project.updatedAt || new Date(),
+    }));
+  }
+}
 
-export const projects: Project[] = ${JSON.stringify(projectsContent, null, 2)
-    .replace(/"(\w+)":/g, '$1:')
-    .replace(/"(new Date\('[^']+'\))"/g, '$1')};`;
-  
-  fs.writeFileSync(filePath, content, 'utf8');
+// Export a single instance of the store
+export const projectStore = ProjectStore.getInstance();
+
+// Helper function to save projects (in-memory for now)
+export const saveProjects = (projectsData: Project[]) => {
+  try {
+    projectStore.setProjects(projectsData);
+    return projectStore.getProjects();
+  } catch (error) {
+    console.error('Error saving projects:', error);
+    throw error;
+  }
 };
+
+// For backward compatibility
+export const inMemoryProjects = projectStore.getProjects();
 
 export async function GET(request: Request) {
   console.log('API: GET /api/admin/projects - Start');
@@ -128,29 +158,47 @@ export async function GET(request: Request) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('API: Missing or invalid authorization header');
       return jsonResponse(
-        { error: 'Missing or invalid authorization header' },
+        { 
+          error: 'Missing or invalid authorization header',
+          message: 'Please log in to access this resource'
+        },
         401
       );
     }
     
     const token = authHeader.split(' ')[1];
     
-    const decodedToken = await verifyToken(token);
-    if (!decodedToken) {
-      console.log('API: Unauthorized - Invalid or expired token');
+    try {
+      const decodedToken = await verifyToken(token);
+      if (!decodedToken) {
+        console.log('API: Unauthorized - Invalid or expired token');
+        return jsonResponse(
+          { 
+            error: 'Unauthorized',
+            message: 'Your session has expired. Please log in again.'
+          },
+          401
+        );
+      }
+      
+      console.log('API: Successfully authenticated, returning projects');
+      return jsonResponse(projectStore.getProjects());
+    } catch (authError) {
+      console.error('API: Authentication error:', authError);
       return jsonResponse(
-        { error: 'Unauthorized - Invalid or expired token' },
+        { 
+          error: 'Authentication failed',
+          message: 'Failed to verify your credentials. Please log in again.'
+        },
         401
       );
     }
-    
-    console.log('API: Successfully authenticated, returning projects');
-    return jsonResponse(projects);
   } catch (error) {
-    console.error('API: Error fetching projects:', error);
+    console.error('API: Error in GET /api/admin/projects:', error);
     return jsonResponse(
       { 
-        error: 'Failed to fetch projects',
+        error: 'Internal Server Error',
+        message: 'An unexpected error occurred while fetching projects',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       500
@@ -163,15 +211,26 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   console.log('API: POST /api/admin/projects - Start');
   
+  const jsonResponse = (data: any, status: number = 200) => {
+    return NextResponse.json(data, {
+      status,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  };
+  
   try {
     // Verify the authorization header
     const authHeader = request.headers.get('authorization');
-    console.log('API: Authorization header:', authHeader ? '***' : 'missing');
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('API: Missing or invalid authorization header');
       return jsonResponse(
-        { error: 'Missing or invalid authorization header' },
+        { 
+          error: 'Missing or invalid authorization header',
+          message: 'Please log in to access this resource'
+        },
         401
       );
     }
@@ -182,98 +241,85 @@ export async function POST(request: Request) {
     if (!decodedToken) {
       console.log('API: Unauthorized - Invalid or expired token');
       return jsonResponse(
-        { error: 'Unauthorized - Invalid or expired token' },
+        { 
+          error: 'Unauthorized',
+          message: 'Your session has expired. Please log in again.'
+        },
         401
       );
     }
-
+    
+    // Parse the request body
     let projectData: ProjectInput;
     try {
       projectData = await request.json();
-      console.log('API: Received project data:', JSON.stringify(projectData, null, 2));
     } catch (error) {
       console.error('API: Error parsing request body:', error);
       return jsonResponse(
-        { error: 'Invalid request body' },
+        { 
+          error: 'Invalid request body',
+          message: 'The request body must be a valid JSON object'
+        },
         400
       );
     }
     
     // Validate required fields
-    if (!projectData.title || !projectData.description) {
-      console.log('API: Missing required fields');
+    if (!projectData.title) {
       return jsonResponse(
         { 
           error: 'Validation error',
-          details: 'Title and description are required' 
+          message: 'Project title is required',
+          field: 'title'
         },
         400
       );
     }
     
-    // Handle dates
-    const now = new Date();
-    const startDate = projectData.startDate 
-      ? new Date(projectData.startDate)
-      : now;
-      
-    const endDate = projectData.endDate && projectData.endDate !== 'Present' 
-      ? new Date(projectData.endDate) 
-      : projectData.endDate;
-    
-    // Create new project with all fields
-    const newProject: ProjectWithAllFields = {
+    // Create the new project with all required fields
+    const newProject: Project = {
       ...projectData,
-      id: Date.now().toString(),
+      id: Math.random().toString(36).substring(2, 11),
+      title: projectData.title,
+      description: projectData.description || '',
       technologies: projectData.technologies || [],
+      github: projectData.github || '',
+      live: projectData.live || '',
       images: projectData.images || [],
-      github: projectData.github || projectData.githubUrl || '',
-      live: projectData.live || projectData.demoUrl || '',
-      startDate,
-      endDate: endDate || 'Present',
-      status: (projectData.status || 'active') as ProjectStatus,
-      createdAt: now,
-      updatedAt: now,
+      startDate: projectData.startDate || new Date(),
+      endDate: projectData.endDate || 'Present',
+      status: projectData.status || 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      documentation: projectData.documentation,
+      githubUrl: projectData.githubUrl,
+      demoUrl: projectData.demoUrl,
+      tags: projectData.tags,
+      featured: projectData.featured
     };
     
-    // Remove any undefined fields
-    Object.keys(newProject).forEach(key => {
-      if (newProject[key as keyof ProjectWithAllFields] === undefined) {
-        delete newProject[key as keyof ProjectWithAllFields];
-      }
-    });
+    // Add the new project to the store
+    const currentProjects = projectStore.getProjects();
+    const updatedProjects = [...currentProjects, newProject];
+    saveProjects(updatedProjects);
     
-    // Add the new project to the beginning of the array
-    projects.unshift(newProject as unknown as Project);
+    console.log('API: Created new project with ID:', newProject.id);
     
-    try {
-      // Save the updated projects to the data file
-      saveProjects(projects as unknown as ProjectWithAllFields[]);
-      console.log('API: Project created successfully');
-      
-      return jsonResponse(
-        { 
-          success: true,
-          message: 'Project created successfully',
-          project: newProject 
-        },
-        201
-      );
-    } catch (error) {
-      console.error('API: Error saving projects:', error);
-      return jsonResponse(
-        { 
-          error: 'Failed to save project',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        },
-        500
-      );
-    }
-  } catch (error) {
-    console.error('API: Error in POST handler:', error);
     return jsonResponse(
       { 
-        error: 'Internal server error',
+        success: true, 
+        message: 'Project created successfully',
+        project: newProject 
+      },
+      201
+    );
+    
+  } catch (error) {
+    console.error('API: Error in POST /api/admin/projects:', error);
+    return jsonResponse(
+      { 
+        error: 'Internal Server Error',
+        message: 'An error occurred while creating the project',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       500

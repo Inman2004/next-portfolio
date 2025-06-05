@@ -97,7 +97,6 @@
   
   /* Enable transitions for specific properties */
   a, button, input, textarea, select, .transition-all {
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }
@@ -121,8 +120,7 @@
   }
   
   a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    text-decoration: none;
   }
   
   /* Code block styling */
@@ -182,7 +180,6 @@
   
   /* Style buttons */
   button, .btn {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
