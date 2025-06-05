@@ -133,18 +133,19 @@
   }
   
   code {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.088);
     color: rgb(var(--foreground));
     border-radius: 0.25rem;
     padding: 0.2rem 0.375rem;
   }
   
   .dark code {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.05);
+    color: rgb(var(--foreground));
   }
   
   pre {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(191, 218, 237, 0.1) !important;
     color: rgb(var(--foreground));
     border-radius: 0.5rem;
     padding: 1rem;

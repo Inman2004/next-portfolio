@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, User, Home, Settings, Menu, X, BriefcaseBusiness, Rss, Mail, AppWindow, PencilLine, Flame, Handshake } from 'lucide-react';
@@ -24,13 +24,13 @@ const navigationLinks: NavLink[] = [
   { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
   { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
   { href: '#services', label: 'Services', icon: <Handshake className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
+  { href: '#contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
   {
     href: '/blog',
     label: 'Blog',
     icon: <Flame className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
     className: 'group/blog',
   },
-  { href: '#contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
 ];
 
 const dashboardLinks: NavLink[] = [
@@ -94,6 +94,8 @@ function NavItem({
         onClick={handleClick}
         className={cn(
           'px-3 py-2.5 rounded-lg',
+          'font-medium',
+          'text-xl',
           'text-foreground/80 group-hover:text-foreground',
           'hover:bg-accent/20 dark:hover:bg-accent/30',
           'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
@@ -102,7 +104,7 @@ function NavItem({
           'flex items-center',
           'transition-all duration-300 ease-out',
           'relative overflow-hidden',
-          'group-hover:pr-10', // Increased padding for smoother transition
+          'group-hover:pr-12', // Increased padding for smoother transition
           'after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5',
           'after:bg-current after:opacity-0 after:transition-all after:duration-300',
           'group-hover:after:opacity-30',
@@ -128,7 +130,7 @@ function NavItem({
             'transform transition-transform duration-300 ease-out',
             'md:group-hover:translate-x-0 -translate-x-1',
             isActive ? 'font-medium' : 'font-normal',
-            'text-sm',
+            'text-xl',
             'md:group-hover:mr-10',
             'relative inline-block',
             'after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5',
@@ -149,7 +151,7 @@ function NavItem({
           'transition-all duration-300 ease-out',
           'transform transition-transform duration-300 ease-out',
           'md:group-hover:translate-x-0 translate-x-2',
-          'text-xs text-muted-foreground',
+          'text-sm text-muted-foreground',
           'hidden md:inline-block',
           'whitespace-nowrap',
           'px-1.5 py-0.5 rounded',
@@ -163,12 +165,65 @@ function NavItem({
 }
 
 export default function Header() {
+  const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
   const isHome = pathname === '/';
+  
+  // Handle mobile menu link clicks
+  const handleMobileLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    // Add a small delay to allow the menu to close before navigation
+    setTimeout(() => {
+      if (href.startsWith('#')) {
+        if (isHome) {
+          const element = document.querySelector(href);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else {
+          router.push(`/${href}`);
+        }
+      } else {
+        router.push(href);
+      }
+    }, 100);
+  };
+  
+  // Handle navigation link clicks
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      if (isHome) {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        router.push(`/${href}`);
+      }
+    }
+  };
+  
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const menuButton = document.querySelector('button[aria-label="Toggle menu"]');
+      const menu = document.querySelector('.mobile-menu-dropdown');
+      
+      if (menuOpen && menuButton && !menuButton.contains(target) && menu && !menu.contains(target)) {
+        setMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -267,11 +322,16 @@ export default function Header() {
           className="hidden md:flex items-center gap-2"
         >
           <ul className="flex items-center space-x-1">
-            {filteredNavLinks.map((link) => (
-              <NavItem key={link.href} href={link.href}>
-                {link.icon}
-                <span>{link.label}</span>
-              </NavItem>
+            {filteredNavLinks.map((link, index) => (
+              <React.Fragment key={link.href}>
+                {index === filteredNavLinks.length - 1 && (
+                  <li className="hidden md:block h-6 w-0.5 bg-blue-500/50 dark:bg-blue-500/50 mx-1" />
+                )}
+                <NavItem href={link.href}>
+                  {link.icon}
+                  <span>{link.label}</span>
+                </NavItem>
+              </React.Fragment>
             ))}
           </ul>
 
@@ -363,86 +423,104 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center">
           <ThemeSwitcher />
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="ml-2 p-2 rounded-md text-foreground hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            aria-expanded={menuOpen}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+          <div className="relative ml-2">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              aria-expanded={menuOpen}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+
+            {/* Mobile Dropdown Menu */}
+            <AnimatePresence>
+              {menuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-popover border border-border bg-gray-50/95 dark:bg-gray-800/95 overflow-hidden z-50"
+                >
+                  <div className="py-1">
+                    {filteredNavLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="flex items-center px-4 py-3 text-sm text-foreground hover:bg-accent/50 transition-colors"
+                        onClick={(e) => handleMobileLinkClick(e, link.href)}
+                      >
+                        {React.cloneElement(link.icon as React.ReactElement, {
+                          className: 'w-4 h-4 mr-3 flex-shrink-0'
+                        })}
+                        {link.label}
+                      </Link>
+                    ))}
+                    
+                    {user ? (
+                      <>
+                        <div className="border-t border-border/50 my-1"></div>
+                        {dashboardLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
+                            onClick={(e) => handleMobileLinkClick(e, link.href)}
+                          >
+                            {link.icon}
+                            {link.label}
+                          </Link>
+                        ))}
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setMenuOpen(false);
+                            setMenuOpen(false);
+                          }}
+                          className="w-full text-left flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4 mr-3" />
+                          Sign out
+                        </button>
+                      </>
+                    ) : (
+                      <div className="p-2 border-t border-border/50">
+                        <Link
+                          href="/signin"
+                          className="block w-full text-center px-4 py-2 text-sm font-medium rounded-md text-foreground bg-primary/10 hover:bg-primary/20 transition-colors mb-2"
+                          onClick={(e) => handleMobileLinkClick(e, '/signin')}
+                        >
+                          Sign in
+                        </Link>
+                        <Link
+                          href="/signup"
+                          className="block w-full text-center px-4 py-2 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors"
+                          onClick={(e) => handleMobileLinkClick(e, '/signup')}
+                        >
+                          Create account
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden bg-popover/95 backdrop-blur-sm border-t border-border overflow-hidden"
-          >
-            <div className="px-4 py-3 space-y-1">
-              {filteredNavLinks.map((link) => (
-                <NavItem
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.icon}
-                  {link.label}
-                </NavItem>
-              ))}
-
-              {user ? (
-                <>
-                  <div className="border-t border-border my-2"></div>
-                  {dashboardLinks.map((link) => (
-                    <NavItem
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {link.icon}
-                      {link.label}
-                    </NavItem>
-                  ))}
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent/50 transition-colors flex items-center"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign out
-                  </button>
-                </>
-              ) : (
-                <div className="space-y-2">
-                  <Link
-                    href="/signin"
-                    className="block w-full px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent/50 transition-colors text-center"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="block w-full px-4 py-2 rounded-md text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 transition-colors text-center"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Create account
-                  </Link>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Click outside handler for mobile dropdown */}
+      {menuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
     </header>
   );
 }
