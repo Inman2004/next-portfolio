@@ -1,3 +1,5 @@
+export type ProjectStatus = 'active' | 'completed' | 'abandoned' | 'deployed' | 'outdated' | 'in-progress' | 'on-hold';
+
 export interface Project {
   title: string;
   description: string;
@@ -8,19 +10,21 @@ export interface Project {
   images: string[];
   startDate: Date; // Start date of the project
   endDate: Date | 'Present'; // End date or 'Present' if ongoing
+  status: ProjectStatus; // Current status of the project
 }
 
 export const projects: Project[] = [
   {
     title: "Pneumoscan",
     description: "A medical diagnostic tool that uses deep learning to detect pneumonia from chest X-ray images with 92% accuracy. The system helps radiologists by providing a second opinion and prioritizing critical cases.",
-    technologies: ["Python", "TensorFlow", "Keras", "Flask", "OpenCV", "NumPy", "Pandas", "scikit-learn"],
+    technologies: ["Python", "TensorFlow", "Keras", "Flask", "OpenCV", "NumPy", "Pandas", "scikit_learn"],
     github: "https://github.com/Inman2004/pneumoscan",
     live: "https://pneumoscan-b9wv.onrender.com/",
     documentation: "https://drive.google.com/file/d/1G96EUDJVgGnPs6g02pyMWWc8Y9SIrymR/view?usp=sharing",
     images: ["/images/projects/pneumoscan.png", "/images/projects/pneumoscan2.png", "/images/projects/pneumoscan3.png"],
     startDate: new Date('2025-03-01'),
-    endDate: new Date('2025-05-30')
+    endDate: new Date('2025-05-30'),
+    status: "deployed"
   },
   {
     title: "HR AI Interview Platform",
@@ -30,7 +34,8 @@ export const projects: Project[] = [
     live: "https://hr-ai-interview.vercel.app",
     images: ["/images/projects/hr1.png", "/images/projects/hr2.png", "/images/projects/hr3.png"],
     startDate: new Date('2025-04-19'),
-    endDate: 'Present'
+    endDate: 'Present',
+    status: "active"
   },
   {
     title: "MoviesDB",
@@ -40,7 +45,8 @@ export const projects: Project[] = [
     live: "https://moviesdb-nine.vercel.app",
     images: ["/images/projects/mdb.png", "/images/projects/mdb2.png", "/images/projects/mdb3.png"],
     startDate: new Date('2024-09-01'),
-    endDate: new Date('2024-11-30')
+    endDate: new Date('2024-11-30'),
+    status: "completed"
   },
   {
     title: "E-commerce Platform",
@@ -50,7 +56,8 @@ export const projects: Project[] = [
     live: "https://shop-demo.rvimman.vercel.app",
     images: ["/images/projects/ecommerce-1.png", "/images/projects/ecommerce-2.png", "/images/projects/ecommerce-3.png", "/images/projects/ecommerce-4.png"],
     startDate: new Date('2022-01-15'),
-    endDate: new Date('2022-06-26')
+    endDate: new Date('2022-06-26'),
+    status: "outdated",
   },
   {
     title: "Data Handler",
@@ -60,7 +67,8 @@ export const projects: Project[] = [
     live: "",
     images: ["/images/projects/dh.png", "/images/projects/dh2.png", "/images/projects/dh3.png"],
     startDate: new Date('2025-05-05'),
-    endDate: new Date('2025-05-08')
+    endDate: new Date('2025-05-08'),
+    status: "completed"
   },
   {
     title: "A Slot Machine Game",
@@ -70,7 +78,8 @@ export const projects: Project[] = [
     live: "https://slot-machine-js.vercel.app",
     images: ["/images/projects/sl.png", "/images/projects/sl2.png", "/images/projects/sl3.png"],
     startDate: new Date('2023-02-01'),
-    endDate: new Date('2023-03-31')
+    endDate: new Date('2023-03-31'),
+    status: "abandoned"
   },
   {
     title: "My First Portfolio",
@@ -80,6 +89,7 @@ export const projects: Project[] = [
     live: "https://rvimman.vercel.app",
     images: ["/images/projects/port.png", "/images/projects/port2.png", "/images/projects/port3.png"],
     startDate: new Date('2022-11-01'),
-    endDate: new Date('2023-04-12')
+    endDate: new Date('2023-04-12'),
+    status: "outdated"
   }
 ];

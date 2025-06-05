@@ -1,8 +1,13 @@
+'use client';
+
+import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter } from 'lucide-react';
+import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Button } from './ui/button';
 
 // Technology to color mapping with better TypeScript support
 interface TechColor {
@@ -45,7 +50,7 @@ const getTechColor = (tech: string): TechColor => {
     // Languages
     typescript: { bg: 'bg-blue-500/10 dark:bg-blue-500/20', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20' },
     javascript: { bg: 'bg-yellow-500/10 dark:bg-yellow-500/20', text: 'text-yellow-600 dark:text-yellow-400', border: 'border-yellow-500/20' },
-    python: { bg: 'bg-yellow-500/10 dark:bg-yellow-500/20', text: 'text-yellow-600 dark:text-yellow-400', border: 'border-yellow-500/20' },
+    python: { bg: 'bg-amber-500/20 dark:bg-amber-500/20', text: 'text-blue-600 dark:text-blue-400/80', border: 'border-yellow-500/20' },
     java: { bg: 'bg-orange-500/10 dark:bg-orange-500/20', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-500/20' },
     
     // Tools & Others
@@ -54,6 +59,14 @@ const getTechColor = (tech: string): TechColor => {
     api: { bg: 'bg-emerald-500/10 dark:bg-emerald-500/20', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20' },
     framer: { bg: 'bg-pink-500/10 dark:bg-pink-500/20', text: 'text-pink-600 dark:text-pink-400', border: 'border-pink-500/20' },
     vercel: { bg: 'bg-black/10 dark:bg-white/20', text: 'text-gray-800 dark:text-white', border: 'border-gray-400/20' },
+    tensorflow: { bg: 'bg-yellow-500/10 dark:bg-amber-500/20', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-500/20' },
+    pytorch: { bg: 'bg-yellow-500/10 dark:bg-yellow-500/20', text: 'text-yellow-600 dark:text-yellow-400', border: 'border-yellow-500/20' },
+    keras: { bg: 'bg-blue-500/10 dark:bg-blue-500/20', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20' },
+    matplotlib: { bg: 'bg-cyan-500/10 dark:bg-cyan-500/20', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-500/20' },
+    seaborn: { bg: 'bg-teal-500/10 dark:bg-teal-500/20', text: 'text-teal-600 dark:text-teal-400', border: 'border-teal-500/20' },
+    scikit_learn: { bg: 'bg-cyan-500/10 dark:bg-cyan-500/20', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-500/20' },
+    
+    
   };
 
   // Find the best matching color
@@ -81,6 +94,7 @@ interface Project {
   images: string[];
   startDate: Date;
   endDate: Date | 'Present';
+  status: ProjectStatus;
 }
 
 // Format date as 'MMM YYYY' (e.g., 'Jan 2023')
@@ -110,7 +124,7 @@ const calculateDuration = (startDate: Date, endDate: Date | 'Present'): string =
   }
 };
 
-import { projects } from '@/data/projects';
+import { projects, type ProjectStatus } from '@/data/projects';
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -187,11 +201,56 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
             }
           }}
         >
+        {/* Status Badge */}
+        <motion.div 
+          className="absolute top-3 right-3 z-10"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <motion.span 
+            className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full 
+              shadow-lg transition-all duration-300 hover:scale-105 ${
+              project.status === 'active' ? 
+                'bg-gradient-to-r from-green-500/30 to-emerald-500/30 dark:from-green-500/20 dark:to-emerald-500/20 ' +
+                'text-green-700 dark:text-green-300 border border-green-500/40 dark:border-green-500/30 ' +
+                'shadow-green-500/10 hover:shadow-green-500/20' :
+              project.status === 'completed' ? 
+                'bg-gradient-to-r from-blue-500/30 to-indigo-500/30 dark:from-blue-500/20 dark:to-indigo-500/20 ' +
+                'text-blue-700 dark:text-blue-300 border border-blue-500/40 dark:border-blue-500/30 ' +
+                'shadow-blue-500/10 hover:shadow-blue-500/20' :
+              project.status === 'deployed' ? 
+                'bg-gradient-to-r from-purple-500/30 to-blue-500/30 dark:from-purple-500/20 dark:to-blue-500/20 ' +
+                'text-purple-700 dark:text-purple-300 border border-purple-500/40 dark:border-purple-500/30 ' +
+                'shadow-purple-500/10 hover:shadow-purple-500/20' :
+              project.status === 'outdated' ? 
+                'bg-gradient-to-r from-amber-500/30 to-yellow-500/30 dark:from-amber-500/20 dark:to-yellow-500/20 ' +
+                'text-amber-700 dark:text-amber-300 border border-yellow-500/40 dark:border-yellow-500/30 ' +
+                'shadow-yellow-500/10 hover:shadow-yellow-500/20' :
+              project.status === 'abandoned' ? 
+                'bg-gradient-to-r from-red-500/30 to-rose-500/30 dark:from-red-500/20 dark:to-rose-500/20 ' +
+                'text-red-700 dark:text-red-300 border border-red-500/40 dark:border-red-500/30 ' +
+                'shadow-red-500/10 hover:shadow-red-500/20' :
+              project.status === 'in-progress' ? 
+                'bg-gradient-to-r from-amber-500/30 to-orange-500/30 dark:from-amber-500/20 dark:to-orange-500/20 ' +
+                'text-amber-700 dark:text-amber-300 border border-amber-500/40 dark:border-amber-500/30 ' +
+                'shadow-amber-500/10 hover:shadow-amber-500/20' :
+                'bg-gradient-to-r from-gray-500/30 to-slate-500/30 dark:from-gray-500/20 dark:to-slate-500/20 ' +
+                'text-gray-700 dark:text-gray-300 border border-gray-500/40 dark:border-gray-500/30 ' +
+                'shadow-gray-500/10 hover:shadow-gray-500/20'
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {project.status.replace('-', ' ')}
+          </motion.span>
+        </motion.div>
+        
         {/* Image Slideshow */}
         <div className="relative w-full h-[200px] sm:h-[250px] overflow-hidden bg-gray-100 dark:bg-gray-800">
           {project.images.map((img, i) => (
             <motion.div
-              key={i}
+              key={`${project.title}-img-${i}`}
               initial={{ opacity: i === 0 ? 1 : 0 }}
               animate={{
                 opacity: i === currentImageIndex ? 1 : 0,
@@ -265,7 +324,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
               >
                 {project.images.map((_, i) => (
                   <button
-                    key={i}
+                    key={`${project.title}-dot-${i}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.nativeEvent.stopImmediatePropagation();
@@ -309,7 +368,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
               const { bg, text, border } = getTechColor(tech);
               return (
                 <span
-                  key={i}
+                  key={`${project.title}-tech-${tech}-${i}`}
                   className={cn(
                     'px-3 py-1 text-sm font-medium rounded-full transition-colors',
                     'border border-opacity-20',
@@ -387,41 +446,63 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
   );
 };
 
-const Projects = () => {
+interface ProjectsProps {
+  showAll?: boolean;
+  maxItems?: number;
+}
+
+const Projects = ({ showAll = false, maxItems = 3 }: ProjectsProps) => {
+  const displayedProjects = showAll ? projects : projects.slice(0, maxItems);
   return (
     <div id="projects" className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 -mt-20 transition-colors duration-300">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          duration: 0.8,
-          ease: [0.16, 1, 0.3, 1],
-          delay: 0.1
-        }}
-        className="text-center mb-16"
-      >
-        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent mb-4 transition-colors duration-300">
-          Featured Projects
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto transition-colors duration-300">
-          Here are some of my recent projects that showcase my skills and experience.
-        </p>
-      </motion.div>
-
-      <AnimatePresence>
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"
+      {!showAll && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            duration: 0.8,
+            ease: [0.16, 1, 0.3, 1],
+            delay: 0.1
+          }}
+          className="text-center mb-16"
         >
-          {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} index={index} />
-          ))}
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent mb-4 transition-colors duration-300">
+            Featured Projects
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto transition-colors duration-300">
+            Here are some of my recent projects that showcase my skills and experience.
+          </p>
         </motion.div>
+      )}
+
+      <AnimatePresence mode="wait">
+        <React.Fragment key={showAll ? 'all' : 'preview'}>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {displayedProjects.map((project: Project, index: number) => (
+              <ProjectCard key={`${project.title}-${index}`} project={project} index={index} />
+            ))}
+          </motion.div>
+          
+          {!showAll && projects.length > maxItems && (
+            <div className="mt-12 text-center">
+              <Link href="/projects">
+                <Button className="group hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-300" variant="outline">
+                  View All Projects
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            </div>
+          )}
+        </React.Fragment>
       </AnimatePresence>
     </div>
   );
 };
 
-export default Projects; 
+export default Projects;

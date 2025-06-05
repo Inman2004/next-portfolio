@@ -48,7 +48,7 @@ export default function Home() {
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
-          <Projects />
+          <Projects showAll={false} maxItems={3} />
           <Skills />
           <Experience />
           <Services />

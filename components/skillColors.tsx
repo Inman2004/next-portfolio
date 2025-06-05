@@ -22,6 +22,16 @@ export const getTechColor = (tech: string): TechColor => {
   if (techLower.includes('css')) return { bg: 'bg-blue-500/15', text: 'text-blue-600 dark:text-blue-400', gradient: 'from-blue-500 to-blue-600', border: 'border-blue-500 dark:border-blue-400', hover: 'hover:bg-blue-500/20' };
   if (techLower.includes('javascript') || techLower.includes('js')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
   
+  // Libraries
+  if (techLower.includes('tensorflow')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('pytorch')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('keras')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('numpy')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('pandas')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('matplotlib')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('seaborn')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+  if (techLower.includes('scikit-learn')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
+
   // Backend
   if (techLower.includes('python')) return { bg: 'bg-amber-500/15', text: 'text-amber-600 dark:text-amber-400', gradient: 'from-amber-500 to-amber-600', border: 'border-amber-500 dark:border-amber-400', hover: 'hover:bg-amber-500/20' };
   if (techLower.includes('mongo')) return { bg: 'bg-green-500/15', text: 'text-green-600 dark:text-green-400', gradient: 'from-green-500 to-green-600', border: 'border-green-500 dark:border-green-400', hover: 'hover:bg-green-500/20' };

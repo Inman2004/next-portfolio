@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, User, Home, Settings, Menu, X, BriefcaseBusiness, Rss, Mail, AppWindow, PencilLine, Flame, Handshake } from 'lucide-react';
+import { LogOut, User, Home, Settings, Menu, X, BriefcaseBusiness, Rss, Mail, AppWindow, PencilLine, Flame, Handshake, User2 } from 'lucide-react';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -20,7 +20,7 @@ interface NavLink {
 }
 
 const navigationLinks: NavLink[] = [
-  { href: '#home', label: 'Home', icon: <Home className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+  { href: '#home', label: 'Intro', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
   { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
   { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
   { href: '#services', label: 'Services', icon: <Handshake className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
@@ -254,7 +254,7 @@ export default function Header() {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300',
-        'backdrop-blur-md border-b',
+        'backdrop-blur-md border-b shadow-sm',
         scrolled
           ? 'bg-background/95 border-border/10 shadow-sm'
           : 'bg-background/80 border-transparent',
@@ -307,8 +307,7 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Home className="w-5 h-5 mr-1.5" />
-                <span>Home</span>
+                <Home className="w-5 h-5 text-foreground mr-1.5" />
               </>
             )}
           </Link>
