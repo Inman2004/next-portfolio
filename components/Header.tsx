@@ -33,9 +33,22 @@ const navigationLinks: NavLink[] = [
   },
 ];
 
-const dashboardLinks: NavLink[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: <Settings className="w-4 h-4 mr-2" /> },
-  { href: '/profile', label: 'Profile', icon: <User className="w-4 h-4 mr-2" /> },
+interface DashboardLink extends NavLink {
+  adminOnly?: boolean;
+}
+
+const dashboardLinks: DashboardLink[] = [
+  { 
+    href: '/admin', 
+    label: 'Admin', 
+    icon: <Settings className="w-4 h-4 mr-2" />,
+    adminOnly: true 
+  },
+  { 
+    href: '/profile', 
+    label: 'Profile', 
+    icon: <User className="w-4 h-4 mr-2" /> 
+  },
 ];
 
 interface NavItemProps extends React.HTMLAttributes<HTMLLIElement> {
@@ -374,17 +387,19 @@ export default function Header() {
                     aria-labelledby="user-menu"
                   >
                     <div className="py-1" role="none">
-                      {dashboardLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
-                          role="menuitem"
-                          onClick={() => setShowDropdown(false)}
-                        >
-                          {link.icon}
-                          {link.label}
-                        </Link>
+                      {dashboardLinks
+                        .filter(link => !link.adminOnly || (user?.email === 'rvimman@gmail.com'))
+                        .map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
+                            role="menuitem"
+                            onClick={() => setShowDropdown(false)}
+                          >
+                            {link.icon}
+                            {link.label}
+                          </Link>
                       ))}
                       <button
                         onClick={handleLogout}

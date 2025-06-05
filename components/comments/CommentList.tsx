@@ -1,20 +1,28 @@
-import { memo, useRef, useEffect, useCallback } from 'react';
+import { memo, useRef, useEffect, useCallback, useState, useContext } from 'react';
+import { Timestamp } from 'firebase/firestore';
 import { Loader2, Pin } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Comment } from './types';
+import type { Comment, User } from './types';
 import { CommentItem } from './CommentItem';
+import { enrichWithUserData } from '@/lib/userUtils';
+import { AuthContext } from '@/contexts/AuthContext';
 
 // Constants
 const ESTIMATED_ROW_HEIGHT = 200; // Increased from 180 to account for larger spacing
 const ROW_GAP = 16; // 16px gap between rows
 const OVERSCAN = 5; // Number of items to render outside the viewport
 
+
+import type { VirtualItem as TanstackVirtualItem } from '@tanstack/react-virtual';
+
+// Use the VirtualItem type from @tanstack/react-virtual
+type VirtualItem = TanstackVirtualItem;
+
 interface CommentListProps {
   comments: Comment[];
   onVote: (id: string, type: 'up' | 'down') => void;
   onDelete: (id: string) => void;
   onPin: (id: string, isPinned: boolean) => void;
-  currentUser: any;
   isAdmin: boolean;
   onLoadMore: () => void;
   hasMore: boolean;
@@ -22,29 +30,107 @@ interface CommentListProps {
   className?: string;
 }
 
-import type { VirtualItem as TanstackVirtualItem } from '@tanstack/react-virtual';
-
-// Use the VirtualItem type from @tanstack/react-virtual
-type VirtualItem = TanstackVirtualItem;
-
 const CommentListComponent = ({
-  comments,
+  comments: initialComments,
   onVote,
   onDelete,
   onPin,
-  currentUser,
   isAdmin,
   onLoadMore,
   hasMore,
   isLoadingMore,
   className = ''
 }: CommentListProps) => {
+  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [isEnriching, setIsEnriching] = useState(true);
   const parentRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
+  // Get the current user from AuthContext and convert to our User type
+  const auth = useContext(AuthContext);
+  const currentUser: User | null = auth?.user ? {
+    uid: auth.user.uid,
+    displayName: auth.user.displayName || '',
+    email: auth.user.email || null,
+    photoURL: auth.user.photoURL || null
+  } : null;
+  
+  // Helper to ensure we have a valid Date object
+  const toDate = (timestamp: Timestamp | string | Date | undefined): Date => {
+    if (!timestamp) return new Date();
+    if (timestamp instanceof Date) return timestamp;
+    if (typeof timestamp === 'string') return new Date(timestamp);
+    return timestamp.toDate();
+  };
+  
+  // Enrich comments with user data
+  useEffect(() => {
+    const enrichComments = async () => {
+      try {
+        setIsEnriching(true);
+        // Convert comments to the format expected by enrichWithUserData
+        const commentsWithUserId = initialComments.map((comment: Comment) => ({
+          ...comment,
+          userId: comment.uid
+        }));
+        
+        const enriched = await enrichWithUserData(commentsWithUserId);
+        
+        // Merge the enriched user data back into the comments
+        const mergedComments = initialComments.map((comment: Comment) => {
+          // Check if the current user is the author of a comment
+          const isAuthor = (comment: Comment) => {
+            return currentUser && comment.uid === currentUser.uid;
+          };
+  
+          // Convert any user object to our User type
+          const toCommentUser = (user: any): User => {
+            if (!user) return {} as User; // Return empty user if user is null/undefined
+            return {
+              uid: user.uid || '',
+              displayName: user.displayName || '',
+              email: user.email || null,
+              photoURL: user.photoURL || null
+            };
+          };
+
+          // If this is the current user's comment, use their latest profile data
+          if (currentUser && comment.uid === currentUser.uid) {
+            return {
+              ...comment,
+              user: toCommentUser(currentUser)
+            };
+          }
+          return {
+            ...comment,
+            user: toCommentUser(enriched.find((e: any) => e.userId === comment.uid)?.user)
+          };
+        });
+        
+        setComments(prev => {
+          // Only update if the enriched data is different
+          if (JSON.stringify(prev) !== JSON.stringify(mergedComments)) {
+            return mergedComments;
+          }
+          return prev;
+        });
+      } catch (error) {
+        console.error('Error enriching comments:', error);
+      } finally {
+        setIsEnriching(false);
+      }
+    };
+
+    if (initialComments.length > 0) {
+      enrichComments();
+    } else {
+      setIsEnriching(false);
+    }
+  }, [initialComments, currentUser?.uid, currentUser?.displayName, currentUser?.photoURL]);
+
   // Set up intersection observer for infinite loading
   useEffect(() => {
-    if (!loadingRef.current || !hasMore || isLoadingMore) return;
+    if (isEnriching || !loadingRef.current || !hasMore || isLoadingMore) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -113,6 +199,13 @@ const CommentListComponent = ({
       ) : null;
     }
 
+    // Ensure we have a properly typed user object
+    const commentUser = comment.user || {
+      uid: comment.uid,
+      displayName: comment.displayName || '',
+      email: comment.email,
+      photoURL: comment.photoURL
+    };
 
     return (
       <div
@@ -130,17 +223,37 @@ const CommentListComponent = ({
       >
         <div className="h-full">
           <CommentItem
-            comment={comment}
+            key={comment.id}
+            comment={{
+              ...comment,
+              user: commentUser,
+              // Ensure required fields are present with proper types
+              id: comment.id,
+              content: comment.content,
+              timestamp: toDate(comment.timestamp),
+              updatedAt: comment.updatedAt ? toDate(comment.updatedAt) : undefined,
+              uid: comment.uid,
+              parentId: comment.parentId,
+              isPinned: comment.isPinned || false,
+              upvotes: comment.upvotes || 0,
+              downvotes: comment.downvotes || 0,
+              upvoters: comment.upvoters || [],
+              downvoters: comment.downvoters || [],
+              mentions: comment.mentions || [],
+              replies: comment.replies || [],
+              edited: comment.edited || false,
+              editHistory: comment.editHistory || []
+            }}
+            currentUser={currentUser}
             onVote={onVote}
             onDelete={onDelete}
             onPin={onPin}
-            currentUser={currentUser}
             isAdmin={isAdmin}
           />
         </div>
       </div>
     );
-  }, [regularComments, hasMore, onVote, onDelete, onPin, currentUser, isAdmin]);
+  }, [regularComments, hasMore, onVote, onDelete, onPin, isAdmin, currentUser]);
 
   // Separate pinned comments
   const pinnedComments = comments.filter(comment => comment.isPinned);

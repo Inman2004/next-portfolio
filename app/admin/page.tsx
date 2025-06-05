@@ -1,12 +1,51 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Users, FileText, Eye, MessageSquare, ArrowRight } from 'lucide-react';
+import { Plus, Users, FileText, Eye, MessageSquare, ArrowRight, Loader2 } from 'lucide-react';
 import { DashboardStats } from '@/components/admin/DashboardStats';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminDashboard() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  // Redirect to signin if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/signin?callbackUrl=/admin');
+    } else if (!loading && user && user.email !== 'rvimman@gmail.com') {
+      // Redirect to unauthorized if not the admin
+      router.push('/unauthorized');
+    }
+  }, [user, loading, router]);
+
+  // Show loading state
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  // Show unauthorized message if not admin
+  if (user.email !== 'rvimman@gmail.com') {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">Unauthorized Access</h1>
+          <p className="mt-2">You don't have permission to access this page.</p>
+          <Button onClick={() => router.push('/')} className="mt-4">
+            Return to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
   // Mock recent activity data
   const recentActivity = [
     {
@@ -47,6 +86,12 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
+    {
+      title: 'Manage Projects',
+      description: 'View, add, edit, or delete projects',
+      icon: <FileText className="h-6 w-6 text-blue-500" />,
+      href: '/admin/projects',
+    },
     {
       title: 'Create New Post',
       description: 'Write a new blog post',

@@ -6,6 +6,7 @@ import { LayoutDashboard, Users, FileText, Settings, LogOut } from 'lucide-react
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Projects', href: '/admin/projects', icon: FileText },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Blog', href: '/admin/blog', icon: FileText },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
@@ -48,17 +49,20 @@ export function AdminSidebar() {
             </nav>
           </div>
           <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-            <button className="flex-shrink-0 w-full group block">
-              <div className="flex items-center">
-                <div>
-                  <LogOut className="h-6 w-6 text-gray-400 group-hover:text-gray-500" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                    Sign out
-                  </p>
-                </div>
-              </div>
+            <button 
+              onClick={async () => {
+                try {
+                  const { signOut } = await import('@/lib/auth');
+                  await signOut();
+                  window.location.href = '/';
+                } catch (error) {
+                  console.error('Error signing out:', error);
+                }
+              }}
+              className="flex items-center w-full text-left text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md p-2"
+            >
+              <LogOut className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+              Sign out
             </button>
           </div>
         </div>

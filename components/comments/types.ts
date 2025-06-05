@@ -3,15 +3,22 @@ import { Timestamp } from 'firebase/firestore';
 export interface Comment {
   id: string;
   uid: string;
-  displayName: string;
-  photoURL: string;
+  // These fields are kept for backward compatibility
+  displayName?: string;
+  photoURL?: string | null;
+  email?: string | null;
+  // User object that will be populated from the users collection
+  user?: {
+    displayName?: string;
+    photoURL?: string | null;
+    email?: string | null;
+  };
   content: string;
-  timestamp: Timestamp;
-  updatedAt?: Timestamp;
+  timestamp: Timestamp | string | Date;
+  updatedAt?: Timestamp | string | Date;
   upvotes: number;
   downvotes: number;
   isPinned?: boolean;
-  email: string;
   upvoters: string[];
   downvoters: string[];
   parentId?: string;
@@ -19,7 +26,7 @@ export interface Comment {
   edited?: boolean;
   editHistory?: {
     content: string;
-    timestamp: Timestamp;
+    timestamp: Timestamp | string | Date;
   }[];
   mentions?: string[];
 }

@@ -78,33 +78,48 @@ export const CommentItem = memo(({
               </motion.div>
             )}
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
-              {comment.photoURL ? (
+              {comment.user?.photoURL || comment.photoURL ? (
                 <Image
-                  src={comment.photoURL}
-                  alt={comment.displayName}
+                  src={(comment.user?.photoURL || comment.photoURL) as string}
+                  alt={comment.user?.displayName || comment.displayName || 'User'}
                   width={40}
                   height={40}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
-                  {comment.displayName?.charAt(0)?.toUpperCase() || '?'}
+                  {(comment.user?.displayName || comment.displayName || '?').charAt(0).toUpperCase()}
                 </div>
               )}
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900 dark:text-white">{comment.displayName}</span>
-              {isAdminComment && (
-                <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
-                  Admin
-                </span>
-              )}
+              <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                {comment.user?.displayName || comment.displayName || 'Anonymous'}
+                {comment.email === ADMIN_EMAIL && (
+                  <span className="ml-1 text-yellow-500" title="Admin">
+                    <Crown className="inline-block w-3 h-3" />
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {(() => {
+                  try {
+                    if (!comment.timestamp) return '';
+                    const date = typeof comment.timestamp === 'string' 
+                      ? new Date(comment.timestamp)
+                      : 'toDate' in comment.timestamp 
+                        ? comment.timestamp.toDate() 
+                        : comment.timestamp;
+                    return date.toLocaleDateString();
+                  } catch (e) {
+                    console.error('Error formatting date:', e);
+                    return '';
+                  }
+                })()}
+              </span>
             </div>
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {comment.timestamp?.toDate ? comment.timestamp.toDate().toLocaleDateString() : ''}
-            </span>
           </div>
         </div>
         <div className="flex items-center gap-2">

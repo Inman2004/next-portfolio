@@ -1,18 +1,24 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  User,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  signInWithPopup,
+import { 
+  User, 
+  UserCredential, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged, 
   updateProfile,
   GoogleAuthProvider,
-  UserCredential
+  signInWithPopup,
+  updateEmail as updateAuthEmail,
+  updatePassword as updateAuthPassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import { updateUserReferences } from '@/lib/updateUserReferences';
 
 // Function to send welcome email using EmailJS
 const sendWelcomeEmail = async (email: string, name: string) => {
@@ -66,17 +72,25 @@ const sendWelcomeEmail = async (email: string, name: string) => {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<any>;
-  signIn: (email: string, password: string) => Promise<any>;
-  signInWithGoogle: () => Promise<any>;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
+  signIn: (email: string, password: string) => Promise<UserCredential>;
+  signInWithGoogle: () => Promise<UserCredential>;
   logout: () => Promise<void>;
   isGoogleUser: boolean;
-  updateUserProfile: (profile: { displayName?: string | null; photoURL?: string | null }) => Promise<void>;
+  updateUserProfile: (profile: { displayName?: string | null; photoURL?: string | null }) => Promise<{ success: boolean }>;
 }
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+export { AuthContext };
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -153,9 +167,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserProfile = async (profile: { displayName?: string | null; photoURL?: string | null }) => {
     if (!auth.currentUser) throw new Error('No user logged in');
-    await updateProfile(auth.currentUser, profile);
-    // Force a user state update
-    setUser(auth.currentUser);
+    
+    try {
+      // Create updated user object
+      const updatedUser = {
+        ...auth.currentUser,
+        displayName: profile.displayName !== undefined ? profile.displayName : auth.currentUser.displayName,
+        photoURL: profile.photoURL !== undefined ? profile.photoURL : auth.currentUser.photoURL
+      };
+
+      // Update auth profile
+      await updateProfile(auth.currentUser, profile);
+      
+      // Prepare update data
+      const updateData: Record<string, any> = {
+        email: auth.currentUser.email,
+        emailVerified: auth.currentUser.emailVerified,
+        updatedAt: serverTimestamp()
+      };
+      
+      if (profile.displayName !== undefined) {
+        updateData.displayName = profile.displayName;
+      }
+      if (profile.photoURL !== undefined) {
+        updateData.photoURL = profile.photoURL;
+      }
+      
+      // Update or create user document in Firestore
+      if (db) {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+          // Update existing document
+          await updateDoc(userRef, updateData);
+        } else {
+          // Create new document with additional fields
+          await setDoc(userRef, {
+            ...updateData,
+            createdAt: serverTimestamp(),
+            role: 'user',
+            isActive: true
+          });
+        }
+      }
+      
+      // Update local state with the new user data
+      setUser(updatedUser);
+      
+      // Update the user cache
+      if (typeof window !== 'undefined') {
+        const userData = {
+          displayName: updatedUser.displayName,
+          photoURL: updatedUser.photoURL,
+          email: updatedUser.email
+        };
+        
+        // Update the cache for this user
+        const userCache = new Map(JSON.parse(localStorage.getItem('userCache') || '[]'));
+        userCache.set(updatedUser.uid, userData);
+        localStorage.setItem('userCache', JSON.stringify(Array.from(userCache.entries())));
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
   };
 
   const value = {

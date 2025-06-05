@@ -1,42 +1,41 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { auth, User } from '@/lib/auth';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  console.log('AdminLayout: Rendering admin layout');
+  const { user, isAdmin, isLoading } = useAdminAuth();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
 
+  // Redirect to signin if not loading and not admin
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { user: currentUser } = await auth();
-        setUser(currentUser);
-        
-        if (currentUser?.email === 'rvimman@gmail.com') {
-          setIsAdmin(true);
-        } else {
-          router.push('/unauthorized');
-        }
-      } catch (error) {
-        console.error('Auth error:', error);
-        router.push('/signin');
-      } finally {
-        setIsLoading(false);
+    console.log('AdminLayout: Auth state -', { 
+      isLoading, 
+      hasUser: !!user, 
+      isAdmin, 
+      userEmail: user?.email 
+    });
+    
+    if (!isLoading) {
+      if (!user) {
+        console.log('AdminLayout: No user found, redirecting to signin');
+        router.push('/signin?callbackUrl=/admin');
+      } else if (!isAdmin) {
+        console.log('AdminLayout: User is not an admin, redirecting to unauthorized');
+        router.push('/unauthorized');
+      } else {
+        console.log('AdminLayout: User is authenticated and is an admin');
       }
-    };
-
-    checkAuth();
-  }, [router]);
+    }
+  }, [user, isAdmin, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -46,8 +45,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
+  // Don't render anything if not admin or no user
   if (!isAdmin || !user) {
-    return null; // Redirecting in useEffect
+    return null;
   }
 
   return (

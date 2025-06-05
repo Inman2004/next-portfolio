@@ -33,11 +33,15 @@ export default function ProfileSettings() {
       setError('');
       setSuccess('');
 
-      await updateUserProfile({
+      const result = await updateUserProfile({
         displayName: displayName,
       });
 
-      setSuccess('Profile updated successfully!');
+      if (result?.success) {
+        setSuccess('Profile updated successfully!');
+      } else {
+        throw new Error('Failed to update profile');
+      }
     } catch (err: any) {
       console.error('Error updating profile:', err);
       setError(err.message || 'Failed to update profile');
