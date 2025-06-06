@@ -1,4 +1,15 @@
-import { doc, getDoc, onSnapshot, Unsubscribe, DocumentData } from 'firebase/firestore';
+import { 
+  doc, 
+  getDoc, 
+  onSnapshot, 
+  Unsubscribe, 
+  DocumentData, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  updateDoc 
+} from 'firebase/firestore';
 import { db } from './firebase';
 import { EnrichedBlogPost } from '@/types/blog';
 
@@ -34,75 +45,222 @@ const saveCache = () => {
   }
 };
 
-export async function getUserData(userId: string, subscribe: boolean = false) {
+export interface UserData {
+  uid: string;
+  displayName?: string | null;
+  photoURL?: string | null;
+  email?: string | null;
+  username?: string;
+  bio?: string;
+  website?: string;
+  location?: string;
+  github?: string;
+  twitter?: string;
+  linkedin?: string;
+  tiktok?: string;
+  instagram?: string;
+  youtube?: string;
+  discord?: string;
+  twitch?: string;
+  reddit?: string;
+  stackoverflow?: string;
+  createdAt?: {
+    toDate?: () => Date;
+  } | null;
+  toDate?: () => Date;
+  providerData?: Array<{
+    providerId: string;
+    uid: string;
+    displayName: string | null;
+    email: string | null;
+    photoURL: string | null;
+    [key: string]: any; // Allow additional properties
+  }>;
+  [key: string]: any; // Allow additional properties
+}
+
+export async function getUserByUsername(username: string): Promise<UserData | null> {
+  try {
+    console.log('🔍 [getUserByUsername] Searching for username:', username);
+    
+    // Check if Firestore is initialized
+    if (!db) {
+      console.error('❌ Firestore is not initialized');
+      return null;
+    }
+    
+    const usersRef = collection(db, 'users');
+    console.log('🔍 Using collection:', 'users');
+    
+    // Try both with and without toLowerCase() for debugging
+    const searchUsername = username.trim();
+    const q = query(usersRef, where('username', '==', searchUsername));
+    
+    console.log('🔍 Executing query for username:', searchUsername);
+    const querySnapshot = await getDocs(q);
+    
+    console.log('🔍 Query results:', {
+      empty: querySnapshot.empty,
+      size: querySnapshot.size,
+      docs: querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        data: doc.data()
+      }))
+    });
+    
+    if (querySnapshot.empty) {
+      console.log(`❌ No user found with username: ${searchUsername}`);
+      return null;
+    }
+    
+    // Get the first matching user
+    const userDoc = querySnapshot.docs[0];
+    const userData = {
+      uid: userDoc.id,
+      ...userDoc.data()
+    };
+    
+    console.log('✅ Found user:', userData);
+    return userData as UserData;
+  } catch (error) {
+    console.error('Error fetching user by username:', error);
+    return null;
+  }
+}
+
+export async function getUserData(userId: string, subscribe: boolean = false): Promise<UserData | null> {
   // Check in-memory cache first
   if (userCache.has(userId) && !subscribe) {
-    return userCache.get(userId);
+    const cachedData = userCache.get(userId);
+    if (cachedData) {
+      return cachedData as UserData;
+    }
   }
 
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
     
     if (userDoc.exists()) {
-      let userData = userDoc.data();
+      const userData = userDoc.data() as Partial<UserData>;
+      if (!userData) {
+        console.error('User data is undefined');
+        return null;
+      }
+
+      let processedData: UserData = {
+        uid: userId,
+        displayName: userData.displayName ?? null,
+        photoURL: userData.photoURL ?? null,
+        email: userData.email ?? null,
+        username: userData.username ?? '',
+        bio: userData.bio ?? '',
+        website: userData.website ?? '',
+        location: userData.location ?? '',
+        createdAt: userData.createdAt ?? null,
+        providerData: Array.isArray(userData.providerData) ? userData.providerData : []
+      };
       
       // If we have provider data, merge it with the user data
-      if (userData.providerData?.length > 0) {
+      if (Array.isArray(userData.providerData) && userData.providerData.length > 0) {
         const providerData = userData.providerData[0];
-        userData = {
-          ...userData,
-          displayName: userData.displayName || providerData.displayName,
-          photoURL: userData.photoURL || providerData.photoURL,
-          email: userData.email || providerData.email
-        };
+        if (providerData) {
+          processedData = {
+            ...processedData,
+            displayName: processedData.displayName || providerData.displayName || null,
+            photoURL: processedData.photoURL || providerData.photoURL || null,
+            email: processedData.email || providerData.email || null
+          };
+        }
       }
       
       // Update both in-memory and localStorage cache
-      userCache.set(userId, userData);
+      userCache.set(userId, processedData);
       saveCache();
       
       // If subscribing, set up real-time updates
       if (subscribe) {
         return new Promise((resolve) => {
-          const unsubscribe = onSnapshot(doc(db, 'users', userId), (doc) => {
-            if (doc.exists()) {
-              let updatedData = doc.data();
-              
-              // If we have provider data, merge it with the user data
-              if (updatedData.providerData?.length > 0) {
-                const providerData = updatedData.providerData[0];
-                updatedData = {
-                  ...updatedData,
-                  displayName: updatedData.displayName || providerData.displayName,
-                  photoURL: updatedData.photoURL || providerData.photoURL,
-                  email: updatedData.email || providerData.email
+          const userDocRef = doc(db, 'users', userId);
+          if (!userDocRef) {
+            console.error('Failed to create document reference');
+            resolve(processedData);
+            return;
+          }
+
+          const unsubscribe = onSnapshot(userDocRef, (doc) => {
+            try {
+              if (doc.exists()) {
+                const updatedData = doc.data();
+                if (!updatedData) {
+                  console.error('Updated data is undefined');
+                  return;
+                }
+
+                let processedUpdatedData: UserData = {
+                  uid: userId,
+                  displayName: updatedData.displayName ?? null,
+                  photoURL: updatedData.photoURL ?? null,
+                  email: updatedData.email ?? null,
+                  username: updatedData.username ?? '',
+                  bio: updatedData.bio ?? '',
+                  website: updatedData.website ?? '',
+                  location: updatedData.location ?? '',
+                  createdAt: updatedData.createdAt ?? null,
+                  providerData: Array.isArray(updatedData.providerData) 
+                    ? updatedData.providerData 
+                    : []
                 };
+                
+                // If we have provider data, merge it with the updated data
+                if (Array.isArray(updatedData.providerData) && updatedData.providerData.length > 0) {
+                  const providerData = updatedData.providerData[0];
+                  if (providerData) {
+                    processedUpdatedData = {
+                      ...processedUpdatedData,
+                      displayName: processedUpdatedData.displayName || providerData.displayName || null,
+                      photoURL: processedUpdatedData.photoURL || providerData.photoURL || null,
+                      email: processedUpdatedData.email || providerData.email || null
+                    };
+                  }
+                }
+                
+                userCache.set(userId, processedUpdatedData);
+                saveCache();
+                
+                // Dispatch a custom event to notify about the update
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('userDataUpdated', {
+                    detail: { userId, userData: processedUpdatedData }
+                  }));
+                }
               }
-              
-              userCache.set(userId, updatedData);
-              saveCache();
-              
-              // Dispatch a custom event to notify about the update
-              window.dispatchEvent(new CustomEvent('userDataUpdated', {
-                detail: { userId, userData: updatedData }
-              }));
+            } catch (error) {
+              console.error('Error in onSnapshot callback:', error);
             }
+          }, (error) => {
+            console.error('Error setting up snapshot listener:', error);
           });
           
           // Store the unsubscribe function
-          subscriptions.set(userId, { 
-            count: 1, 
-            unsubscribe: () => {
-              unsubscribe();
-              subscriptions.delete(userId);
-            } 
-          });
+          if (unsubscribe) {
+            subscriptions.set(userId, { 
+              count: 1, 
+              unsubscribe: () => {
+                try {
+                  unsubscribe();
+                } catch (error) {
+                  console.error('Error unsubscribing:', error);
+                }
+                subscriptions.delete(userId);
+              } 
+            });
+          }
           
-          resolve(userData);
-        });
+          resolve(processedData);
+        }) as Promise<UserData>;
       }
       
-      return userData;
+      return processedData;
     }
     
     return null;
@@ -113,40 +271,94 @@ export async function getUserData(userId: string, subscribe: boolean = false) {
 }
 
 // Function to unsubscribe from user updates
-export function unsubscribeFromUser(userId: string) {
+export function unsubscribeFromUser(userId: string): void {
+  if (!userId) {
+    console.error('User ID is required');
+    return;
+  }
+
   const sub = subscriptions.get(userId);
-  if (sub) {
+  if (!sub) {
+    return; // No subscription found for this user
+  }
+
+  try {
     sub.count--;
     if (sub.count <= 0) {
-      sub.unsubscribe();
+      if (typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe();
+      }
       subscriptions.delete(userId);
     }
+  } catch (error) {
+    console.error(`Error unsubscribing user ${userId}:`, error);
+    // Ensure we clean up even if there's an error
+    subscriptions.delete(userId);
   }
 }
 
 // Function to subscribe to user data updates
-export function subscribeToUser(userId: string, callback: (userData: any) => void) {
+export function subscribeToUser(
+  userId: string, 
+  callback: (userData: UserData | null) => void
+): () => void {
+  if (!userId) {
+    console.error('User ID is required for subscription');
+    return () => {}; // Return no-op function if no userId provided
+  }
+
+  // Set up a flag to track if the component is still mounted
+  let isMounted = true;
+  
   // Get initial data
-  getUserData(userId, true).then(callback);
+  getUserData(userId, true)
+    .then((userData) => {
+      if (isMounted) {
+        callback(userData);
+      }
+    })
+    .catch((error) => {
+      console.error(`Error fetching initial user data for ${userId}:`, error);
+      if (isMounted) {
+        callback(null);
+      }
+    });
   
   // Set up event listener for updates
   const handleUpdate = (event: Event) => {
-    const { userId: updatedUserId, userData } = (event as CustomEvent).detail;
-    if (updatedUserId === userId) {
-      callback(userData);
+    try {
+      const customEvent = event as CustomEvent<{ userId: string; userData: UserData }>;
+      const { userId: updatedUserId, userData } = customEvent.detail || {};
+      
+      if (updatedUserId === userId) {
+        callback(userData);
+      }
+    } catch (error) {
+      console.error('Error handling user data update:', error);
     }
   };
-  
+
+  // Add event listener if in browser environment
   if (typeof window !== 'undefined') {
     window.addEventListener('userDataUpdated', handleUpdate as EventListener);
   }
   
   // Return cleanup function
   return () => {
+    isMounted = false; // Mark as unmounted
+    
     if (typeof window !== 'undefined') {
       window.removeEventListener('userDataUpdated', handleUpdate as EventListener);
     }
-    unsubscribeFromUser(userId);
+    
+    // Clean up the subscription
+    try {
+      if (userId) {
+        unsubscribeFromUser(userId);
+      }
+    } catch (error) {
+      console.error('Error during cleanup:', error);
+    }
   };
 }
 
@@ -155,6 +367,9 @@ export interface EnrichableItem {
   userId: string;
   [key: string]: any; // Allow any other properties
 }
+
+// TypeScript already has CustomEvent defined in lib.dom.d.ts
+// No need to redeclare it, just use it directly
 
 // Define the structure of the enriched item
 export interface EnrichedItem<T> {
@@ -182,32 +397,47 @@ export async function enrichWithUserData<T extends EnrichableItem>(
   
   // Create a map of user data
   const userDataMap = userIds.reduce((acc, userId, index) => {
-    if (userDataArray[index]) {
-      const userData: any = {};
-      fields.forEach(field => {
-        // Check both the field name and the providerData for the field
-        if (userDataArray[index][field] !== undefined) {
-          userData[field] = userDataArray[index][field];
-        } else if (userDataArray[index].providerData?.[0]?.[field] !== undefined) {
-          // Check providerData for Google/Facebook login data
-          userData[field] = userDataArray[index].providerData[0][field];
-        }
-      });
-      acc[userId] = userData;
+    const userDataItem = userDataArray[index];
+    if (!userDataItem) {
+      return acc;
     }
+    
+    const userData: Record<string, any> = {};
+    const providerData = Array.isArray(userDataItem.providerData) ? userDataItem.providerData[0] : null;
+    
+    fields.forEach(field => {
+      // Check the field directly on user data
+      if (field in userDataItem && userDataItem[field] !== undefined) {
+        userData[field] = userDataItem[field];
+      } 
+      // Check providerData for Google/Facebook login data
+      else if (providerData && field in providerData && providerData[field] !== undefined) {
+        userData[field] = providerData[field];
+      }
+    });
+    
+    acc[userId] = userData;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, Record<string, any>>);
   
   // Enrich items with user data and set up subscriptions if needed
   return items.map(item => {
+    if (!item.userId) {
+      // If no userId is provided, return the item as is with minimal enrichment
+      return {
+        ...item,
+        user: undefined,
+        _userUnsubscribe: undefined
+      } as T & EnrichedItem<T>;
+    }
+
     // Set up subscription for real-time updates if requested
     let unsubscribe: (() => void) | undefined;
     
-    if (subscribe && item.userId) {
-      unsubscribe = subscribeToUser(item.userId, (userData) => {
-        // This callback will be called whenever the user data is updated
-        // You can handle the update here if needed
+    if (subscribe) {
+      unsubscribe = subscribeToUser(item.userId, () => {
         // The cache is already updated by the subscription
+        // Additional update logic can be added here if needed
       });
     }
     
@@ -218,8 +448,8 @@ export async function enrichWithUserData<T extends EnrichableItem>(
     const enrichedItem: T & EnrichedItem<T> = {
       ...item,
       user: {
-        displayName: userData.displayName || userData.name,
-        photoURL: userData.photoURL || userData.photoURL
+        displayName: userData.displayName || userData.name || '',
+        photoURL: userData.photoURL || null
       },
       _userUnsubscribe: unsubscribe
     };

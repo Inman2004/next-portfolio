@@ -71,7 +71,7 @@ export async function deleteBlogPost(postId: string, currentUserId?: string) {
     
     // Delete the post's view count
     try {
-      const viewRef = doc(db, 'post_views', postId);
+      const viewRef = doc(getgetgetDb, 'post_views', postId);
       await deleteDoc(viewRef);
     } catch (error) {
       console.warn('Failed to delete view count:', error);

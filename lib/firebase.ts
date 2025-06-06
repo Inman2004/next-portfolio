@@ -49,6 +49,10 @@ const initializeFirebase = () => {
     googleProvider.setCustomParameters({
       prompt: 'select_account'
     });
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Firebase initialized successfully');
+    }
   } catch (error) {
     console.error('Firebase initialization error:', error);
   }
@@ -65,13 +69,10 @@ async function testConnection() {
   try {
     if (!db) {
       console.error('Firestore not initialized');
-      return;
+      return false;
     }
-
-    // Ensure we have a valid db instance
-    const firestoreDb = db || getFirestore();
     
-    const querySnapshot = await getDocs(collection(firestoreDb, 'comments'));
+    const querySnapshot = await getDocs(collection(db, 'comments'));
     console.log('Successfully connected to Firestore. Found', querySnapshot.size, 'comments');
     
     if (process.env.NODE_ENV === 'development') {

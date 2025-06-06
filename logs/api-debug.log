@@ -1,0 +1,2203 @@
+[2025-06-06T19:10:44.073Z] [k4kg2fb4] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:10:44.289Z] [k4kg2fb4] [jillybean] Fetching user by username
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:10:44.290Z] ERROR ([k4kg2fb4] [jillybean] Database error): Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+FirebaseError: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:10:44.443Z] [iwd2gw7b] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:10:44.644Z] [iwd2gw7b] [jillybean] Fetching user by username
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:10:44.645Z] ERROR ([iwd2gw7b] [jillybean] Database error): Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+FirebaseError: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:15:42.885Z] [cpnmaqoe] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:15:43.065Z] [cpnmaqoe] [jillybean] Fetching user by username
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:15:43.065Z] ERROR ([cpnmaqoe] [jillybean] Database error): Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+FirebaseError: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:15:43.204Z] [9kdx7ej9] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:15:43.387Z] [9kdx7ej9] [jillybean] Fetching user by username
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:15:43.388Z] ERROR ([9kdx7ej9] [jillybean] Database error): Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+FirebaseError: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:38.957Z] [yraj5rlr] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:39.166Z] [yraj5rlr] [jillybean] Fetching user by username
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:39.834Z] [yraj5rlr] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "emailVerified": false,
+    "email": "lily19@hotmail.com",
+    "isActive": true,
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "username": "jillybean",
+    "role": "user",
+    "displayName": "Jilly",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:39.835Z] [yraj5rlr] [jillybean] Fetching published posts for user
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:40.216Z] ERROR ([yraj5rlr] [jillybean] Database error): Missing or insufficient permissions.
+FirebaseError: Missing or insufficient permissions.
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:40.358Z] [ln6sd9j5] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:40.549Z] [ln6sd9j5] [jillybean] Fetching user by username
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:40.925Z] [ln6sd9j5] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "username": "jillybean",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "email": "lily19@hotmail.com",
+    "isActive": true,
+    "emailVerified": false,
+    "role": "user",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "displayName": "Jilly",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:40.925Z] [ln6sd9j5] [jillybean] Fetching published posts for user
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:18:41.305Z] ERROR ([ln6sd9j5] [jillybean] Database error): Missing or insufficient permissions.
+FirebaseError: Missing or insufficient permissions.
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:53.925Z] [6x66d8m0] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:54.110Z] [6x66d8m0] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:54.113Z] [6x66d8m0] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:54.811Z] [6x66d8m0] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "username": "jillybean",
+    "email": "lily19@hotmail.com",
+    "displayName": "Jilly",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "isActive": true,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "role": "user",
+    "emailVerified": false,
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:54.812Z] [6x66d8m0] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:55.220Z] ERROR ([6x66d8m0] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__c8880160._.js:579:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:55.357Z] [qwj6781d] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:55.614Z] [qwj6781d] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:55.615Z] [qwj6781d] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:56.004Z] [qwj6781d] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "email": "lily19@hotmail.com",
+    "isActive": true,
+    "username": "jillybean",
+    "displayName": "Jilly",
+    "emailVerified": false,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "role": "user",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:56.004Z] [qwj6781d] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:22:56.395Z] ERROR ([qwj6781d] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__c8880160._.js:579:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:28.114Z] [6v2daoh4] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:28.311Z] [6v2daoh4] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:28.312Z] [6v2daoh4] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:28.710Z] [6v2daoh4] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "username": "jillybean",
+    "isActive": true,
+    "emailVerified": false,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "role": "user",
+    "displayName": "Jilly",
+    "email": "lily19@hotmail.com",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:28.711Z] [6v2daoh4] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:29.109Z] ERROR ([6v2daoh4] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__c8880160._.js:579:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:29.254Z] [bo5ixpjl] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:29.450Z] [bo5ixpjl] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:29.451Z] [bo5ixpjl] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:29.848Z] [bo5ixpjl] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "role": "user",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "emailVerified": false,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "username": "jillybean",
+    "email": "lily19@hotmail.com",
+    "isActive": true,
+    "displayName": "Jilly",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:29.849Z] [bo5ixpjl] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:23:30.240Z] ERROR ([bo5ixpjl] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__c8880160._.js:579:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.105Z] [77n5krrd] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.313Z] [77n5krrd] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.314Z] [h4i5n3e9] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.314Z] [h4i5n3e9] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.315Z] [h4i5n3e9] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.316Z] [h4i5n3e9] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.317Z] [h4i5n3e9] Connecting to emulators
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.319Z] [h4i5n3e9] Connected to all emulators
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.320Z] [h4i5n3e9] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.320Z] [77n5krrd] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.397Z] ERROR ([77n5krrd] [jillybean]): User not found with username: jillybean
+Error: User not found with username: jillybean
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__c8880160._.js:554:149)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:555:9)
+    at process.processTimers (node:internal/timers:529:7)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.543Z] [ogo34o69] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.746Z] [ogo34o69] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.747Z] [b7dgop2t] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:14.747Z] [ogo34o69] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:25:15.178Z] ERROR ([ogo34o69] [jillybean]): User not found with username: jillybean
+Error: User not found with username: jillybean
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__c8880160._.js:554:149)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.068Z] [ussw14bp] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.335Z] [ussw14bp] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.336Z] [iffn0acb] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.337Z] [iffn0acb] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.337Z] [iffn0acb] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.338Z] [iffn0acb] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.340Z] [iffn0acb] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:09.341Z] [ussw14bp] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.044Z] [ussw14bp] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "displayName": "Jilly",
+    "isActive": true,
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "role": "user",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "username": "jillybean",
+    "emailVerified": false,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "email": "lily19@hotmail.com",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.045Z] [ussw14bp] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.424Z] ERROR ([ussw14bp] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:609:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.606Z] [v0963dac] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.830Z] [v0963dac] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.831Z] [9x4ou6y4] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:10.831Z] [v0963dac] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:11.210Z] [v0963dac] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "displayName": "Jilly",
+    "role": "user",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "email": "lily19@hotmail.com",
+    "isActive": true,
+    "username": "jillybean",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "emailVerified": false,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:11.211Z] [v0963dac] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:29:11.566Z] ERROR ([v0963dac] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:609:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:43.835Z] [bwwvghww] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.076Z] [bwwvghww] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.077Z] [lsk1r5yz] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.077Z] [lsk1r5yz] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.078Z] [lsk1r5yz] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.079Z] [lsk1r5yz] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.080Z] [lsk1r5yz] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.080Z] [bwwvghww] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.772Z] [bwwvghww] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "isActive": true,
+    "emailVerified": false,
+    "email": "lily19@hotmail.com",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "role": "user",
+    "username": "jillybean",
+    "displayName": "Jilly",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:44.773Z] [bwwvghww] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.141Z] ERROR ([bwwvghww] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:610:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.286Z] [je36cbah] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.545Z] [je36cbah] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.546Z] [txdv478f] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.546Z] [je36cbah] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.923Z] [je36cbah] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "email": "lily19@hotmail.com",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "username": "jillybean",
+    "emailVerified": false,
+    "role": "user",
+    "displayName": "Jilly",
+    "isActive": true,
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:45.924Z] [je36cbah] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:30:46.293Z] ERROR ([je36cbah] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:610:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:15.786Z] [uirj6uzj] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:15.994Z] [uirj6uzj] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:15.995Z] [4szc4cdz] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:15.995Z] [uirj6uzj] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:16.491Z] [uirj6uzj] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "displayName": "Jilly",
+    "email": "lily19@hotmail.com",
+    "isActive": true,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "emailVerified": false,
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "role": "user",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "username": "jillybean",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:16.492Z] [uirj6uzj] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:16.859Z] ERROR ([uirj6uzj] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:610:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.012Z] [katqtuti] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.220Z] [katqtuti] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.221Z] [94nocl92] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.221Z] [katqtuti] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.601Z] [katqtuti] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "role": "user",
+    "username": "jillybean",
+    "emailVerified": false,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "displayName": "Jilly",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "isActive": true,
+    "email": "lily19@hotmail.com",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.602Z] [katqtuti] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:36:17.964Z] ERROR ([katqtuti] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:610:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:33.818Z] [x9b5oj7l] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:34.078Z] [x9b5oj7l] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:34.079Z] [lcfnadq1] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:34.080Z] [x9b5oj7l] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:34.582Z] [x9b5oj7l] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "email": "lily19@hotmail.com",
+    "username": "jillybean",
+    "isActive": true,
+    "emailVerified": false,
+    "displayName": "Jilly",
+    "role": "user",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:34.583Z] [x9b5oj7l] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:34.943Z] ERROR ([x9b5oj7l] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:610:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:35.082Z] [zodah4wc] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:35.369Z] [zodah4wc] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:35.370Z] [qm3th8hd] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:35.371Z] [zodah4wc] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:35.748Z] [zodah4wc] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "role": "user",
+    "displayName": "Jilly",
+    "isActive": true,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "emailVerified": false,
+    "username": "jillybean",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "email": "lily19@hotmail.com",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:35.749Z] [zodah4wc] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:38:36.105Z] ERROR ([zodah4wc] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__da27ed67._.js:610:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:43:07.147Z] [lwbbbnau] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:43:07.631Z] [327pnz1n] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:43:22.362Z] [v65kwnm0] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:43:22.786Z] [6hgya2w2] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.510Z] [otwu1cbb] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.725Z] [otwu1cbb] [jillybean] Token verification failed: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.725Z] [otwu1cbb] [jillybean] Proceeding with unauthenticated request
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.725Z] [otwu1cbb] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.726Z] [vk5s6xgd] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.727Z] [vk5s6xgd] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.729Z] [vk5s6xgd] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.732Z] [vk5s6xgd] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.734Z] [vk5s6xgd] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:00.735Z] [otwu1cbb] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:01.472Z] [otwu1cbb] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "isActive": true,
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "displayName": "Jilly",
+    "email": "lily19@hotmail.com",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "role": "user",
+    "username": "jillybean",
+    "emailVerified": false,
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:01.473Z] [otwu1cbb] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:01.853Z] ERROR ([otwu1cbb] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:652:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:02.010Z] [jkxkbees] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:02.707Z] [jkxkbees] [jillybean] Token verification failed: Firebase: Error (auth/invalid-custom-token).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:02.707Z] [jkxkbees] [jillybean] Proceeding with unauthenticated request
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:02.708Z] [jkxkbees] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:02.708Z] [fimtkvdb] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:02.708Z] [jkxkbees] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:03.071Z] [jkxkbees] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "displayName": "Jilly",
+    "emailVerified": false,
+    "email": "lily19@hotmail.com",
+    "role": "user",
+    "username": "jillybean",
+    "isActive": true,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:03.072Z] [jkxkbees] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:44:03.408Z] ERROR ([jkxkbees] [jillybean]): Database error: Missing or insufficient permissions.
+Error: Database error: Missing or insufficient permissions.
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:652:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.282Z] [1hvqf9ce] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.483Z] [1hvqf9ce] [jillybean] Token verification failed: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.483Z] [1hvqf9ce] [jillybean] Request details:
+Data: {
+  "method": "GET",
+  "url": "http://localhost:3000/api/users/jillybean/posts",
+  "isAuthenticated": false,
+  "authHeader": "Present",
+  "timestamp": "2025-06-06T19:47:36.483Z"
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.484Z] [1hvqf9ce] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.484Z] [rew1431d] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.485Z] [rew1431d] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.485Z] [rew1431d] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.486Z] [rew1431d] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.488Z] [rew1431d] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.488Z] [1hvqf9ce] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:36.490Z] [1hvqf9ce] [jillybean] User query:
+Data: {
+  "collection": "users",
+  "where": [
+    "username",
+    "==",
+    "jillybean"
+  ],
+  "isAuthenticated": false
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:37.170Z] [1hvqf9ce] [jillybean] User query result:
+Data: {
+  "exists": true,
+  "size": 1,
+  "docs": [
+    {
+      "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+      "data": {
+        "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+        "isActive": true,
+        "username": "jillybean",
+        "updatedAt": {
+          "seconds": 1749230873,
+          "nanoseconds": 687000000
+        },
+        "createdAt": {
+          "seconds": 1749131845,
+          "nanoseconds": 645000000
+        },
+        "emailVerified": false,
+        "role": "user",
+        "displayName": "Jilly",
+        "email": "lily19@hotmail.com"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:37.172Z] [1hvqf9ce] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "isActive": true,
+    "username": "jillybean",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "emailVerified": false,
+    "role": "user",
+    "displayName": "Jilly",
+    "email": "lily19@hotmail.com",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:37.172Z] [1hvqf9ce] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:37.173Z] [1hvqf9ce] [jillybean] Query:
+Data: "{\n  \"converter\": null,\n  \"_query\": {\n    \"path\": {\n      \"segments\": [\n        \"blogPosts\"\n      ],\n      \"offset\": 0,\n      \"len\": 1\n    },\n    \"collectionGroup\": null,\n    \"explicitOrderBy\": [\n      {\n        \"field\": {\n          \"segments\": [\n            \"createdAt\"\n          ],\n          \"offset\": 0,\n          \"len\": 1\n        },\n        \"dir\": \"desc\"\n      }\n    ],\n    \"filters\": [\n      {\n        \"field\": {\n          \"segments\": [\n            \"authorId\"\n          ],\n          \"offset\": 0,\n          \"len\": 1\n        },\n        \"op\": \"==\",\n        \"value\": {\n          \"stringValue\": \"7tG9Be4vOLVjuDQ95JCDhwycRvt1\"\n        }\n      },\n      {\n        \"field\": {\n          \"segments\": [\n            \"published\"\n          ],\n          \"offset\": 0,\n          \"len\": 1\n        },\n        \"op\": \"==\",\n        \"value\": {\n          \"booleanValue\": true\n        }\n      }\n    ],\n    \"limit\": 10,\n    \"limitType\": \"F\",\n    \"startAt\": null,\n    \"endAt\": null,\n    \"memoizedNormalizedOrderBy\": null,\n    \"memoizedTarget\": null,\n    \"memoizedAggregateTarget\": null\n  },\n  \"type\": \"query\",\n  \"firestore\": {\n    \"app\": {\n      \"_isDeleted\": false,\n      \"_options\": {\n        \"apiKey\": \"AIzaSyDcy9M06qGY_CdMg_3re2K9Ct4ZcgOga3M\",\n        \"authDomain\": \"next-portfolio-85305.firebaseapp.com\",\n        \"projectId\": \"next-portfolio-85305\",\n        \"storageBucket\": \"next-portfolio-85305.firebasestorage.app\",\n        \"messagingSenderId\": \"363822253777\",\n        \"appId\": \"1:363822253777:web:f7c40a2418d1ded19767f0\"\n      },\n      \"_config\": {\n        \"name\": \"[DEFAULT]\",\n        \"automaticDataCollectionEnabled\": false\n      },\n      \"_name\": \"[DEFAULT]\",\n      \"_automaticDataCollectionEnabled\": false,\n      \"_container\": {\n        \"name\": \"[DEFAULT]\",\n        \"providers\": {}\n      }\n    },\n    \"databaseId\": {\n      \"projectId\": \"next-portfolio-85305\",\n      \"database\": \"(default)\"\n    },\n    \"settings\": {\n      \"host\": \"firestore.googleapis.com\",\n      \"ssl\": true,\n      \"ignoreUndefinedProperties\": false,\n      \"cacheSizeBytes\": 41943040,\n      \"experimentalForceLongPolling\": false,\n      \"experimentalAutoDetectLongPolling\": true,\n      \"experimentalLongPollingOptions\": {},\n      \"useFetchStreams\": true\n    }\n  }\n}"
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:37.561Z] ERROR ([1hvqf9ce] [jillybean]): Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:683:145)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processTimers (node:internal/timers:526:9)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:37.750Z] [fx5bjzmq] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.357Z] [fx5bjzmq] [jillybean] Token verification failed: Firebase: Error (auth/invalid-custom-token).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.357Z] [fx5bjzmq] [jillybean] Request details:
+Data: {
+  "method": "GET",
+  "url": "http://localhost:3000/api/users/jillybean/posts",
+  "isAuthenticated": false,
+  "authHeader": "Present",
+  "timestamp": "2025-06-06T19:47:38.357Z"
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.358Z] [fx5bjzmq] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.358Z] [fbcdmtfz] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.358Z] [fx5bjzmq] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.359Z] [fx5bjzmq] [jillybean] User query:
+Data: {
+  "collection": "users",
+  "where": [
+    "username",
+    "==",
+    "jillybean"
+  ],
+  "isAuthenticated": false
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.739Z] [fx5bjzmq] [jillybean] User query result:
+Data: {
+  "exists": true,
+  "size": 1,
+  "docs": [
+    {
+      "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+      "data": {
+        "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+        "email": "lily19@hotmail.com",
+        "updatedAt": {
+          "seconds": 1749230873,
+          "nanoseconds": 687000000
+        },
+        "isActive": true,
+        "role": "user",
+        "displayName": "Jilly",
+        "createdAt": {
+          "seconds": 1749131845,
+          "nanoseconds": 645000000
+        },
+        "emailVerified": false,
+        "username": "jillybean"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.740Z] [fx5bjzmq] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "email": "lily19@hotmail.com",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "isActive": true,
+    "role": "user",
+    "displayName": "Jilly",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "emailVerified": false,
+    "username": "jillybean",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.741Z] [fx5bjzmq] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:38.742Z] [fx5bjzmq] [jillybean] Query:
+Data: "{\n  \"converter\": null,\n  \"_query\": {\n    \"path\": {\n      \"segments\": [\n        \"blogPosts\"\n      ],\n      \"offset\": 0,\n      \"len\": 1\n    },\n    \"collectionGroup\": null,\n    \"explicitOrderBy\": [\n      {\n        \"field\": {\n          \"segments\": [\n            \"createdAt\"\n          ],\n          \"offset\": 0,\n          \"len\": 1\n        },\n        \"dir\": \"desc\"\n      }\n    ],\n    \"filters\": [\n      {\n        \"field\": {\n          \"segments\": [\n            \"authorId\"\n          ],\n          \"offset\": 0,\n          \"len\": 1\n        },\n        \"op\": \"==\",\n        \"value\": {\n          \"stringValue\": \"7tG9Be4vOLVjuDQ95JCDhwycRvt1\"\n        }\n      },\n      {\n        \"field\": {\n          \"segments\": [\n            \"published\"\n          ],\n          \"offset\": 0,\n          \"len\": 1\n        },\n        \"op\": \"==\",\n        \"value\": {\n          \"booleanValue\": true\n        }\n      }\n    ],\n    \"limit\": 10,\n    \"limitType\": \"F\",\n    \"startAt\": null,\n    \"endAt\": null,\n    \"memoizedNormalizedOrderBy\": null,\n    \"memoizedTarget\": null,\n    \"memoizedAggregateTarget\": null\n  },\n  \"type\": \"query\",\n  \"firestore\": {\n    \"app\": {\n      \"_isDeleted\": false,\n      \"_options\": {\n        \"apiKey\": \"AIzaSyDcy9M06qGY_CdMg_3re2K9Ct4ZcgOga3M\",\n        \"authDomain\": \"next-portfolio-85305.firebaseapp.com\",\n        \"projectId\": \"next-portfolio-85305\",\n        \"storageBucket\": \"next-portfolio-85305.firebasestorage.app\",\n        \"messagingSenderId\": \"363822253777\",\n        \"appId\": \"1:363822253777:web:f7c40a2418d1ded19767f0\"\n      },\n      \"_config\": {\n        \"name\": \"[DEFAULT]\",\n        \"automaticDataCollectionEnabled\": false\n      },\n      \"_name\": \"[DEFAULT]\",\n      \"_automaticDataCollectionEnabled\": false,\n      \"_container\": {\n        \"name\": \"[DEFAULT]\",\n        \"providers\": {}\n      }\n    },\n    \"databaseId\": {\n      \"projectId\": \"next-portfolio-85305\",\n      \"database\": \"(default)\"\n    },\n    \"settings\": {\n      \"host\": \"firestore.googleapis.com\",\n      \"ssl\": true,\n      \"ignoreUndefinedProperties\": false,\n      \"cacheSizeBytes\": 41943040,\n      \"experimentalForceLongPolling\": false,\n      \"experimentalAutoDetectLongPolling\": true,\n      \"experimentalLongPollingOptions\": {},\n      \"useFetchStreams\": true\n    }\n  }\n}"
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:47:39.125Z] ERROR ([fx5bjzmq] [jillybean]): Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:683:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.586Z] [skrdqaht] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.829Z] [skrdqaht] [jillybean] Token verification failed: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.830Z] [skrdqaht] [jillybean] Request details:
+Data: {
+  "method": "GET",
+  "url": "http://localhost:3000/api/users/jillybean/posts",
+  "isAuthenticated": false,
+  "authHeader": "Present",
+  "timestamp": "2025-06-06T19:51:08.830Z"
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.830Z] [skrdqaht] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.831Z] [glwd07rd] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.832Z] [glwd07rd] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.833Z] [glwd07rd] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.834Z] [glwd07rd] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.836Z] [glwd07rd] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.837Z] [skrdqaht] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:08.840Z] [skrdqaht] [jillybean] User query:
+Data: {
+  "collection": "users",
+  "where": [
+    "username",
+    "==",
+    "jillybean"
+  ],
+  "isAuthenticated": false
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.550Z] [skrdqaht] [jillybean] User query result:
+Data: {
+  "exists": true,
+  "size": 1,
+  "docs": [
+    {
+      "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+      "data": {
+        "displayName": "Jilly",
+        "emailVerified": false,
+        "role": "user",
+        "email": "lily19@hotmail.com",
+        "username": "jillybean",
+        "updatedAt": {
+          "seconds": 1749230873,
+          "nanoseconds": 687000000
+        },
+        "isActive": true,
+        "createdAt": {
+          "seconds": 1749131845,
+          "nanoseconds": 645000000
+        },
+        "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.552Z] [skrdqaht] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "displayName": "Jilly",
+    "emailVerified": false,
+    "role": "user",
+    "email": "lily19@hotmail.com",
+    "username": "jillybean",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "isActive": true,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.553Z] [skrdqaht] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.554Z] [skrdqaht] [jillybean] Created posts collection reference
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.555Z] [skrdqaht] [jillybean] Query built:
+Data: {
+  "collection": "blogPosts",
+  "conditions": [
+    [
+      "authorId",
+      "==",
+      "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+    ],
+    [
+      "published",
+      "==",
+      true
+    ]
+  ],
+  "orderBy": "createdAt",
+  "limit": 10
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.556Z] [skrdqaht] [jillybean] Executing query...
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.934Z] ERROR ([skrdqaht] [jillybean]): Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:681:153
+    at async GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:642:35)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:09.935Z] ERROR ([skrdqaht] [jillybean]): Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:729:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.131Z] [g3nosci1] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.839Z] [g3nosci1] [jillybean] Token verification failed: Firebase: Error (auth/invalid-custom-token).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.839Z] [g3nosci1] [jillybean] Request details:
+Data: {
+  "method": "GET",
+  "url": "http://localhost:3000/api/users/jillybean/posts",
+  "isAuthenticated": false,
+  "authHeader": "Present",
+  "timestamp": "2025-06-06T19:51:10.839Z"
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.840Z] [g3nosci1] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.841Z] [pztmljzt] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.841Z] [g3nosci1] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:10.841Z] [g3nosci1] [jillybean] User query:
+Data: {
+  "collection": "users",
+  "where": [
+    "username",
+    "==",
+    "jillybean"
+  ],
+  "isAuthenticated": false
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.201Z] [g3nosci1] [jillybean] User query result:
+Data: {
+  "exists": true,
+  "size": 1,
+  "docs": [
+    {
+      "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+      "data": {
+        "updatedAt": {
+          "seconds": 1749230873,
+          "nanoseconds": 687000000
+        },
+        "isActive": true,
+        "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+        "createdAt": {
+          "seconds": 1749131845,
+          "nanoseconds": 645000000
+        },
+        "displayName": "Jilly",
+        "username": "jillybean",
+        "role": "user",
+        "emailVerified": false,
+        "email": "lily19@hotmail.com"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.202Z] [g3nosci1] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "isActive": true,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "displayName": "Jilly",
+    "username": "jillybean",
+    "role": "user",
+    "emailVerified": false,
+    "email": "lily19@hotmail.com",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.203Z] [g3nosci1] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.203Z] [g3nosci1] [jillybean] Created posts collection reference
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.203Z] [g3nosci1] [jillybean] Query built:
+Data: {
+  "collection": "blogPosts",
+  "conditions": [
+    [
+      "authorId",
+      "==",
+      "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+    ],
+    [
+      "published",
+      "==",
+      true
+    ]
+  ],
+  "orderBy": "createdAt",
+  "limit": 10
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.204Z] [g3nosci1] [jillybean] Executing query...
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.571Z] ERROR ([g3nosci1] [jillybean]): Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:681:153
+    at async GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:642:35)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:51:11.573Z] ERROR ([g3nosci1] [jillybean]): Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:729:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:01.543Z] [pf9lzgu7] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.301Z] [pf9lzgu7] [jillybean] Token verification failed: Firebase: Error (auth/invalid-custom-token).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.302Z] [pf9lzgu7] [jillybean] Request details:
+Data: {
+  "method": "GET",
+  "url": "http://localhost:3000/api/users/jillybean/posts",
+  "isAuthenticated": false,
+  "authHeader": "Present",
+  "timestamp": "2025-06-06T19:59:02.302Z"
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.302Z] [pf9lzgu7] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.303Z] [lmjl38jp] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.304Z] [pf9lzgu7] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.304Z] [pf9lzgu7] [jillybean] User query:
+Data: {
+  "collection": "users",
+  "where": [
+    "username",
+    "==",
+    "jillybean"
+  ],
+  "isAuthenticated": false
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.710Z] [pf9lzgu7] [jillybean] User query result:
+Data: {
+  "exists": true,
+  "size": 1,
+  "docs": [
+    {
+      "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+      "data": {
+        "createdAt": {
+          "seconds": 1749131845,
+          "nanoseconds": 645000000
+        },
+        "displayName": "Jilly",
+        "emailVerified": false,
+        "role": "user",
+        "username": "jillybean",
+        "email": "lily19@hotmail.com",
+        "updatedAt": {
+          "seconds": 1749230873,
+          "nanoseconds": 687000000
+        },
+        "isActive": true,
+        "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.711Z] [pf9lzgu7] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "displayName": "Jilly",
+    "emailVerified": false,
+    "role": "user",
+    "username": "jillybean",
+    "email": "lily19@hotmail.com",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "isActive": true,
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.712Z] [pf9lzgu7] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.713Z] [pf9lzgu7] [jillybean] Created posts collection reference
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.713Z] [pf9lzgu7] [jillybean] Query built:
+Data: {
+  "collection": "blogPosts",
+  "conditions": [
+    [
+      "authorId",
+      "==",
+      "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+    ],
+    [
+      "published",
+      "==",
+      true
+    ]
+  ],
+  "orderBy": "createdAt",
+  "limit": 10
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:02.714Z] [pf9lzgu7] [jillybean] Executing query...
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.092Z] ERROR ([pf9lzgu7] [jillybean]): Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:681:153
+    at async GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:642:35)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.094Z] ERROR ([pf9lzgu7] [jillybean]): Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:729:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.283Z] [qo60gs5m] [jillybean] Request received
+Data: {
+  "params": {
+    "username": "jillybean"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.857Z] [qo60gs5m] [jillybean] Token verification failed: Firebase: Error (auth/invalid-custom-token).
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.858Z] [qo60gs5m] [jillybean] Request details:
+Data: {
+  "method": "GET",
+  "url": "http://localhost:3000/api/users/jillybean/posts",
+  "isAuthenticated": false,
+  "authHeader": "Present",
+  "timestamp": "2025-06-06T19:59:03.858Z"
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.858Z] [qo60gs5m] [jillybean] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.859Z] [8m53imxh] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.860Z] [qo60gs5m] [jillybean] Fetching user by username: jillybean
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:03.861Z] [qo60gs5m] [jillybean] User query:
+Data: {
+  "collection": "users",
+  "where": [
+    "username",
+    "==",
+    "jillybean"
+  ],
+  "isAuthenticated": false
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.224Z] [qo60gs5m] [jillybean] User query result:
+Data: {
+  "exists": true,
+  "size": 1,
+  "docs": [
+    {
+      "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+      "data": {
+        "displayName": "Jilly",
+        "isActive": true,
+        "username": "jillybean",
+        "role": "user",
+        "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+        "updatedAt": {
+          "seconds": 1749230873,
+          "nanoseconds": 687000000
+        },
+        "emailVerified": false,
+        "createdAt": {
+          "seconds": 1749131845,
+          "nanoseconds": 645000000
+        },
+        "email": "lily19@hotmail.com"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.225Z] [qo60gs5m] [jillybean] Found user
+Data: {
+  "userId": "7tG9Be4vOLVjuDQ95JCDhwycRvt1",
+  "username": "jillybean",
+  "userData": {
+    "displayName": "Jilly",
+    "isActive": true,
+    "username": "jillybean",
+    "role": "user",
+    "photoURL": "https://res.cloudinary.com/drtrvs4uq/image/upload/c_thumb,g_face,h_400,w_400/profile-pictures/ejeqdevlqtkrzrqcpjr7",
+    "updatedAt": {
+      "seconds": 1749230873,
+      "nanoseconds": 687000000
+    },
+    "emailVerified": false,
+    "createdAt": {
+      "seconds": 1749131845,
+      "nanoseconds": 645000000
+    },
+    "email": "lily19@hotmail.com",
+    "id": "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+  }
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.225Z] [qo60gs5m] [jillybean] Fetching published posts for user 7tG9Be4vOLVjuDQ95JCDhwycRvt1
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.226Z] [qo60gs5m] [jillybean] Created posts collection reference
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.226Z] [qo60gs5m] [jillybean] Query built:
+Data: {
+  "collection": "blogPosts",
+  "conditions": [
+    [
+      "authorId",
+      "==",
+      "7tG9Be4vOLVjuDQ95JCDhwycRvt1"
+    ],
+    [
+      "published",
+      "==",
+      true
+    ]
+  ],
+  "orderBy": "createdAt",
+  "limit": 10
+}
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.227Z] [qo60gs5m] [jillybean] Executing query...
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.606Z] ERROR ([qo60gs5m] [jillybean]): Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Posts query error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:681:153
+    at async GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:642:35)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T19:59:04.607Z] ERROR ([qo60gs5m] [jillybean]): Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+Error: Database error: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/next-portfolio-85305/firestore/indexes?create_composite=ClZwcm9qZWN0cy9uZXh0LXBvcnRmb2xpby04NTMwNS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvYmxvZ1Bvc3RzL2luZGV4ZXMvXxABGgwKCGF1dGhvcklkEAEaDQoJcHVibGlzaGVkEAEaDQoJY3JlYXRlZEF0EAIaDAoIX19uYW1lX18QAg
+    at GET (C:\Users\rvimm\Documents\GitHub\next-portfolio\.next\server\chunks\[root-of-the-server]__96e73a17._.js:729:145)
+    at async AppRouteRouteModule.do (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:34112)
+    at async AppRouteRouteModule.handle (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:26:41338)
+    at async doRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1513:42)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1915:28)
+    at async DevServer.renderPageComponent (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2403:24)
+    at async DevServer.renderToResponseImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:2440:32)
+    at async DevServer.pipeImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:1007:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\next-server.js:305:17)
+    at async DevServer.handleRequestImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\base-server.js:899:17)
+    at async C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:371:20
+    at async Span.traceAsyncFn (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\dev\next-dev-server.js:368:24)
+    at async invokeRender (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:237:21)
+    at async handleRequest (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:428:24)
+    at async requestHandlerImpl (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\router-server.js:452:13)
+    at async Server.requestListener (C:\Users\rvimm\Documents\GitHub\next-portfolio\node_modules\next\dist\server\lib\start-server.js:158:13)
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:05:46.696Z] [52svueov] Initializing Firebase
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:05:46.697Z] [52svueov] Initializing Auth service
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:05:46.699Z] [52svueov] Initializing Firestore
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:05:46.700Z] [52svueov] Initializing Storage
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:05:46.702Z] [52svueov] Firebase initialized successfully
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:05:48.068Z] [edhacdl6] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:07:04.304Z] [ei3tyn49] Using existing Firebase instance
+
+--------------------------------------------------------------------------------
+[2025-06-06T20:07:05.222Z] [20opifhu] Using existing Firebase instance
+
+--------------------------------------------------------------------------------

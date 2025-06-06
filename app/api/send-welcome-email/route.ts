@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     console.log('Sending email to:', email);
     console.log('Email HTML length:', emailHtml.length);
     
-    // Use sandbox mode for testing with a free domain
+    // Use sangetDbox mode for testing with a free domain
     // In production, replace with your custom domain
     const isProduction = process.env.NODE_ENV === 'production';
     const fromEmail = isProduction 
@@ -52,8 +52,8 @@ export async function POST(request: Request) {
       to: [email],
       subject: `Welcome to My Portfolio, ${name.split(' ')[0]}!`,
       html: emailHtml,
-      // Add this line to enable sandbox mode in development
-      ...(!isProduction && { headers: { 'X-Sandbox': 'yes' } })
+      // Add this line to enable sangetDbox mode in development
+      ...(!isProduction && { headers: { 'X-SangetDbox': 'yes' } })
     };
     
     console.log('Email data:', JSON.stringify(emailData, null, 2));

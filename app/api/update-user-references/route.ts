@@ -12,7 +12,7 @@ const auth = admin.auth();
 import { getFirestore } from 'firebase-admin/firestore';
 
 // Initialize Firestore
-const db = getFirestore();
+const getDb = getFirestore();
 
 export async function POST(request: Request) {
   try {
@@ -37,11 +37,11 @@ export async function POST(request: Request) {
 
     const { displayName, photoURL } = await request.json();
     const userId = decodedToken.uid;
-    const batch = db.batch();
+    const batch = getDb.batch();
     let hasUpdates = false;
 
     // Update comments
-    const commentsSnapshot = await db
+    const commentsSnapshot = await getDb
       .collectionGroup('comments')
       .where('userId', '==', userId)
       .get();
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     });
 
     // Update posts
-    const postsSnapshot = await db
+    const postsSnapshot = await getDb
       .collection('posts')
       .where('authorId', '==', userId)
       .get();

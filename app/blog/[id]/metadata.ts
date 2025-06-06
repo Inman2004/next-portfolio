@@ -1,5 +1,5 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase-server';
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const postRef = doc(db, 'blogPosts', params.id);

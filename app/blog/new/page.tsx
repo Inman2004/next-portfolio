@@ -6,7 +6,7 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import { Camera, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
-import { db, app } from '@/lib/firebase';
+import { app, db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -157,21 +157,21 @@ const NewBlogPostPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!currentUser) {
+      setError('You must be logged in to create a blog post');
+      return;
+    }
+
     if (!title.trim() || !content.trim()) {
       setError('Title and content are required');
       return;
     }
 
-    if (!currentUser) {
-      setError('You must be logged in to create a post');
-      return;
-    }
+    setIsSubmitting(true);
+    setError('');
 
     try {
-      setIsSubmitting(true);
-      setError('');
-      
-      // Create a clean post data object with all required fields
+      const postsCollection = collection(db, 'blog-posts');
       const newPost = {
         title: title.trim(),
         content: content.trim(),
@@ -193,8 +193,7 @@ const NewBlogPostPage = () => {
       
       console.log('Creating post with data:', newPost);
       
-      const blogPostsRef = collection(db, 'blogPosts');
-      const docRef = await addDoc(blogPostsRef, newPost);
+      const docRef = await addDoc(collection(db, 'blog-posts'), newPost);
       
       toast.success('Post created successfully!');
       router.push(`/blog/${docRef.id}`);

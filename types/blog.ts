@@ -12,8 +12,11 @@ export interface BaseBlogPost {
   title: string;
   content: string; // Raw content (markdown or plain text)
   htmlContent?: string; // HTML content for rich text
-  author: string;
+  author: string; // Legacy field, use authorName instead
   authorId: string;
+  authorName?: string;
+  authorUsername?: string;
+  authorTitle?: string;
   authorPhotoURL?: string | null;
   // Allow both Firestore Timestamp and JavaScript Date
   // When reading from Firestore, it will be Timestamp
@@ -26,6 +29,8 @@ export interface BaseBlogPost {
   published?: boolean;
   isAdmin?: boolean;
   tags?: string[];
+  readingTime?: string;
+  viewCount?: number;
 }
 
 // Interface for user data that comes from the users collection
