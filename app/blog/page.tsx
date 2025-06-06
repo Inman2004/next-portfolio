@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/lib/firebase';
-import { getBlogPosts } from '@/lib/blog';
+import { getBlogPosts } from '@/lib/blogUtils';
 import { Eye, Clock, Calendar, Search, Filter, X, Loader2, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight } from 'lucide-react';
 import { formatNumber } from '@/lib/formatNumber';
 import { toast } from 'react-hot-toast';
@@ -151,13 +151,22 @@ export default function BlogPage() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const postsData = await getBlogPosts();
-        setPosts(postsData);
+        // Use the new getBlogPosts function that includes user data
+        const postsData = await getBlogPosts({ publishedOnly: true });
+        
+        // Map to the expected BlogPost type
+        const mappedPosts = postsData.map(post => ({
+          ...post,
+          author: post.user?.displayName || post.author || 'Anonymous',
+          authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
+        }));
+        
+        setPosts(mappedPosts);
         
         // Fetch view counts for all posts
         const counts: Record<string, number> = {};
         await Promise.all(
-          postsData.map(async (post) => {
+          mappedPosts.map(async (post) => {
             if (post.id) {
               counts[post.id] = await getViewCount(post.id);
             }
@@ -504,8 +513,8 @@ export default function BlogPage() {
                 >
                   <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
                     {post.isAdmin && (
-                      <div className="bg-amber-400/90 dark:bg-yellow-500/90 text-amber-900 dark:text-yellow-900 text-xs font-bold px-2.5 py-1 rounded-full flex items-center shadow-sm">
-                        <Crown className="w-3 h-3 mr-1.5" />
+                      <div className="bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-gray-200 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700 flex items-center backdrop-blur-sm">
+                        <Crown className="w-3 h-3 mr-1.5 text-gray-600 dark:text-gray-400" />
                         Admin
                       </div>
                     )}

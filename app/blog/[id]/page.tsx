@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User } from 'firebase/auth';
 import { PostData } from '@/types';
-import { doc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { doc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { getBlogPost } from '@/lib/blogUtils';
 import { Crown, Edit, Eye, ArrowLeft, Trash2 } from 'lucide-react';
 import SocialShare from '@/components/SocialShare';
 import { toast } from 'react-hot-toast';
@@ -144,28 +145,33 @@ export default function PostPage({ params }: PostPageProps) {
         setLoading(true);
         setError(null);
 
-        const postRef = doc(db, 'blogPosts', postId);
-        const postDoc = await getDoc(postRef);
+        // Use the new getBlogPost utility function
+        const postData = await getBlogPost(postId);
 
-        if (!postDoc.exists()) {
+        if (!postData) {
           setError('Post not found');
           return;
         }
 
-        const postData: PostData = {
-          id: postDoc.id,
-          title: postDoc.data().title || '',
-          content: postDoc.data().content || '',
+        // Map to the expected PostData type
+        const formattedPost: PostData = {
+          id: postData.id,
+          title: postData.title,
+          content: postData.content,
           author: {
-            id: postDoc.data().authorId || postDoc.data().author?.id || '',
-            name: postDoc.data().author || postDoc.data().author?.name || '',
-            photoURL: postDoc.data().authorPhotoURL || postDoc.data().author?.photoURL || '',
+            id: postData.authorId,
+            name: postData.user?.displayName || postData.author || 'Anonymous',
+            photoURL: postData.user?.photoURL || postData.authorPhotoURL || null,
           },
-          createdAt: postDoc.data().createdAt,
-          coverImage: postDoc.data().coverImage || postDoc.data().image
+          createdAt: postData.createdAt,
+          coverImage: postData.coverImage,
+          excerpt: postData.excerpt,
+          published: postData.published,
+          isAdmin: postData.isAdmin,
+          tags: postData.tags
         };
 
-        setPost(postData);
+        setPost(formattedPost);
       } catch (err) {
         console.error('Error fetching post:', err);
         setError('Failed to load post');

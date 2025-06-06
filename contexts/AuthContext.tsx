@@ -210,6 +210,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             isActive: true
           });
         }
+        
+        // Note: Blog posts will be updated with the latest user data when they are loaded
+        // using the enrichBlogPosts utility function
       }
       
       // Update local state with the new user data
