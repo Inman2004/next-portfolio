@@ -44,35 +44,62 @@ export async function getUserData(userId: string, subscribe: boolean = false) {
     const userDoc = await getDoc(doc(db, 'users', userId));
     
     if (userDoc.exists()) {
-      const userData = userDoc.data();
+      let userData = userDoc.data();
+      
+      // If we have provider data, merge it with the user data
+      if (userData.providerData?.length > 0) {
+        const providerData = userData.providerData[0];
+        userData = {
+          ...userData,
+          displayName: userData.displayName || providerData.displayName,
+          photoURL: userData.photoURL || providerData.photoURL,
+          email: userData.email || providerData.email
+        };
+      }
+      
       // Update both in-memory and localStorage cache
       userCache.set(userId, userData);
       saveCache();
       
-      // Set up real-time subscription if requested
-      if (subscribe && !subscriptions.has(userId)) {
-        const unsubscribe = onSnapshot(doc(db, 'users', userId), (doc) => {
-          if (doc.exists()) {
-            const updatedData = doc.data();
-            userCache.set(userId, updatedData);
-            saveCache();
-            
-            // Notify any listeners about the update
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(
-                new CustomEvent('userDataUpdated', { detail: { userId, userData: updatedData } })
-              );
+      // If subscribing, set up real-time updates
+      if (subscribe) {
+        return new Promise((resolve) => {
+          const unsubscribe = onSnapshot(doc(db, 'users', userId), (doc) => {
+            if (doc.exists()) {
+              let updatedData = doc.data();
+              
+              // If we have provider data, merge it with the user data
+              if (updatedData.providerData?.length > 0) {
+                const providerData = updatedData.providerData[0];
+                updatedData = {
+                  ...updatedData,
+                  displayName: updatedData.displayName || providerData.displayName,
+                  photoURL: updatedData.photoURL || providerData.photoURL,
+                  email: updatedData.email || providerData.email
+                };
+              }
+              
+              userCache.set(userId, updatedData);
+              saveCache();
+              
+              // Dispatch a custom event to notify about the update
+              window.dispatchEvent(new CustomEvent('userDataUpdated', {
+                detail: { userId, userData: updatedData }
+              }));
             }
-          }
+          });
+          
+          // Store the unsubscribe function
+          subscriptions.set(userId, { 
+            count: 1, 
+            unsubscribe: () => {
+              unsubscribe();
+              subscriptions.delete(userId);
+            } 
+          });
+          
+          resolve(userData);
         });
-        
-        subscriptions.set(userId, { count: 1, unsubscribe });
-      } else if (subscribe) {
-        // Increment subscription count if already subscribed
-        const sub = subscriptions.get(userId);
-        if (sub) {
-          sub.count++;
-        }
       }
       
       return userData;
@@ -158,8 +185,12 @@ export async function enrichWithUserData<T extends EnrichableItem>(
     if (userDataArray[index]) {
       const userData: any = {};
       fields.forEach(field => {
+        // Check both the field name and the providerData for the field
         if (userDataArray[index][field] !== undefined) {
           userData[field] = userDataArray[index][field];
+        } else if (userDataArray[index].providerData?.[0]?.[field] !== undefined) {
+          // Check providerData for Google/Facebook login data
+          userData[field] = userDataArray[index].providerData[0][field];
         }
       });
       acc[userId] = userData;
@@ -180,10 +211,16 @@ export async function enrichWithUserData<T extends EnrichableItem>(
       });
     }
     
+    // Get user data with fallbacks
+    const userData = userDataMap[item.userId] || {};
+    
     // Create the enriched item with proper typing
     const enrichedItem: T & EnrichedItem<T> = {
       ...item,
-      user: userDataMap[item.userId] || {},
+      user: {
+        displayName: userData.displayName || userData.name,
+        photoURL: userData.photoURL || userData.photoURL
+      },
       _userUnsubscribe: unsubscribe
     };
     

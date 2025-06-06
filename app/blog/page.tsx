@@ -234,23 +234,8 @@ export default function BlogPage() {
             // Update current posts for cleanup
             currentPostsRef.current = enrichedPosts as EnrichedBlogPost[];
             
-            // Map to the expected EnrichedBlogPost type
-            const mappedPosts = enrichedPosts.map(post => {
-              const userData: BlogPostUserData = {
-                displayName: post.user?.displayName,
-                photoURL: post.user?.photoURL
-              };
-              
-              const enrichedPost: EnrichedBlogPost = {
-                ...post,
-                author: post.user?.displayName || post.author || 'Anonymous',
-                authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || '',
-                user: userData,
-                _userUnsubscribe: (post as any)._userUnsubscribe
-              };
-              
-              return enrichedPost;
-            });
+            // Use the already enriched posts directly
+            const mappedPosts = enrichedPosts as EnrichedBlogPost[];
             
             // Update state with new posts and view counts
             setPosts(mappedPosts);
@@ -697,14 +682,26 @@ export default function BlogPage() {
                       <div className="mt-4 pt-4 border-t border-gray-200/70 dark:border-gray-700/50">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
-                            {post.authorPhotoURL ? (
-                              <Image 
-                                src={post.authorPhotoURL} 
-                                alt={post.author || 'Author'} 
-                                width={32} 
-                                height={32} 
-                                className="rounded-full mr-2.5 border border-gray-200/50 dark:border-gray-600/50"
-                              />
+                            {(post.authorPhotoURL || post.user?.photoURL) ? (
+                              <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2.5 border border-gray-200/50 dark:border-gray-600/50">
+                                <Image 
+                                  src={(post.authorPhotoURL || post.user?.photoURL) as string} 
+                                  alt={post.author || 'Author'} 
+                                  width={32} 
+                                  height={32}
+                                  className="object-cover w-full h-full"
+                                  onError={(e) => {
+                                    // Fallback to initials if image fails to load
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    const fallback = target.parentElement?.querySelector('.avatar-fallback') as HTMLElement;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                                <div className="avatar-fallback hidden w-full h-full bg-blue-600 items-center justify-center text-white font-bold">
+                                  {post.author?.charAt(0)?.toUpperCase() || 'A'}
+                                </div>
+                              </div>
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2.5 shadow-sm">
                                 {post.author?.charAt(0)?.toUpperCase() || 'A'}

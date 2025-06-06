@@ -17,7 +17,21 @@ interface ProfileImageUploadProps {
 const ProfileImageUpload = ({ onImageUpdate }: ProfileImageUploadProps) => {
   const { user, updateUserProfile } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
-  const [currentImage, setCurrentImage] = useState(user?.photoURL || '');
+  const [currentImage, setCurrentImage] = useState('');
+  
+  // Get the photo URL from user data or provider data
+  const getPhotoUrl = useCallback(() => {
+    if (!user) return '';
+    if (user.photoURL) return user.photoURL;
+    if (user.providerData && user.providerData.length > 0) {
+      return user.providerData[0]?.photoURL || '';
+    }
+    return '';
+  }, [user]);
+  
+  useEffect(() => {
+    setCurrentImage(getPhotoUrl());
+  }, [user, getPhotoUrl]);
 
   // Function to extract public ID from Cloudinary URL
   const extractPublicId = (url: string): string | null => {
@@ -177,14 +191,26 @@ const ProfileImageUpload = ({ onImageUpdate }: ProfileImageUploadProps) => {
       <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
         {isUploading ? (
           <Loader2 className="w-8 h-8 text-white animate-spin" />
-        ) : user?.photoURL ? (
+        ) : currentImage ? (
           <img 
-            src={user.photoURL}
-            alt={user.displayName || 'Profile'}
+            src={currentImage}
+            alt={user?.displayName || 'Profile'}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to user icon if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              const fallback = target.parentElement?.querySelector('.user-fallback') as HTMLElement;
+              if (fallback) fallback.style.display = 'flex';
+            }}
           />
         ) : (
           <User className="w-16 h-16 text-white" />
+        )}
+        {!isUploading && !currentImage && (
+          <div className="absolute inset-0 w-full h-full bg-blue-600 hidden items-center justify-center user-fallback">
+            <User className="w-16 h-16 text-white" />
+          </div>
         )}
       </div>
       {!isUploading && (

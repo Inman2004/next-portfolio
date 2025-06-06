@@ -53,11 +53,29 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
   // Map back to the original structure with proper typing
   return enrichedPosts.map(post => {
     const { userId, _userUnsubscribe, ...rest } = post as any;
+    
+    // Create a new user object with the data from the enriched post
+    const userData: BlogPostUserData = {
+      displayName: post.user?.displayName || post.author,
+      photoURL: post.user?.photoURL || post.authorPhotoURL
+    };
+    
+    // Get the photo URL from either the user data or the post data
+    const photoURL = post.user?.photoURL || post.authorPhotoURL || '';
+    
+    // Return the enriched post with the user data
     const enrichedPost: T & EnrichedBlogPost = {
       ...rest,
-      _userUnsubscribe,
-      user: post.user || {}
+      // Ensure author and authorPhotoURL are set from user data if available
+      author: userData.displayName || post.author || 'Anonymous',
+      // Make sure to use the photoURL from user data if available
+      authorPhotoURL: photoURL,
+      // Include the full user data
+      user: userData,
+      // Keep the unsubscribe function
+      _userUnsubscribe
     };
+    
     return enrichedPost as T & EnrichedBlogPost;
   });
 };
