@@ -1,4 +1,17 @@
-import { doc, getFirestore, increment, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { 
+  doc, 
+  getFirestore, 
+  increment, 
+  updateDoc, 
+  getDoc, 
+  setDoc, 
+  query, 
+  collection, 
+  where, 
+  getDocs, 
+  DocumentData,
+  QueryDocumentSnapshot
+} from 'firebase/firestore';
 import { getFirebase } from './firebase';
 
 // Initialize Firebase and get Firestore instance
@@ -45,5 +58,39 @@ export async function getViewCount(postId: string): Promise<number> {
   } catch (error) {
     console.error('Error getting view count:', error);
     return 0;
+  }
+}
+
+// Get view counts for multiple posts in a single batch
+export async function getViewCounts(postIds: string[]): Promise<Record<string, number>> {
+  try {
+    if (!postIds.length) return {};
+    
+    const counts: Record<string, number> = {};
+    
+    // Fetch all view counts in a single query
+    const q = query<DocumentData, DocumentData>(
+      collection(db, VIEWS_COLLECTION),
+      where('postId', 'in', postIds)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    // Initialize all counts to 0 first
+    postIds.forEach(id => counts[id] = 0);
+    
+    // Update counts for documents that exist
+    querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data();
+      if (data.postId && typeof data.count === 'number') {
+        counts[data.postId] = data.count;
+      }
+    });
+    
+    return counts;
+  } catch (error) {
+    console.error('Error getting view counts:', error);
+    // Return an object with all counts as 0 if there's an error
+    return postIds.reduce((acc, id) => ({ ...acc, [id]: 0 }), {});
   }
 }

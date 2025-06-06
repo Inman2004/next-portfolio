@@ -1,12 +1,13 @@
 import { Timestamp } from 'firebase/firestore';
 
-const ADMIN_EMAIL = "rvimman@gmail.com";
+export const ADMIN_EMAIL = "rvimman@gmail.com";
 
 export function isBlogPostAdmin(email: string): boolean {
   return email === ADMIN_EMAIL;
 }
 
-export interface BlogPost {
+// Base interface for blog posts without user data
+export interface BaseBlogPost {
   id?: string;
   title: string;
   content: string; // Raw content (markdown or plain text)
@@ -25,4 +26,24 @@ export interface BlogPost {
   published?: boolean;
   isAdmin?: boolean;
   tags?: string[];
+}
+
+// Interface for user data that comes from the users collection
+export interface BlogPostUserData {
+  displayName?: string;
+  photoURL?: string | null;
+}
+
+// Interface for blog posts with user data and subscription management
+export interface BlogPost extends BaseBlogPost {
+  // User data that comes from the users collection
+  user?: BlogPostUserData;
+  // Optional unsubscribe function for cleaning up real-time subscriptions
+  _userUnsubscribe?: () => void;
+}
+
+// Type for the enriched blog post returned by enrichBlogPosts
+export interface EnrichedBlogPost extends Omit<BlogPost, 'user'> {
+  user: BlogPostUserData;
+  _userUnsubscribe?: () => void;
 }

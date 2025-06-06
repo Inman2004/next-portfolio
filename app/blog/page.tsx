@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { app } from '@/lib/firebase';
-import { getBlogPosts, subscribeToBlogPosts } from '@/lib/blogUtils';
+import { app, db } from '@/lib/firebase';
+import { getBlogPosts, enrichBlogPosts, cleanupBlogPostSubscriptions } from '@/lib/blogUtils';
+import { collection, query, where, orderBy, onSnapshot, DocumentData, Timestamp } from 'firebase/firestore';
 import { Eye, Clock, Calendar, Search, Filter, X, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight, Loader } from 'lucide-react';
 import { BlogLoadingSkeleton } from '@/components/ui/blog-loading-skeleton';
 import { formatNumber } from '@/lib/formatNumber';
 import { toast } from 'react-hot-toast';
-import type { BlogPost } from '@/types/blog';
-import { getViewCount } from '@/lib/views';
+import type { BlogPost, EnrichedBlogPost, BlogPostUserData } from '@/types/blog';
+import { getViewCount, getViewCounts } from '@/lib/views';
 import { deleteBlogPost } from '@/app/actions/blog';
 import dynamic from 'next/dynamic';
 
@@ -26,16 +27,9 @@ const MarkdownViewer = dynamic(
 
 type SortOption = 'newest' | 'oldest' | 'popular';
 
-type BlogPostWithUser = BlogPost & {
-  user?: {
-    displayName?: string;
-    photoURL?: string;
-  };
-};
-
 export default function BlogPage() {
   // State declarations at the top
-  const [posts, setPosts] = useState<BlogPostWithUser[]>([]);
+  const [posts, setPosts] = useState<EnrichedBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -43,9 +37,11 @@ export default function BlogPage() {
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [unsubscribe, setUnsubscribe] = useState<() => void>(() => () => {});
   const router = useRouter();
   const auth = getAuth(app);
+  
+  // Track current posts for cleanup
+  const currentPostsRef = useRef<EnrichedBlogPost[]>([]);
   
   // Handle authentication state changes and admin check
   useEffect(() => {
@@ -93,7 +89,6 @@ export default function BlogPage() {
   };
 
   // Sort posts based on selected option
-  // Sort posts based on selected option with proper type safety
   const sortedPosts = useMemo(() => {
     const postsToSort = [...posts];
     
@@ -152,119 +147,178 @@ export default function BlogPage() {
     }
   }, [user]);
 
-  // Set up auth listener
+  // Set up real-time subscription to blog posts
   useEffect(() => {
     const authUnsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
     });
 
-    return () => {
-      authUnsubscribe();
-    };
-  }, [auth]);
-
-  // Set up real-time subscription to blog posts
-  useEffect(() => {
+    // Set loading state
     setLoading(true);
     setError(null);
 
-    const fetchInitialPosts = async () => {
-      try {
-        // Get initial posts to handle the first render
-        const initialPosts = await getBlogPosts({ publishedOnly: true });
-        const mappedPosts = initialPosts.map((post: BlogPostWithUser) => ({
-          ...post,
-          author: post.user?.displayName || post.author || 'Anonymous',
-          authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
-        }));
-        
-        setPosts(mappedPosts);
-        
-        // Fetch initial view counts
-        if (mappedPosts.length > 0) {
+    // Create a query for published posts
+    const postsQuery = query(
+      collection(db, 'blogPosts'),
+      where('published', '==', true),
+      orderBy('createdAt', 'desc')
+    );
+
+    // Subscribe to real-time updates
+    const unsubscribe = onSnapshot(
+      postsQuery,
+      async (snapshot) => {
+        try {
+          const postsData: BlogPost[] = [];
           const counts: Record<string, number> = {};
-          await Promise.all(
-            mappedPosts.map(async (post: BlogPostWithUser) => {
-              if (post.id) {
-                try {
-                  counts[post.id] = await getViewCount(post.id);
-                } catch (err) {
-                  console.error(`Error fetching view count for post ${post.id}:`, err);
-                  counts[post.id] = 0;
-                }
-              }
-            })
-          );
-          setViewCounts(counts);
+          
+          // First, collect all post IDs for batch view count fetch
+          const postIds = snapshot.docs.map(doc => doc.id);
+          
+          // Fetch all view counts in a single batch
+          try {
+            console.log('Fetching view counts for post IDs:', postIds);
+            const viewCounts = await getViewCounts(postIds);
+            console.log('Received view counts:', viewCounts);
+            
+            if (!viewCounts) {
+              console.error('Error: getViewCounts returned undefined or null');
+              postIds.forEach(id => counts[id] = 0);
+            } else {
+              Object.assign(counts, viewCounts);
+              console.log('Updated counts object:', counts);
+            }
+          } catch (err) {
+            console.error('Error fetching view counts:', err);
+            // Initialize all counts to 0 if there's an error
+            postIds.forEach(id => counts[id] = 0);
+          }
+          
+          // Process each document
+          const processPosts = async () => {
+            // Clean up previous subscriptions before creating new ones
+            if (currentPostsRef.current.length > 0) {
+              cleanupBlogPostSubscriptions(currentPostsRef.current);
+            }
+            
+            const newPosts: EnrichedBlogPost[] = [];
+            
+            for (const doc of snapshot.docs) {
+              const data = doc.data();
+              const postId = doc.id;
+              
+              // Get required fields with proper types
+              const { title, content, author, authorId, excerpt, coverImage, published, tags } = data as Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>;
+              
+              // Convert Firestore timestamps to Date objects
+              const postData: BlogPost = {
+                id: postId,
+                title,
+                content,
+                author,
+                authorId,
+                excerpt,
+                coverImage,
+                published,
+                tags,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : null
+              };
+              
+              postsData.push(postData);
+            }
+            
+            // Enrich posts with user data and subscribe to updates
+            const enrichedPosts = await enrichBlogPosts(postsData, true);
+            
+            // Update current posts for cleanup
+            currentPostsRef.current = enrichedPosts as EnrichedBlogPost[];
+            
+            // Map to the expected EnrichedBlogPost type
+            const mappedPosts = enrichedPosts.map(post => {
+              const userData: BlogPostUserData = {
+                displayName: post.user?.displayName,
+                photoURL: post.user?.photoURL
+              };
+              
+              const enrichedPost: EnrichedBlogPost = {
+                ...post,
+                author: post.user?.displayName || post.author || 'Anonymous',
+                authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || '',
+                user: userData,
+                _userUnsubscribe: (post as any)._userUnsubscribe
+              };
+              
+              return enrichedPost;
+            });
+            
+            // Update state with new posts and view counts
+            setPosts(mappedPosts);
+            setViewCounts(prev => ({
+              ...prev,
+              ...counts
+            }));
+          };
+          
+          await processPosts();
+          
+        } catch (err) {
+          console.error('Error processing posts:', err);
+          setError('Failed to process blog posts. Please refresh the page to try again.');
+          toast.error('Failed to process blog posts');
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error('Error fetching initial blog posts:', err);
+      },
+      (error) => {
+        console.error('Error subscribing to posts:', error);
         setError('Failed to load blog posts. Please refresh the page to try again.');
         toast.error('Failed to load blog posts');
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    // Set up real-time subscription
-    const setupSubscription = async () => {
-      try {
-        // First, fetch initial posts
-        await fetchInitialPosts();
-        
-        // Then set up real-time listener
-        const unsubscribeFn = subscribeToBlogPosts(
-          async (updatedPosts: BlogPostWithUser[]) => {
-            // Map the updated posts to match our format
-            const mappedPosts = updatedPosts.map((post: BlogPostWithUser) => ({
-              ...post,
-              author: post.user?.displayName || post.author || 'Anonymous',
-              authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
-            }));
-            
-            setPosts(mappedPosts);
-            
-            // Update view counts for any new posts
-            const newViewCounts = { ...viewCounts };
-            let needsUpdate = false;
-            
-            for (const post of mappedPosts) {
-              if (post.id && !(post.id in newViewCounts)) {
-                try {
-                  newViewCounts[post.id] = await getViewCount(post.id);
-                  needsUpdate = true;
-                } catch (err) {
-                  console.error(`Error fetching view count for post ${post.id}:`, err);
-                  newViewCounts[post.id] = 0;
-                  needsUpdate = true;
-                }
-              }
-            }
-            
-            if (needsUpdate) {
-              setViewCounts(newViewCounts);
-            }
-          },
-          { publishedOnly: true }
-        );
-        
-        setUnsubscribe(() => unsubscribeFn);
-      } catch (err) {
-        console.error('Error setting up blog posts subscription:', err);
-        setError('Failed to set up real-time updates. Please refresh the page to try again.');
-        toast.error('Failed to set up real-time updates');
-      }
-    };
-    
-    setupSubscription();
-    
-    // Clean up subscription on unmount
+    // Cleanup function
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
+      // Clean up all subscriptions
+      if (currentPostsRef.current.length > 0) {
+        cleanupBlogPostSubscriptions(currentPostsRef.current);
       }
+      unsubscribe();
+      authUnsubscribe();
     };
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
+
+  // Handle user data updates
+  useEffect(() => {
+    const handleUserDataUpdate = (event: CustomEvent<{ userId: string; userData: BlogPostUserData }>) => {
+      setPosts(currentPosts => {
+        return currentPosts.map(post => {
+          if (post.authorId === event.detail.userId) {
+            return {
+              ...post,
+              author: event.detail.userData.displayName || post.author,
+              authorPhotoURL: event.detail.userData.photoURL || post.authorPhotoURL,
+              user: {
+                displayName: event.detail.userData.displayName,
+                photoURL: event.detail.userData.photoURL
+              }
+            };
+          }
+          return post;
+        });
+      });
+    };
+    
+    // Add event listener for user data updates
+    const eventListener = (e: Event) => handleUserDataUpdate(e as CustomEvent<{ userId: string; userData: BlogPostUserData }>);
+    window.addEventListener('userDataUpdated', eventListener);
+    
+    // Clean up event listener
+    return () => {
+      window.removeEventListener('userDataUpdated', eventListener);
+    };
+  }, []);
 
   const getPostDateTime = (date: Date | { toDate: () => Date } | undefined) => {
     if (!date) return '';
