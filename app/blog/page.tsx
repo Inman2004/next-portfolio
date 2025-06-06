@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/lib/firebase';
-import { getBlogPosts } from '@/lib/blogUtils';
+import { getBlogPosts, subscribeToBlogPosts } from '@/lib/blogUtils';
 import { Eye, Clock, Calendar, Search, Filter, X, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight, Loader } from 'lucide-react';
 import { BlogLoadingSkeleton } from '@/components/ui/blog-loading-skeleton';
 import { formatNumber } from '@/lib/formatNumber';
@@ -26,9 +26,16 @@ const MarkdownViewer = dynamic(
 
 type SortOption = 'newest' | 'oldest' | 'popular';
 
+type BlogPostWithUser = BlogPost & {
+  user?: {
+    displayName?: string;
+    photoURL?: string;
+  };
+};
+
 export default function BlogPage() {
   // State declarations at the top
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPostWithUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -36,6 +43,7 @@ export default function BlogPage() {
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [unsubscribe, setUnsubscribe] = useState<() => void>(() => () => {});
   const router = useRouter();
   const auth = getAuth(app);
   
@@ -85,6 +93,7 @@ export default function BlogPage() {
   };
 
   // Sort posts based on selected option
+  // Sort posts based on selected option with proper type safety
   const sortedPosts = useMemo(() => {
     const postsToSort = [...posts];
     
@@ -143,36 +152,39 @@ export default function BlogPage() {
     }
   }, [user]);
 
-  // Fetch posts and set up auth listener
+  // Set up auth listener
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const authUnsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
     });
 
-    const fetchPosts = async () => {
-      // Set loading to true at the start
-      setLoading(true);
-      setError(null);
-      
+    return () => {
+      authUnsubscribe();
+    };
+  }, [auth]);
+
+  // Set up real-time subscription to blog posts
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    const fetchInitialPosts = async () => {
       try {
-        // Use the new getBlogPosts function that includes user data
-        const postsData = await getBlogPosts({ publishedOnly: true });
-        
-        // Map to the expected BlogPost type
-        const mappedPosts = postsData.map(post => ({
+        // Get initial posts to handle the first render
+        const initialPosts = await getBlogPosts({ publishedOnly: true });
+        const mappedPosts = initialPosts.map((post: BlogPostWithUser) => ({
           ...post,
           author: post.user?.displayName || post.author || 'Anonymous',
           authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
         }));
         
-        // Set posts first
         setPosts(mappedPosts);
         
-        // Fetch view counts for all posts in parallel
+        // Fetch initial view counts
         if (mappedPosts.length > 0) {
           const counts: Record<string, number> = {};
           await Promise.all(
-            mappedPosts.map(async (post) => {
+            mappedPosts.map(async (post: BlogPostWithUser) => {
               if (post.id) {
                 try {
                   counts[post.id] = await getViewCount(post.id);
@@ -186,21 +198,73 @@ export default function BlogPage() {
           setViewCounts(counts);
         }
       } catch (err) {
-        console.error('Error fetching blog posts:', err);
+        console.error('Error fetching initial blog posts:', err);
         setError('Failed to load blog posts. Please refresh the page to try again.');
         toast.error('Failed to load blog posts');
       } finally {
-        // Ensure loading is set to false when done
         setLoading(false);
       }
     };
 
-    fetchPosts();
-
-    return () => {
-      unsubscribe();
+    // Set up real-time subscription
+    const setupSubscription = async () => {
+      try {
+        // First, fetch initial posts
+        await fetchInitialPosts();
+        
+        // Then set up real-time listener
+        const unsubscribeFn = subscribeToBlogPosts(
+          async (updatedPosts: BlogPostWithUser[]) => {
+            // Map the updated posts to match our format
+            const mappedPosts = updatedPosts.map((post: BlogPostWithUser) => ({
+              ...post,
+              author: post.user?.displayName || post.author || 'Anonymous',
+              authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
+            }));
+            
+            setPosts(mappedPosts);
+            
+            // Update view counts for any new posts
+            const newViewCounts = { ...viewCounts };
+            let needsUpdate = false;
+            
+            for (const post of mappedPosts) {
+              if (post.id && !(post.id in newViewCounts)) {
+                try {
+                  newViewCounts[post.id] = await getViewCount(post.id);
+                  needsUpdate = true;
+                } catch (err) {
+                  console.error(`Error fetching view count for post ${post.id}:`, err);
+                  newViewCounts[post.id] = 0;
+                  needsUpdate = true;
+                }
+              }
+            }
+            
+            if (needsUpdate) {
+              setViewCounts(newViewCounts);
+            }
+          },
+          { publishedOnly: true }
+        );
+        
+        setUnsubscribe(() => unsubscribeFn);
+      } catch (err) {
+        console.error('Error setting up blog posts subscription:', err);
+        setError('Failed to set up real-time updates. Please refresh the page to try again.');
+        toast.error('Failed to set up real-time updates');
+      }
     };
-  }, []);
+    
+    setupSubscription();
+    
+    // Clean up subscription on unmount
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []); // Empty dependency array means this effect runs once on mount
 
   const getPostDateTime = (date: Date | { toDate: () => Date } | undefined) => {
     if (!date) return '';

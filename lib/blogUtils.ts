@@ -8,7 +8,10 @@ import {
   getDocs, 
   orderBy, 
   limit, 
-  DocumentData 
+  DocumentData,
+  onSnapshot,
+  QuerySnapshot,
+  DocumentSnapshot
 } from 'firebase/firestore';
 import { getUserData } from './userUtils';
 
@@ -38,37 +41,59 @@ export interface BlogPost {
   };
 }
 
+interface UserBasicInfo {
+  displayName?: string;
+  photoURL?: string | null;
+}
+
 /**
  * Enrich blog posts with user data
  * @param posts - Array of blog posts to enrich
  * @returns Array of blog posts with user data
  */
-export const enrichBlogPosts = async <T extends { authorId: string }>(posts: T[]): Promise<Array<T & { user?: any }>> => {
+export const enrichBlogPosts = async <T extends { authorId: string }>(
+  posts: T[]
+): Promise<Array<T & { user?: UserBasicInfo | null }>> => {
   if (!posts.length) return [];
   
-  // Get unique user IDs
-  const userIds = [...new Set(posts.map(post => post.authorId))];
-  
-  // Fetch all user data in parallel
-  const userPromises = userIds.map(userId => getUserData(userId));
-  const userDataArray = await Promise.all(userPromises);
-  
-  // Create a map of user data
-  const userDataMap = userIds.reduce((acc, userId, index) => {
-    if (userDataArray[index]) {
-      acc[userId] = {
-        displayName: userDataArray[index]?.displayName,
-        photoURL: userDataArray[index]?.photoURL
-      };
-    }
-    return acc;
-  }, {} as Record<string, any>);
-  
-  // Enrich posts with user data
-  return posts.map(post => ({
-    ...post,
-    user: userDataMap[post.authorId] || {}
-  }));
+  try {
+    // Get unique user IDs
+    const userIds = [...new Set(posts.map(post => post.authorId))];
+    
+    // Fetch all user data in parallel
+    const userPromises = userIds.map(userId => 
+      getUserData(userId).catch(error => {
+        console.error(`Error fetching user data for ${userId}:`, error);
+        return null;
+      })
+    );
+    
+    const userDataArray = await Promise.all(userPromises);
+    
+    // Create a map of user data
+    const userDataMap = userIds.reduce<Record<string, UserBasicInfo>>((acc, userId, index) => {
+      const userData = userDataArray[index];
+      if (userData) {
+        acc[userId] = {
+          displayName: userData.displayName || undefined,
+          photoURL: userData.photoURL || null
+        };
+      }
+      return acc;
+    }, {});
+    
+    // Enrich posts with user data
+    return posts.map(post => ({
+      ...post,
+      user: userDataMap[post.authorId] || null
+    }));
+  } catch (error) {
+    console.error('Error in enrichBlogPosts:', error);
+    return posts.map(post => ({
+      ...post,
+      user: null
+    }));
+  }
 };
 
 /**
@@ -91,6 +116,74 @@ export const getBlogPost = async (postId: string): Promise<(BlogPost & { user?: 
   } catch (error) {
     console.error('Error fetching blog post:', error);
     return null;
+  }
+};
+
+/**
+ * Get all blog posts with enriched user data
+ * @param options - Options for filtering and pagination
+ * @returns Array of blog posts with user data
+ */
+/**
+ * Subscribe to real-time updates for blog posts
+ * @param callback - Function to call when posts are updated
+ * @param options - Options for filtering
+ * @returns Unsubscribe function
+ */
+export const subscribeToBlogPosts = (
+  callback: (posts: Array<BlogPost & { user?: any }>) => void,
+  options: { publishedOnly?: boolean } = { publishedOnly: true }
+) => {
+  try {
+    // Create base query
+    let q = query(collection(db, 'blogPosts'));
+    
+    // Add published filter if needed
+    if (options.publishedOnly) {
+      q = query(q, where('published', '==', true));
+    }
+    
+    // Add ordering
+    q = query(q, orderBy('createdAt', 'desc'));
+    
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, 
+      async (snapshot: QuerySnapshot) => {
+        const postsPromises = snapshot.docs.map(async (doc: DocumentSnapshot) => {
+          const data = doc.data() as Omit<BlogPost, 'id'> | undefined;
+          if (!data) return null;
+          
+          let user = null;
+          
+          try {
+            user = await getUserData(data.authorId);
+          } catch (error) {
+            console.error(`Error fetching user data for author ${data.authorId}:`, error);
+          }
+          
+          return {
+            ...data,
+            id: doc.id,
+            user: user ? {
+              displayName: user.displayName,
+              photoURL: user.photoURL
+            } : undefined
+          } as BlogPost;
+        });
+        
+        const posts = (await Promise.all(postsPromises)).filter(Boolean) as BlogPost[];
+        callback(posts);
+      }, 
+      (error: Error) => {
+        console.error('Error subscribing to blog posts:', error);
+      }
+    );
+    
+    return unsubscribe;
+  } catch (error) {
+    console.error('Error setting up blog posts subscription:', error);
+    // Return a no-op function if there's an error
+    return () => {};
   }
 };
 
@@ -162,7 +255,12 @@ export const getBlogPosts = async (options: {
     }
     
     // Enrich with user data
-    return await enrichBlogPosts(posts);
+    const enrichedPosts = await enrichBlogPosts(posts);
+    return enrichedPosts.map(post => ({
+      ...post,
+      author: post.user?.displayName || post.author || 'Anonymous',
+      authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
+    }));
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     return [];
