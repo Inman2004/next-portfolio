@@ -9,7 +9,8 @@ import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import { getBlogPosts } from '@/lib/blogUtils';
-import { Eye, Clock, Calendar, Search, Filter, X, Loader2, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight } from 'lucide-react';
+import { Eye, Clock, Calendar, Search, Filter, X, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight, Loader } from 'lucide-react';
+import { BlogLoadingSkeleton } from '@/components/ui/blog-loading-skeleton';
 import { formatNumber } from '@/lib/formatNumber';
 import { toast } from 'react-hot-toast';
 import type { BlogPost } from '@/types/blog';
@@ -149,8 +150,11 @@ export default function BlogPage() {
     });
 
     const fetchPosts = async () => {
+      // Set loading to true at the start
+      setLoading(true);
+      setError(null);
+      
       try {
-        setLoading(true);
         // Use the new getBlogPosts function that includes user data
         const postsData = await getBlogPosts({ publishedOnly: true });
         
@@ -161,24 +165,32 @@ export default function BlogPage() {
           authorPhotoURL: post.user?.photoURL || post.authorPhotoURL || ''
         }));
         
+        // Set posts first
         setPosts(mappedPosts);
         
-        // Fetch view counts for all posts
-        const counts: Record<string, number> = {};
-        await Promise.all(
-          mappedPosts.map(async (post) => {
-            if (post.id) {
-              counts[post.id] = await getViewCount(post.id);
-            }
-          })
-        );
-        setViewCounts(counts);
-        
-        setError(null);
+        // Fetch view counts for all posts in parallel
+        if (mappedPosts.length > 0) {
+          const counts: Record<string, number> = {};
+          await Promise.all(
+            mappedPosts.map(async (post) => {
+              if (post.id) {
+                try {
+                  counts[post.id] = await getViewCount(post.id);
+                } catch (err) {
+                  console.error(`Error fetching view count for post ${post.id}:`, err);
+                  counts[post.id] = 0;
+                }
+              }
+            })
+          );
+          setViewCounts(counts);
+        }
       } catch (err) {
         console.error('Error fetching blog posts:', err);
-        toast.error('Failed to fetch blog posts. Please try again later.');
+        setError('Failed to load blog posts. Please refresh the page to try again.');
+        toast.error('Failed to load blog posts');
       } finally {
+        // Ensure loading is set to false when done
         setLoading(false);
       }
     };
@@ -254,7 +266,7 @@ export default function BlogPage() {
             >
               {deletingId === postId ? (
                 <span className="flex items-center">
-                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  <Loader className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                   Deleting...
                 </span>
               ) : 'Delete'}
@@ -272,9 +284,8 @@ export default function BlogPage() {
   if (loading) {
     return (
       <div className="min-h-screen pt-24 px-6">
-        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-          <p>Loading blog posts...</p>
+        <div className="max-w-7xl mx-auto">
+          <BlogLoadingSkeleton count={6} />
         </div>
       </div>
     );
@@ -429,26 +440,7 @@ export default function BlogPage() {
         </motion.div>
 
         {/* Loading State */}
-        {loading ? (
-          <div className="space-y-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white/80 dark:bg-gray-800/30 rounded-2xl p-6 border border-gray-200/50 dark:border-white/10 overflow-hidden animate-pulse backdrop-blur-sm">
-                <div className="space-y-4">
-                  <div className="h-7 bg-gray-200/70 dark:bg-white/10 rounded-lg w-3/4"></div>
-                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-1/2"></div>
-                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-full"></div>
-                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-5/6"></div>
-                  <div className="h-4 bg-gray-100/70 dark:bg-white/5 rounded w-4/6"></div>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-6 w-20 bg-gray-100/70 dark:bg-white/5 rounded-full"></div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : null}
+        {loading ? <BlogLoadingSkeleton /> : null}
 
         {/* Error State */}
         {error && (
@@ -526,7 +518,7 @@ export default function BlogPage() {
                         aria-label="Delete post"
                       >
                         {deletingId === postId ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <Loader className="w-3.5 h-3.5 animate-spin" />
                         ) : (
                           <Trash2 className="w-3.5 h-3.5" />
                         )}

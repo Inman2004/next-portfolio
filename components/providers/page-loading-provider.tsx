@@ -19,7 +19,13 @@ function LoadingContent({ children }: { children: React.ReactNode }) {
 
   // Handle route changes
   useEffect(() => {
-    if (pathname !== prevPath) {
+    // Don't show loading spinner for blog page
+    if (pathname && pathname.startsWith('/blog')) {
+      setIsLoading(false);
+      return;
+    }
+    
+    if (pathname && pathname !== prevPath) {
       setIsLoading(true);
       setPrevPath(pathname);
     }
