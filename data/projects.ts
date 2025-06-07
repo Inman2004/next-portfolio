@@ -17,7 +17,7 @@ export const projects: Project[] = [
   {
     title: "Pneumoscan",
     description: "A medical diagnostic tool that uses deep learning to detect pneumonia from chest X-ray images with 92% accuracy. The system helps radiologists by providing a second opinion and prioritizing critical cases.",
-    technologies: ["Python", "TensorFlow", "Keras", "Flask", "OpenCV", "NumPy", "Pandas", "scikit_learn"],
+    technologies: ["Python", "TensorFlow", "Keras", "Flask", "CNN", "NumPy", "Pandas", "scikit_learn"],
     github: "https://github.com/Inman2004/pneumoscan",
     live: "https://pneumoscan-b9wv.onrender.com/",
     documentation: "https://drive.google.com/file/d/1G96EUDJVgGnPs6g02pyMWWc8Y9SIrymR/view?usp=sharing",
@@ -51,7 +51,7 @@ export const projects: Project[] = [
   {
     title: "E-commerce Platform",
     description: "A full-featured e-commerce solution with product catalog, shopping cart, user authentication, and Stripe payment integration. Handled 500+ products and processed 200+ orders during the development phase.",
-    technologies: ["React.js", "Node.js", "Express", "MongoDB", "Stripe API", "JWT", "Redux"],
+    technologies: ["React.js", "Node.js", "axios", "MySQL", "PHP", "Custom Auth", "Styled Components"],
     github: "https://github.com/Inman2004/ecommerce",
     live: "https://shop-demo.rvimman.vercel.app",
     images: ["/images/projects/ecommerce-1.png", "/images/projects/ecommerce-2.png", "/images/projects/ecommerce-3.png", "/images/projects/ecommerce-4.png"],
@@ -62,7 +62,7 @@ export const projects: Project[] = [
   {
     title: "Data Handler",
     description: "A full-stack web interface that allows users to upload and display a CSV file. Features include filtering by date and restaurant name, displaying data in a responsive table, a mock email send feature for recruiters, and download and delete functionalities.",
-    technologies: ["Next.js", "Python", "Flask", "Pandas", "MongoDB"],
+    technologies: ["Next.js", "Python", "Flask", "Pandas"],
     github: "https://github.com/Inman2004/assinment-data-handler",
     live: "",
     images: ["/images/projects/dh.png", "/images/projects/dh2.png", "/images/projects/dh3.png"],
