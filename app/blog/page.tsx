@@ -708,7 +708,19 @@ export default function BlogPage() {
                               </div>
                             )}
                             <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-white">{post.author || 'Anonymous'}</p>
+                              {post.username ? (
+                                <Link 
+                                  href={`/users/${post.username}`}
+                                  className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                >
+                                  {post.author || 'Anonymous'}
+                                </Link>
+                              ) : (
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {post.author || 'Anonymous'}
+                                </p>
+                              )}
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {formatCreatedAt(post.createdAt)}
                               </p>

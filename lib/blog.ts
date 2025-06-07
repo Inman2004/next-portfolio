@@ -52,11 +52,16 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         }
       }
       
+      // Initialize post with author data including username
       const post: BlogPost = {
         id: postDoc.id,
         title: data.title || '',
         content: data.content || '',
-        author: data.author || '',
+        author: {
+          ...(typeof data.author === 'object' ? data.author : { id: '', name: 'Unknown Author' }),
+          // Include username from post data or author object if available
+          username: data.username || (typeof data.author === 'object' ? data.author.username : undefined)
+        },
         authorId: data.authorId || '',
         authorPhotoURL: data.authorPhotoURL || '',
         createdAt: data.createdAt?.toDate() || new Date(),
@@ -92,11 +97,16 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
     }
 
     const data = docSnap.data();
+    // Initialize post with author data
     const post: BlogPost = {
       id: docSnap.id,
       title: data.title,
       content: data.content,
-      author: data.author,
+      author: {
+        ...data.author,
+        // Ensure author object has username if available in the post data
+        username: data.username || data.author?.username
+      },
       authorId: data.authorId,
       authorPhotoURL: data.authorPhotoURL,
       createdAt: data.createdAt?.toDate() || new Date(),

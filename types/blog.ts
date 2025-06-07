@@ -16,6 +16,7 @@ export interface BaseBlogPost {
   authorId: string;
   authorName?: string;
   authorUsername?: string;
+  username?: string; // For backward compatibility with existing posts
   authorTitle?: string;
   authorPhotoURL?: string | null;
   // Allow both Firestore Timestamp and JavaScript Date
@@ -50,5 +51,6 @@ export interface BlogPost extends BaseBlogPost {
 // Type for the enriched blog post returned by enrichBlogPosts
 export interface EnrichedBlogPost extends Omit<BlogPost, 'user'> {
   user: BlogPostUserData;
+  username?: string;
   _userUnsubscribe?: () => void;
 }

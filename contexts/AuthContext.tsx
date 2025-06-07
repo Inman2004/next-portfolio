@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { 
   User, 
   UserCredential, 
@@ -14,11 +14,49 @@ import {
   updateEmail as updateAuthEmail,
   updatePassword as updateAuthPassword,
   reauthenticateWithCredential,
-  EmailAuthProvider
+  EmailAuthProvider,
+  Auth,
+  User as FirebaseUser
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, DocumentData } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { updateUserReferences } from '@/lib/updateUserReferences';
+
+// Extend the Firebase User type with our custom fields
+export interface AppUser extends FirebaseUser {
+  username?: string;
+  role?: string;
+  isActive?: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+interface UpdateProfileParams {
+  displayName?: string | null;
+  photoURL?: string | null;
+  username?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}
+
+interface UpdateProfileResult {
+  success: boolean;
+  error?: string;
+}
+
+interface AuthContextType {
+  user: AppUser | null;
+  loading: boolean;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
+  signIn: (email: string, password: string) => Promise<UserCredential>;
+  signInWithGoogle: () => Promise<UserCredential>;
+  logout: () => Promise<void>;
+  isGoogleUser: boolean;
+  updateUserProfile: (profile: UpdateProfileParams) => Promise<UpdateProfileResult>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export { AuthContext };
 
 // Function to send welcome email using EmailJS
 const sendWelcomeEmail = async (email: string, name: string) => {
@@ -69,20 +107,7 @@ const sendWelcomeEmail = async (email: string, name: string) => {
   }
 };
 
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  signUp: (email: string, password: string) => Promise<UserCredential>;
-  signIn: (email: string, password: string) => Promise<UserCredential>;
-  signInWithGoogle: () => Promise<UserCredential>;
-  logout: () => Promise<void>;
-  isGoogleUser: boolean;
-  updateUserProfile: (profile: { displayName?: string | null; photoURL?: string | null }) => Promise<{ success: boolean }>;
-}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export { AuthContext };
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -92,10 +117,14 @@ export function useAuth() {
   return context;
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isGoogleUser, setIsGoogleUser] = useState(false);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isGoogleUser, setIsGoogleUser] = useState<boolean>(false);
 
   useEffect(() => {
     const processUser = async (authUser: User | null) => {
@@ -106,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Create a copy of the user object that we can modify
-      let processedUser = { ...authUser };
+      let processedUser: User = { ...authUser };
       
       // Check if user is signed in with Google
       const isGoogle = authUser.providerData.some(
@@ -114,67 +143,129 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
       setIsGoogleUser(isGoogle);
       
-      // If user has provider data, ensure it's saved to Firestore
-      if (authUser.providerData?.length > 0) {
-        try {
-          if (!db) {
-            console.error('Firestore database not initialized');
-            return;
-          }
+      // Ensure user data is saved to Firestore
+      try {
+        if (!db) {
+          console.error('Firestore database not initialized');
+          setUser(processedUser);
+          return;
+        }
+        
+        const userRef = doc(db, 'users', authUser.uid);
+        const userDoc = await getDoc(userRef);
+        const updateData: Record<string, any> = {
+          updatedAt: serverTimestamp()
+        };
+        
+        // Check if we need to create or update the user document
+        if (userDoc.exists()) {
+          const existingData = userDoc.data();
+          const providerData = authUser.providerData[0];
           
-          const userRef = doc(db, 'users', authUser.uid);
-          const userDoc = await getDoc(userRef);
+          // Check if we need to update any fields
+          const needsUpdate = 
+            (!existingData.photoURL && providerData?.photoURL) ||
+            (!existingData.displayName && providerData?.displayName) ||
+            !existingData.username;
           
-          if (userDoc.exists()) {
-            const existingData = userDoc.data();
-            const providerData = authUser.providerData[0];
-            const needsUpdate = (!existingData.photoURL && providerData.photoURL) ||
-                              (!existingData.displayName && providerData.displayName);
-            
-            if (needsUpdate) {
-              const updateData: Record<string, any> = {
-                updatedAt: serverTimestamp()
+          if (needsUpdate) {
+            // Update photoURL if missing and available from provider
+            if (!existingData.photoURL && providerData?.photoURL) {
+              updateData.photoURL = providerData.photoURL;
+              processedUser = {
+                ...processedUser,
+                photoURL: providerData.photoURL
               };
-              
-              if (!existingData.photoURL && providerData.photoURL) {
-                updateData.photoURL = providerData.photoURL;
-                processedUser = {
-                  ...processedUser,
-                  photoURL: providerData.photoURL
-                };
-              }
-              
-              if (!existingData.displayName && providerData.displayName) {
-                updateData.displayName = providerData.displayName;
-                processedUser = {
-                  ...processedUser,
-                  displayName: providerData.displayName
-                };
-              }
-              
-              try {
-                await updateDoc(userRef, updateData);
-              } catch (updateError) {
-                console.error('Error updating user document:', updateError);
-              }
             }
             
-            // Merge with any existing data from Firestore
-            processedUser = {
-              ...processedUser,
-              ...existingData,
-              // Don't override with null values
-              photoURL: processedUser.photoURL || existingData.photoURL || null,
-              displayName: processedUser.displayName || existingData.displayName || null
-            };
+            // Update displayName if missing and available from provider
+            if (!existingData.displayName && providerData?.displayName) {
+              updateData.displayName = providerData.displayName;
+              processedUser = {
+                ...processedUser,
+                displayName: providerData.displayName
+              };
+            }
+            
+            // Generate and set username if missing
+            if (!existingData.username) {
+              const emailUsername = authUser.email ? 
+                authUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+              const displayNameUsername = authUser.displayName ? 
+                authUser.displayName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+              const username = emailUsername || displayNameUsername || `user${Date.now()}`;
+              
+              updateData.username = username;
+            }
+            
+            try {
+              await updateDoc(userRef, updateData);
+              // Update the existing data with the new values
+              if (updateData.photoURL) existingData.photoURL = updateData.photoURL;
+              if (updateData.displayName) existingData.displayName = updateData.displayName;
+              if (updateData.username) existingData.username = updateData.username;
+            } catch (updateError) {
+              console.error('Error updating user document:', updateError);
+            }
           }
-        } catch (error) {
-          console.error('Error updating user data from provider:', error);
+          
+          // Create a new object with the combined user data
+          const userWithData: User & { username?: string } = {
+            ...processedUser,
+            // Include any additional user data from Firestore
+            displayName: processedUser.displayName || existingData.displayName || null,
+            photoURL: processedUser.photoURL || existingData.photoURL || null,
+            // Add the username from Firestore
+            username: existingData.username
+          };
+          
+          setUser(userWithData);
+        } else {
+          // Create new user document if it doesn't exist
+          const emailUsername = authUser.email ? 
+            authUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+          const displayNameUsername = authUser.displayName ? 
+            authUser.displayName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+          const username = emailUsername || displayNameUsername || `user${Date.now()}`;
+          
+          const newUserData = {
+            uid: authUser.uid,
+            email: authUser.email || null,
+            emailVerified: authUser.emailVerified || false,
+            displayName: authUser.displayName || null,
+            photoURL: authUser.photoURL || null,
+            username: username,
+            providerData: authUser.providerData?.map(pd => ({
+              providerId: pd.providerId,
+              uid: pd.uid || '',
+              displayName: pd.displayName || null,
+              email: pd.email || null,
+              photoURL: pd.photoURL || null,
+              phoneNumber: pd.phoneNumber || null
+            })) || [],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            role: 'user',
+            isActive: true
+          };
+          
+          try {
+            await setDoc(userRef, newUserData);
+            // Create a new user object with the username
+            const userWithUsername: User & { username: string } = {
+              ...processedUser,
+              username: username
+            };
+            setUser(userWithUsername);
+          } catch (createError) {
+            console.error('Error creating user document:', createError);
+            setUser(processedUser);
+          }
         }
-      }
-      
-      // Update the user state with the processed user data
-      setUser(processedUser);
+      } catch (error) {
+        console.error('Error updating user data from provider:', error);
+        setUser(processedUser);
+      }  
     };
     
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -184,24 +275,91 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     });
 
-    return unsubscribe;
-  }, []);
+return unsubscribe;
+}, []);
 
   const signUp = async (email: string, password: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    // Send welcome email (don't await to prevent blocking the auth flow)
-    sendWelcomeEmail(email, email.split('@')[0])
-      .then(result => {
-        if (result.error) {
-          console.warn('Welcome email not sent:', result.error);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      if (!userCredential.user) {
+        throw new Error('User creation failed');
+      }
+      
+      const user = userCredential.user;
+      
+      // Generate a username from email
+      const emailUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      const username = emailUsername || `user${Date.now()}`;
+      
+      // Create user document in Firestore
+      if (db) {
+        const userRef = doc(db, 'users', user.uid);
+        const userData = {
+          uid: user.uid,
+          email: user.email || null,
+          emailVerified: user.emailVerified || false,
+          displayName: user.displayName || email.split('@')[0],
+          photoURL: user.photoURL || null,
+          username,
+          providerData: user.providerData.map(pd => ({
+            providerId: pd.providerId,
+            uid: pd.uid || '',
+            displayName: pd.displayName || null,
+            email: pd.email || null,
+            photoURL: pd.photoURL || null,
+            phoneNumber: pd.phoneNumber || null
+          })),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          role: 'user',
+          isActive: true
+        };
+        
+        try {
+          await setDoc(userRef, userData);
+          
+          // Update local state with the new user data including username
+          setUser({
+            ...user,
+            ...userData
+          });
+          
+          // Send welcome email (don't await to prevent blocking the auth flow)
+          if (user.email) {
+            const displayName = user.displayName || email.split('@')[0];
+            sendWelcomeEmail(user.email, displayName)
+              .then(result => {
+                if (result.error) {
+                  console.warn('Welcome email not sent:', result.error);
+                }
+              });
+          }
+          
+          return userCredential;
+        } catch (error) {
+          console.error('Error creating user document:', error);
+          // If we fail to create the user document, delete the auth user to keep things clean
+          try {
+            await user.delete();
+          } catch (deleteError) {
+            console.error('Error cleaning up auth user after failed document creation:', deleteError);
+          }
+          throw new Error('Failed to create user profile');
         }
-      });
-    return userCredential;
+      } else {
+        throw new Error('Database not initialized');
+      }
+    } catch (error) {
+      console.error('Error in signUp:', error);
+      throw error;
+    }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<UserCredential> => {
     try {
-      return await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      return userCredential;
     } catch (error) {
       console.error('Error signing in:', error);
       throw error;
@@ -209,80 +367,95 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async (): Promise<UserCredential> => {
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const user = result.user;
       
-      if (!result.user) {
-        throw new Error('Failed to sign in with Google');
+      if (!user) {
+        throw new Error('Google sign in failed');
       }
       
-      const user = result.user;
-      // Check if this is a new user by comparing creation and last sign-in times
-      const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+      // Get the Google provider data which contains the high-quality avatar
+      const googleProviderData = user.providerData?.find(
+        (provider) => provider.providerId === 'google.com'
+      );
+      
+      // Use the photoURL from Google provider data if available (higher resolution)
+      const googlePhotoURL = googleProviderData?.photoURL?.replace(/=s96-c$/, '=s400-c') || user.photoURL;
+      
+      // Check if this is a new user
+      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
       
       try {
-        // For new users or when provider data is available
-        if (isNewUser || (user.providerData && user.providerData.length > 0)) {
+        if (db) {
+          const userRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userRef);
+          
+          // Generate a username from email or display name
+          const emailUsername = user.email ? 
+            user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+          const displayNameUsername = user.displayName ? 
+            user.displayName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+          const username = emailUsername || displayNameUsername || `user${Date.now()}`;
+          
           const updateData: Record<string, any> = {
             email: user.email || null,
             emailVerified: user.emailVerified || false,
             updatedAt: serverTimestamp(),
-            // Only update these fields if they're not already set
-            ...(user.displayName ? { displayName: user.displayName } : {}),
-            ...(user.photoURL ? { photoURL: user.photoURL } : {})
+            // Always update displayName and photoURL from Google if available
+            displayName: user.displayName || null,
+            // Use the high-quality Google photo URL if available
+            photoURL: googlePhotoURL || null,
+            // Always set username for new users, or if it's missing
+            ...(isNewUser || !userDoc.exists() ? { username } : {})
           };
           
           // Add provider data if available
           if (user.providerData) {
             updateData.providerData = user.providerData.map((pd) => ({
               providerId: pd.providerId,
-              uid: pd.uid,
+              uid: pd.uid || '',
               displayName: pd.displayName || null,
               email: pd.email || null,
               photoURL: pd.photoURL || null
             }));
           }
           
-          // Update or create user document in Firestore
-          if (db) {
-            const userRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            // Update existing document but don't overwrite existing fields with null
+            const existingData = userDoc.data();
+            const mergedData = { ...existingData };
             
-            if (userDoc.exists()) {
-              // Update existing document but don't overwrite existing fields with null
-              const existingData = userDoc.data();
-              const mergedData = { ...existingData };
-              
-              // Only update fields that have values in updateData
-              Object.entries(updateData).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                  mergedData[key] = value;
-                }
-              });
-              
-              await updateDoc(userRef, mergedData);
-            } else {
-              // Create new document with additional fields
-              await setDoc(userRef, {
-                ...updateData,
-                createdAt: serverTimestamp(),
-                role: 'user',
-                isActive: true
-              });
-            }
-          }
-        }
-        
-        // Send welcome email for new Google sign-ups (don't await to prevent blocking)
-        if (isNewUser && user.email) {
-          const displayName = user.displayName || user.email.split('@')[0] || 'User';
-          sendWelcomeEmail(user.email, displayName)
-            .then(result => {
-              if (result.error) {
-                console.warn('Welcome email not sent:', result.error);
+            // Only update fields that have values in updateData
+            Object.entries(updateData).forEach(([key, value]) => {
+              if (value !== undefined && value !== null) {
+                mergedData[key] = value;
               }
             });
+            
+            await updateDoc(userRef, mergedData);
+          } else {
+            // Create new document with additional fields
+            await setDoc(userRef, {
+              ...updateData,
+              uid: user.uid,
+              createdAt: serverTimestamp(),
+              role: 'user',
+              isActive: true
+            });
+          }
+          
+          // Send welcome email for new users (don't await to prevent blocking)
+          if ((isNewUser || !userDoc.exists()) && user.email) {
+            const displayName = user.displayName || user.email.split('@')[0] || 'User';
+            sendWelcomeEmail(user.email, displayName)
+              .then(emailResult => {
+                if (emailResult.error) {
+                  console.warn('Welcome email not sent:', emailResult.error);
+                }
+              });
+          }
         }
       } catch (error) {
         console.error('Error updating user data after Google sign-in:', error);
@@ -305,81 +478,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateUserProfile = async (profile: { displayName?: string | null; photoURL?: string | null }) => {
-    if (!auth.currentUser) throw new Error('No user logged in');
+  const updateUserProfile = async (profile: UpdateProfileParams): Promise<UpdateProfileResult> => {
+    if (!user || !db) return { success: false, error: 'User not authenticated or database not initialized' };
     
     try {
-      // Create updated user object
-      const updatedUser = {
-        ...auth.currentUser,
-        displayName: profile.displayName !== undefined ? profile.displayName : auth.currentUser.displayName,
-        photoURL: profile.photoURL !== undefined ? profile.photoURL : auth.currentUser.photoURL
-      };
-
-      // Update auth profile
-      await updateProfile(auth.currentUser, profile);
-      
-      // Prepare update data
-      const updateData: Record<string, any> = {
-        email: auth.currentUser.email,
-        emailVerified: auth.currentUser.emailVerified,
+      // Prepare updates object with proper Firestore types
+      const updates: {
+        displayName?: string | null;
+        photoURL?: string | null;
+        username?: string;
+        updatedAt: any; // This will be set to serverTimestamp()
+      } = {
         updatedAt: serverTimestamp()
       };
       
+      // Prepare auth profile updates
+      const authUpdates: { displayName?: string | null; photoURL?: string | null } = {};
+      
       if (profile.displayName !== undefined) {
-        updateData.displayName = profile.displayName;
-      }
-      if (profile.photoURL !== undefined) {
-        updateData.photoURL = profile.photoURL;
+        updates.displayName = profile.displayName;
+        authUpdates.displayName = profile.displayName;
       }
       
-      // Update or create user document in Firestore
-      if (db) {
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        const userDoc = await getDoc(userRef);
-        
-        if (userDoc.exists()) {
-          // Update existing document
-          await updateDoc(userRef, updateData);
-        } else {
-          // Create new document with additional fields
-          await setDoc(userRef, {
-            ...updateData,
-            createdAt: serverTimestamp(),
-            role: 'user',
-            isActive: true
-          });
+      if (profile.photoURL !== undefined) {
+        updates.photoURL = profile.photoURL;
+        authUpdates.photoURL = profile.photoURL;
+      }
+      
+      if (profile.username !== undefined) {
+        updates.username = profile.username;
+      }
+      
+      try {
+        // Update Firebase Auth profile if there are auth updates
+        if (Object.keys(authUpdates).length > 0 && auth.currentUser) {
+          await updateProfile(auth.currentUser, authUpdates);
         }
         
-        // Note: Blog posts will be updated with the latest user data when they are loaded
-        // using the enrichBlogPosts utility function
-      }
-      
-      // Update local state with the new user data
-      setUser(updatedUser);
-      
-      // Update the user cache
-      if (typeof window !== 'undefined') {
-        const userData = {
-          displayName: updatedUser.displayName,
-          photoURL: updatedUser.photoURL,
-          email: updatedUser.email
-        };
+        // Update Firestore
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, updates);
         
-        // Update the cache for this user
-        const userCache = new Map(JSON.parse(localStorage.getItem('userCache') || '[]'));
-        userCache.set(updatedUser.uid, userData);
-        localStorage.setItem('userCache', JSON.stringify(Array.from(userCache.entries())));
+        // Update local state
+        setUser({
+          ...user,
+          ...updates
+        } as AppUser);
+        
+        return { success: true };
+      } catch (error) {
+        console.error('Error updating user profile:', error);
+        throw error; // Re-throw to be caught by the outer catch
       }
-      
-      return { success: true };
     } catch (error) {
-      console.error('Error updating profile:', error);
-      throw error;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error in updateUserProfile:', errorMessage);
+      return { 
+        success: false, 
+        error: errorMessage 
+      };
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     loading,
     signUp,

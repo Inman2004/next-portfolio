@@ -7,15 +7,18 @@ import { getBlogPostById, updateBlogPost } from '@/lib/blog';
 import { motion } from 'framer-motion';
 import { Camera, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function EditBlogPost() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [username, setUsername] = useState<string | undefined>(undefined);
   const { user } = useAuth();
   const router = useRouter();
   // Get the post ID from params with proper type safety
@@ -65,7 +68,23 @@ export default function EditBlogPost() {
         
         setTitle(post.title);
         setContent(post.content);
-        setCoverImage(post.coverImage || null);
+        setCoverImage(post.coverImage || undefined);
+        
+        // Set username if it exists in the post
+        if (post.username) {
+          setUsername(post.username);
+        } else if (post.authorId) {
+          // Fallback to fetch username from users collection if not in post
+          try {
+            const userDoc = await getDoc(doc(db, 'users', post.authorId));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              setUsername(userData?.username);
+            }
+          } catch (err) {
+            console.error('Error loading user data:', err);
+          }
+        }
         setIsLoading(false);
       } catch (err) {
         console.error('Error loading post:', err);
@@ -188,7 +207,8 @@ export default function EditBlogPost() {
         title: title.trim(),
         content: content.trim(),
         excerpt: content.trim().substring(0, 160) + (content.length > 160 ? '...' : ''),
-        ...(coverImage && { coverImage })
+        ...(coverImage ? { coverImage } : { coverImage: null }),
+        username: username || undefined
       };
       
       await updateBlogPost(postId, postData);

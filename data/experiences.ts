@@ -21,11 +21,8 @@ export const experiences: ExperienceType[] = [
     startDate: 'May 2025',
     endDate: 'Present',
     description: [
-      'Developed and maintained responsive web applications using Next.js and React, improving user engagement by 40%',
-      'Implemented server-side rendering (SSR) and static site generation (SSG) to enhance performance and SEO',
-      'Collaborated with cross-functional teams to design and implement new features using TypeScript and Node.js',
-      'Optimized database queries and API endpoints, reducing average response time by 35%',
-      'Containerized applications using Docker and deployed them on AWS infrastructure'
+      'Not started yet',
+      'Planning to start soon'
     ],
     skills: ['Next.js', 'React', 'Node.js', 'TypeScript', 'TailwindCSS', 'MongoDB', 'Docker', 'AWS', 'CI/CD', 'RESTful APIs'],
   },
@@ -33,7 +30,7 @@ export const experiences: ExperienceType[] = [
     id: 2,
     role: 'Indie Web Developer',
     company: 'Self-Employed',
-    companyUrl: 'https://rvimman.vercel.app',
+    companyUrl: 'https://rvinman2004.vercel.app',
     location: 'Tamil Nadu, India',
     startDate: 'Jun 2022',
     endDate: 'Dec 2024',

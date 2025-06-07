@@ -3,6 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 export interface Comment {
   id: string;
   uid: string;
+  username?: string;
   // These fields are kept for backward compatibility
   displayName?: string;
   photoURL?: string | null;

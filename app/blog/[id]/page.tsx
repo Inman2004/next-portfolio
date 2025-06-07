@@ -20,6 +20,23 @@ import { incrementViewCount, getViewCount } from '@/lib/views';
 import { formatNumber } from '@/lib/formatNumber';
 import MarkdownViewer from '@/components/MarkdownViewer';
 
+// Define types for author data
+interface AuthorData {
+  id?: string;
+  name?: string;
+  username?: string;
+  photoURL?: string;
+  [key: string]: any; // For any additional properties
+}
+
+// Ensure this matches the Author interface from types.ts
+type PostAuthorData = {
+  id: string;
+  name: string;
+  username?: string;
+  photoURL?: string; // Changed from string | null to string | undefined to match Author interface
+};
+
 interface PostPageProps {
   params: Promise<{
     id: string;
@@ -153,16 +170,76 @@ export default function PostPage({ params }: PostPageProps) {
           return;
         }
 
+        // Helper function to safely get author data
+        const getAuthorData = (): PostAuthorData => {
+          // Default values with explicit type casting to ensure string
+          const defaultAuthor: PostAuthorData = {
+            id: postData.authorId ? String(postData.authorId) : 'unknown',
+            name: 'Anonymous',
+            username: undefined,
+            photoURL: undefined
+          };
+
+          // Handle case where author is a string
+          if (typeof postData.author === 'string') {
+            return {
+              ...defaultAuthor,
+              name: postData.author,
+              username: postData.user?.username,
+              photoURL: postData.user?.photoURL || postData.authorPhotoURL
+            };
+          }
+          
+          // Handle case where author is an object
+          if (postData.author && typeof postData.author === 'object') {
+            // Type guard to check if the object has the expected properties
+            const authorObj = postData.author as Record<string, unknown>;
+            const authorId = postData.authorId || 
+                           (authorObj.id ? String(authorObj.id) : 'unknown');
+            
+            return {
+              ...defaultAuthor,
+              id: authorId,
+              name: (postData.user?.displayName || 
+                    (authorObj.name as string) || 
+                    'Anonymous'),
+              username: (authorObj.username as string) || postData.user?.username,
+              photoURL: (postData.user?.photoURL || 
+                       authorObj.photoURL as string || 
+                       postData.authorPhotoURL)
+            };
+          }
+          
+          // Fallback to user data if available
+          if (postData.user) {
+            let userId: string;
+            if (postData.authorId) {
+              userId = String(postData.authorId);
+            } else if (postData.user.uid) {
+              userId = String(postData.user.uid);
+            } else {
+              userId = 'unknown';
+            }
+            
+            return {
+              ...defaultAuthor,
+              id: userId,
+              name: postData.user.displayName || 'Anonymous',
+              username: postData.user.username,
+              photoURL: postData.user.photoURL
+            };
+          }
+          
+          return defaultAuthor;
+        };
+
         // Map to the expected PostData type
+        const authorData = getAuthorData();
         const formattedPost: PostData = {
           id: postData.id,
           title: postData.title,
           content: postData.content,
-          author: {
-            id: postData.authorId,
-            name: postData.user?.displayName || postData.author || 'Anonymous',
-            photoURL: postData.user?.photoURL || postData.authorPhotoURL || null,
-          },
+          author: authorData,
           createdAt: postData.createdAt,
           coverImage: postData.coverImage,
           excerpt: postData.excerpt,
@@ -242,21 +319,52 @@ export default function PostPage({ params }: PostPageProps) {
           </Link>
           
           <div className="flex items-center gap-4 mb-8">
-            <div className="flex-shrink-0">
-              <Image
-                src={post.author.photoURL || '/default-avatar.png'}
-                alt={post.author.name}
-                width={48}
-                height={48}
-                className="object-cover rounded-full"
-                sizes="48px"
-                priority
-              />
-            </div>
+            {post.author.username ? (
+              <Link 
+                href={`/users/${post.author.username}`}
+                className="flex-shrink-0 hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50 rounded-full transition-all"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={post.author.photoURL || '/default-avatar.png'}
+                  alt={post.author.name}
+                  width={48}
+                  height={48}
+                  className="object-cover rounded-full"
+                  sizes="48px"
+                  priority
+                />
+              </Link>
+            ) : (
+              <div className="flex-shrink-0">
+                <Image
+                  src={post.author.photoURL || '/default-avatar.png'}
+                  alt={post.author.name}
+                  width={48}
+                  height={48}
+                  className="object-cover rounded-full"
+                  sizes="48px"
+                  priority
+                />
+              </div>
+            )}
             <div className="min-w-0">
               <h1 className="text-2xl sm:text-3xl font-bold mb-1 truncate">{post.title}</h1>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
-                <span>By {post.author.name}</span>
+                <span>
+                  By{' '}
+                  {post.author.username ? (
+                    <Link 
+                      href={`/users/${post.author.username}`}
+                      className="text-blue-600 hover:underline dark:text-blue-400"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {post.author.name}
+                    </Link>
+                  ) : (
+                    <span>{post.author.name}</span>
+                  )}
+                </span>
                 <span className="hidden sm:inline">•</span>
                 <span>{formatCreatedAt(post.createdAt)}</span>
                 <span>•</span>

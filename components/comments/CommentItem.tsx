@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Trash2, Pin, Crown } from 'lucide-react';
 import Image from 'next/image';
 import { formatNumber } from '@/lib/formatNumber';
+import Link from 'next/link';
 import { CommentItemProps, ADMIN_EMAIL } from './types';
 
 export const CommentItem = memo(({ 
@@ -18,6 +19,8 @@ export const CommentItem = memo(({
   const isCommentAuthor = currentUser?.uid === comment.uid;
   const canModify = isCurrentUserAdmin || isCommentAuthor;
   
+  // Comment interface includes username field
+
   // Styling classes
   const metaClasses = 'text-sm text-gray-600 dark:text-gray-400';
   const contentClasses = 'mt-3 text-gray-800 dark:text-gray-200 leading-relaxed break-words text-base';
@@ -77,26 +80,63 @@ export const CommentItem = memo(({
                 <Crown className="w-5 h-5 text-yellow-500" />
               </motion.div>
             )}
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
-              {comment.user?.photoURL || comment.photoURL ? (
-                <Image
-                  src={(comment.user?.photoURL || comment.photoURL) as string}
-                  alt={comment.user?.displayName || comment.displayName || 'User'}
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
-                  {(comment.user?.displayName || comment.displayName || '?').charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
+            {comment.username ? (
+              <Link 
+                href={`/users/${comment.username}`}
+                className="relative group block w-10 h-10 rounded-full overflow-hidden bg-gray-700"
+                onClick={(e) => {
+                  console.log('Avatar clicked for user:', comment.username);
+                  e.stopPropagation();
+                }}
+                title={`View ${comment.user?.displayName || comment.displayName || 'user'}'s profile`}
+              >
+                <div className="absolute inset-0 rounded-full group-hover:ring-2 group-hover:ring-blue-500 group-hover:ring-opacity-50 transition-all duration-200 pointer-events-none"></div>
+                {comment.user?.photoURL || comment.photoURL ? (
+                  <Image
+                    src={(comment.user?.photoURL || comment.photoURL) as string}
+                    alt={comment.user?.displayName || comment.displayName || 'User'}
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
+                    {(comment.user?.displayName || comment.displayName || '?').charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </Link>
+            ) : (
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
+                {comment.user?.photoURL || comment.photoURL ? (
+                  <Image
+                    src={(comment.user?.photoURL || comment.photoURL) as string}
+                    alt={comment.user?.displayName || comment.displayName || 'User'}
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
+                    {(comment.user?.displayName || comment.displayName || '?').charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2">
               <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                {comment.user?.displayName || comment.displayName || 'Anonymous'}
+                {comment.username ? (
+                  <Link 
+                    href={`/users/${comment.username}`}
+                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-semibold hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {comment.user?.displayName || comment.displayName || 'Anonymous'}
+                  </Link>
+                ) : (
+                  <span>{comment.user?.displayName || comment.displayName || 'Anonymous'}</span>
+                )}
                 {comment.email === ADMIN_EMAIL && (
                   <span className="ml-1 text-yellow-500" title="Admin">
                     <Crown className="inline-block w-3 h-3" />

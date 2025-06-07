@@ -7,6 +7,9 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
+    fontFamily: {
+      pacifico: ['var(--font-pacifico)', 'cursive'],
+    },
     container: {
       center: true,
       padding: "2rem",

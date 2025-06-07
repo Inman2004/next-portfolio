@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import { Camera, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
@@ -171,7 +171,10 @@ const NewBlogPostPage = () => {
     setError('');
 
     try {
-      const postsCollection = collection(db, 'blog-posts');
+      // Get the username from the user's profile if available
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      const username = userDoc?.data()?.username || null;
+      
       const newPost = {
         title: title.trim(),
         content: content.trim(),
@@ -180,6 +183,7 @@ const NewBlogPostPage = () => {
         author: currentUser.displayName || currentUser.name || 'Anonymous',
         authorId: currentUser.uid || 'anonymous',
         authorPhotoURL: currentUser.photoURL || null,
+        username,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         published: true,

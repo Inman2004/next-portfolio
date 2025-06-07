@@ -7,11 +7,14 @@ import { collection, query, where, orderBy, limit, getDocs } from 'firebase/fire
 import { format } from 'date-fns';
 import { FiGithub, FiTwitter, FiLinkedin, FiGlobe, FiCalendar, FiMapPin } from 'react-icons/fi';
 import Link from 'next/link';
+import { UserAvatar } from '@/components/UserAvatar';
+import MarkdownViewer from '@/components/MarkdownViewer';
 
 // Types
 import { BlogPost } from '@/types/blog';
 import { UserData, getUserByUsername } from '@/lib/userUtils';
 import { db } from '@/lib/firebase';
+import Quotes from '@/components/Quotes';
 
 // Define BlogCard component props
 interface BlogCardProps {
@@ -20,33 +23,38 @@ interface BlogCardProps {
 }
 
 // Define BlogCard component
-const BlogCard = ({ post, className = '' }: BlogCardProps) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden ${className}`}>
-    {post.coverImage && (
-      <div className="h-48 overflow-hidden">
-        <img 
-          src={post.coverImage} 
-          alt={post.title} 
-          className="w-full h-full object-cover"
-        />
-      </div>
-    )}
-    <div className="p-6">
-      <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
-        {post.title}
-      </h3>
-      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-        {post.excerpt || post.content?.substring(0, 150)}...
-      </p>
-      <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-        <span>{format(new Date(post.createdAt || new Date()), 'MMM d, yyyy')}</span>
-        <span className="text-blue-600 dark:text-blue-400 hover:underline">
-          Read more →
-        </span>
+const BlogCard = ({ post, className = '' }: BlogCardProps) => {
+  // Get excerpt or first 200 characters of content
+  const excerpt = post.excerpt || (post.content ? post.content.substring(0, 200) : '');
+
+  return (
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden ${className}`}>
+      {post.coverImage && (
+        <div className="h-48 overflow-hidden">
+          <img 
+            src={post.coverImage} 
+            alt={post.title} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      <div className="p-6">
+        <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+          {post.title}
+        </h3>
+        <div className="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+          <MarkdownViewer content={excerpt + (excerpt.length === 200 ? '...' : '')} />
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+          <span>{format(new Date(post.createdAt || new Date()), 'MMM d, yyyy')}</span>
+          <Link href={`/blog/${post.id}`} className="text-blue-600 dark:text-blue-400 hover:underline">
+            Read more →
+          </Link>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Define ProfileTabs props
 interface ProfileTabsProps {
@@ -138,6 +146,12 @@ export default function UserProfilePage() {
           throw new Error(`User not found with username: ${username}`);
         }
         
+        console.log('👤 [UserProfile] Setting user data:', {
+          displayName: userData.displayName,
+          photoURL: userData.photoURL,
+          email: userData.email,
+          providerData: userData.providerData
+        });
         setUser(userData);
 
         // Fetch user's blog posts through API route using username
@@ -295,23 +309,60 @@ export default function UserProfilePage() {
   }
 
   if (error) {
+    // Check if the error is specifically for user not found
+    const isUserNotFound = error.toLowerCase().includes('user not found');
+    
+    if (isUserNotFound) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">
+          <div className="max-w-md w-full text-center bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <div className="text-6xl mb-4">👤</div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">User Not Found</h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              The user you're looking for doesn't exist or may have been removed.
+            </p>
+            <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 justify-center">
+              <Link 
+                href="/" 
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Return Home
+              </Link>
+              <Link 
+                href="/blog" 
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Browse Blog
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // For other types of errors, show a generic error message
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white overflow-x-hidden w-full transition-colors duration-200">
-        {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 mx-4 mt-4 rounded" role="alert">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded mb-6" role="alert">
             <p className="font-bold">Error Loading Profile</p>
             <p className="mb-2">We couldn't load the profile data. Please try again later.</p>
             {process.env.NODE_ENV === 'development' && (
-              <details className="mt-2 p-2 bg-red-50 rounded text-sm">
+              <details className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded text-sm">
                 <summary className="cursor-pointer font-medium">Show technical details</summary>
-                <pre className="mt-2 p-2 bg-white rounded overflow-auto max-h-40">
-                  {JSON.stringify(error, null, 2)}
+                <pre className="mt-2 p-2 bg-white dark:bg-gray-800 rounded overflow-auto max-h-40 text-left">
+                  {error}
                 </pre>
               </details>
             )}
           </div>
-        )}
-        <span className="block sm:inline">{error}</span>
+          <Link 
+            href="/" 
+            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Return to Homepage
+          </Link>
+        </div>
       </div>
     );
   }
@@ -333,25 +384,19 @@ export default function UserProfilePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Profile Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-32"></div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8 my-12">
+        <div className="bg-gradient-to-r from-blue-500/50 to-purple-600/50 dark:from-blue-500/50 dark:to-purple-600/50 h-32">
+          <Quotes />
+        </div>
         <div className="px-6 pb-6 relative">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between">
             <div className="flex items-end -mt-16">
-              <div className="h-32 w-32 rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-700">
-                {user.photoURL ? (
-                  <img 
-                    src={user.photoURL} 
-                    alt={user.displayName || 'User'}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                    <span className="text-4xl font-bold text-gray-500 dark:text-gray-300">
-                      {(user.displayName || 'U')[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
+              <div className="h-32 w-32 rounded-full border-4 border-white dark:border-gray-800 overflow-hidden">
+                <UserAvatar 
+                  photoURL={user.photoURL} 
+                  displayName={user.displayName}
+                  size={128}
+                />
               </div>
               <div className="ml-6 mb-2">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">

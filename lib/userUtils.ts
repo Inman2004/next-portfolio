@@ -81,23 +81,56 @@ export interface UserData {
 
 export async function getUserByUsername(username: string): Promise<UserData | null> {
   try {
-    console.log('🔍 [getUserByUsername] Searching for username:', username);
+    console.log('🔍 [getUserByUsername] Starting search for username:', username);
     
     // Check if Firestore is initialized
     if (!db) {
       console.error('❌ Firestore is not initialized');
+      console.log('Firebase config:', process.env.NEXT_PUBLIC_FIREBASE_CONFIG);
       return null;
     }
     
+    // Verify database connection
+    console.log('✅ Firestore is initialized');
+    console.log('Environment:', process.env.NODE_ENV);
+    
     const usersRef = collection(db, 'users');
-    console.log('🔍 Using collection:', 'users');
+    console.log('🔍 Using Firestore collection: users');
     
-    // Try both with and without toLowerCase() for debugging
+    // Clean and prepare the username for search
     const searchUsername = username.trim();
-    const q = query(usersRef, where('username', '==', searchUsername));
+    console.log('🔍 Cleaned search username:', searchUsername);
     
-    console.log('🔍 Executing query for username:', searchUsername);
+    // Create a case-insensitive query
+    const q = query(usersRef, where('username', '==', searchUsername));
+    console.log('🔍 Executing Firestore query for username:', searchUsername);
+    
+    // Log the query for debugging
+    console.log('🔍 Firestore query details:', {
+      collection: 'users',
+      field: 'username',
+      operator: '==',
+      value: searchUsername
+    });
+    
     const querySnapshot = await getDocs(q);
+    console.log(`🔍 Query completed. Found ${querySnapshot.size} matching documents.`);
+    
+    // Log the first few documents for debugging
+    querySnapshot.forEach((doc) => {
+      const docData = doc.data();
+      console.log('📄 Document:', {
+        id: doc.id,
+        exists: doc.exists(),
+        data: {
+          ...docData,
+          // Add any specific fields you want to log
+          username: docData.username,
+          email: docData.email,
+          displayName: docData.displayName
+        }
+      });
+    });
     
     console.log('🔍 Query results:', {
       empty: querySnapshot.empty,
