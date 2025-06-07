@@ -44,7 +44,7 @@ export default function MusicPlayer() {
       id: '2',
       title: 'Ride It',
       artist: 'Lil Nas X',
-      previewUrl: '/songs/Ride it.mp3',
+      previewUrl: '/songs/Rideit.mp3',
       imageUrl: 'https://c.saavncdn.com/068/Ride-It-English-2013-500x500.jpg',
     },
     {
