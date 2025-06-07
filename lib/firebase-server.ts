@@ -43,19 +43,6 @@ const initializeFirebase = () => {
     logToFile(`${logContext} Initializing Firestore`);
     db = getFirestore(firebaseApp);
     
-    // Configure Firestore settings for better reliability
-    try {
-      // Note: In newer versions, settings are passed directly to getFirestore
-      // If you need to update settings, you might need to reinitialize Firestore
-      logToFile(`${logContext} Firestore initialized with settings:`, {
-        experimentalForceLongPolling: true,
-        ignoreUndefinedProperties: true
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logError(new Error(`${logContext} Error configuring Firestore settings: ${errorMessage}`));
-    }
-    
     logToFile(`${logContext} Initializing Storage`);
     storage = getStorage(firebaseApp);
 

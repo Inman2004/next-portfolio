@@ -1,33 +1,6 @@
 import { NextRequest } from 'next/server';
-import { collection, query, where, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db, initializeFirebase } from '@/lib/firebase-server';
-
-// Helper function to retry operations
-const withRetry = async <T>(
-  operation: () => Promise<T>,
-  maxRetries = 3,
-  delay = 1000
-): Promise<T> => {
-  let lastError: Error | null = null;
-  
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await operation();
-    } catch (error) {
-      lastError = error as Error;
-      console.warn(`Attempt ${i + 1} failed:`, error);
-      
-      if (i < maxRetries - 1) {
-        // Exponential backoff
-        const waitTime = delay * Math.pow(2, i);
-        console.log(`Retrying in ${waitTime}ms...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-      }
-    }
-  }
-  
-  throw lastError;
-};
 
 const COMMON_HEADERS = {
   'Content-Type': 'application/json',
@@ -40,90 +13,81 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { username: string } }
 ) {
-  const startTime = Date.now();
-  let requestId = Math.random().toString(36).substring(2, 10);
-  
-  const log = (message: string, data?: any) => {
-    console.log(`[${requestId}] ${message}`, data || '');
-  };
-  
-  const logError = (message: string, error?: Error) => {
-    console.error(`[${requestId}] ${message}`, error || '');
-  };
-  
   try {
-    log('Request started');
-    
     // Ensure params is resolved
     const resolvedParams = await Promise.resolve(params);
     const username = resolvedParams.username?.trim();
-    
     if (!username) {
-      log('Username is required');
       return new Response(JSON.stringify({ 
-        error: 'Username is required',
-        requestId
+        error: 'Username is required'
       }), { status: 400, headers: COMMON_HEADERS });
     }
-    
-    log('Initializing Firebase');
-    const { db: firestoreDb } = await withRetry(() => {
-      const result = initializeFirebase();
-      if (!result.db) throw new Error('Firestore not initialized');
-      return Promise.resolve(result);
-    });
 
-    // Get user by username with retry logic
-    log(`Searching for user with username: "${username}"`);
-    
-    const usersRef = collection(firestoreDb, 'users');
-    const userQuery = query(usersRef, where('username', '==', username));
-    
-    log('Executing user query');
-    const userSnapshot = await withRetry(() => getDocs(userQuery));
-    log(`Query completed. Found ${userSnapshot.size} matching users`);
-    
-    if (userSnapshot.empty) {
-      log('User not found, listing all users for debugging');
-      
-      try {
-        const allUsersSnapshot = await withRetry(() => getDocs(usersRef));
-        const allUsers = allUsersSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        
-        log(`Found ${allUsers.length} total users in database`);
-        
-        return new Response(JSON.stringify({ 
-          error: 'User not found',
-          details: {
-            searchedUsername: username,
-            suggestion: 'The username might be misspelled or the user might not exist',
-            availableUsernames: allUsers
-              .filter((user: any) => user.username)
-              .map((user: any) => user.username)
-              .filter(Boolean)
-              .slice(0, 10) // Limit to first 10 usernames
-          },
-          requestId
-        }), { 
-          status: 404, 
-          headers: COMMON_HEADERS 
-        });
-      } catch (listError) {
-        logError('Error listing all users', listError as Error);
-        throw new Error('Failed to verify user existence');
-      }
+    // Initialize Firebase
+    const { db: firestoreDb } = initializeFirebase();
+    if (!firestoreDb) {
+      throw new Error('Failed to initialize Firestore');
     }
 
-    const userDoc = userSnapshot.docs[0];
-    const userId = userDoc.id;
-    const userData = userDoc.data();
+    // Get user by username
+    console.log(`🔍 [API] Searching for user with username: "${username}"`);
+    console.log('🔍 [API] Firestore database instance:', firestoreDb ? 'Initialized' : 'Not initialized');
     
-    log(`Found user: ${userData.displayName || userData.email} (${userId})`);
+      const usersRef = collection(firestoreDb, 'users');
+      console.log('✅ [API] Users collection reference created');
+      
+      const userQuery = query(usersRef, where('username', '==', username));
+      console.log('🔍 [API] Firestore query:', {
+        collection: 'users',
+        field: 'username',
+        operator: '==',
+        value: username
+      });
+      
+      console.log('🔍 [API] Executing Firestore query...');
+      const userSnapshot = await getDocs(userQuery);
+      console.log(`🔍 [API] Query completed. Found ${userSnapshot.size} matching users`);
+      
+      // Log all users for debugging
+      if (userSnapshot.size > 0) {
+        console.log('📋 [API] Matching users:');
+        userSnapshot.forEach(doc => {
+          const userData = doc.data();
+          console.log(`  - ID: ${doc.id}, Username: ${userData.username}, Email: ${userData.email}, Display Name: ${userData.displayName || 'N/A'}`);
+        });
+      } else {
+        console.log('⚠️ [API] No users found with username:', username);
+        // Try to list all usernames for debugging
+        try {
+          const allUsersSnapshot = await getDocs(usersRef);
+          console.log(`📋 [API] Listing all ${allUsersSnapshot.size} users in the database:`);
+          allUsersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            console.log(`  - ID: ${doc.id}, Username: ${userData.username || 'N/A'}, Email: ${userData.email || 'N/A'}`);
+          });
+        } catch (listError) {
+          console.error('❌ [API] Error listing all users:', listError);
+        }
+      }
     
-    // Get user's published posts with retry logic
+    if (userSnapshot.empty) {
+      console.error(`❌ [API] User not found with username: "${username}"`);
+      return new Response(JSON.stringify({ 
+        error: `User not found with username: ${username}`,
+        debug: {
+          searchedUsername: username,
+          availableUsers: userSnapshot.size > 0 ? 
+            userSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            })) : []
+        }
+      }), { status: 404, headers: COMMON_HEADERS });
+    }
+
+    const userId = userSnapshot.docs[0].id;
+    
+    // Get user's posts (simplified query)
     const postsRef = collection(firestoreDb, 'blogPosts');
     const postsQuery = query(
       postsRef,
@@ -131,93 +95,32 @@ export async function GET(
       where('published', '==', true)
     );
     
-    log('Fetching user posts');
-    const postsSnapshot = await withRetry(() => getDocs(postsQuery));
+    const postsSnapshot = await getDocs(postsQuery);
     
-    // Process and return posts
-    const posts = postsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        title: data.title,
-        excerpt: data.excerpt,
-        coverImage: data.coverImage,
-        createdAt: data.createdAt?.toDate?.()?.toISOString(),
-        updatedAt: data.updatedAt?.toDate?.()?.toISOString(),
-        // Add any other fields you need
-      };
-    });
+    // Process posts
+    const posts = postsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      // Convert Firestore Timestamp to ISO string if it exists
+      createdAt: doc.data().createdAt?.toDate?.()?.toISOString(),
+      updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString()
+    }));
     
-    const responseData = {
-      success: true,
-      user: {
-        id: userId,
-        username: userData.username,
-        displayName: userData.displayName,
-        photoURL: userData.photoURL,
-        // Add any other user fields you need
-      },
-      posts,
-      meta: {
-        count: posts.length,
-        requestId,
-        timestamp: new Date().toISOString(),
-        duration: Date.now() - startTime
-      }
-    };
-    
-    log(`Request completed successfully. Found ${posts.length} posts.`);
-    
-    return new Response(JSON.stringify(responseData), { 
-      headers: {
-        ...COMMON_HEADERS,
-        'X-Request-ID': requestId,
-        'X-Duration': `${Date.now() - startTime}ms`
-      }
+    return new Response(JSON.stringify({ 
+      success: true, 
+      posts
+    }), { 
+      headers: COMMON_HEADERS 
     });
     
   } catch (error) {
-    const errorId = `err_${Math.random().toString(36).substring(2, 8)}`;
-    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-    
-    logError(`API Error [${errorId}]:`, error instanceof Error ? error : new Error(errorMessage));
-    
-    // Handle Firestore specific errors
-    const isFirestoreError = error?.code && typeof error.code === 'string' && error.code.startsWith('firestore/');
-    const isNetworkError = error?.code === 'unavailable' || 
-                         error?.code === 'resource-exhausted' ||
-                         error?.message?.includes('network');
-    
-    const statusCode = isNetworkError ? 503 : 500;
-    const errorType = isNetworkError ? 'service_unavailable' : 
-                     isFirestoreError ? 'database_error' : 'server_error';
-    
+    console.error('API Error:', error);
     return new Response(JSON.stringify({ 
-      error: isNetworkError ? 'Service Unavailable' : 'Internal Server Error',
-      message: isNetworkError 
-        ? 'The service is temporarily unavailable. Please try again later.' 
-        : `An error occurred (${errorId})`,
-      type: errorType,
-      errorId,
-      requestId,
-      timestamp: new Date().toISOString(),
-      ...(process.env.NODE_ENV === 'development' && {
-        details: {
-          message: errorMessage,
-          stack: error instanceof Error ? error.stack : undefined,
-          code: error?.code,
-          name: error?.name
-        }
-      })
+      error: 'Internal Server Error',
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }), { 
-      status: statusCode,
-      headers: {
-        ...COMMON_HEADERS,
-        'Retry-After': isNetworkError ? '30' : undefined,
-        'X-Request-ID': requestId,
-        'X-Error-ID': errorId,
-        'X-Error-Type': errorType
-      }
+      status: 500, 
+      headers: COMMON_HEADERS 
     });
   }
 }
