@@ -35,7 +35,7 @@ export const projects: Project[] = [
     images: ["/images/projects/hr1.png", "/images/projects/hr2.png", "/images/projects/hr3.png"],
     startDate: new Date('2025-04-19'),
     endDate: 'Present',
-    status: "active"
+    status: "on-hold"
   },
   {
     title: "MoviesDB",
