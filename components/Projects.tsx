@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight } from 'lucide-react';
+import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight, Flame } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -91,6 +91,7 @@ interface Project {
   github?: string;
   live?: string;
   documentation?: string;
+  blogPost?: string; // URL to related blog post
   images: string[];
   startDate: Date;
   endDate: Date | 'Present';
@@ -125,6 +126,7 @@ const calculateDuration = (startDate: Date, endDate: Date | 'Present'): string =
 };
 
 import { projects, type ProjectStatus } from '@/data/projects';
+import { InteractiveHoverButton } from './magicui/interactive-hover-button';
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -435,6 +437,22 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                 </motion.a>
               </div>
             )}
+            {project.blogPost && (
+              <div className="relative">
+                <motion.a
+                  href={project.blogPost}
+                  target="_self"
+                  rel="noopener noreferrer"
+                  className="inline-block text-gray-500 hover:text-orange-600 hover:fill-orange-600 dark:hover:text-orange-400 dark:hover:fill-orange-400 hover:scale-110 transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Read Blog Post"
+                >
+                  <Flame className="w-6 h-6" />
+                  <span className="sr-only">Blog Post</span>
+                </motion.a>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
@@ -491,11 +509,10 @@ const Projects = ({ showAll = false, maxItems = 3 }: ProjectsProps) => {
           
           {!showAll && projects.length > maxItems && (
             <div className="mt-12 text-center">
-              <Link href="/projects">
-                <Button className="group hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-300" variant="outline">
+              <Link className='bg-transparent hover:bg-transparent' href="/projects">
+                <InteractiveHoverButton>
                   View All Projects
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
+                </InteractiveHoverButton>
               </Link>
             </div>
           )}

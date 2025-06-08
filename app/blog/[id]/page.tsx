@@ -13,7 +13,7 @@ import SocialShare from '@/components/SocialShare';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import ConfirmationDialog from '@/components/ConfirmationDialog';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import { incrementViewCount, getViewCount } from '@/lib/views';

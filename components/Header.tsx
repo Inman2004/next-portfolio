@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, User, Home, Settings, Menu, X, BriefcaseBusiness, Rss, Mail, AppWindow, PencilLine, Flame, Handshake, User2 } from 'lucide-react';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { ThemeSwitcher } from './ThemeSwitcher';
+import { ThemeSwitcher } from './ui/ThemeSwitcher';
 import { cn } from '@/lib/utils';
 
 interface NavLink {

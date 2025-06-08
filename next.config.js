@@ -7,6 +7,16 @@ const nextConfig = {
     domains: [
       'res.cloudinary.com',
       'lh3.googleusercontent.com',
+      'm.media-amazon.com',
+      'resizing.flixster.com',
+      'www.peacocktv.com',
+      'images.justwatch.com'
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
     ],
   },
   

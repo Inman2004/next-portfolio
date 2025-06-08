@@ -14,6 +14,7 @@ import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
 import MusicPlayer from "@/components/MusicPlayer";
+import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
 
 export default function Home() {
   const { resolvedTheme } = useTheme();
@@ -49,7 +50,6 @@ export default function Home() {
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
-          <MusicPlayer />
           <Projects showAll={false} maxItems={3} />
           <Skills />
           <Experience />

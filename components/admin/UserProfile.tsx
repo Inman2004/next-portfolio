@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/ui/icons';
 import { Loader2, Save, Trash2, ArrowLeft } from 'lucide-react';
 
 type UserRole = 'ADMIN' | 'EDITOR' | 'AUTHOR' | 'USER';

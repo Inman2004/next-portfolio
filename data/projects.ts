@@ -7,6 +7,7 @@ export interface Project {
   github: string;
   live: string;
   documentation?: string;
+  blogPost?: string; // URL to related blog post
   images: string[];
   startDate: Date; // Start date of the project
   endDate: Date | 'Present'; // End date or 'Present' if ongoing
@@ -21,6 +22,7 @@ export const projects: Project[] = [
     github: "https://github.com/Inman2004/pneumoscan",
     live: "https://pneumoscan-b9wv.onrender.com/",
     documentation: "https://drive.google.com/file/d/1G96EUDJVgGnPs6g02pyMWWc8Y9SIrymR/view?usp=sharing",
+    blogPost: "https://rvinman2004.vercel.app/blog/yq2jOnFdljslBNQuAXBk",
     images: ["/images/projects/pneumoscan.png", "/images/projects/pneumoscan2.png", "/images/projects/pneumoscan3.png"],
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-05-30'),
@@ -77,7 +79,7 @@ export const projects: Project[] = [
     github: "https://github.com/Inman2004/slot-machine-js",
     live: "https://slot-machine-js.vercel.app",
     images: ["/images/projects/sl.png", "/images/projects/sl2.png", "/images/projects/sl3.png"],
-    startDate: new Date('2023-02-01'),
+    startDate: new Date('2023-03-01'),
     endDate: new Date('2023-03-31'),
     status: "abandoned"
   },

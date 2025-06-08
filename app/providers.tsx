@@ -5,7 +5,7 @@ import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
 import { AuthProvider } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import emailjs from '@emailjs/browser';
-import { ThemeProvider } from '@/components/ThemeProvider';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
 
 type ThemeProviderProps = {
   children: React.ReactNode;

@@ -567,7 +567,7 @@ export default function BlogPage() {
             {user ? (
               <Link 
                 href="/blog/new"
-                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors shadow-md hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium shadow-md hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Create Your First Post

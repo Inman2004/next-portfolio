@@ -234,12 +234,12 @@ export default function Hero() {
                 View My Work
               </motion.a>
               <motion.a
-                href="#contact"
+                href="/personal"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 border border-blue-500/30 dark:border-blue-500/30 rounded-lg text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white"
               >
-                Get in Touch
+                Get to know me
               </motion.a>
             </div>
 

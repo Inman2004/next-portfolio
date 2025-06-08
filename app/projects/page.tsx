@@ -11,13 +11,13 @@ export default function ProjectsPage() {
       <div className="max-w-7xl mx-auto">
       <div className="relative py-2 md:py-4">
             <span 
-              className="absolute inset-0 mx-auto flex items-center justify-center w-full blur-xl opacity-70 bg-gradient-to-r from-indigo-700 via-blue-500 to-purple-600 bg-clip-text text-5xl md:text-7xl font-extrabold text-transparent pointer-events-none"
+              className="absolute inset-0 mx-auto flex items-center justify-center w-full blur-xl opacity-70 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-5xl md:text-7xl font-extrabold text-transparent pointer-events-none"
               aria-hidden="true"
             >
               MyProjects
             </span>
             <h1 
-              className="relative z-10 text-4xl md:text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-400 dark:to-purple-500 p-2 text-center"
+              className="relative z-10 text-4xl md:text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 p-2 text-center"
             >
               My Projects
             </h1>
