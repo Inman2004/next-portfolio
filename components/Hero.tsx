@@ -124,7 +124,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center relative w-full mb-24 overflow-hidden"
+      className="min-h-screen flex items-center justify-center relative w-full overflow-hidden pt-16 pb-24 md:pt-24"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 w-full h-full">
@@ -134,8 +134,10 @@ export default function Hero() {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-12 pt-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-16 pt-8 lg:pt-12">
+          {/* Left Content - Text */}
+          <div className="w-full lg:max-w-[60%] xl:max-w-[60%]">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -160,7 +162,7 @@ export default function Hero() {
               </span>
             </h1>
 
-            <div className="text-lg sm:text-xl md:text-2xl text-indigo-700 dark:text-indigo-300 mb-8 h-[180px] flex items-center justify-center lg:justify-start">
+            <div className="text-lg sm:text-xl md:text-2xl text-indigo-700 dark:text-indigo-300 mb-8 min-h-[120px] flex items-center justify-center lg:justify-start">
               <MorphingText
                 texts={[
                   "UI/UX Designer",
@@ -224,12 +226,12 @@ export default function Hero() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
               <motion.a
                 href="#projects"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-medium hover:opacity-90 transition-all duration-300 shadow-lg shadow-blue-500/25 text-white text-center"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-base sm:text-lg font-medium hover:opacity-90 transition-all duration-300 shadow-lg shadow-blue-500/25 text-white text-center w-full sm:w-auto"
               >
                 View My Work
               </motion.a>
@@ -237,14 +239,14 @@ export default function Hero() {
                 href="/personal"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 border border-blue-500/30 dark:border-blue-500/30 rounded-lg text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white"
+                className="px-6 sm:px-8 py-3 sm:py-4 border border-blue-500/30 dark:border-blue-500/30 rounded-lg text-base sm:text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white w-full sm:w-auto"
               >
                 Get to know me
               </motion.a>
             </div>
 
             {/* Social Links */}
-            <div className="mt-12 flex items-center gap-6 justify-center lg:justify-start">
+            <div className="mt-8 sm:mt-10 flex items-center gap-4 sm:gap-6 justify-center lg:justify-start flex-wrap">
               <motion.a
                 href="https://github.com/Inman2004"
                 target="_blank"
@@ -283,21 +285,17 @@ export default function Hero() {
               </motion.a>
             </div>
           </motion.div>
+          </div>
 
-          {/* Right Content - 3D or Image Element */}
-          <motion.div
+          {/* Right Content - Image */}
+          <motion.div 
+            className="w-full lg:max-w-[40%] xl:max-w-[40%] flex justify-center lg:justify-end"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="flex flex-col items-center text-center space-y-6 mt-4"
           >
-            <motion.div 
-              className="relative w-full max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="relative w-full aspect-square group">
+            <div className="relative w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[420px] xl:max-w-[480px] mx-auto">
+              <div className="relative w-full aspect-square group mx-auto overflow-visible">
                 {/* Glow effect with animation */}
                 <motion.div 
                   className="absolute inset-0 rounded-full -z-10"
@@ -325,7 +323,7 @@ export default function Hero() {
                 <motion.div 
                   className="relative w-full h-full overflow-hidden border-2 border-blue-300/40 dark:border-blue-500/30 
                     shadow-[0_0_25px_-10px_rgba(99,102,241,0.2)] dark:shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)]
-                    bg-white/20 dark:bg-transparent backdrop-blur-sm"
+                    bg-white/20 dark:bg-transparent backdrop-blur-sm flex items-center justify-center"
                   initial={{ borderRadius: '50%' }}
                   whileHover={{
                     borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
@@ -371,7 +369,7 @@ export default function Hero() {
                       alt="Immanuvel"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover transition-all duration-1000 ease-out"
+                      className="object-cover w-full h-full transition-all duration-1000 ease-out"
                       priority
                       quality={90}
                       loading="eager"
@@ -446,59 +444,11 @@ export default function Hero() {
                   />
                 ))}
               </div>
-            </motion.div>
-            
-            <div className="space-y-2">
-              <motion.a 
-                className="text-purple-700 dark:text-purple-300 font-medium cursor-pointer hover:opacity-80 transition-opacity"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-                href="https://instagram.com/rv_imman"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                @rv_imman
-              </motion.a>
-              <div className="flex items-center justify-center gap-2 mt-1 sm:mt-0">
-                  <motion.span 
-                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/30 to-yellow-500/30 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-700 dark:text-amber-300 border border-yellow-500/40 dark:border-yellow-500/30 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 transition-all duration-300 hover:scale-105"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.9, duration: 0.5 }}
-                  >
-                    Author
-                  </motion.span>
-                  <motion.span 
-                    className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500/30 to-blue-500/30 dark:from-purple-500/20 dark:to-blue-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 dark:border-purple-500/30 shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.8, duration: 0.5 }}
-                  >
-                    Admin
-                  </motion.span>
-                </div>
-              <motion.p 
-                className="text-transparent bg-clip-text bg-gradient-to-t to-blue-600/90 from-gray-800/90 dark:to-blue-300/80 dark:from-gray-900/80 max-w-md text-sm sm:text-base px-4"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.5 }}
-                style={{ 
-                  fontFamily: 'var(--font-pacifico), cursive', 
-                  filter: 'contrast(0.9) brightness(1.1)',
-                  wordSpacing: '0.1em',
-                  letterSpacing: '0.01em'
-                }}
-              >
-                " Turn your dev journey into a movement—share, connect, and grow together. " 
-              </motion.p>
             </div>
           </motion.div>
         </div>
       </div>
-
+      
       {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
