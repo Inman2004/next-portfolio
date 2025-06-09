@@ -38,46 +38,71 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
 ): Promise<Array<T & EnrichedBlogPost>> => {
   if (!posts.length) return [];
   
-  // Get unique user IDs
-  const userIds = [...new Set(posts.map(post => post.authorId))];
-  
-  // Use enrichWithUserData which now supports real-time subscriptions
-  // We need to map the authorId to userId which is what enrichWithUserData expects
-  const postsWithUserId = posts.map(post => ({
-    ...post,
-    userId: post.authorId
-  })) as Array<T & { userId: string }>;
-  
-  const enrichedPosts = await enrichWithUserData(postsWithUserId, ['displayName', 'photoURL'], subscribe);
-  
-  // Map back to the original structure with proper typing
-  return enrichedPosts.map(post => {
-    const { userId, _userUnsubscribe, ...rest } = post as any;
+  try {
+    // Get unique user IDs
+    const userIds = [...new Set(posts.map(post => post.authorId).filter(Boolean))];
     
-    // Create a new user object with the data from the enriched post
-    const userData: BlogPostUserData = {
-      displayName: post.user?.displayName || post.author,
-      photoURL: post.user?.photoURL || post.authorPhotoURL
-    };
+    if (!userIds.length) {
+      console.warn('No valid user IDs found in posts');
+      return posts.map(post => ({
+        ...post,
+        author: post.author || 'Anonymous',
+        authorPhotoURL: post.authorPhotoURL || '',
+        user: {
+          displayName: post.author || 'Anonymous',
+          photoURL: post.authorPhotoURL || ''
+        }
+      })) as Array<T & EnrichedBlogPost>;
+    }
     
-    // Get the photo URL from either the user data or the post data
-    const photoURL = post.user?.photoURL || post.authorPhotoURL || '';
+    // Always fetch fresh user data to ensure we have the latest
+    const usersCollection = collection(db, 'users');
+    const usersQuery = query(usersCollection, where('__name__', 'in', userIds));
+    const usersSnapshot = await getDocs(usersQuery);
     
-    // Return the enriched post with the user data
-    const enrichedPost: T & EnrichedBlogPost = {
-      ...rest,
-      // Ensure author and authorPhotoURL are set from user data if available
-      author: userData.displayName || post.author || 'Anonymous',
-      // Make sure to use the photoURL from user data if available
-      authorPhotoURL: photoURL,
-      // Include the full user data
-      user: userData,
-      // Keep the unsubscribe function
-      _userUnsubscribe
-    };
+    const userDataMap = new Map<string, { displayName?: string; photoURL?: string }>();
     
-    return enrichedPost as T & EnrichedBlogPost;
-  });
+    usersSnapshot.forEach(doc => {
+      const data = doc.data();
+      userDataMap.set(doc.id, {
+        displayName: data.displayName,
+        photoURL: data.photoURL
+      });
+    });
+    
+    // Enrich each post with the latest user data
+    return posts.map(post => {
+      const userData = userDataMap.get(post.authorId) || {};
+      
+      // Always use the latest user data if available, otherwise fall back to post data
+      const displayName = userData.displayName || post.author || 'Anonymous';
+      const photoURL = userData.photoURL || post.authorPhotoURL || '';
+      
+      return {
+        ...post,
+        author: displayName,
+        authorPhotoURL: photoURL,
+        user: {
+          displayName,
+          photoURL
+        },
+        // Keep any existing unsubscribe function
+        _userUnsubscribe: (post as any)._userUnsubscribe
+      } as T & EnrichedBlogPost;
+    });
+  } catch (error) {
+    console.error('Error enriching blog posts:', error);
+    // Fallback to original data if there's an error
+    return posts.map(post => ({
+      ...post,
+      author: post.author || 'Anonymous',
+      authorPhotoURL: post.authorPhotoURL || '',
+      user: {
+        displayName: post.author || 'Anonymous',
+        photoURL: post.authorPhotoURL || ''
+      }
+    })) as Array<T & EnrichedBlogPost>;
+  }
 };
 
 /**

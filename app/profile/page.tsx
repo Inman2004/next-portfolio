@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProfileSettings from '@/components/ui/ProfileSettings';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -18,6 +18,35 @@ export default function ProfilePage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Get the best available photo URL
+  const getBestPhotoUrl = useCallback(() => {
+    if (!user) return '';
+    
+    // Check if we have a direct photoURL
+    if (user.photoURL) {
+      // If it's a Google photo URL, modify it to get a smaller version
+      if (user.photoURL.includes('googleusercontent.com')) {
+        // Try to get a smaller version of the Google profile picture
+        // by appending '=s96-c' to get a 96x96 pixel version
+        return user.photoURL.split('=')[0] + '=s256-c';
+      }
+      return user.photoURL;
+    }
+    
+    // Check provider data for photo URL
+    const provider = user.providerData?.find(p => p?.photoURL);
+    if (provider?.photoURL) {
+      if (provider.photoURL.includes('googleusercontent.com')) {
+        return provider.photoURL.split('=')[0] + '=s256-c';
+      }
+      return provider.photoURL;
+    }
+    
+    return '';
+  }, [user]);
+  
+  const photoUrl = getBestPhotoUrl();
 
   if (!isClient || loading) {
     return (
@@ -93,8 +122,22 @@ export default function ProfilePage() {
             <Card className="sticky top-8">
               <CardHeader className="items-center text-center">
                 <Avatar className="h-32 w-32 mb-4">
-                  <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                  <AvatarFallback className="text-2xl">
+                  <AvatarImage 
+                    src={photoUrl}
+                    alt={user.displayName || 'User'} 
+                    onError={(e) => {
+                      // If the image fails to load, try to fallback to initials
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (fallback) {
+                        fallback.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <AvatarFallback 
+                    className="text-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+                    style={{ display: photoUrl ? 'none' : 'flex' }}
+                  >
                     {getInitials(user.displayName || user.email)}
                   </AvatarFallback>
                 </Avatar>

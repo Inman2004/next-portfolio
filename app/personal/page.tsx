@@ -285,7 +285,7 @@ const Personel = () => {
                         fill 
                         className="object-cover" 
                         sizes="(max-width: 768px) 100vw, 33vw" 
-                        src="/images/anime-tnp.png" 
+                        src="/images/anime1-tnp.png" 
                         alt="Profile" 
                     />
                   </div>

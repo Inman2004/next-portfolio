@@ -6,19 +6,32 @@ import {
   UserCredential, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
   signOut, 
-  onAuthStateChanged, 
-  updateProfile,
-  GoogleAuthProvider,
-  signInWithPopup,
-  updateEmail as updateAuthEmail,
-  updatePassword as updateAuthPassword,
-  reauthenticateWithCredential,
+  updateProfile, 
+  updatePassword, 
+  reauthenticateWithCredential, 
   EmailAuthProvider,
+  onAuthStateChanged,
+  getAuth,
   Auth,
   User as FirebaseUser
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, DocumentData } from 'firebase/firestore';
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  updateDoc, 
+  serverTimestamp, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  writeBatch,
+  Firestore,
+  DocumentData
+} from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 // Extend the Firebase User type with our custom fields
@@ -142,6 +155,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
         (provider) => provider.providerId === 'google.com'
       );
       setIsGoogleUser(isGoogle);
+
+      // Get the primary provider data (usually the first one)
+      const primaryProvider = authUser.providerData[0];
+      
+      // Update photoURL from provider if available and not already set
+      if (primaryProvider?.photoURL && !processedUser.photoURL) {
+        processedUser = {
+          ...processedUser,
+          photoURL: primaryProvider.photoURL
+        };
+      }
       
       // Ensure user data is saved to Firestore
       try {
@@ -478,58 +502,168 @@ return unsubscribe;
     }
   };
 
+  // Function to update blog posts when user profile changes
+  const updateUserBlogPosts = async (userId: string, updates: { displayName?: string | null; photoURL?: string | null }) => {
+    if (!db) {
+      console.error('Firestore not initialized');
+      return;
+    }
+    
+    console.log('Starting updateUserBlogPosts for user:', userId, 'with updates:', updates);
+    
+    try {
+      // First, verify the user exists and has the expected fields
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (!userDoc.exists()) {
+        console.error('User document not found:', userId);
+        return;
+      }
+      
+      console.log('Found user document:', userDoc.data());
+      
+      // Find all blog posts by this user
+      const postsQuery = query(
+        collection(db, 'blogPosts'),
+        where('authorId', '==', userId)
+      );
+      
+      console.log('Querying for blog posts...');
+      const querySnapshot = await getDocs(postsQuery);
+      
+      if (querySnapshot.empty) {
+        console.log('No blog posts found for user:', userId);
+        return;
+      }
+      
+      console.log(`Found ${querySnapshot.size} blog posts to update`);
+      
+      const batch = writeBatch(db);
+      let updateCount = 0;
+      
+      querySnapshot.forEach((doc) => {
+        const postData = doc.data();
+        const postRef = doc.ref;
+        const postUpdates: Record<string, any> = {};
+        let needsUpdate = false;
+        
+        console.log('Processing post:', postData.title || postData.id);
+        
+        if (updates.displayName !== undefined && postData.author !== updates.displayName) {
+          console.log(`Updating author name from '${postData.author}' to '${updates.displayName}'`);
+          postUpdates['author'] = updates.displayName;
+          needsUpdate = true;
+        }
+        
+        if (updates.photoURL !== undefined && postData.authorPhotoURL !== updates.photoURL) {
+          console.log(`Updating author photo from '${postData.authorPhotoURL}' to '${updates.photoURL}'`);
+          postUpdates['authorPhotoURL'] = updates.photoURL;
+          needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+          postUpdates['updatedAt'] = serverTimestamp();
+          batch.update(postRef, postUpdates);
+          updateCount++;
+          console.log('Queued update for post:', doc.id, 'with updates:', postUpdates);
+        } else {
+          console.log('No updates needed for post:', doc.id);
+        }
+      });
+      
+      if (updateCount > 0) {
+        console.log(`Committing batch update for ${updateCount} posts...`);
+        await batch.commit();
+        console.log('Successfully updated blog posts');
+      } else {
+        console.log('No blog posts needed updating');
+      }
+    } catch (error) {
+      console.error('Error in updateUserBlogPosts:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+    }
+  };
+
   const updateUserProfile = async (profile: UpdateProfileParams): Promise<UpdateProfileResult> => {
     if (!user || !db) return { success: false, error: 'User not authenticated or database not initialized' };
     
     try {
+      const userRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+      
       // Prepare updates object with proper Firestore types
-      const updates: {
-        displayName?: string | null;
-        photoURL?: string | null;
-        username?: string;
-        updatedAt: any; // This will be set to serverTimestamp()
-      } = {
+      const updates: Record<string, any> = {
         updatedAt: serverTimestamp()
       };
       
       // Prepare auth profile updates
       const authUpdates: { displayName?: string | null; photoURL?: string | null } = {};
       
+      // Track if we need to update blog posts
+      const blogPostUpdates: { displayName?: string | null; photoURL?: string | null } = {};
+      
+      // Only add fields that are provided in the profile
       if (profile.displayName !== undefined) {
         updates.displayName = profile.displayName;
         authUpdates.displayName = profile.displayName;
+        blogPostUpdates.displayName = profile.displayName;
       }
       
       if (profile.photoURL !== undefined) {
         updates.photoURL = profile.photoURL;
         authUpdates.photoURL = profile.photoURL;
+        blogPostUpdates.photoURL = profile.photoURL;
       }
       
       if (profile.username !== undefined) {
-        updates.username = profile.username;
+        updates.username = profile.username.toLowerCase().replace(/[^a-z0-9]/g, '');
       }
       
-      try {
-        // Update Firebase Auth profile if there are auth updates
-        if (Object.keys(authUpdates).length > 0 && auth.currentUser) {
-          await updateProfile(auth.currentUser, authUpdates);
-        }
-        
-        // Update Firestore
-        const userRef = doc(db, 'users', user.uid);
+      // Update Firebase Auth profile if there are auth updates
+      if (Object.keys(authUpdates).length > 0 && auth.currentUser) {
+        await updateProfile(auth.currentUser, authUpdates);
+      }
+      
+      // If the document doesn't exist, create it with required fields
+      if (!userDoc.exists()) {
+        await setDoc(userRef, {
+          ...updates,
+          uid: user.uid,
+          email: user.email || null,
+          emailVerified: user.emailVerified || false,
+          role: 'user',
+          isActive: true,
+          createdAt: serverTimestamp(),
+          providerData: user.providerData?.map(pd => ({
+            providerId: pd.providerId,
+            uid: pd.uid || '',
+            displayName: pd.displayName || null,
+            email: pd.email || null,
+            photoURL: pd.photoURL || null
+          })) || []
+        });
+      } else {
+        // Update existing document
         await updateDoc(userRef, updates);
         
-        // Update local state
-        setUser({
-          ...user,
-          ...updates
-        } as AppUser);
-        
-        return { success: true };
-      } catch (error) {
-        console.error('Error updating user profile:', error);
-        throw error; // Re-throw to be caught by the outer catch
+        // Update blog posts if displayName or photoURL changed
+        if (Object.keys(blogPostUpdates).length > 0) {
+          await updateUserBlogPosts(user.uid, blogPostUpdates);
+        }
       }
+      
+      // Update local user state
+      setUser(prev => ({
+        ...prev!,
+        ...updates
+      }));
+      
+      return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error in updateUserProfile:', errorMessage);

@@ -10,6 +10,30 @@ import { app, db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
+// Utility function to extract public ID from Cloudinary URL
+const extractPublicId = (url: string): string | null => {
+  if (!url) return null;
+  
+  try {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/');
+    
+    // Find the index of 'upload' in the path
+    const uploadIndex = pathParts.findIndex(part => part === 'upload');
+    if (uploadIndex === -1) return null;
+    
+    // The public ID is everything after the version number (if present)
+    const publicIdWithExtension = pathParts.slice(uploadIndex + 2).join('/');
+    if (!publicIdWithExtension) return null;
+    
+    // Remove file extension if present
+    return publicIdWithExtension.split('.')[0];
+  } catch (e) {
+    console.error('Error parsing URL:', e);
+    return null;
+  }
+};
+
 const NewBlogPostPage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -20,6 +44,27 @@ const NewBlogPostPage = () => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Function to delete image from Cloudinary
+  const deleteImage = useCallback(async (imageUrl: string | null) => {
+    if (!imageUrl) return;
+    
+    const publicId = extractPublicId(imageUrl);
+    if (!publicId) return;
+    
+    try {
+      await fetch('/api/delete-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ publicId }),
+      });
+    } catch (error) {
+      console.error('Error deleting old image:', error);
+      // Continue with upload even if deletion fails
+    }
+  }, []);
 
   // Handle Firebase auth state
   useEffect(() => {
@@ -100,6 +145,9 @@ const NewBlogPostPage = () => {
           resourceType: 'image',
           clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
           maxFileSize: 5000000, // 5MB
+          folder: 'blog-covers',
+          publicId: coverImage ? extractPublicId(coverImage) : undefined,
+          overwrite: true,
           styles: {
             palette: {
               window: "#1E1E2D",
@@ -125,7 +173,7 @@ const NewBlogPostPage = () => {
             }
           }
         },
-        (error: any, result: any) => {
+        async (error: any, result: any) => {
           if (error) {
             console.error('Upload error details:', error);
             setError('Failed to upload image. ' + (error.message || 'Please try again.'));
@@ -134,9 +182,19 @@ const NewBlogPostPage = () => {
           }
 
           if (result.event === 'success') {
-            console.log('Upload successful:', result);
-            setCoverImage(result.info.secure_url);
-            setIsUploading(false);
+            try {
+              // Delete old image if it exists and is different from the new one
+              if (coverImage && coverImage !== result.info.secure_url) {
+                await deleteImage(coverImage);
+              }
+              
+              setCoverImage(result.info.secure_url);
+            } catch (err) {
+              console.error('Error handling image upload:', err);
+              // Don't fail the upload if cleanup fails
+            } finally {
+              setIsUploading(false);
+            }
           } else if (result.event === 'display-changed') {
             console.log('Widget display changed:', result);
           } else if (result.event === 'close') {
@@ -152,7 +210,7 @@ const NewBlogPostPage = () => {
       setError('Failed to initialize image uploader. ' + (err instanceof Error ? err.message : 'Please try again.'));
       setIsUploading(false);
     }
-  }, [isCloudinaryReady]);
+  }, [isCloudinaryReady, coverImage, deleteImage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,7 +255,7 @@ const NewBlogPostPage = () => {
       
       console.log('Creating post with data:', newPost);
       
-      const docRef = await addDoc(collection(db, 'blog-posts'), newPost);
+      const docRef = await addDoc(collection(db, 'blogPosts'), newPost);
       
       toast.success('Post created successfully!');
       router.push(`/blog/${docRef.id}`);

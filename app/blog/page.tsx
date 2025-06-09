@@ -2,20 +2,20 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatDate } from '@/lib/utils';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app, db } from '@/lib/firebase';
 import { getBlogPosts, enrichBlogPosts, cleanupBlogPostSubscriptions } from '@/lib/blogUtils';
-import { collection, query, where, orderBy, onSnapshot, DocumentData, Timestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, startAfter, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
 import { Eye, Clock, Calendar, Search, Filter, X, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight, Loader } from 'lucide-react';
 import { BlogLoadingSkeleton } from '@/components/ui/blog-loading-skeleton';
 import { formatNumber } from '@/lib/formatNumber';
 import { toast } from 'react-hot-toast';
 import type { BlogPost, EnrichedBlogPost, BlogPostUserData } from '@/types/blog';
-import { getViewCount, getViewCounts } from '@/lib/views';
+import { getViewCounts } from '@/lib/views';
 import { deleteBlogPost } from '@/app/actions/blog';
 import dynamic from 'next/dynamic';
 
@@ -31,17 +31,23 @@ export default function BlogPage() {
   // State declarations at the top
   const [posts, setPosts] = useState<EnrichedBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
   const router = useRouter();
   const auth = getAuth(app);
+  const postsPerPage = 9; // Number of posts to load per page
   
   // Track current posts for cleanup
   const currentPostsRef = useRef<EnrichedBlogPost[]>([]);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   
   // Handle authentication state changes and admin check
   useEffect(() => {
@@ -92,31 +98,27 @@ export default function BlogPage() {
   const sortedPosts = useMemo(() => {
     const postsToSort = [...posts];
     
-    switch (sortBy) {
-      case 'newest':
-        return postsToSort.sort((a: BlogPost, b: BlogPost) => {
+    return postsToSort.sort((a: BlogPost, b: BlogPost) => {
+      switch (sortBy) {
+        case 'newest':
           const dateA = a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
           const dateB = b.createdAt instanceof Date ? b.createdAt : b.createdAt.toDate();
           return dateB.getTime() - dateA.getTime();
-        });
-        
-      case 'oldest':
-        return postsToSort.sort((a: BlogPost, b: BlogPost) => {
-          const dateA = a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
-          const dateB = b.createdAt instanceof Date ? b.createdAt : b.createdAt.toDate();
-          return dateA.getTime() - dateB.getTime();
-        });
-        
-      case 'popular':
-        return postsToSort.sort((a: BlogPost, b: BlogPost) => {
+          
+        case 'oldest':
+          const dateAO = a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
+          const dateBO = b.createdAt instanceof Date ? b.createdAt : b.createdAt.toDate();
+          return dateAO.getTime() - dateBO.getTime();
+          
+        case 'popular':
           const viewsA = viewCounts[a.id || ''] || 0;
           const viewsB = viewCounts[b.id || ''] || 0;
           return viewsB - viewsA;
-        });
-        
-      default:
-        return postsToSort;
-    }
+          
+        default:
+          return 0;
+      }
+    });
   }, [posts, sortBy, viewCounts]);
 
   // Check if user is admin
@@ -147,130 +149,162 @@ export default function BlogPage() {
     }
   }, [user]);
 
-  // Set up real-time subscription to blog posts
+  // Initial data load
+  const loadPosts = useCallback(async (initialLoad = false) => {
+    try {
+      if (initialLoad) {
+        setLoading(true);
+        setPosts([]);
+        setLastVisible(null);
+        setHasMore(true);
+      } else {
+        if (!lastVisible || !hasMore) return;
+        setLoadingMore(true);
+      }
+
+      setError(null);
+
+      // Create a query for published posts with pagination
+      let postsQuery = query(
+        collection(db, 'blogPosts'),
+        where('published', '==', true),
+        orderBy('createdAt', 'desc'),
+        limit(postsPerPage)
+      );
+
+      if (lastVisible && !initialLoad) {
+        postsQuery = query(postsQuery, startAfter(lastVisible));
+      }
+
+      const querySnapshot = await getDocs(postsQuery);
+      
+      // Update last visible document for pagination
+      if (querySnapshot.docs.length > 0) {
+        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      }
+      
+      // Check if there are more posts to load
+      if (querySnapshot.docs.length < postsPerPage) {
+        setHasMore(false);
+      }
+
+      const newPosts: BlogPost[] = [];
+      const postIds: string[] = [];
+
+      // Process each document
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const postId = doc.id;
+        postIds.push(postId);
+
+        const { title, content, author, authorId, excerpt, coverImage, published, tags } = 
+          data as Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>;
+
+        newPosts.push({
+          id: postId,
+          title,
+          content,
+          author,
+          authorId,
+          excerpt,
+          coverImage,
+          published,
+          tags,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : null
+        });
+      });
+
+      // Fetch view counts for the new posts
+      let counts: Record<string, number> = {};
+      try {
+        const viewCounts = await getViewCounts(postIds);
+        if (viewCounts) {
+          counts = viewCounts;
+        }
+      } catch (err) {
+        console.error('Error fetching view counts:', err);
+        postIds.forEach(id => counts[id] = 0);
+      }
+
+      // Enrich posts with user data
+      const enrichedPosts = await enrichBlogPosts(newPosts, false);
+      
+      // Update state
+      setPosts(prevPosts => {
+        // For initial load, replace all posts
+        if (initialLoad) return enrichedPosts as EnrichedBlogPost[];
+        // For pagination, append new posts
+        return [...prevPosts, ...(enrichedPosts as EnrichedBlogPost[])];
+      });
+      
+      setViewCounts(prev => ({
+        ...prev,
+        ...counts
+      }));
+      
+      // Clean up old subscriptions if this is a refresh
+      if (initialLoad && currentPostsRef.current.length > 0) {
+        cleanupBlogPostSubscriptions(currentPostsRef.current);
+      }
+      
+      // Update current posts ref
+      currentPostsRef.current = initialLoad 
+        ? enrichedPosts as EnrichedBlogPost[] 
+        : [...currentPostsRef.current, ...(enrichedPosts as EnrichedBlogPost[])];
+      
+    } catch (err) {
+      console.error('Error loading posts:', err);
+      setError('Failed to load blog posts. Please refresh the page to try again.');
+      toast.error('Failed to load blog posts');
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [lastVisible, hasMore]);
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    if (!hasMore || loading || loadingMore) return;
+    
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        loadPosts(false);
+      }
+    };
+
+    if (loadMoreRef.current) {
+      observer.current = new IntersectionObserver(observerCallback, {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0.1,
+      });
+
+      observer.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [hasMore, loading, loadingMore, loadPosts]);
+
+  // Initial load
   useEffect(() => {
     const authUnsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
+      // Only load posts after auth state is determined
+      loadPosts(true);
     });
 
-    // Set loading state
-    setLoading(true);
-    setError(null);
-
-    // Create a query for published posts
-    const postsQuery = query(
-      collection(db, 'blogPosts'),
-      where('published', '==', true),
-      orderBy('createdAt', 'desc')
-    );
-
-    // Subscribe to real-time updates
-    const unsubscribe = onSnapshot(
-      postsQuery,
-      async (snapshot) => {
-        try {
-          const postsData: BlogPost[] = [];
-          const counts: Record<string, number> = {};
-          
-          // First, collect all post IDs for batch view count fetch
-          const postIds = snapshot.docs.map(doc => doc.id);
-          
-          // Fetch all view counts in a single batch
-          try {
-            console.log('Fetching view counts for post IDs:', postIds);
-            const viewCounts = await getViewCounts(postIds);
-            console.log('Received view counts:', viewCounts);
-            
-            if (!viewCounts) {
-              console.error('Error: getViewCounts returned undefined or null');
-              postIds.forEach(id => counts[id] = 0);
-            } else {
-              Object.assign(counts, viewCounts);
-              console.log('Updated counts object:', counts);
-            }
-          } catch (err) {
-            console.error('Error fetching view counts:', err);
-            // Initialize all counts to 0 if there's an error
-            postIds.forEach(id => counts[id] = 0);
-          }
-          
-          // Process each document
-          const processPosts = async () => {
-            // Clean up previous subscriptions before creating new ones
-            if (currentPostsRef.current.length > 0) {
-              cleanupBlogPostSubscriptions(currentPostsRef.current);
-            }
-            
-            const newPosts: EnrichedBlogPost[] = [];
-            
-            for (const doc of snapshot.docs) {
-              const data = doc.data();
-              const postId = doc.id;
-              
-              // Get required fields with proper types
-              const { title, content, author, authorId, excerpt, coverImage, published, tags } = data as Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>;
-              
-              // Convert Firestore timestamps to Date objects
-              const postData: BlogPost = {
-                id: postId,
-                title,
-                content,
-                author,
-                authorId,
-                excerpt,
-                coverImage,
-                published,
-                tags,
-                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
-                updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : null
-              };
-              
-              postsData.push(postData);
-            }
-            
-            // Enrich posts with user data and subscribe to updates
-            const enrichedPosts = await enrichBlogPosts(postsData, true);
-            
-            // Update current posts for cleanup
-            currentPostsRef.current = enrichedPosts as EnrichedBlogPost[];
-            
-            // Use the already enriched posts directly
-            const mappedPosts = enrichedPosts as EnrichedBlogPost[];
-            
-            // Update state with new posts and view counts
-            setPosts(mappedPosts);
-            setViewCounts(prev => ({
-              ...prev,
-              ...counts
-            }));
-          };
-          
-          await processPosts();
-          
-        } catch (err) {
-          console.error('Error processing posts:', err);
-          setError('Failed to process blog posts. Please refresh the page to try again.');
-          toast.error('Failed to process blog posts');
-        } finally {
-          setLoading(false);
-        }
-      },
-      (error) => {
-        console.error('Error subscribing to posts:', error);
-        setError('Failed to load blog posts. Please refresh the page to try again.');
-        toast.error('Failed to load blog posts');
-        setLoading(false);
-      }
-    );
-
-    // Cleanup function
     return () => {
-      // Clean up all subscriptions
+      authUnsubscribe();
+      // Clean up subscriptions when component unmounts
       if (currentPostsRef.current.length > 0) {
         cleanupBlogPostSubscriptions(currentPostsRef.current);
       }
-      unsubscribe();
-      authUnsubscribe();
     };
   }, []);
 
@@ -384,6 +418,62 @@ export default function BlogPage() {
     });
   };
 
+  const handleDeletePost = (postId: string, postTitle: string) => {
+    toast(
+      (t) => (
+        <div className="p-4">
+          <p className="font-medium mb-3">Delete "{postTitle}"?</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">This action cannot be undone.</p>
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  if (!user) return;
+                  setDeletingId(postId);
+                  const result = await deleteBlogPost(postId, user.uid);
+                  
+                  if (result.success) {
+                    toast.success('Post deleted successfully', { id: 'delete-success' });
+                    // Remove the deleted post from the UI
+                    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+                    toast.dismiss(t.id);
+                  } else {
+                    throw new Error(result.error || 'Failed to delete post');
+                  }
+                } catch (error) {
+                  console.error('Error deleting post:', error);
+                  toast.error(error instanceof Error ? error.message : 'Failed to delete post', { id: 'delete-error' });
+                } finally {
+                  setDeletingId(null);
+                }
+              }}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+              disabled={deletingId === postId}
+            >
+              {deletingId === postId ? (
+                <span className="flex items-center">
+                  <Loader className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  Deleting...
+                </span>
+              ) : 'Delete'}
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        id: 'delete-confirmation',
+        duration: 10000, // 10 seconds
+        position: 'bottom-center',
+      }
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen pt-24 px-6">
@@ -431,10 +521,10 @@ export default function BlogPage() {
           </button>
         )}
       </div>
-      
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
       {/* Hero Section */}
       <div className="relative overflow-hidden py-20 md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
+
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className="relative">
             <motion.span 
@@ -470,8 +560,8 @@ export default function BlogPage() {
               </span>
             </h1>
           </motion.div>
-        </div>
-      
+       
+      </div>
 
       {/* Blog Content */}
       <div className="container mx-auto px-4 py-8 pb-20 max-w-7xl">
@@ -589,158 +679,189 @@ export default function BlogPage() {
         {/* Posts Grid */}
         {!loading && sortedPosts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedPosts.map((post, index) => {
-              const postId = post.id || '';
-              const viewCount = viewCounts[postId] || 0;
-              
-              return (
-                <motion.article
-                  key={postId}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-                  className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-500/30 ${
-                    post.isAdmin 
-                      ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 hover:!shadow-amber-500/30 dark:hover:!shadow-amber-500/30' 
-                      : 'border-gray-200/70 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
-                  }`}
-                >
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                    {post.isAdmin && (
-                      <div className="bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-gray-200 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700 flex items-center backdrop-blur-sm">
-                        <Crown className="w-3 h-3 mr-1.5 text-gray-600 dark:text-gray-400" />
-                        Admin
-                      </div>
-                    )}
-                    {isAdmin && (
-                      <button
-                        onClick={(e) => handleDelete(postId, e)}
-                        disabled={deletingId === postId}
-                        className="p-1.5 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                        aria-label="Delete post"
-                      >
-                        {deletingId === postId ? (
-                          <Loader className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-3.5 h-3.5" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                  <Link href={`/blog/${postId}`} className="flex flex-col h-full">
-                    {/* Cover Image */}
-                    <div className={`h-48 relative overflow-hidden ${
+            <AnimatePresence>
+              {sortedPosts.map((post, index) => {
+                const postId = post.id || '';
+                const viewCount = viewCounts[postId] || 0;
+                
+                return (
+                  <motion.article
+                    key={postId}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
+                    className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-500/30 ${
                       post.isAdmin 
-                        ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30' 
-                        : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30'
-                    }`}>
-                      {post.coverImage ? (
-                        <Image 
-                          src={post.coverImage} 
-                          alt={post.title}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
-                          <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
+                        ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 hover:!shadow-amber-500/30 dark:hover:!shadow-amber-500/30' 
+                        : 'border-gray-200/70 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                      {post.isAdmin && (
+                        <div className="bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-gray-200 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700 flex items-center backdrop-blur-sm">
+                          <Crown className="w-3 h-3 mr-1.5 text-gray-600 dark:text-gray-400" />
+                          Admin
                         </div>
                       )}
-                      <div className={`absolute inset-0 bg-gradient-to-t ${
-                        post.isAdmin 
-                          ? 'from-amber-900/80 dark:from-amber-900/80' 
-                          : 'from-black/70 dark:from-black/70'
-                      } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                          post.isAdmin 
-                            ? 'bg-amber-400/90 hover:bg-amber-300 text-amber-900 dark:bg-yellow-500/90 dark:hover:bg-yellow-400/90 dark:text-yellow-900' 
-                            : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500/90 dark:hover:bg-blue-400/90'
-                        }`}>
-                          Read More
-                          <ArrowRight className="w-3.5 h-3.5 ml-1.5 -mr-0.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                        </span>
-                      </div>
+                      {isAdmin && (
+                        <button
+                          onClick={(e) => handleDelete(postId, e)}
+                          disabled={deletingId === postId}
+                          className="p-1.5 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                          aria-label="Delete post"
+                        >
+                          {deletingId === postId ? (
+                            <Loader className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      )}
                     </div>
-
-                    {/* Post Content */}
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="flex-1">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {post.title}
-                        </h2>
-                        {post.excerpt && (
-                          <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 prose prose-sm dark:prose-invert max-w-none">
-                            <MarkdownViewer content={post.excerpt} />
+                    <Link href={`/blog/${postId}`} className="flex flex-col h-full">
+                      {/* Cover Image */}
+                      <div className={`h-48 relative overflow-hidden ${
+                        post.isAdmin 
+                          ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30' 
+                          : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30'
+                      }`}>
+                        {post.coverImage ? (
+                          <div className="relative w-full h-full">
+                            <Image 
+                              src={post.coverImage} 
+                              alt={post.title}
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              priority={index < 3} // Only preload first 3 images
+                              loading={index > 2 ? 'lazy' : undefined}
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                            <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                           </div>
                         )}
+                        <div className={`absolute inset-0 bg-gradient-to-t ${
+                          post.isAdmin 
+                            ? 'from-amber-900/80 dark:from-amber-900/80' 
+                            : 'from-black/70 dark:from-black/70'
+                        } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                            post.isAdmin 
+                              ? 'bg-amber-400/90 hover:bg-amber-300 text-amber-900 dark:bg-yellow-500/90 dark:hover:bg-yellow-400/90 dark:text-yellow-900' 
+                              : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500/90 dark:hover:bg-blue-400/90'
+                          }`}>
+                            Read More
+                            <ArrowRight className="w-3.5 h-3.5 ml-1.5 -mr-0.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                          </span>
+                        </div>
                       </div>
-                      
-                      {/* Post Meta */}
-                      <div className="mt-4 pt-4 border-t border-gray-200/70 dark:border-gray-700/50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            {(post.authorPhotoURL || post.user?.photoURL) ? (
-                              <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2.5 border border-gray-200/50 dark:border-gray-600/50">
-                                <Image 
-                                  src={(post.authorPhotoURL || post.user?.photoURL) as string} 
-                                  alt={post.author || 'Author'} 
-                                  width={32} 
-                                  height={32}
-                                  className="object-cover w-full h-full"
-                                  onError={(e) => {
-                                    // Fallback to initials if image fails to load
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                    const fallback = target.parentElement?.querySelector('.avatar-fallback') as HTMLElement;
-                                    if (fallback) fallback.style.display = 'flex';
-                                  }}
-                                />
-                                <div className="avatar-fallback hidden w-full h-full bg-blue-600 items-center justify-center text-white font-bold">
+
+                      {/* Post Content */}
+                      <div className="p-6 flex-1 flex flex-col">
+                        <div className="flex-1">
+                          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {post.title}
+                          </h2>
+                          {post.excerpt && (
+                            <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 prose prose-sm dark:prose-invert max-w-none">
+                              <MarkdownViewer content={post.excerpt} />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Post Meta */}
+                        <div className="mt-4 pt-4 border-t border-gray-200/70 dark:border-gray-700/50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              {(post.authorPhotoURL || post.user?.photoURL) ? (
+                                <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2.5 border border-gray-200/50 dark:border-gray-600/50">
+                                  <Image 
+                                    src={(post.authorPhotoURL || post.user?.photoURL) as string} 
+                                    alt={post.author || 'Author'} 
+                                    width={32} 
+                                    height={32}
+                                    className="object-cover w-full h-full"
+                                    onError={(e) => {
+                                      // Fallback to initials if image fails to load
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const fallback = target.parentElement?.querySelector('.avatar-fallback') as HTMLElement;
+                                      if (fallback) fallback.style.display = 'flex';
+                                    }}
+                                  />
+                                  <div className="avatar-fallback hidden w-full h-full bg-blue-600 items-center justify-center text-white font-bold">
+                                    {post.author?.charAt(0)?.toUpperCase() || 'A'}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2.5 shadow-sm">
                                   {post.author?.charAt(0)?.toUpperCase() || 'A'}
                                 </div>
-                              </div>
-                            ) : (
-                              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2.5 shadow-sm">
-                                {post.author?.charAt(0)?.toUpperCase() || 'A'}
-                              </div>
-                            )}
-                            <div>
-                              {post.username ? (
-                                <Link 
-                                  href={`/users/${post.username}`}
-                                  className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                >
-                                  {post.author || 'Anonymous'}
-                                </Link>
-                              ) : (
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {post.author || 'Anonymous'}
-                                </p>
                               )}
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {formatCreatedAt(post.createdAt)}
-                              </p>
+                              <div>
+                                {post.username ? (
+                                  <Link 
+                                    href={`/users/${post.username}`}
+                                    className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                  >
+                                    {post.author || 'Anonymous'}
+                                  </Link>
+                                ) : (
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                    {post.author || 'Anonymous'}
+                                  </p>
+                                )}
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {formatCreatedAt(post.createdAt)}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-                            <Eye className="w-4 h-4 mr-1.5 opacity-70" />
-                            <span className="font-medium">{formatNumber(viewCount)}</span>
+                            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+                              <Eye className="w-4 h-4 mr-1.5 opacity-70" />
+                              <span className="font-medium">{formatNumber(viewCount)}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </motion.article>
-              );
-            })}
+                    </Link>
+                  </motion.article>
+                );
+              })}
+            </AnimatePresence>
+            
+            {/* Loading indicator for infinite scroll */}
+            {loadingMore && (
+              <div className="col-span-full flex justify-center py-8">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+            
+            {/* Intersection observer target */}
+            <div ref={loadMoreRef} className="h-1 w-full col-span-full" />
+            
+            {!loadingMore && !hasMore && sortedPosts.length > 0 && (
+              <div className="col-span-full text-center py-6 text-gray-500 dark:text-gray-400">
+                <Image
+                  src="/images/ui/bad.png"
+                  alt="No posts found"
+                  width={150}
+                  height={150}
+                  className="mx-auto opacity-50"
+                />
+                <p>No more posts</p>
+              </div>
+            )}
           </div>
-        )}
+        )} 
       </div>
-    </div>
+      </div>
     </div>
   );
 }
