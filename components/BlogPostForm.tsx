@@ -288,7 +288,7 @@ export default function BlogPostForm({
                 croppingAspectRatio: 16 / 9,
                 showSkipCropButton: false,
                 singleUploadAutoClose: true,
-                folder: 'blog-covers', // Optional: Organize uploads in a folder
+                // The folder is now set in the upload preset settings
                 theme: 'minimal',
                 styles: {
                   palette: {

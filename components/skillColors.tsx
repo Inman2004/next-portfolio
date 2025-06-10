@@ -49,6 +49,8 @@ export const getTechColor = (tech: string): TechColor => {
   if (techLower.includes('aws')) return { bg: 'bg-yellow-500/15', text: 'text-yellow-600 dark:text-yellow-400', gradient: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500 dark:border-yellow-400', hover: 'hover:bg-yellow-500/20' };
   if (techLower.includes('llm')) return { bg: 'bg-sky-500/15', text: 'text-sky-600 dark:text-sky-400', gradient: 'from-sky-500 to-sky-600', border: 'border-sky-500 dark:border-sky-400', hover: 'hover:bg-sky-500/20' };
   
+  // Misc
+  if (techLower.includes('blender')) return { bg: 'bg-orange-500/15', text: 'text-gray-900 dark:text-gray-100', gradient: 'from-orange-500 to-orange-600', border: 'border-orange-500 dark:border-orange-400', hover: 'hover:bg-orange-500/20' };
   // Default
   return { bg: 'bg-gray-500/15', text: 'text-gray-600 dark:text-gray-400', gradient: 'from-gray-500 to-gray-600', border: 'border-gray-500 dark:border-gray-400', hover: 'hover:bg-gray-500/20' };
 };

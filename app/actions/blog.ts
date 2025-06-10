@@ -1,7 +1,7 @@
 
 'use server';
 
-import { deleteDoc, doc, getDoc, getFirestore } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, getFirestore, runTransaction } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { revalidatePath } from 'next/cache';
@@ -56,37 +56,50 @@ export async function deleteBlogPost(postId: string, currentUserId?: string) {
       throw new Error('You are not authorized to delete this post');
     }
     
-    // Only delete the image if the current user is the author or an admin
-    if (postData.coverImage && (isAuthor || isUserAdmin)) {
-      try {
-        await deleteImageFromCloudinary(postData.coverImage);
-      } catch (error) {
-        console.warn('Failed to delete image from Cloudinary:', error);
-        // Continue with post deletion even if image deletion fails
-      }
-    }
-
-    // Delete the post from Firestore
-    await deleteDoc(postRef);
-    
-    // Delete the post's view count
     try {
-      const viewRef = doc(getgetgetDb, 'post_views', postId);
-      await deleteDoc(viewRef);
+      // Start a transaction to ensure atomic deletion of post and its view count
+      await runTransaction(db, async (transaction) => {
+        // Verify the post still exists and user is still authorized
+        const freshPost = await transaction.get(postRef);
+        if (!freshPost.exists()) {
+          throw new Error('Post not found');
+        }
+        
+        // Delete the post document
+        transaction.delete(postRef);
+        
+        // Delete the view count document
+        const viewRef = doc(db, 'post_views', postId);
+        transaction.delete(viewRef);
+      });
+      
+      // Only delete the image if the current user is the author or an admin
+      // Do this outside the transaction since it's an external service
+      if (postData.coverImage && (isAuthor || isUserAdmin)) {
+        try {
+          await deleteImageFromCloudinary(postData.coverImage);
+        } catch (error) {
+          console.warn('Failed to delete image from Cloudinary:', error);
+          // Continue even if image deletion fails
+        }
+      }
+      
+      revalidatePath('/blog');
+      revalidatePath(`/blog/${postId}`);
+      
+      return { success: true };
     } catch (error) {
-      console.warn('Failed to delete view count:', error);
-      // Continue even if view count deletion fails
+      console.error('Error deleting post:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to delete post' 
+      };
     }
-    
-    revalidatePath('/blog');
-    revalidatePath(`/blog/${postId}`);
-    
-    return { success: true };
   } catch (error) {
-    console.error('Error deleting post:', error);
+    console.error('Error in deleteBlogPost:', error);
     return { 
       success: false, 
-      error: error instanceof Error ? error.message : 'Failed to delete post' 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
     };
   }
 }

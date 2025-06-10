@@ -1,10 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BriefcaseBusiness, ExternalLink, MapPin, Calendar, ChevronDown, Loader2 } from 'lucide-react';
+import { Briefcase, Calendar, Clock, Code, ExternalLink, MapPin, X, CheckCircle2, ChevronDown, ChevronRight, Loader2, FileSearch, FileCheck2 } from 'lucide-react';
 import { SkillBadge } from '@/components/skillColors';
 import Image from 'next/image';
-import { ExperienceType } from '@/data/experiences';
+import { ExperienceType, ExperienceStatus } from '@/data/experiences';
+import { useState, useEffect } from 'react';
+import { fetchExperiences } from '@/lib/api';
 
 // Define the API response type
 interface ApiResponse {
@@ -16,10 +18,98 @@ interface ApiResponse {
     sheetUrl: string;
   };
 }
-import { useState, useEffect } from 'react';
-import { fetchExperiences } from '@/lib/api';
 
-const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean }) => {
+type ExperienceCardProps = {
+  exp: ExperienceType;
+  isLast: boolean;
+};
+
+const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
+  console.log('Rendering ExperienceCard with:', {
+    id: exp.id,
+    company: exp.company,
+    status: exp.status,
+    hasStatus: 'status' in exp,
+    exp: JSON.stringify(exp, null, 2)
+  });
+  // Format status for display
+  const formatStatus = (status: ExperienceStatus): string => {
+    return status
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+  
+  // Get status badge color and icon
+  const getStatusBadgeProps = (status: ExperienceStatus, index: number, total: number) => {
+    const base = {
+      className: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium',
+      icon: null as React.ReactNode,
+      text: formatStatus(status),
+      isFirst: index === 0,
+      isLast: index === total - 1
+    };
+
+    let statusProps;
+    
+    switch (status) {
+      case 'working':
+        statusProps = {
+          className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+          icon: <CheckCircle2 className="w-3 h-3" />
+        };
+        break;
+      case 'interview':
+        statusProps = {
+          className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+          icon: <FileSearch className="w-3 h-3" />
+        };
+        break;
+      case 'issued_offer':
+        statusProps = {
+          className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+          icon: <FileCheck2 className="w-3 h-3" />
+        };
+        break;
+      case 'joined':
+        statusProps = {
+          className: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
+          icon: <Briefcase className="w-3 h-3" />
+        };
+        break;
+      case 'freelance':
+        statusProps = {
+          className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+          icon: <Code className="w-3 h-3" />
+        };
+        break;
+      case 'resigned':
+      case 'contract_ended':
+        statusProps = {
+          className: 'bg-gray-100/50 text-gray-800 dark:bg-gray-700/50 dark:text-gray-300/50',
+          icon: <X className="w-3 h-3" />
+        };
+        break;
+      default:
+        statusProps = {
+          className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+          icon: <Clock className="w-3 h-3" />
+        };
+    }
+
+    return {
+      ...base,
+      ...statusProps,
+      className: `${base.className} ${statusProps.className} relative`,
+      // Add arrow connector after each status except the last one
+      connector: index < total - 1 ? (
+        <div className="relative h-full flex items-center px-1">
+          <div className="w-2 h-px bg-gray-300 dark:bg-gray-600"></div>
+          <ChevronRight className="w-3 h-3 text-gray-400 dark:text-gray-500 -ml-1 flex-shrink-0" />
+        </div>
+      ) : null
+    };
+  };
   // Function to render the company logo or fallback
   const renderLogo = () => {
     // First try to use the logo URL if it exists and is valid
@@ -105,11 +195,30 @@ const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean 
               <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-100 dark:border-white/10">
                 {renderLogo()}
                 <div className="logo-fallback w-full h-full hidden items-center justify-center">
-                  <BriefcaseBusiness className="w-6 h-6 text-blue-500 dark:text-blue-400" />
+                  <Briefcase className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{exp.role}</h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{exp.role}</h3>
+                  <div className="flex items-center">
+                    {exp.status?.map((status, i, arr) => {
+                      const { className, icon, text, connector } = getStatusBadgeProps(status, i, arr.length);
+                      return (
+                        <div key={`${exp.id}-status-${i}`} className="flex items-center">
+                          <div 
+                            className={`${className} flex items-center gap-1`}
+                            title={text}
+                          >
+                            {icon}
+                            <span className="hidden sm:inline">{text}</span>
+                          </div>
+                          {connector}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
                 <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {exp.companyUrl ? (
                     <a 
@@ -140,9 +249,7 @@ const ExperienceCard = ({ exp, isLast }: { exp: ExperienceType; isLast: boolean 
               <span>{exp.startDate} - {exp.endDate}</span>
             </div>
             
-            <ChevronDown 
-              className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
-            />
+            <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
           </div>
           
           <motion.div 
@@ -187,10 +294,17 @@ export default function Experience() {
     const loadExperiences = async () => {
       try {
         setLoading(true);
+        console.log('Fetching experiences...');
         const data = await fetchExperiences();
         console.log('Fetched experiences:', data);
         
         if (Array.isArray(data) && data.length > 0) {
+          console.log('Setting experiences with data:', data.map(d => ({
+            id: d.id,
+            company: d.company,
+            status: d.status,
+            hasStatus: 'status' in d
+          })));
           setExperiences(data);
         } else {
           throw new Error('No experience data found');
@@ -236,7 +350,7 @@ export default function Experience() {
         <div className="relative">
           {loading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-gray-500 dark:text-gray-400" />
             </div>
           ) : error ? (
             <div className="text-center py-8 text-red-400">
