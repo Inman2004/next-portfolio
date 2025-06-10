@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Briefcase, Calendar, Clock, Code, ExternalLink, MapPin, X, CheckCircle2, ChevronDown, ChevronRight, Loader2, FileSearch, FileCheck2 } from 'lucide-react';
+import { Briefcase, Calendar, Clock, ExternalLink, MapPin, X, CheckCircle2, ChevronDown, ChevronRight, Loader2, FileSearch, FileCheck2, CalendarCheck2, CalendarClock, Smile } from 'lucide-react';
 import { SkillBadge } from '@/components/skillColors';
 import Image from 'next/image';
 import { ExperienceType, ExperienceStatus } from '@/data/experiences';
@@ -71,16 +71,22 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
           icon: <FileCheck2 className="w-3 h-3" />
         };
         break;
+      case 'pending':
+        statusProps = {
+          className: 'bg-yellow-100 text-yellow-500 dark:bg-yellow-900/30 dark:text-yellow-300',
+          icon: <CalendarClock className="w-3 h-3" />
+        };
+        break;
       case 'joined':
         statusProps = {
           className: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
-          icon: <Briefcase className="w-3 h-3" />
+          icon: <CalendarCheck2 className="w-3 h-3" />
         };
         break;
       case 'freelance':
         statusProps = {
-          className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-          icon: <Code className="w-3 h-3" />
+          className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+          icon: <Smile className="w-3 h-3" />
         };
         break;
       case 'resigned':

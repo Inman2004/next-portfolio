@@ -1,15 +1,5 @@
-export type ExperienceStatus = 'interview' | 'issued_offer' | 'joined' | 'working' | 'resigned' | 'break' | 'contract_ended' | 'freelance';
+export type ExperienceStatus = 'interview' | 'issued_offer' | 'pending' | 'joined' | 'working' | 'resigned' | 'break' | 'contract_ended' | 'freelance';
 
-export const experienceStatuses: ExperienceStatus[] = [
-  'interview',
-  'issued_offer',
-  'joined',
-  'working',
-  'resigned',
-  'break',
-  'contract_ended',
-  'freelance'
-];
 
 export interface ExperienceType {
   id: number;
@@ -39,7 +29,7 @@ export const experiences: ExperienceType[] = [
       'Planning to start soon'
     ],
     skills: ['Next.js', 'React', 'Node.js', 'TypeScript', 'TailwindCSS', 'MongoDB', 'Docker', 'AWS', 'CI/CD', 'RESTful APIs'],
-    status: ['interview', 'issued_offer'],
+    status: ['interview', 'issued_offer', 'pending'],
   },
   {
     id: 2,
