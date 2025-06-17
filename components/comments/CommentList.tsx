@@ -301,6 +301,7 @@ const CommentListComponent = ({
               scrollbar-track-transparent hover:scrollbar-thumb-gray-500/50 
               dark:hover:scrollbar-thumb-gray-600/50 scrollbar-thumb-rounded-full
               transition-colors duration-200 scroll-smooth
+              p-4
             `}
             style={{ 
               minHeight: '300px',

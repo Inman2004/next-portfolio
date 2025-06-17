@@ -216,7 +216,7 @@ export function BottomNav() {
   }
 
   return (
-    <div className="fixed bottom-5 left-0 right-0 hidden md:flex flex-col items-center justify-center z-50">
+    <div className="fixed bottom-5 right-5 hidden md:flex flex-col items-center justify-center z-50">
       <TooltipProvider>
         <Dock direction="middle" className="bg-background/80 backdrop-blur-md border border-border/10 shadow-lg">
           {visibleNavItems.map((item) => (
@@ -229,7 +229,7 @@ export function BottomNav() {
                       aria-label={item.label}
                       className={cn(
                         buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full text-foreground hover:text-foreground/80",
+                        "size-12 rounded-full text-foreground hover:bg-foreground/10",
                         (pathname === item.href || 
                         (pathname?.startsWith('/blog') && item.href === '#blog')) ? 'text-primary' : '',
                         item.className

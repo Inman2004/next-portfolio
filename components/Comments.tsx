@@ -171,7 +171,7 @@ const Comments = () => {
   }
   
   // Define common classes
-  const containerClasses = 'max-w-3xl mx-auto px-4 py-8';
+  const containerClasses = 'max-w-5xl mx-auto px-4 py-8';
   const sectionTitleClasses = 'text-2xl font-bold text-gray-900 dark:text-white';
   const sortButtonClasses = 'flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800/50 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors';
   const sortOptionClasses = (isActive: boolean) => `w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${

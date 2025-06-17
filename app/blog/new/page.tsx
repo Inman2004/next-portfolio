@@ -338,7 +338,7 @@ const NewBlogPostPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="title" className="block text-sm font-medium text-foreground mb-2">
                 Title
                 <span className="text-red-400 ml-1">*</span>
               </label>
@@ -361,7 +361,7 @@ const NewBlogPostPage = () => {
               transition={{ delay: 0.35 }}
               className="space-y-2"
             >
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Cover Image
                 <span className="text-gray-500 text-xs ml-2">(Optional)</span>
               </label>
@@ -425,7 +425,7 @@ const NewBlogPostPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <label htmlFor="content" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="content" className="block text-sm font-medium text-foreground mb-2">
                 Content
                 <span className="text-red-400 ml-1">*</span>
               </label>
