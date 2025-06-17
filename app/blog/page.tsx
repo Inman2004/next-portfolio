@@ -503,7 +503,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       {/* Create Post Button - Floating */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed md:hidden flex bottom-6 right-6 z-50">
         {user ? (
           <Link
             href="/blog/new"
@@ -582,7 +582,7 @@ export default function BlogPage() {
           {user && (
             <Link
               href="/blog/new"
-              className="inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-xl hover:shadow-blue-700/50 shadow-blue-500/10 hover:-translate-y-0.5 transform transition-all duration-200"
+              className="hidden md:inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-xl hover:shadow-blue-700/50 shadow-blue-500/10 hover:-translate-y-0.5 transform transition-all duration-200"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Post

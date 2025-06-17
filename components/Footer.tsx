@@ -14,9 +14,9 @@ const Footer = () => {
 
   const navLinks = [
     { href: '#home', label: 'Home' },
-    { href: '#projects', label: 'Projects' },
+    { href: '/projects', label: 'Projects' },
+    { href: '/blog', label: 'Blog' },
     { href: '#contact', label: 'Contact' },
-    { href: '#experience', label: 'Experience' },
   ];
 
   return (

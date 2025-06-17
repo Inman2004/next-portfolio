@@ -257,7 +257,7 @@ export const CommentItem = memo(({
                 className="absolute -top-2 -right-2"
                 title="Liked by Admin"
               >
-                <Crown className="w-4 h-4 text-yellow-500" />
+                <Crown className="w-4 h-4 text-yellow-500 fill-current" />
               </motion.div>
             )}
           </div>

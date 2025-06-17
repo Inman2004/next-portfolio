@@ -255,7 +255,6 @@ const Comments = () => {
                 onVote={handleVote}
                 onDelete={handleDelete}
                 onPin={handlePin}
-                currentUser={user}
                 isAdmin={isAdmin}
                 onLoadMore={loadMoreComments}
                 hasMore={hasMore}
@@ -687,7 +686,6 @@ const Comments = () => {
             onVote={handleVote}
             onDelete={handleDelete}
             onPin={handlePin}
-            currentUser={user}
             isAdmin={isAdmin}
             onLoadMore={loadMoreComments}
             hasMore={hasMore}
