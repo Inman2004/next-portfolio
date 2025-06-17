@@ -181,8 +181,8 @@ const ProfileImageUpload = ({
       // First, delete the old profile image
       await deleteOldProfileImage(user.uid);
       
-      // Use a deterministic public_id based on user ID and place in profile-images folder
-      const publicId = `profile-images/${user.uid}`;
+      // Use user ID as public_id - the 'profile-images/' folder is set in the Cloudinary upload preset
+      const publicId = user.uid;
       const tags = ['profile', 'user-avatar'];
       const context = `user_id=${user.uid}|username=${user.displayName || 'user'}`;
       
@@ -212,6 +212,7 @@ const ProfileImageUpload = ({
       
       const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
       console.log('Sending upload request to Cloudinary...');
+      // First, upload the image
       const uploadResponse = await fetch(cloudinaryUrl, {
         method: 'POST',
         body: formData,
@@ -233,6 +234,35 @@ const ProfileImageUpload = ({
         console.error('Upload failed with status:', uploadResponse.status, uploadResponse.statusText);
         console.error('Error details:', result);
         throw new Error(`Upload failed: ${result?.error?.message || 'Unknown error'}`);
+      }
+      
+      // Handle pending status by polling for completion
+      if (result.status === 'pending' && result.public_id) {
+        console.log('Upload is pending, polling for completion...');
+        const maxAttempts = 10;
+        const delayMs = 1000;
+        
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+          console.log(`Polling attempt ${attempt}/${maxAttempts}...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          
+          const statusUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/resources/image/upload/${result.public_id}`;
+          const statusResponse = await fetch(statusUrl);
+          
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
+            console.log('Polling status:', statusData);
+            
+            if (statusData.secure_url || statusData.url) {
+              result = statusData;
+              break;
+            }
+          }
+          
+          if (attempt === maxAttempts) {
+            throw new Error('Image processing is taking too long. Please try again.');
+          }
+        }
       }
       
       // Make sure we have a valid secure_url or url
