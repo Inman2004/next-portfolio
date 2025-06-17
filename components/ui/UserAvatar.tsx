@@ -20,34 +20,76 @@ export function UserAvatar({
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    // Reset state when photoURL changes
+    setHasError(false);
+    
+    // If no photoURL or it's an empty string, use fallback
     if (!photoURL) {
+      console.log('No photoURL provided, using fallback');
       setHasError(true);
       return;
     }
     
-    // Reset error state when photoURL changes
-    setHasError(false);
+    // If photoURL is explicitly set to 'undefined' as a string, treat as no photo
+    if (photoURL === 'undefined') {
+      console.log('photoURL is string "undefined", using fallback');
+      setHasError(true);
+      return;
+    }
+    
+    let processedUrl = photoURL;
+    
+    try {
+      // If it's a Cloudinary URL, ensure it has the proper format
+      if (typeof photoURL === 'string' && photoURL.includes('cloudinary.com')) {
+        // Skip processing if it already has transformations or is a data URL
+        if (!photoURL.includes('upload/') && !photoURL.startsWith('data:')) {
+          const parts = photoURL.split('/upload/');
+          if (parts.length === 2) {
+            processedUrl = `${parts[0]}/upload/c_fill,g_face,w_400,h_400/${parts[1]}`;
+            console.log('Processed Cloudinary URL:', processedUrl);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error processing photoURL:', error);
+      setHasError(true);
+      return;
+    }
     
     // Create a test image to check if the URL is valid
     const testImg = new window.Image();
     
     const handleLoad = () => {
-      // If image loads successfully, use the high-res version
-      const highResUrl = photoURL.replace(/=s\d+-c$/, '=s400-c');
-      setImgSrc(highResUrl);
+      // If image loads successfully, use it
+      setImgSrc(processedUrl);
     };
     
     const handleError = () => {
-      // If high-res fails, try the original URL
-      console.log('High-res image failed, trying original URL');
-      setImgSrc(photoURL);
+      console.log('Image failed to load:', processedUrl);
+      setHasError(true);
     };
     
     testImg.onload = handleLoad;
     testImg.onerror = handleError;
     
-    // Start loading the test image
-    testImg.src = photoURL;
+    try {
+      // Check if the URL is valid before creating a URL object
+      if (!processedUrl || typeof processedUrl !== 'string' || !processedUrl.match(/^https?:\/\//)) {
+        throw new Error('Invalid URL format');
+      }
+      
+      // Add cache-busting parameter
+      const url = new URL(processedUrl);
+      url.searchParams.set('v', Date.now().toString());
+      
+      // Start loading the test image
+      testImg.src = url.toString();
+    } catch (error) {
+      console.error('Invalid image URL:', processedUrl, error);
+      setHasError(true);
+      return;
+    }
     
     return () => {
       // Cleanup
@@ -56,34 +98,66 @@ export function UserAvatar({
     };
   }, [photoURL]);
 
-  // If no photoURL or there was an error, show initial
-  if (!photoURL || hasError) {
+  // If there was an error or no valid photoURL, show initials
+  if (hasError || !photoURL || photoURL === 'undefined') {
+    const initials = (displayName || 'U').match(/\b\w/g)?.join('').toUpperCase() || 'U';
+    const fontSize = Math.min(size / 2, 48); // Scale font size based on avatar size
+    
     return (
       <div 
-        className={`rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center ${className}`}
-        style={{ width: `${size}px`, height: `${size}px` }}
+        className={`rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${className}`}
+        style={{ 
+          width: `${size}px`, 
+          height: `${size}px`,
+          fontSize: `${fontSize}px`,
+          fontWeight: 'bold'
+        }}
       >
-        <span className="text-3xl font-bold text-gray-500 dark:text-gray-300">
-          {(displayName || 'U')[0].toUpperCase()}
-        </span>
+        {initials.slice(0, 2)}
       </div>
     );
   }
 
   // If we have a valid image URL, use Next.js Image component
-  return (
-    <div className={`relative rounded-full overflow-hidden ${className}`}>
-      <Image
-        src={imgSrc || photoURL}
-        alt={displayName || 'User avatar'}
-        width={size}
-        height={size}
-        className="object-cover w-full h-full"
-        onError={() => {
-          console.log('Image component error, falling back to img element');
-          setHasError(true);
+  if (imgSrc) {
+    return (
+      <div 
+        className={`relative rounded-full overflow-hidden ${className}`}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          minWidth: `${size}px`,
+          minHeight: `${size}px`
         }}
-      />
+      >
+        <Image
+          src={imgSrc}
+          alt={displayName || 'User avatar'}
+          width={size}
+          height={size}
+          className="object-cover w-full h-full"
+          onError={() => setHasError(true)}
+          unoptimized={imgSrc.startsWith('blob:')}
+        />
+      </div>
+    );
+  }
+  
+  // Fallback to initials if imgSrc is not available yet
+  const initials = (displayName || 'U').match(/\b\w/g)?.join('').toUpperCase() || 'U';
+  const fontSize = Math.min(size / 2, 48);
+  
+  return (
+    <div 
+      className={`rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${className}`}
+      style={{ 
+        width: `${size}px`, 
+        height: `${size}px`,
+        fontSize: `${fontSize}px`,
+        fontWeight: 'bold'
+      }}
+    >
+      {initials.slice(0, 2)}
     </div>
   );
 }

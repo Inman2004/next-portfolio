@@ -1,473 +1,380 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useCallback, useState } from 'react';
+"use client";
+
+import { useState, useRef, useCallback, useEffect, ChangeEvent, DragEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Camera, User, Loader2 } from 'lucide-react';
+import { Camera, User, Loader2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { cloudinaryPresets, getFolderByPreset } from '@/lib/cloudinary';
 
 interface CloudinaryUploadResult {
-  event: string;
-  info: {
-    public_id: string;
-    secure_url: string;
-    [key: string]: any;
-  };
-}
-
-interface CloudinaryWidget {
-  open: () => void;
-  close: () => void;
-  update: (options: any) => void;
-  on: (event: string, callback: (error?: any, result?: any) => void) => void;
-}
-
-declare global {
-  interface Window {
-    cloudinary: {
-      createUploadWidget: (options: any, callback: (error: any, result: any) => void) => CloudinaryWidget;
-    };
-  }
+  secure_url: string;
+  public_id: string;
+  width: number;
+  height: number;
+  format: string;
+  resource_type: string;
+  created_at: string;
+  tags: string[];
+  bytes: number;
+  type: string;
+  etag: string;
+  url: string;
+  signature: string;
+  original_filename: string;
 }
 
 interface ProfileImageUploadProps {
   onImageUpdate?: () => void;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const ProfileImageUpload = ({ onImageUpdate }: ProfileImageUploadProps) => {
+const sizeClasses = {
+  sm: 'w-16 h-16',
+  md: 'w-32 h-32',
+  lg: 'w-48 h-48',
+};
+
+const ProfileImageUpload = ({
+  onImageUpdate,
+  className = '',
+  size = 'md',
+}: ProfileImageUploadProps) => {
   const { user, updateUserProfile } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
-  const [currentImage, setCurrentImage] = useState('');
-  
-  // Get the photo URL from user data or provider data
-  const getPhotoUrl = useCallback(() => {
-    if (!user) return '';
-    if (user.photoURL) return user.photoURL;
-    if (user.providerData && user.providerData.length > 0) {
-      return user.providerData[0]?.photoURL || '';
-    }
-    return '';
-  }, [user]);
-  
+  const [previewUrl, setPreviewUrl] = useState(user?.photoURL || '');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update preview URL when user's photoURL changes
   useEffect(() => {
-    setCurrentImage(getPhotoUrl());
-  }, [user, getPhotoUrl]);
-
-  // Function to extract public ID from Cloudinary URL
-  const extractPublicId = (url: string): string | null => {
-    if (!url) return null;
-    
-    try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/');
-      
-      // Find the index of 'upload' in the path
-      const uploadIndex = pathParts.findIndex(part => part === 'upload');
-      if (uploadIndex === -1) return null;
-      
-      // The public ID is everything after the version number (if present)
-      const publicIdWithExtension = pathParts.slice(uploadIndex + 2).join('/');
-      if (!publicIdWithExtension) return null;
-      
-      // Remove file extension if present
-      return publicIdWithExtension.split('.')[0];
-    } catch (e) {
-      console.error('Error parsing URL:', e);
-      return null;
+    console.log('User photoURL changed:', user?.photoURL);
+    if (user?.photoURL) {
+      // Add a timestamp to the URL to prevent caching issues
+      const timestamp = new Date().getTime();
+      const url = user.photoURL.includes('?') 
+        ? `${user.photoURL}&v=${timestamp}` 
+        : `${user.photoURL}?v=${timestamp}`;
+      console.log('Setting preview URL:', url);
+      setPreviewUrl(url);
+    } else {
+      console.log('No photoURL found for user');
+      setPreviewUrl('');
     }
-  };
+  }, [user?.photoURL]);
 
-  const handleUpload = useCallback(async () => {
-    setIsUploading(true);
-    if (typeof window === 'undefined' || !window.cloudinary) {
-      console.error('Cloudinary not available');
-      toast.error('Cloudinary uploader is not available');
-      setIsUploading(false);
-      return;
+  // Handle file selection via input
+  const handleFileInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
     }
+  }, []);
 
-    // Generate a unique signature for the upload
-    const timestamp = Math.round((new Date).getTime()/1000);
-    const preset = cloudinaryPresets.profile;
-    const folder = getFolderByPreset(preset);
-    
-    console.log('Starting upload with:', {
-      preset,
-      folder,
-      timestamp,
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      useSignedUploads: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_SIGNED
-    });
-    
-    // Get the upload signature from your API
-    const getSignature = async () => {
-      try {
-        const requestBody = {
-          timestamp,
-          preset,
-          folder,
-          transformation: 'c_fill,g_face,w_800,h_800',
-          tags: ['profile', 'user-avatar']
-        };
-        
-        console.log('Sending signature request:', requestBody);
-        
-        const response = await fetch('/api/cloudinary/sign-upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-        
-        const responseData = await response.json();
-        console.log('Received signature response:', {
-          status: response.status,
-          ok: response.ok,
-          data: responseData
-        });
-        
-        if (!response.ok) {
-          throw new Error(responseData.error || 'Failed to get upload signature');
-        }
-        
-        // Ensure we have all required fields
-        if (!responseData.signature || !responseData.timestamp || !responseData.api_key) {
-          throw new Error('Invalid signature response from server');
-        }
-        
-        return responseData;
-        
-      } catch (error) {
-        console.error('Error getting upload signature:', error);
-        toast.error('Failed to prepare upload: ' + (error instanceof Error ? error.message : 'Unknown error'));
-        return null;
-      }
-    };
-
+  // Handle file selection with validation
+  const handleFileSelect = useCallback(async (file: File) => {
     try {
-      // Always use signed uploads for security
-      const signatureData = await getSignature();
-      if (!signatureData) {
-        setIsUploading(false);
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
         return;
       }
 
-      // Prepare upload options with signature
-      const uploadOptions: any = {
-        cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-        uploadPreset: preset,
-        sources: ['local', 'camera'],
-        multiple: false,
-        cropping: true,
-        croppingAspectRatio: 1,
-        croppingShowDimensions: true,
-        croppingValidateDimensions: true,
-        croppingShowBackButton: true,
-        maxImageWidth: 2000,
-        maxImageHeight: 2000,
-        minImageWidth: 100,
-        minImageHeight: 100,
-        resourceType: 'image',
-        maxFiles: 1,
-        folder: folder,
-        // Add signature parameters - these must match exactly what was signed
-        api_key: signatureData.api_key,
-        timestamp: signatureData.timestamp.toString(),
-        signature: signatureData.signature,
-        // Additional parameters
-        context: `alt=Profile image`,
-        tags: 'profile,user-avatar',
-        // Transformation - must match what was signed
-        transformation: 'c_fill,g_face,w_800,h_800',
-        // Important: Set the upload signature explicitly
-        uploadSignature: signatureData.signature,
-        uploadSignatureTimestamp: signatureData.timestamp.toString(),
-        // Ensure we're using the correct API key
-        apiKey: signatureData.api_key,
-        // Add the exact parameters that were used to generate the signature
-        public_id: `profile-${Date.now()}`,
-        // Disable any automatic transformations that might affect the signature
-        invalidate: true,
-        eager: [],
-        eager_async: false,
-        eager_notification_url: null,
-        styles: {
-          palette: {
-            window: "#FFFFFF",
-            sourceBg: "#F4F4F5",
-            windowBorder: "#90A0B3",
-            tabIcon: "#000000",
-            inactiveTabIcon: "#555A5F",
-            menuIcons: "#555A5F",
-            link: "#000000",
-            action: "#000000",
-            inProgress: "#000000",
-            complete: "#000000",
-            error: "#000000",
-            textDark: "#000000",
-            textLight: "#FFFFFF"
-          },
-          fonts: {
-            default: null,
-            "sans-serif": {
-              url: null,
-              active: true
-            }
-          }
-        }
-      };
-
-      // Log the final upload options (without sensitive data)
-      const { api_key, signature: sig, uploadSignature, ...safeOptions } = uploadOptions;
-      console.log('Upload options:', {
-        ...safeOptions,
-        api_key: '***',
-        signature: '***',
-        uploadSignature: '***'
-      });
-
-      try {
-        // Create the widget
-        const widget = window.cloudinary.createUploadWidget(
-          uploadOptions,
-          (error: any, result: any) => {
-            console.log('Cloudinary widget callback:', { error, result });
-            
-            // Handle error case
-            if (error) {
-              console.error('Upload widget error:', {
-                name: error.name,
-                message: error.message,
-                stack: error.stack,
-                code: error.code,
-                status: error.status,
-                response: error.response,
-                ...error
-              });
-              toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
-              setIsUploading(false);
-              return;
-            }
-            
-            // Handle result events
-            if (result) {
-              console.log(`Upload event [${result.event}]:`, result);
-              
-              switch (result.event) {
-                case 'success':
-                  handleUploadResult(null, result);
-                  break;
-                case 'close':
-                  console.log('Upload widget closed by user');
-                  setIsUploading(false);
-                  break;
-                case 'upload_added':
-                  console.log('File added to upload queue:', result.info);
-                  break;
-                case 'queues_start':
-                  console.log('Upload started');
-                  break;
-                case 'progress':
-                  console.log('Upload progress:', result.info);
-                  break;
-                case 'failure':
-                  console.error('Upload failed with result:', {
-                    info: result.info,
-                    error: result.error,
-                    status: result.status,
-                    statusText: result.statusText,
-                    response: result.response
-                  });
-                  handleUploadResult(result.error || new Error('Upload failed'), result);
-                  break;
-                case 'abort':
-                  console.log('Upload aborted by user');
-                  setIsUploading(false);
-                  break;
-                case 'retry':
-                  console.log('Retrying upload...');
-                  break;
-                default:
-                  console.log('Unhandled upload event:', result.event, result);
-              }
-            } else {
-              console.error('No result object in callback');
-              handleUploadResult(new Error('No result from upload'), null);
-            }
-          }
-        );
-        
-        // Add error event listener
-        widget.on('error', (error: any) => {
-          console.error('Widget error event:', error);
-          toast.error(`Upload error: ${error?.message || 'Unknown error'}`);
-          setIsUploading(false);
-        });
-        
-        // Open the widget
-        widget.open();
-        
-      } catch (error) {
-        console.error('Error initializing upload widget:', error);
-        toast.error('Failed to initialize upload dialog');
-        setIsUploading(false);
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
       }
 
-      const handleUploadResult = async (error: any, result: any) => {
-        console.log('handleUploadResult called with:', { error, result });
-        
-        // If there's an error or the result indicates an error
-        if (error || (result?.event === 'failure' || result?.error)) {
-          const errorObj = error || result?.error || result?.info?.error || {};
-          
-          console.error('Upload error details:', {
-            error: errorObj,
-            errorString: String(errorObj),
-            errorType: typeof errorObj,
-            errorKeys: errorObj ? Object.keys(errorObj) : 'no error object',
-            result: result,
-            rawError: JSON.stringify(errorObj, Object.getOwnPropertyNames(errorObj)),
-            rawResult: JSON.stringify(result, Object.getOwnPropertyNames(result || {})),
-            timestamp: new Date().toISOString()
-          });
-          
-          let errorMessage = 'Failed to upload image';
-          
-          // Try to extract meaningful error message from various possible locations
-          const possibleErrorMessages = [
-            errorObj?.message,
-            errorObj?.error?.message,
-            errorObj?.response?.data?.message,
-            result?.info?.error?.message,
-            result?.message,
-            result?.error?.message,
-            errorObj?.toString()
-          ].filter(Boolean);
-          
-          if (possibleErrorMessages.length > 0) {
-            errorMessage = possibleErrorMessages[0];
-          }
-          
-          console.error('Upload failed:', errorMessage);
-          toast.error(errorMessage);
-          setIsUploading(false);
-          return;
-        }
+      // Create preview URL
+      const objectUrl = URL.createObjectURL(file);
+      console.log('Created preview URL:', objectUrl);
+      setPreviewUrl(objectUrl);
 
-        if (result.event === 'success') {
-          try {
-            // Delete old profile image if it exists
-            if (currentImage) {
-              const oldPublicId = extractPublicId(currentImage);
-              if (oldPublicId) {
-                try {
-                  // Call our API route to delete the old image
-                  const response = await fetch('/api/delete-image', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ publicId: oldPublicId }),
-                  });
-                  
-                  if (!response.ok) {
-                    const error = await response.json();
-                    console.error('Failed to delete old image:', error);
-                  }
-                } catch (error) {
-                  console.error('Error deleting old profile image:', error);
-                  // Continue with the update even if deletion fails
-                }
-              }
-            }
-
-            // Get the public ID of the new uploaded image
-            const publicId = result.info.public_id;
-            // Construct the transformed URL with cropping parameters
-            const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-            const imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_thumb,g_face,h_400,w_400/${folder ? folder + '/' : ''}${publicId}`;
-            
-            // Update user profile with new image URL
-            await updateUserProfile({
-              photoURL: imageUrl
-            });
-            
-            setCurrentImage(imageUrl);
-            onImageUpdate?.();
-          } catch (err) {
-            console.error('Error updating profile image:', err);
-            toast.error('Failed to update profile');
-          } finally {
-            setIsUploading(false);
-          }
-        }
-      };
-
-      // Create and open the upload widget
-      const uploadWidget = window.cloudinary.createUploadWidget(uploadOptions, handleUploadResult);
-      uploadWidget.open();
+      // Upload the file
+      await handleUpload(file, objectUrl);
+      
+      // Clean up the object URL after upload is complete
+      URL.revokeObjectURL(objectUrl);
     } catch (error) {
-      console.error('Error in upload process:', error);
-      toast.error('An error occurred during upload');
-      setIsUploading(false);
+      console.error('Error handling file select:', error);
+      toast.error('Failed to process image. Please try again.');
     }
-  }, [currentImage, onImageUpdate, updateUserProfile]);
-
-  useEffect(() => {
-    // Load Cloudinary Upload Widget script
-    const script = document.createElement('script');
-    script.src = 'https://upload-widget.cloudinary.com/global/all.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
   }, []);
 
+  // Handle drag and drop events
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) setIsDragging(true);
+  }, [isDragging]);
+
+  const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  }, [handleFileSelect]);
+
+  // Handle the actual file upload to Cloudinary
+  // Function to delete old profile image
+  const deleteOldProfileImage = useCallback(async (userId: string) => {
+    try {
+      if (!userId) {
+        console.log('No user ID provided for image deletion');
+        return { success: false, error: 'No user ID provided' };
+      }
+      
+      console.log('Attempting to delete old profile image for user:', userId);
+      const publicId = userId; // Just the user ID, folder is handled by the preset
+      console.log('Using publicId for deletion:', publicId);
+      
+      const response = await fetch('/api/cloudinary/delete-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          publicId,
+          resourceType: 'image'
+        })
+      });
+      
+      const result = await response.json();
+      console.log('Delete API response:', result);
+      
+      if (!response.ok) {
+        console.warn('Failed to delete old profile image:', result);
+        // Don't throw error, we can still try to upload new image
+      }
+      return result;
+    } catch (error) {
+      console.error('Error in deleteOldProfileImage:', error);
+      return { success: false, error };
+    }
+  }, []);
+
+  const handleUpload = useCallback(async (file: File, objectUrl: string) => {
+    if (!user) {
+      toast.error('You must be logged in to upload an image');
+      return;
+    }
+    
+    if (!user.uid) {
+      toast.error('User information is incomplete');
+      return;
+    }
+    
+    setIsUploading(true);
+    
+    try {
+      // First, delete the old profile image
+      await deleteOldProfileImage(user.uid);
+      
+      // Use a deterministic public_id based on user ID and place in profile-images folder
+      const publicId = `profile-images/${user.uid}`;
+      const tags = ['profile', 'user-avatar'];
+      const context = `user_id=${user.uid}|username=${user.displayName || 'user'}`;
+      
+      console.log('Uploading new profile image for user:', user.uid);
+      console.log('Using Cloudinary preset: profile_pictures_unsigned');
+      
+      // Create FormData with all required fields
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'profile_pictures_unsigned');
+      formData.append('public_id', publicId);
+      formData.append('context', context);
+      formData.append('tags', tags.join(','));
+      // Removed 'invalidate' parameter as it's not allowed in unsigned uploads
+      
+      // Note: Transformation parameters are not allowed in unsigned uploads.
+      // They should be configured in the Cloudinary upload preset instead.
+      // Add folder to ensure consistent organization
+      formData.append('folder', 'profile-images');
+      
+      console.log('Uploading to Cloudinary with settings:', {
+        publicId,
+        tags,
+        context,
+        timestamp: Date.now()
+      });
+      
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+      console.log('Sending upload request to Cloudinary...');
+      const uploadResponse = await fetch(cloudinaryUrl, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      let result;
+      try {
+        result = await uploadResponse.json();
+      } catch (jsonError) {
+        console.error('Failed to parse Cloudinary response as JSON:', jsonError);
+        const errorText = await uploadResponse.text();
+        console.error('Raw Cloudinary response:', errorText);
+        throw new Error(`Failed to parse Cloudinary response: ${uploadResponse.status} ${uploadResponse.statusText}`);
+      }
+      
+      console.log('Cloudinary response:', result);
+      
+      if (!uploadResponse.ok) {
+        console.error('Upload failed with status:', uploadResponse.status, uploadResponse.statusText);
+        console.error('Error details:', result);
+        throw new Error(`Upload failed: ${result?.error?.message || 'Unknown error'}`);
+      }
+      
+      // Make sure we have a valid secure_url or url
+      if (!result.secure_url && !result.url) {
+        console.error('No secure_url or url in Cloudinary response:', result);
+        throw new Error('No image URL returned from Cloudinary');
+      }
+      
+      // Use secure_url if available, otherwise fall back to url
+      const imageUrl = result.secure_url || result.url;
+      
+      console.log('Final image URL:', imageUrl);
+
+      // Update user profile with new image URL
+      console.log('Updating user profile with new image URL...');
+      const updateResult = await updateUserProfile({
+        photoURL: imageUrl,
+        displayName: user.displayName || '' // Include displayName to ensure it's preserved
+      });
+      
+      console.log('Profile update result:', updateResult);
+      
+      if (updateResult?.success) {
+        // Update the preview URL with the new image URL and cache-busting parameter
+        const timestamp = new Date().getTime();
+        const updatedUrl = `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}v=${timestamp}`;
+        setPreviewUrl(updatedUrl);
+        
+        toast.success('Profile image updated successfully');
+        
+        // Call the onImageUpdate callback if provided
+        if (onImageUpdate) {
+          console.log('Calling onImageUpdate callback');
+          onImageUpdate();
+        } else {
+          console.log('No onImageUpdate callback provided');
+        }
+        
+        // Force a small delay to ensure the UI updates
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } else {
+        throw new Error(updateResult?.error || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setPreviewUrl('');
+    } finally {
+      setIsUploading(false);
+      // Clean up object URL
+      URL.revokeObjectURL(objectUrl);
+    }
+  }, [user, updateUserProfile, onImageUpdate]);
+
+  // Handle remove image
+  const handleRemoveImage = useCallback(async () => {
+    if (!user?.photoURL) return;
+    
+    try {
+      await updateUserProfile({
+        photoURL: null
+      });
+      
+      toast.success('Profile image removed');
+      onImageUpdate?.();
+    } catch (error) {
+      console.error('Failed to remove image:', error);
+      toast.error('Failed to remove image');
+    }
+  }, [user, updateUserProfile, onImageUpdate]);
+
+  const displayImage = previewUrl || user?.photoURL || '';
+  const showRemoveButton = !isUploading && (previewUrl || user?.photoURL);
+
   return (
-    <motion.button
-      type="button"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={handleUpload}
-      disabled={isUploading}
-      className="relative group"
-      aria-label={isUploading ? 'Uploading...' : 'Change profile picture'}
-    >
-      <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+    <div className={`relative ${sizeClasses[size]} ${className}`}>
+      <div 
+        className={`relative w-full h-full rounded-full overflow-hidden border-2 border-dashed ${
+          isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-200 dark:border-gray-700'
+        } transition-colors duration-200 flex items-center justify-center cursor-pointer`}
+        onClick={() => !isUploading && fileInputRef.current?.click()}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {isUploading ? (
-          <Loader2 className="w-8 h-8 text-white animate-spin" />
-        ) : currentImage ? (
-          <img 
-            src={currentImage}
-            alt={user?.displayName || 'Profile'}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback to user icon if image fails to load
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              const fallback = target.parentElement?.querySelector('.user-fallback') as HTMLElement;
-              if (fallback) fallback.style.display = 'flex';
-            }}
-          />
+          <div className="flex flex-col items-center justify-center w-full h-full bg-gray-100 dark:bg-gray-800">
+            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            <span className="mt-2 text-sm text-gray-500">Uploading...</span>
+          </div>
+        ) : displayImage ? (
+          <>
+            <img 
+              src={displayImage} 
+              alt={user?.displayName || 'Profile'} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.parentElement?.querySelector('.user-fallback') as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+              <Camera className="w-8 h-8 text-white" />
+            </div>
+          </>
         ) : (
-          <User className="w-16 h-16 text-white" />
-        )}
-        {!isUploading && !currentImage && (
-          <div className="absolute inset-0 w-full h-full bg-blue-600 hidden items-center justify-center user-fallback">
-            <User className="w-16 h-16 text-white" />
+          <div className="flex flex-col items-center justify-center w-full h-full bg-gray-100 dark:bg-gray-800">
+            <User className="w-12 h-12 text-gray-400" />
+            <span className="mt-2 text-sm text-gray-500 text-center px-2">
+              {isDragging ? 'Drop image here' : 'Click or drag image to upload'}
+            </span>
           </div>
         )}
       </div>
-      {!isUploading && (
-        <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <Camera className="w-8 h-8 text-white" />
-        </div>
+
+      {showRemoveButton && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemoveImage();
+          }}
+          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+          disabled={isUploading}
+          aria-label="Remove profile image"
+        >
+          <X className="w-4 h-4" />
+        </button>
       )}
-    </motion.button>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileInputChange}
+        className="hidden"
+        accept="image/*"
+        disabled={isUploading}
+      />
+    </div>
   );
 };
 
-export default ProfileImageUpload; 
+export default ProfileImageUpload;

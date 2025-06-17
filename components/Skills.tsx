@@ -23,7 +23,7 @@ const skills: Skill[] = [
       { name: "TailwindCSS", level: 85 },
       { name: "HTML", level: 95 },
       { name: "CSS", level: 95 },
-      { name: "JavaScript", level: 85 },
+      { name: "JavaScript", level: 95 },
     ]
   },
   {
@@ -45,9 +45,9 @@ const skills: Skill[] = [
       { name: "Git", level: 80 },
       { name: "Postman", level: 85 },
       { name: "Docker", level: 70 },
-      { name: "Vercel", level: 65 },
+      { name: "Vercel", level: 95 },
       { name: "AWS", level: 60 },
-      { name: "LLMs & AI", level: 50 },
+      { name: "LLMs & AI Integration", level: 50 },
     ]
   }
 ];

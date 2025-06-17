@@ -13,8 +13,7 @@ import Footer from '@/components/Footer';
 import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
-import MusicPlayer from "@/components/MusicPlayer";
-import HeroVideoDialog from "@/components/magicui/hero-video-dialog";
+
 
 export default function Home() {
   const { resolvedTheme } = useTheme();

@@ -1,10 +1,11 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Trash2, Pin, Crown } from 'lucide-react';
 import Image from 'next/image';
 import { formatNumber } from '@/lib/formatNumber';
 import Link from 'next/link';
 import { CommentItemProps, ADMIN_EMAIL } from './types';
+import { isValidUrl } from '@/lib/urlUtils';
 
 export const CommentItem = memo(({ 
   comment, 
@@ -91,35 +92,79 @@ export const CommentItem = memo(({
                 title={`View ${comment.user?.displayName || comment.displayName || 'user'}'s profile`}
               >
                 <div className="absolute inset-0 rounded-full group-hover:ring-2 group-hover:ring-blue-500 group-hover:ring-opacity-50 transition-all duration-200 pointer-events-none"></div>
-                {comment.user?.photoURL || comment.photoURL ? (
-                  <Image
-                    src={(comment.user?.photoURL || comment.photoURL) as string}
-                    alt={comment.user?.displayName || comment.displayName || 'User'}
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
-                    {(comment.user?.displayName || comment.displayName || '?').charAt(0).toUpperCase()}
-                  </div>
-                )}
+                {(() => {
+                  const photoURL = comment.user?.photoURL || comment.photoURL;
+                  const displayName = comment.user?.displayName || comment.displayName || 'User';
+                  
+                  if (!photoURL || !isValidUrl(photoURL)) {
+                    return (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <>
+                      <Image
+                        src={photoURL}
+                        alt={displayName}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) {
+                            fallback.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="hidden absolute inset-0 items-center justify-center bg-gray-600 text-white">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    </>
+                  );
+                })()}
               </Link>
             ) : (
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
-                {comment.user?.photoURL || comment.photoURL ? (
-                  <Image
-                    src={(comment.user?.photoURL || comment.photoURL) as string}
-                    alt={comment.user?.displayName || comment.displayName || 'User'}
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
-                    {(comment.user?.displayName || comment.displayName || '?').charAt(0).toUpperCase()}
-                  </div>
-                )}
+              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-700">
+                {(() => {
+                  const photoURL = comment.user?.photoURL || comment.photoURL;
+                  const displayName = comment.user?.displayName || comment.displayName || 'User';
+                  
+                  if (!photoURL || !isValidUrl(photoURL)) {
+                    return (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <>
+                      <Image
+                        src={photoURL}
+                        alt={displayName}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) {
+                            fallback.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="hidden absolute inset-0 items-center justify-center bg-gray-600 text-white">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>

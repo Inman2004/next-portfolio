@@ -7,6 +7,7 @@ export const metadata = {
 
 export default function ProjectsPage() {
   return (
+    <>
     <main className="container mx-auto px-4 py-12 md:py-20">
       <div className="max-w-7xl mx-auto">
       <div className="relative py-2 md:py-4">
@@ -28,5 +29,6 @@ export default function ProjectsPage() {
         <Projects showAll={true} />
       </div>
     </main>
+    </>
   );
 }

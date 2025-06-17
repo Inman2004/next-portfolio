@@ -76,7 +76,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="pt-8 text-center">
           <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
-            Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" fill="currentColor" /> by Immanuvel
+            Made by Immanuvel B <u className="text-xs mt-1 text-blue-600 dark:text-blue-400">B.E, DCE</u>
           </p>
           <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
             &copy; {currentYear} All rights reserved.

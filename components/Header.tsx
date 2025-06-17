@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, User, Home, Settings, Menu, X, BriefcaseBusiness, Rss, Mail, AppWindow, PencilLine, Flame, Handshake, User2 } from 'lucide-react';
-
-import { useAuth } from '@/contexts/AuthContext';
-import { ThemeSwitcher } from './ui/ThemeSwitcher';
+import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, BookOpen, Code2, LogOut, User, Settings, LayoutDashboard, FileText, Image as ImageIcon, Plus, Handshake, Flame } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { ThemeSwitcher } from './ui/ThemeSwitcher';
 
 interface NavLink {
   href: string;
@@ -266,7 +267,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 lg:hidden xl:hidden',
         'backdrop-blur-md border-b shadow-sm',
         scrolled
           ? 'bg-background/95 border-border/10 shadow-sm'
@@ -333,7 +334,7 @@ export default function Header() {
           transition={{ delay: 0.3 }}
           className="hidden md:flex items-center gap-2"
         >
-          <ul className="flex items-center space-x-1">
+          {/* <ul className="flex items-center space-x-1">
             {filteredNavLinks.map((link, index) => (
               <React.Fragment key={link.href}>
                 {index === filteredNavLinks.length - 1 && (
@@ -345,12 +346,12 @@ export default function Header() {
                 </NavItem>
               </React.Fragment>
             ))}
-          </ul>
+          </ul> */}
 
           {/* Theme Toggle */}
-          <div className="ml-2">
+          {/* <div className="ml-2">
             <ThemeSwitcher />
-          </div>
+          </div> */}
 
           {/* User Menu */}
           {user ? (
@@ -361,17 +362,27 @@ export default function Header() {
                 aria-haspopup="true"
                 aria-expanded={showDropdown}
               >
-                {user.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt={user.displayName || 'User'}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <User className="w-5 h-5 text-foreground" />
-                )}
+                {(() => {
+                  const displayName = user.displayName || 'User';
+                  const initials = displayName
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2);
+
+                  // Use UserAvatar component for consistent avatar display
+                  return (
+                    <div className="w-8 h-8">
+                      <UserAvatar 
+                        photoURL={user.photoURL || ''} 
+                        displayName={displayName} 
+                        size={32}
+                        className="w-full h-full"
+                      />
+                    </div>
+                  );
+                })()}
               </button>
 
               <AnimatePresence>

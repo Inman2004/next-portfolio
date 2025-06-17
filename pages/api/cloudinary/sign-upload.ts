@@ -48,8 +48,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       timestamp = Math.round(Date.now() / 1000),
       preset,
       folder,
+      public_id,
       transformation = '',
-      tags = []
+      tags = [],
+      context = '',
+      overwrite = false,
+      invalidate = false
     } = req.body;
 
     console.log('Processing request with:', {
@@ -71,35 +75,54 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
-    // Create the parameters to sign
-    const paramsToSign: Record<string, any> = {
-      timestamp,
-      upload_preset: preset
-    };
-
+    // Create the parameters to sign in the exact order expected by Cloudinary
+    // The order of these parameters is VERY important for the signature
+    const paramsToSign: Record<string, any> = {};
+    
+    // Add parameters in the exact order they should be signed
+    // This order must match what Cloudinary expects
+    if (context) paramsToSign.context = context;
     if (folder) paramsToSign.folder = folder;
-    if (transformation) paramsToSign.transformation = transformation;
+    if (public_id) paramsToSign.public_id = public_id;
     if (tags?.length) paramsToSign.tags = Array.isArray(tags) ? tags.join(',') : tags;
+    
+    // Always include these
+    paramsToSign.timestamp = timestamp;
+    paramsToSign.upload_preset = preset;
+    
+    // Add transformation if it exists
+    if (transformation) paramsToSign.transformation = transformation;
+    
+    // Add boolean flags if true
+    if (overwrite) paramsToSign.overwrite = 'true';
+    if (invalidate) paramsToSign.invalidate = 'true';
 
     console.log('Parameters to sign:', paramsToSign);
 
     // Create the signature string in the exact format Cloudinary expects
-    // The parameters must be in a specific order: upload_preset, folder, etc.
-    const signatureParams = [
-      `folder=${paramsToSign.folder || ''}`,
-      `timestamp=${paramsToSign.timestamp}`,
-      `upload_preset=${paramsToSign.upload_preset}`
-    ];
+    // The order of parameters in the string is critical
+    const signatureParts = [];
     
-    // Add optional parameters if they exist
+    // Add parameters in the correct order
+    if (paramsToSign.context) signatureParts.push(`context=${paramsToSign.context}`);
+    if (paramsToSign.folder) signatureParts.push(`folder=${paramsToSign.folder}`);
+    if (paramsToSign.invalidate) signatureParts.push(`invalidate=${paramsToSign.invalidate}`);
+    if (paramsToSign.overwrite) signatureParts.push(`overwrite=${paramsToSign.overwrite}`);
+    if (paramsToSign.public_id) signatureParts.push(`public_id=${paramsToSign.public_id}`);
+    if (paramsToSign.tags) signatureParts.push(`tags=${paramsToSign.tags}`);
+    
+    // Always include these
+    signatureParts.push(`timestamp=${paramsToSign.timestamp}`);
+    
+    // Add transformation if it exists (must be URL encoded)
     if (paramsToSign.transformation) {
-      signatureParams.push(`transformation=${encodeURIComponent(paramsToSign.transformation)}`);
+      signatureParts.push(`transformation=${encodeURIComponent(paramsToSign.transformation)}`);
     }
-    if (paramsToSign.tags) {
-      signatureParams.push(`tags=${paramsToSign.tags}`);
-    }
-
-    const signatureString = signatureParams.join('&') + cloudinarySecret;
+    
+    signatureParts.push(`upload_preset=${paramsToSign.upload_preset}`);
+    
+    const signatureString = signatureParts.join('&') + cloudinarySecret;
+    console.log('Final signature string (before hashing):', signatureString);
     console.log('Signature string:', signatureString);
 
     const signature = crypto.createHash('sha1').update(signatureString).digest('hex');

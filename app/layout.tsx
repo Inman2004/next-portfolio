@@ -9,7 +9,7 @@ import { elegantScript, pacifico } from './fonts';
 import WelcomePopup from '@/components/WelcomePopupClient';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { FontLoader } from '@/components/FontLoader';
-import SEO from '@/components/SEO';
+import { BottomNav } from "@/components/BottomNav";
 
 // Base URL for the site
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.app/';
@@ -199,6 +199,7 @@ export default function RootLayout({
                 <main className="flex-grow" id="main-content">
                   {children}
                 </main>
+                <BottomNav />
               </div>
               <WelcomePopup />
               <PerformanceMonitor />

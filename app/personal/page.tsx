@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { BookOpen, Music, Film, Code, Briefcase, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { BookOpen, Music, Film, Code, Briefcase, ArrowRight, ChevronDown, ChevronUp, MapPin, Mail, HeartCrack, Languages } from 'lucide-react';
 import { Gamepad2, Utensils } from 'lucide-react';
 import MusicPlayer from '@/components/MusicPlayer';
 import { NeonGradientCard } from '@/components/magicui/neon-gradient-card';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 
 type TabType = 'about' | 'favorites' | 'studies' | 'music' | 'shows';
 
@@ -67,14 +68,19 @@ const Personel = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
-                  { label: 'Location', value: 'Tamil Nadu, India' },
-                  { label: 'Email', value: 'rvimman@gmail.com' },
-                  { label: 'Education', value: 'B.E in Computer Science' },
-                  { label: 'Interests', value: 'Tech, Music, Travel' },
+                  { icon: <MapPin size={18} className="text-rose-500" />, label: 'Location', value: 'Tamil Nadu, India' },
+                  { icon: <Mail size={18} className="text-indigo-500" />, label: 'Email', value: 'rvimman@gmail.com' },
+                  { icon: <BookOpen size={18} className="text-blue-500" />, label: 'Education', value: 'B.E in Computer Science' },
+                  { icon: <Music size={18} className="text-amber-500" />, label: 'Interests', value: 'Tech, Music, Games, Phycology' },
+                  { icon: <HeartCrack size={18} className="text-pink-500" />, label: 'Marital Status', value: 'Unmarried' },
+                  { icon: <Languages size={18} className="text-teal-500" />, label: 'Languages', value: 'English, Tamil' },
                 ].map((item, index) => (
                   <div key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
-                    <p className="font-medium">{item.value}</p>
+                    <div className="flex items-center gap-2">
+                      {item.icon}
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
+                    </div>
+                    <p className="font-medium text-gray-700/80 dark:text-gray-200/80">{item.value}</p>
                   </div>
                 ))}
               </div>
@@ -96,13 +102,13 @@ const Personel = () => {
                 id: 'games',
                 title: 'Games',
                 icon: <Gamepad2 size={18} className="text-green-500" />,
-                items: ['God of War', 'Red Dead Redemption 2', 'Death Stranding'] 
+                items: ['God of War 4', 'Red Dead Redemption 2', 'Death Stranding'] 
               },
               { 
                 id: 'food',
                 title: 'Food',
                 icon: <Utensils size={18} className="text-amber-500" />,
-                items: ['Biryani', 'Dosa', 'Parotta'] 
+                items: ['Non-veg', 'Spicy', 'All Deserts'] 
               },
             ].map((section, index) => (
               <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -144,16 +150,20 @@ const Personel = () => {
               <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500/20 via-indigo-500/50 to-transparent" />
               {[
                 {
-                  title: 'B.E in Computer Science',
+                  department: 'Computer Science and Engineering',
+                  Degree: 'Bachelor of Engineering',
                   institution: 'Anna University',
                   year: '2022 - 2025',
-                  description: 'Specialized in Machine Learning and AI'
+                  description: 'Specialized in Machine Learning and AI',
+                  website: 'https://www.annauniv.edu'
                 },
                 {
-                  title: 'Diploma in Computer Science',
-                  institution: 'Anna University',
+                  department: 'Computer Engineering',
+                  Degree: 'Diploma',
+                  institution: 'MSPVl Polytechnic college',
                   year: '2019 - 2022',
-                  description: 'Web Development and Programming'
+                  description: 'Web Development and Programming',
+                  website: 'http://www.mspvl.com/'
                 }
               ].map((edu, index) => (
                 <div key={index} className="relative pl-16 pb-8">
@@ -161,8 +171,9 @@ const Personel = () => {
                   <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg font-semibold">{edu.title}</h3>
-                        <p className="text-indigo-500">{edu.institution}</p>
+                        <h3 className="text-lg font-semibold">{edu.Degree}</h3>
+                        <h5 className="text-sm font-medium text-gray-500 mb-2">{edu.department}</h5>
+                        <a href={edu.website} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:font-medium mt-2 block">{edu.institution}</a>
                       </div>
                       <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
                         {edu.year}
@@ -194,9 +205,9 @@ const Personel = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {[
                 { 
-                    title: 'Stranger Things', 
+                    title: 'Money Heist', 
                     type: 'TV Series', 
-                    image: 'https://m.media-amazon.com/images/M/MV5BMjg2NmM0MTEtYWY2Yy00NmFlLTllNTMtMjVkZjEwMGVlNzdjXkEyXkFqcGc@._V1_.jpg' 
+                    image: 'https://loyolamaroon.com/wp-content/uploads/2020/04/MoneyHeistPart4.jpg' 
                 },
                 { 
                     title: '96', 
@@ -209,9 +220,9 @@ const Personel = () => {
                     image: 'https://m.media-amazon.com/images/M/MV5BZjliODY5MzQtMmViZC00MTZmLWFhMWMtMjMwM2I3OGY1MTRiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg' 
                 },
                 { 
-                    title: 'Modern Family', 
-                    type: 'TV Series', 
-                    image: 'https://www.peacocktv.com/dam/growth/assets/Library/ModernFamily/modern-family-description-image.jpg?downsize=1200:*&image-quality=7&output-format=webp&output-quality=70' 
+                    title: 'Bleach', 
+                    type: 'Anime', 
+                    image: 'https://static.wikia.nocookie.net/bleach/images/9/93/Bleach_Viz_DVD_Set_Twenty-Two_Cover.png/revision/latest?cb=20180216053904&path-prefix=en' 
                 },
                 { 
                     title: 'Pacific Rim', 

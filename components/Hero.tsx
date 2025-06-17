@@ -124,7 +124,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center relative w-full overflow-hidden pt-16 pb-24 md:pt-24"
+      className="min-h-screen flex items-center justify-center relative w-full overflow-hidden pb-24 pt-24 md:pt-24 lg:pt-6"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 w-full h-full">
