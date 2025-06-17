@@ -299,7 +299,6 @@ export function BottomNav() {
                           key={link.href}
                           href={link.href}
                           className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
-                          onClick={() => setShowDropdown(false)}
                         >
                           {link.icon({ className: 'w-4 h-4 mr-2' })}
                           {link.label}
