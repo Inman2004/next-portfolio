@@ -139,7 +139,7 @@ export default function RootLayout({
     <html 
       lang="en" 
       className={`${geistSans.variable} ${geistMono.variable} ${elegantScript.variable} ${pacifico.variable}`}
-      suppressHydrationWarning
+      suppressHydrationWarning={true}
     >
       <head>
         <script

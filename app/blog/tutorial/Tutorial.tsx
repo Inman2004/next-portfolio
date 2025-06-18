@@ -38,7 +38,7 @@ export function Tutorial() {
         return (
           <div className="group relative">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium text-foreground">{title}</span>
+              <span className="text-sm font-medium text-primary">{title}</span>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -137,7 +137,7 @@ export function Tutorial() {
                           <h3 className="text-lg font-semibold text-foreground border-b pb-2">Lists</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <h4 className="font-medium mb-2">Unordered List</h4>
+                              <h4 className="font-medium text-primary mb-2">Unordered List</h4>
                               <div className="bg-muted p-4 rounded-md">
                                 <pre className="text-sm">- Item 1<br/>- Item 2<br/>  - Nested item</pre>
                               </div>
@@ -151,7 +151,7 @@ export function Tutorial() {
                               </ul>
                             </div>
                             <div>
-                              <h4 className="font-medium mb-2">Ordered List</h4>
+                              <h4 className="font-medium text-primary mb-2">Ordered List</h4>
                               <div className="bg-muted p-4 rounded-md">
                                 <pre className="text-sm">1. First item<br/>2. Second item<br/>   - Nested item</pre>
                               </div>
@@ -197,7 +197,7 @@ export function Tutorial() {
                               className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono"
                             />
                             <div>
-                              <h4 className="font-medium mb-2">Code Block</h4>
+                              <h4 className="font-medium text-primary mb-2">Code Block</h4>
                               <div className="bg-muted p-4 rounded-md">
                                 <pre className="text-sm">
                                   {`\`\`\`javascript
@@ -219,7 +219,7 @@ function hello() {
 
                         {/* Divider */}
                         <div className="space-y-2">
-                          <h4 className="font-medium">Horizontal Rule</h4>
+                          <h4 className="font-medium text-primary">Horizontal Rule</h4>
                           <div className="bg-muted p-4 rounded-md">
                             <pre className="text-sm">---</pre>
                           </div>
@@ -228,7 +228,7 @@ function hello() {
                       </div>
                       {/* Table */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-foreground border-b pb-2">Table</h3>
+                        <h3 className="text-lg font-medium text-primary pt-2">Table</h3>
                         <div className="bg-muted p-4 rounded-md">
                           <pre className="text-sm">
                             {`| Header 1 | Header 2 | Header 3 |
