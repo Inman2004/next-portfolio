@@ -1,15 +1,8 @@
 'use client';
 
-import React, { ReactNode, AnchorHTMLAttributes, HTMLAttributes } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Custom light theme with better contrast
 const customLightTheme = {
@@ -61,7 +54,13 @@ const customLightTheme = {
   },
 };
 
-
+import type { ReactNode, AnchorHTMLAttributes, HTMLAttributes } from 'react';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { ScrollBar } from './ui/scroll-area';
 
 // Custom components for better styling
@@ -168,7 +167,6 @@ const extensionMap: Record<string, string> = {
     'gitignore': '.gitignore'
   };
               
-// Custom component to render code blocks with proper structure
 const CustomCode = ({ 
   node, 
   inline = false, 
@@ -176,108 +174,113 @@ const CustomCode = ({
   children, 
   ...props 
 }: CustomCodeProps) => {
-  const [mounted, setMounted] = React.useState(false);
-  const [isDark, setIsDark] = React.useState(false);
-  
-  React.useEffect(() => {
-    setMounted(true);
-    // Check for dark mode preference
-    if (typeof window !== 'undefined') {
-      const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      setIsDark(darkModeMediaQuery.matches);
-      
-      const handleChange = (e: MediaQueryListEvent) => setIsDark(e.matches);
-      darkModeMediaQuery.addEventListener('change', handleChange);
-      return () => darkModeMediaQuery.removeEventListener('change', handleChange);
-    }
-  }, []);
-  
-  // Don't render anything during SSR to avoid hydration mismatches
-  if (!mounted) {
-    return null;
-  }
-
-  // For inline code
-  if (inline) {
-    return (
-      <code 
-        className="bg-gray-200 dark:bg-gray-800/50 rounded px-1.5 py-0.5 text-sm font-mono text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700"
-        {...props}
-      >
-        {children}
-      </code>
-    );
-  }
-
-  // Extract language from className if present (e.g., "language-js")
   const match = /language-(\w+)/.exec(className || '');
-  let language = match ? match[1].toLowerCase() : 'text';
+  let language = match ? match[1].toLowerCase() : '';
   
   // Map the language to a known one if needed
   if (language in languageMap) {
     language = languageMap[language];
   }
 
+  if (inline) {
+    return (
+      <code className={`bg-gray-200 dark:bg-gray-800/50 rounded px-1.5 py-0.5 text-sm font-mono text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 ${className}`} {...props}>
+        {children}
+      </code>
+    );
+  }
+
   // For code blocks without a specified language
   if (!match) {
     return (
       <div className="my-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow">
-        <div className="p-4 overflow-x-auto bg-white dark:bg-gray-800">
-          <pre className="m-0">
-            <code className="text-sm font-mono text-gray-900 dark:text-gray-200 block" {...props}>
-              {String(children).replace(/\n$/, '')}
-            </code>
-          </pre>
-        </div>
+        <pre className="p-4 overflow-x-auto m-0 bg-white dark:bg-transparent">
+          <code className="text-sm font-mono text-gray-900 dark:text-gray-200" {...props}>
+            {children}
+          </code>
+        </pre>
       </div>
     );
   }
 
-  // For block code, use SyntaxHighlighter with ScrollArea
   return (
-    <div className="my-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow">
-      <div className="relative">
-        <ScrollArea className="w-full max-h-[500px]">
-          <div className="min-w-max">
-            <SyntaxHighlighter
-              style={isDark ? vscDarkPlus : customLightTheme}
-              language={language}
-              className="m-0 text-sm"
-              showLineNumbers
-              wrapLines
-              customStyle={{
-                margin: 0,
-                padding: '1rem',
-                backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
-                borderRadius: '0.5rem',
-                fontSize: '0.875rem',
-                lineHeight: '1.5',
-                minWidth: '100%',
-                display: 'inline-block',
-              }}
-              lineNumberStyle={{
-                color: isDark ? '#6b7280' : '#9ca3af',
-                paddingRight: '1rem',
-                userSelect: 'none',
-                minWidth: '2.5em',
-                textAlign: 'right',
-                position: 'sticky',
-                left: 0,
-                backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
-                zIndex: 1,
-              }}
-              PreTag={({ children, ...preProps }: { children: ReactNode; [key: string]: any }) => (
-                <pre className="!m-0 !p-0 !bg-transparent dark:!bg-gray-800 !text-gray-900 dark:!text-gray-200" {...preProps}>
-                  {children}
-                </pre>
-              )}
-              {...props}
-            >
-              {String(children).replace(/\n$/, '')}
-            </SyntaxHighlighter>
+    <div className="my-6 rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="flex space-x-2 mr-3">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <ScrollBar orientation="horizontal" className="h-2.5" />
-        </ScrollArea>
+          <span className="font-medium text-gray-900 dark:text-gray-200">
+            {(() => {
+              const ext = extensionMap[language] || 'txt';
+              return `${language}.${ext}`;
+            })()}
+          </span>
+        </div>
+        <div className="text-xs text-gray-800 dark:text-gray-300">
+          {match[1]} • {String(children).split('\n').length} lines
+        </div>
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">
+        <div className="relative">
+          <ScrollArea className="w-full" type="always">
+            <div className="min-w-max p-4">
+              <SyntaxHighlighter
+                style={typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? vscDarkPlus : vs}
+                language={language}
+                className="!m-0 !bg-transparent !text-gray-900 dark:!text-gray-200"
+                customStyle={{
+                  margin: 0,
+                  padding: 0,
+                  fontSize: '0.875rem',
+                  lineHeight: 1.5,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                  backgroundColor: 'transparent',
+                  background: 'transparent',
+                  color: 'inherit',
+                }}
+                showLineNumbers={true}
+                wrapLines={false}
+                wrapLongLines={false}
+                lineNumberStyle={{
+                  color: '#6b7280',
+                  paddingRight: '1em',
+                  userSelect: 'none',
+                  minWidth: '2.5em',
+                  textAlign: 'right',
+                  opacity: 0.7,
+                  position: 'sticky',
+                  left: 0,
+                  backgroundColor: 'inherit',
+                }}
+                lineProps={{
+                  style: {
+                    whiteSpace: 'pre',
+                    wordBreak: 'normal',
+                    wordWrap: 'normal',
+                  },
+                }}
+                codeTagProps={{
+                  style: {
+                    fontFamily: 'inherit',
+                    display: 'block',
+                    color: 'inherit',
+                  },
+                }}
+                PreTag={({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
+                  <pre className="!m-0 !p-0 !bg-transparent dark:!bg-gray-800 !text-gray-900 dark:!text-gray-200" {...props}>
+                    {children}
+                  </pre>
+                )}
+              >
+                {String(children).replace(/\n$/, '')}
+              </SyntaxHighlighter>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </div>
     </div>
   );
@@ -288,77 +291,6 @@ interface MarkdownViewerProps {
   className?: string;
 }
 
-// Component to safely render paragraphs with proper nesting
-const SafeParagraph = ({ children, className = '', ...props }: { children?: ReactNode } & HTMLAttributes<HTMLParagraphElement>) => {
-  // Always check children for block elements, even if there's only one child
-  const hasBlockElements = React.Children.toArray(children).some((child: any) => {
-    // Handle React elements
-    if (React.isValidElement(child)) {
-      const elementType = child.type;
-      
-      // Check for HTML elements
-      if (typeof elementType === 'string') {
-        return [
-          'div', 'pre', 'figure', 'ul', 'ol', 'li', 'table', 
-          'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 
-          'hr', 'p', 'header', 'footer', 'section', 'article',
-          'aside', 'nav', 'main', 'div', 'pre', 'code'
-        ].includes(elementType);
-      }
-      
-      // Check for custom components that might render block elements
-      if (elementType === CustomCode) {
-        return true;
-      }
-      
-      // Check for any component that might render block elements
-      const displayName = (elementType as any).displayName || (elementType as any).name || '';
-      if (typeof displayName === 'string' && [
-        'CustomCode', 'CodeBlock', 'pre', 'div', 'table', 'ul', 'ol', 'li',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'hr'
-      ].some(name => displayName.toLowerCase().includes(name.toLowerCase()))) {
-        return true;
-      }
-    }
-    
-    // Check for text nodes that might contain block-level markdown
-    if (typeof child === 'string' && (
-      child.trim().startsWith('```') || // Code block
-      child.trim().startsWith('#') ||   // Heading
-      child.trim().startsWith('> ') ||  // Blockquote
-      child.trim().match(/^[-*+]\s/)   // List
-    )) {
-      return true;
-    }
-    
-    return false;
-  });
-
-  // Don't wrap block elements in a paragraph
-  if (hasBlockElements) {
-    return <>{children}</>;
-  }
-
-  // Only render a paragraph if there's actual content
-  const hasContent = React.Children.toArray(children).some(child => {
-    if (typeof child === 'string') return child.trim().length > 0;
-    return true; // Assume non-string children have content
-  });
-
-  if (!hasContent) {
-    return null;
-  }
-
-  return (
-    <p 
-      className={`my-4 text-gray-700 dark:text-gray-300 leading-relaxed ${className}`} 
-      {...props}
-    >
-      {children}
-    </p>
-  );
-};
-
 export default function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
   return (
     <div className={`prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
@@ -366,16 +298,7 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeRaw, rehypeKatex]}
         components={{
-          // Handle code blocks with proper structure
-          code: ({ node, inline, className, children, ...props }: any) => {
-            // For inline code
-            if (inline) {
-              return <code className="bg-gray-200 dark:bg-gray-800/50 rounded px-1.5 py-0.5 text-sm font-mono text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700" {...props}>{children}</code>;
-            }
-            
-            // For block code, use our CustomCode component
-            return <CustomCode className={className} {...props}>{children}</CustomCode>;
-          },
+          code: CustomCode,
           a: CustomLink,
           h1: (props) => (
             <h1 
@@ -395,6 +318,48 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
               {...props} 
             />
           ),
+          p: (props: any) => {
+            const { node, children, ...restProps } = props;
+            
+            // Check if this paragraph contains any block-level elements that shouldn't be in a <p>
+            const hasBlockLevelElements = node?.children?.some(
+              (child: any) => {
+                if (!child) return false;
+                
+                // Common block-level elements
+                const blockElements = [
+                  'div', 'pre', 'figure', 'ul', 'ol', 'table', 'h1', 'h2', 'h3', 
+                  'h4', 'h5', 'h6', 'blockquote', 'hr', 'dl', 'dd', 'dt', 'form', 
+                  'fieldset', 'legend', 'article', 'aside', 'details', 'figcaption',
+                  'footer', 'header', 'main', 'nav', 'section', 'summary', 'img'
+                ];
+                
+                return blockElements.includes(child.tagName);
+              }
+            );
+            
+            // Don't render paragraph wrapper if it contains block-level elements
+            if (hasBlockLevelElements) {
+              return <>{children}</>;
+            }
+            
+            // Check if this paragraph has any meaningful content
+            const hasContent = node?.children?.some(
+              (child: any) => 
+                (child.type === 'text' && child.value.trim() !== '') ||
+                (child.type === 'element' && child.tagName !== 'br')
+            );
+            
+            if (!hasContent) {
+              return null;
+            }
+            
+            return (
+              <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...restProps}>
+                {children}
+              </p>
+            );
+          },
           ul: (props) => (
             <ul className="list-disc pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" {...props} />
           ),
