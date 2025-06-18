@@ -10,7 +10,9 @@ import { app, db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
+import { Tutorial } from '../tutorial/Tutorial';
 // Utility function to extract public ID from Cloudinary URL
+
 const extractPublicId = (url: string): string | null => {
   if (!url) return null;
   
@@ -429,6 +431,7 @@ const NewBlogPostPage = () => {
                 Content
                 <span className="text-red-400 ml-1">*</span>
               </label>
+              <Tutorial />
               <textarea
                 id="content"
                 value={content}
