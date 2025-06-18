@@ -164,7 +164,7 @@
   }
 
   code {
-    background-color: rgba(175, 212, 248, 0.075) !important;
+    background-color: rgba(175, 212, 248, 0) !important;
     color: rgb(var(--foreground));
     filter: saturate(200%) contrast(100%) hue-rotate(0deg) brightness(80%);
     border-radius: 0.25rem;
@@ -177,7 +177,7 @@
   }
 
   pre {
-    background-color: rgba(191, 218, 237, 0.1) !important;
+    background-color: rgba(191, 218, 237, 0.025) !important;
     color: rgb(var(--foreground));
     border-radius: 0.5rem;
     padding: 1rem;

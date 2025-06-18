@@ -725,7 +725,7 @@ export default function BlogPage() {
                       <div className={`h-48 relative overflow-hidden ${
                         post.isAdmin 
                           ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30' 
-                          : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30'
+                          : 'bg-gradient-to-r from-blue-500/30 dark:from-blue-900/30 dark:to-purple-900/30 to-indigo-500/30'
                       }`}>
                         {post.coverImage ? (
                           <div className="relative w-full h-full">
@@ -749,7 +749,7 @@ export default function BlogPage() {
                         <div className={`absolute inset-0 bg-gradient-to-t ${
                           post.isAdmin 
                             ? 'from-amber-900/80 dark:from-amber-900/80' 
-                            : 'from-black/70 dark:from-black/70'
+                            : 'from-indigo-500/50 dark:from-indigo-900/70'
                         } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}>
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all ${
                             post.isAdmin 
