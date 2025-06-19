@@ -9,6 +9,7 @@ import { Camera, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { Tutorial } from '../../tutorial/Tutorial';
 
 export default function EditBlogPost() {
   const [title, setTitle] = useState('');
@@ -393,6 +394,7 @@ export default function EditBlogPost() {
                 Content
                 <span className="text-red-400 ml-1">*</span>
               </label>
+              <Tutorial/>
               <textarea
                 id="content"
                 value={content}

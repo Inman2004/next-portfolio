@@ -59,18 +59,52 @@ interface SkillBadgeProps {
   skill: string;
   className?: string;
   children?: React.ReactNode;
+  proficiency?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
 }
 
-// Component for rendering a skill badge
-export const SkillBadge: React.FC<SkillBadgeProps> = ({ skill, className = '', children }) => {
+// Component for rendering a skill badge with hover underline for proficiency
+export const SkillBadge: React.FC<SkillBadgeProps> = ({ 
+  skill, 
+  className = '', 
+  children,
+  proficiency 
+}) => {
   const { bg, text, border, hover } = getTechColor(skill);
   
+  // Color mapping for proficiency levels
+  const proficiencyColor = {
+    'Beginner': 'bg-blue-400',
+    'Intermediate': 'bg-green-400',
+    'Advanced': 'bg-purple-400',
+    'Expert': 'bg-yellow-400'
+  }[proficiency || 'Beginner'];
+  
+  // Width mapping for proficiency levels
+  const proficiencyWidth = {
+    'Beginner': 'w-1/4',
+    'Intermediate': 'w-1/2',
+    'Advanced': 'w-3/4',
+    'Expert': 'w-full'
+  }[proficiency || 'Beginner'];
+  
   return (
-    <span 
-      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${bg} ${text} ${border} ${hover} ${className}`}
-    >
-      {children || skill}
-    </span>
+    <div className="group relative inline-block">
+      <div className="relative">
+        <span 
+          className={`inline-flex items-center px-3 py-1 rounded-full hover:rounded cursor-pointer text-sm font-medium ${bg} ${text} ${border} ${hover} ${className} transition-all duration-200`}
+        >
+          {children || skill}
+        </span>
+        {proficiency && (
+          <div className="absolute bottom-0 left-0 w-full h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            <div 
+              className={`absolute inset-0 ${proficiencyColor} transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100 ${proficiencyWidth} rounded-full`}
+            />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
