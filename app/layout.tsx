@@ -82,9 +82,10 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.png",
   },
+  other: {
+    'google-adsense-account': 'ca-pub-6373066383987878'
+  },
 };
-
-<meta name="google-adsense-account" content="ca-pub-6373066383987878"></meta>
 
 export const viewport: Viewport = {
   themeColor: [
