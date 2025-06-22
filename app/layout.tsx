@@ -145,6 +145,8 @@ export default function RootLayout({
       suppressHydrationWarning={true}
     >
       <head>
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6373066383987878"
+     crossOrigin="anonymous"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
