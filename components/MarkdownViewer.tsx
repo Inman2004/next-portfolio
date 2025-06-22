@@ -184,7 +184,7 @@ const CustomCode = ({
 
   if (inline) {
     return (
-      <code className={`bg-gray-200 dark:bg-gray-800/50 rounded px-1.5 py-0.5 text-sm font-mono text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 ${className}`} {...props}>
+      <code className={`bg-gray-200 dark:bg-gray-800/50 ${className}`} {...props}>
         {children}
       </code>
     );
@@ -193,9 +193,9 @@ const CustomCode = ({
   // For code blocks without a specified language
   if (!match) {
     return (
-      <div className="my-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow">
-        <pre className="p-4 overflow-x-auto m-0 bg-white dark:bg-transparent">
-          <code className="text-sm font-mono text-gray-900 dark:text-gray-200" {...props}>
+      <div className=" rounded-lg overflow-hidden ">
+        <pre className="overflow-x-auto m-0 bg-white dark:bg-transparent">
+          <code className="text-sm font-mono text-teal-600 dark:text-gray-200" {...props}>
             {children}
           </code>
         </pre>
@@ -204,7 +204,7 @@ const CustomCode = ({
   }
 
   return (
-    <div className="my-6 rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg">
+    <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg">
       <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center">
           <div className="flex space-x-2 mr-3">

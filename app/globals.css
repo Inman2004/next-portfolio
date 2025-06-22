@@ -147,7 +147,6 @@
 
   /* Better contrast for links in both themes */
   a {
-    color: rgb(var(--primary));
     text-decoration: none;
     transition: color 150ms ease, text-decoration-color 150ms ease;
   }
@@ -183,7 +182,7 @@
     padding: 1rem;
     overflow-x: auto;
     margin: 1rem 0;
-    border: 1px solid rgb(var(--border));
+    border: none;
   }
 
   .dark pre {
