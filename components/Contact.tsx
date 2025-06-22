@@ -65,7 +65,7 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-950 py-20">
+    <section id="contact" className="bg-white dark:bg-gradient-to-b dark:from-gray-900 rounded-lg dark:to-gray-950 py-20">
       <div className="max-w-6xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -272,7 +272,7 @@ export default function Hero() {
                 </div>
               </div> */}
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
+            <div className="flex flex-col my-4 sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
               <motion.a
                 href="#projects"
                 whileHover={{ scale: 1.05 }}
@@ -292,7 +292,7 @@ export default function Hero() {
             </div>
 
             {/* Social Links */}
-            <div className="mt-6 lg:mt-5 sm:mt-10 flex items-center gap-4 sm:gap-6 justify-center lg:justify-start flex-wrap">
+            <div className="mt-6 lg:mt-12 sm:mt-10 flex items-center gap-4 sm:gap-6 justify-center lg:justify-start flex-wrap">
               <motion.a
                 href="https://github.com/Inman2004"
                 target="_blank"
@@ -411,7 +411,7 @@ export default function Hero() {
                     }}
                   >
                     <Image
-                      src="/images/grammers.gif"
+                      src="/images/avatar1.png"
                       alt="Immanuvel"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
@@ -437,8 +437,8 @@ export default function Hero() {
                     transition={{ duration: 0.5, delay: 0.1 }}
                   />
                   <motion.div 
-                    className="absolute inset-0 bg-gradient-to-r from-blue-100/20 via-transparent to-purple-100/20 
-                      dark:from-blue-900/20 dark:via-transparent dark:to-purple-900/20"
+                    className="absolute inset-0 bg-gradient-to-r from-blue-100/90 via-transparent to-purple-100/90 
+                      dark:from-blue-900/50 dark:via-transparent dark:to-purple-900/50"
                     whileHover={{ opacity: 0.6 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                   />

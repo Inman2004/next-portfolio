@@ -84,6 +84,8 @@ export const metadata: Metadata = {
   },
 };
 
+<meta name="google-adsense-account" content="ca-pub-6373066383987878"></meta>
+
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
