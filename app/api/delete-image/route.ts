@@ -11,23 +11,82 @@ cloudinary.config({
 
 export async function POST(request: Request) {
   try {
-    const { publicId } = await request.json();
+    console.log('=== DELETE IMAGE REQUEST ===');
+    const body = await request.json();
+    console.log('Request body:', body);
+    
+    const { publicId } = body;
     
     if (!publicId) {
+      console.error('Error: Missing publicId in request');
       return NextResponse.json(
-        { success: false, error: 'Missing publicId' },
+        { 
+          success: false, 
+          error: 'Missing publicId',
+          receivedData: body
+        },
         { status: 400 }
       );
     }
 
-    const result = await cloudinary.uploader.destroy(publicId);
+    console.log(`Attempting to delete image with publicId: ${publicId}`);
     
-    return NextResponse.json({ success: true, result });
+    // First, check if the resource exists
+    try {
+      const resource = await cloudinary.api.resource(publicId);
+      console.log('Found resource to delete:', resource);
+    } catch (resourceError) {
+      console.error('Error fetching resource:', resourceError);
+      // Continue with deletion attempt even if resource fetch fails
+    }
+
+    // Perform the deletion
+    console.log('Sending delete request to Cloudinary...');
+    const result = await cloudinary.uploader.destroy(publicId, {
+      invalidate: true, // Invalidate CDN cache
+      resource_type: 'image'
+    });
+    
+    console.log('Cloudinary delete result:', result);
+    
+    if (result.result === 'not found') {
+      console.warn(`Warning: Image with publicId ${publicId} was not found`);
+      return NextResponse.json({
+        success: false,
+        error: 'Image not found',
+        result
+      }, { status: 404 });
+    }
+    
+    if (result.result !== 'ok') {
+      console.error('Unexpected result from Cloudinary:', result);
+      throw new Error(`Unexpected result: ${result.result}`);
+    }
+    
+    console.log(`Successfully deleted image: ${publicId}`);
+    return NextResponse.json({ 
+      success: true, 
+      result,
+      message: `Successfully deleted image: ${publicId}`
+    });
+    
   } catch (error) {
-    console.error('Error deleting image:', error);
+    console.error('Error in delete-image API:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'UnknownError'
+    });
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to delete image' },
+      { 
+        success: false, 
+        error: 'Failed to delete image',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error instanceof Error ? error.name : 'UnknownError'
+      },
       { status: 500 }
     );
+  } finally {
+    console.log('=== END DELETE IMAGE REQUEST ===\n');
   }
 }

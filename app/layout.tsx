@@ -18,7 +18,7 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Rv',
+    default: 'Rv Imman',
     template: '%s | Rv Imman',
   },
   description: 'Portfolio of rv imman - Full Stack Developer specializing in modern web technologies. Check out my projects and get in touch!',

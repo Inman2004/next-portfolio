@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { BookOpen, Music, Film, Code, Briefcase, ArrowRight, ChevronDown, ChevronUp, MapPin, Mail, HeartCrack, Languages } from 'lucide-react';
+import { BookOpen, Music, Film, Code, Briefcase, ArrowRight, ChevronDown, ChevronUp, MapPin, Mail, HeartCrack, Languages, Video } from 'lucide-react';
 import { Gamepad2, Utensils } from 'lucide-react';
 import MusicPlayer from '@/components/MusicPlayer';
 import { NeonGradientCard } from '@/components/magicui/neon-gradient-card';
 import Footer from '@/components/Footer';
-import Header from '@/components/Header';
+import HeroVideoDialog from '@/components/magicui/hero-video-dialog';
 
-type TabType = 'about' | 'favorites' | 'studies' | 'music' | 'shows';
+type TabType = 'about' | 'favorites' | 'studies' | 'music' | 'shows' | 'recording';
 
 const Personel = () => {
   const [activeTab, setActiveTab] = useState<TabType>('about');
@@ -22,11 +22,63 @@ const Personel = () => {
     }));
   };
 
-  // Helper function to get section key
-  const getSectionKey = (index: number) => `section-${index}`;
+  const [loading, setLoading] = useState(false);
+
+  const handleDownload = async (filename: string = 'Immanuvel_B_2025.pdf') => {
+    setLoading(true);
+    try {
+      // Encode the filename for URL safety
+      const encodedFilename = encodeURIComponent(filename);
+      const response = await fetch(`/api/download?file=${encodedFilename}`);
+      
+      // Handle API errors
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || 'Failed to download file');
+      }
+      
+      // Get the filename from the Content-Disposition header
+      const contentDisposition = response.headers.get('content-disposition');
+      let downloadFilename = filename;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
+        if (filenameMatch && filenameMatch[1]) {
+          downloadFilename = filenameMatch[1].replace(/['"]/g, '');
+        }
+      }
+      
+      // Create blob and download link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
+      link.href = url;
+      link.setAttribute('download', downloadFilename);
+      link.style.display = 'none';
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+      window.URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      // Show error message to user
+      alert(error instanceof Error ? error.message : 'Failed to download file');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const tabs: {id: TabType; icon: JSX.Element; label: string}[] = [
     { id: 'about', icon: <Briefcase size={18} />, label: 'About Me' },
+    { id: 'recording', icon: <Video size={18} />, label: 'Recording' },
     { id: 'favorites', icon: <BookOpen size={18} />, label: 'Favorites' },
     { id: 'studies', icon: <Code size={18} />, label: 'Studies' },
     { id: 'music', icon: <Music size={18} />, label: 'Music' },
@@ -85,6 +137,70 @@ const Personel = () => {
                 ))}
               </div>
             </div>
+            <div className="mt-4">
+              <button
+                onClick={() => handleDownload('Immanuvel_B_2025.pdf')}
+                disabled={loading}
+                className={`inline-flex items-center px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
+                  loading
+                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Downloading...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Resume
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'recording':
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-primary">Recording</h2>
+            <p className="text-muted-foreground">Check out some of my latest recordings and performances.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  videoSrc: '/videos/PneumoScan Demo.mp4',
+                  title: 'PneumoScan Demo',
+                  thumbnailSrc: '/videos/PneumoScan Demo-Cover.jpg',
+                  description: 'PneumoScan is a web application that uses CNN and machine learning to detect pneumonia in chest X-rays.',
+                  autoGenerateThumbnail: false
+                },
+                // Add more videos
+              ].map((item, index) => (
+                <div key={index} className="group">
+                  <div className="relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-200 hover:shadow-md">
+                    <HeroVideoDialog 
+                      videoSrc={item.videoSrc}
+                      thumbnailSrc={item.thumbnailSrc}
+                      thumbnailAlt={item.title}
+                      autoGenerateThumbnail={item.autoGenerateThumbnail}
+                      className="aspect-video w-full"
+                    />
+                    <div className="p-4">
+                      <h3 className="font-medium leading-tight">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{item.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         );
 
@@ -116,7 +232,7 @@ const Personel = () => {
                   onClick={() => toggleSection(section.id)}
                   className="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <h3 className="text-lg font-medium flex items-center gap-2">
+                  <h3 className="text-lg text-primary font-medium flex items-center gap-2">
                     {section.icon}
                     <span>{section.title}</span>
                   </h3>
@@ -190,7 +306,7 @@ const Personel = () => {
       case 'music':
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold mb-4">My Music Player</h3>
+            <h3 className="text-xl text-primary font-semibold mb-4">My Music Player</h3>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
               <MusicPlayer />
             </div>
@@ -200,7 +316,7 @@ const Personel = () => {
       case 'shows':
         return (
             <div className="space-y-6">
-            <h3 className="text-xl font-semibold mb-4">My Favorite Shows</h3>
+            <h3 className="text-xl text-primary font-semibold mb-4">My Favorite Shows</h3>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {[
