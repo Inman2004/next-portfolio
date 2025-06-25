@@ -69,7 +69,7 @@ export const projects: Project[] = [
     technologies: ["Next.js", "Python", "Flask", "Pandas"],
     github: "https://github.com/Inman2004/assinment-data-handler",
     live: "",
-    blogPost: "blog/kprqN5h359Kf7TKzahpO"
+    blogPost: "blog/kprqN5h359Kf7TKzahpO",
     images: ["/images/projects/dh.png", "/images/projects/dh2.png", "/images/projects/dh3.png"],
     startDate: new Date('2025-05-05'),
     endDate: new Date('2025-05-08'),
