@@ -30,24 +30,23 @@ const skills: Skill[] = [
     category: "Backend",
     items: [
       { name: "Node.js", level: 80 },
-      { name: "Python", level: 75 },
+      { name: "Python", level: 50 },
       { name: "MongoDB", level: 80 },
-      { name: "MySQL", level: 75 },
+      { name: "MySQL", level: 70 },
       { name: "Firebase", level: 90 },
       { name: "Express", level: 85 },
-      { name: "Flask", level: 70 },
+      { name: "Flask", level: 40 },
     ]
   },
   {
     category: "DevOps & Tools",
     items: [
-      { name: "Figma", level: 85 },
+      { name: "Figma", level: 65 },
       { name: "Git", level: 80 },
       { name: "Postman", level: 85 },
-      { name: "Docker", level: 70 },
+      { name: "Docker", level: 40 },
       { name: "Vercel", level: 95 },
-      { name: "AWS", level: 60 },
-      { name: "LLMs & AI Integration", level: 50 },
+      { name: "LLMs & AI Integration", level: 40 },
     ]
   }
 ];
