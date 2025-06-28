@@ -16,23 +16,23 @@ export interface ExperienceType {
 }
 
 export const experiences: ExperienceType[] = [
+  // {
+  //   id: 1,
+  //   role: 'Full Stack Developer',
+  //   company: 'Mann Hospitality',
+  //   companyUrl: 'https://mannhospitality.com/',
+  //   location: 'Bengaluru, India',
+  //   startDate: 'May 2025',
+  //   endDate: 'Present',
+  //   description: [
+  //     'Not started yet',
+  //     'Planning to start soon'
+  //   ],
+  //   skills: ['Next.js', 'React', 'Node.js', 'TypeScript', 'TailwindCSS', 'MongoDB', 'Docker', 'AWS', 'CI/CD', 'RESTful APIs'],
+  //   status: ['interview', 'issued_offer', 'pending'],
+  // },
   {
     id: 1,
-    role: 'Full Stack Developer',
-    company: 'Mann Hospitality',
-    companyUrl: 'https://mannhospitality.com/',
-    location: 'Bengaluru, India',
-    startDate: 'May 2025',
-    endDate: 'Present',
-    description: [
-      'Not started yet',
-      'Planning to start soon'
-    ],
-    skills: ['Next.js', 'React', 'Node.js', 'TypeScript', 'TailwindCSS', 'MongoDB', 'Docker', 'AWS', 'CI/CD', 'RESTful APIs'],
-    status: ['interview', 'issued_offer', 'pending'],
-  },
-  {
-    id: 2,
     role: 'Indie Web Developer',
     company: 'Self-Employed',
     companyUrl: 'https://rvinman2004.vercel.app',
@@ -51,7 +51,7 @@ export const experiences: ExperienceType[] = [
     status: ['freelance', 'working']
   },
   {
-    id: 3,
+    id: 2,
     role: '3D Artist',
     company: 'Freelancer',
     companyUrl: 'https://linkedin.com/in/rv3d',
@@ -67,7 +67,7 @@ export const experiences: ExperienceType[] = [
     status: ['freelance', 'contract_ended', 'break']
   },
   {
-    id: 4,
+    id: 3,
     role: 'Open Source Contributor',
     company: 'GitHub',
     companyUrl: 'https://github.com/Inman2004',
