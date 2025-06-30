@@ -20,12 +20,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useMarkdownEditor, MarkdownEditorContextType } from './MarkdownEditorContext';
-import { Popover } from './ui/popover';
+import { useMarkdownEditor } from './MarkdownEditorContext';
 import toast from 'react-hot-toast';
 import { Toaster } from 'sonner';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -73,7 +72,7 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
     const handleAction = useCallback((action: MarkdownAction) => {
         if (!insertText) return;
 
-        if (action.action) {    
+        if (action.action) {
             action.action(editorProxy);
         }
 
@@ -84,7 +83,7 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
 
     const handleImageUpload = useCallback(async (file?: File) => {
         if (!file) return;
-    
+
         try {
             const imageUrl = await handleFileUpload(file);
             if (imageUrl) {
@@ -99,14 +98,14 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
             toast.error('Failed to upload image');
         }
     }, [altText, insertText]);
-    
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             handleImageUpload(file);
         }
     };
-    
+
     const handleUrlInsert = () => {
         if (!imageUrl) return;
         const markdown = `![${altText || 'image'}](${imageUrl})`;
@@ -316,7 +315,6 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
                         }
 
                         const commonProps = {
-                            key: action.id,
                             'aria-label': action.label,
                             'data-tooltip-id': `tooltip-${action.id}`,
                             className: 'h-8 w-8 p-0 flex items-center justify-center',
@@ -355,76 +353,76 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
                 </div>
             </TooltipProvider>
             <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-    <DialogContent>
-        <DialogHeader>
-            <DialogTitle>Insert Image</DialogTitle>
-        </DialogHeader>
-        <Tabs 
-            value={activeTab} 
-            onValueChange={(value) => {
-                setActiveTab(value);
-                setImageUrl('');
-                setAltText('');
-            }}
-            className="w-full"
-        >
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="upload">Upload Image</TabsTrigger>
-                <TabsTrigger value="url">From URL</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="upload" className="space-y-4 pt-4">
-                <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="file-upload">Choose an image</Label>
-                    <Input 
-                        id="file-upload" 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleFileChange}
-                    />
-                </div>
-                <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="alt-text-upload">Alt Text (optional)</Label>
-                    <Input
-                        id="alt-text-upload"
-                        placeholder="Describe the image for accessibility"
-                        value={altText}
-                        onChange={(e) => setAltText(e.target.value)}
-                    />
-                </div>
-            </TabsContent>
-
-            <TabsContent value="url" className="space-y-4 pt-4">
-                <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="image-url">Image URL</Label>
-                    <Input
-                        id="image-url"
-                        placeholder="https://example.com/image.jpg"
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                    />
-                </div>
-                <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="alt-text-url">Alt Text (optional)</Label>
-                    <Input
-                        id="alt-text-url"
-                        placeholder="Describe the image for accessibility"
-                        value={altText}
-                        onChange={(e) => setAltText(e.target.value)}
-                    />
-                </div>
-                <div className="flex justify-end pt-2">
-                    <Button 
-                        onClick={handleUrlInsert} 
-                        disabled={!imageUrl}
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Insert Image</DialogTitle>
+                    </DialogHeader>
+                    <Tabs
+                        value={activeTab}
+                        onValueChange={(value) => {
+                            setActiveTab(value);
+                            setImageUrl('');
+                            setAltText('');
+                        }}
+                        className="w-full"
                     >
-                        Insert Image
-                    </Button>
-                </div>
-            </TabsContent>
-        </Tabs>
-    </DialogContent>
-</Dialog>
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="upload">Upload Image</TabsTrigger>
+                            <TabsTrigger value="url">From URL</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="upload" className="space-y-4 pt-4">
+                            <div className="grid w-full items-center gap-1.5">
+                                <Label htmlFor="file-upload">Choose an image</Label>
+                                <Input
+                                    id="file-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
+                            </div>
+                            <div className="grid w-full items-center gap-1.5">
+                                <Label htmlFor="alt-text-upload">Alt Text (optional)</Label>
+                                <Input
+                                    id="alt-text-upload"
+                                    placeholder="Describe the image for accessibility"
+                                    value={altText}
+                                    onChange={(e) => setAltText(e.target.value)}
+                                />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="url" className="space-y-4 pt-4">
+                            <div className="grid w-full items-center gap-1.5">
+                                <Label htmlFor="image-url">Image URL</Label>
+                                <Input
+                                    id="image-url"
+                                    placeholder="https://example.com/image.jpg"
+                                    value={imageUrl}
+                                    onChange={(e) => setImageUrl(e.target.value)}
+                                />
+                            </div>
+                            <div className="grid w-full items-center gap-1.5">
+                                <Label htmlFor="alt-text-url">Alt Text (optional)</Label>
+                                <Input
+                                    id="alt-text-url"
+                                    placeholder="Describe the image for accessibility"
+                                    value={altText}
+                                    onChange={(e) => setAltText(e.target.value)}
+                                />
+                            </div>
+                            <div className="flex justify-end pt-2">
+                                <Button
+                                    onClick={handleUrlInsert}
+                                    disabled={!imageUrl}
+                                >
+                                    Insert Image
+                                </Button>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
