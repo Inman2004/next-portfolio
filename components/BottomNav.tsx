@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -150,6 +150,79 @@ export function BottomNav() {
   const pathname = usePathname();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
+
+  // Toggle dock expansion
+  const toggleExpand = useCallback(() => {
+    setIsExpanded(!isExpanded);
+  }, [isExpanded]);
+
+  // Handle navigation item clicks
+  const handleItemClick = useCallback((item: NavItem, e: React.MouseEvent) => {
+    if (item.onClick) {
+      item.onClick(e);
+    } else if (item.href) {
+      if (item.href.startsWith('http')) {
+        window.open(item.href, '_blank');
+      } else if (item.href.startsWith('#')) {
+        e.preventDefault();
+        const targetId = item.href.substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        router.push(item.href);
+      }
+    }
+    // Collapse after navigation on mobile
+    if (window.innerWidth < 768) {
+      setIsExpanded(false);
+    }
+  }, [router]);
+
+  // Handle click outside to close expanded dock
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isExpanded && !target.closest('.dock-container')) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isExpanded]);
+
+  // Update active section based on scroll
+  useEffect(() => {
+    if (pathname === '/') {
+      const handleScroll = () => {
+        const sections = ['home', 'projects', 'experience', 'services', 'contact'];
+        const scrollPosition = window.scrollY + 200;
+
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element) {
+            const offsetTop = element.offsetTop;
+            const offsetHeight = element.offsetHeight;
+
+            if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+              setActiveSection(section);
+              break;
+            }
+          }
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      handleScroll(); // Initial check
+
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [pathname]);
   
   // Navigation items for non-home pages (minimal navigation)
   const minimalNavItems = useMemo(() => {
@@ -228,102 +301,136 @@ export function BottomNav() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 hidden md:flex flex-col items-center justify-center z-50">
-      <TooltipProvider>
-        <Dock direction="middle" className="bg-background/80 backdrop-blur-md border border-border/10 shadow-lg">
-          {visibleNavItems.map((item) => (
-            <DockIcon key={item.label}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {item.href ? (
-                    <Link
-                      href={item.href}
-                      aria-label={item.label}
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full text-foreground hover:bg-foreground/10",
-                        (pathname === item.href || 
-                        (pathname?.startsWith('/blog') && item.href === '#blog')) ? 'text-primary' : '',
-                        item.className
-                      )}
-                    >
-                      <item.icon className="size-4" />
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={item.onClick}
-                      aria-label={item.label}
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "size-12 rounded-full hover:text-foreground/80"
-                      )}
-                    >
-                      <item.icon className="size-4" />
-                    </button>
+    <div 
+      className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out hidden md:block ${
+        isExpanded ? 'w-64' : 'w-16'
+      }`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <motion.div 
+        className={`h-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-r-2xl shadow-xl border-r border-gray-200 dark:border-gray-800 flex flex-col p-2 transition-all ${isHovering ? 'shadow-2xl' : ''}`}
+        initial={false}
+        animate={{ width: isExpanded ? '16rem' : '4rem' }}
+        transition={{ duration: 0.2, ease: 'easeInOut' }}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+      {/* Expand/Collapse Button */}
+      <button
+        onClick={toggleExpand}
+        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 mb-4 self-end"
+        aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
+      >
+        <ChevronLeft 
+          className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-0' : 'rotate-180'}`} 
+        />
+      </button>
+
+      {/* Navigation Items */}
+      <nav className="flex-1 flex flex-col space-y-2 overflow-y-auto">
+        {visibleNavItems.map((item, index) => {
+          const isActive = item.href?.startsWith('#') 
+            ? activeSection === item.href.substring(1) 
+            : pathname === item.href;
+
+          return (
+            <Tooltip key={index}>
+              <TooltipTrigger asChild>
+                <motion.button
+                  onClick={(e) => handleItemClick(item, e)}
+                  className={cn(
+                    'flex items-center p-3 rounded-xl transition-all duration-200 w-full',
+                    'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
+                    'hover:bg-gray-100 dark:hover:bg-gray-800',
+                    isActive && 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+                    item.className
                   )}
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{item.label}</p>
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label={item.label}
+                >
+                  <div className="flex items-center">
+                    {item.icon({ className: 'w-5 h-5 flex-shrink-0' })}
+                    <motion.span 
+                      className="ml-3 whitespace-nowrap"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ 
+                        opacity: isExpanded ? 1 : 0,
+                        x: isExpanded ? 0 : -10,
+                        display: isExpanded ? 'inline-block' : 'none'
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item.label}
+                    </motion.span>
+                  </div>
+                </motion.button>
+              </TooltipTrigger>
+              {!isExpanded && (
+                <TooltipContent side="right" className="bg-gray-900 text-white text-xs ml-2">
+                  {item.label}
                 </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-          ))}
-          
-          <Separator orientation="vertical" className="h-full py-2" />
-          
-          {user ? (
+              )}
+            </Tooltip>
+          );
+        })}
+      </nav>
+
+      {/* Bottom Section - Theme Toggle and User Menu */}
+      <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+        <div className="flex flex-col justify-between items-center gap-4 p-4">
+          <ThemeSwitcher />
+          {user && (
             <div className="relative">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-accent/50 transition-colors focus:outline-none"
-                    aria-haspopup="true"
-                    aria-expanded={showDropdown}
-                    onBlur={() => setShowDropdown(false)}
-                  >
-                    <UserAvatar 
-                      photoURL={user.photoURL || ''} 
-                      displayName={user.displayName || 'User'} 
-                      size={32}
-                      className="w-8 h-8"
-                    />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Account</p>
-                </TooltipContent>
-              </Tooltip>
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center space-x-2 focus:outline-none"
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
+              >
+                <UserAvatar
+                  photoURL={user.photoURL || undefined}
+                  displayName={user.displayName || 'User'}
+                  compact
+                  className="h-8 w-8"
+                />
+              </button>
 
               <AnimatePresence>
                 {showDropdown && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute bottom-full right-0 mb-2 w-48 rounded-md shadow-lg bg-background border border-border overflow-hidden z-50"
-                    onClick={(e) => e.stopPropagation()}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.15, ease: 'easeInOut' }}
+                    className="absolute right-0 left-0 bottom-full mb-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                   >
                     <div className="py-1">
-                      {DashboardLinks.filter(link => !link.adminOnly || user?.email === 'rvimman@gmail.com').map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
+                      {DashboardLinks.map((link, index) => (
+                        <motion.div
+                          key={index}
+                          initial={false}
+                          animate={{ opacity: 1 }}
+                          className="transition-colors duration-150 ease-in-out"
                         >
-                          {link.icon({ className: 'w-4 h-4 mr-2' })}
-                          {link.label}
-                        </Link>
+                          <Link
+                            href={link.href}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            {link.icon({ className: 'w-4 h-4 mr-2' })}
+                            {link.label}
+                          </Link>
+                        </motion.div>
                       ))}
                       <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleLogout();
+                        onClick={() => {
+                          logout();
+                          setShowDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 flex items-center"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-4 h-4 mr-2" />
                         Sign out
                       </button>
                     </div>
@@ -331,59 +438,35 @@ export function BottomNav() {
                 )}
               </AnimatePresence>
             </div>
-          ) : (
-            <div className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/signin"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full hover:text-foreground/80"
-                    )}
-                  >
-                    <LogIn className="w-4 h-4 text-foreground" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Sign in</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/signup"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "size-12 rounded-full hover:text-foreground/80"
-                    )}
-                  >
-                    <UserPlus className="w-4 h-4 text-foreground" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Sign up</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
           )}
-
-          <Separator orientation="vertical" className="h-full py-2" />
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <DockIcon>
-                  <ThemeSwitcher className="w-full p-6 h-full" />
-                </DockIcon>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Theme</p>
-            </TooltipContent>
-          </Tooltip>
-        </Dock>
-      </TooltipProvider>
+        </div>
+        
+        {!user && (
+          <div className="flex flex-col space-y-2 p-4">
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'sm' }),
+                'w-full flex items-center justify-center'
+              )}
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              <span className={isExpanded ? 'block' : 'hidden'}>Login</span>
+            </Link>
+            <Link
+              href="/register"
+              className={cn(
+                buttonVariants({ variant: 'default', size: 'sm' }),
+                'w-full flex items-center justify-center'
+              )}
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              <span className={isExpanded ? 'block' : 'hidden'}>Sign up</span>
+            </Link>
+          </div>
+        )}
+      </div>
+      </motion.div>
     </div>
   );
 }

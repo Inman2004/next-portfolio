@@ -14,91 +14,24 @@ import { Tutorial } from '../tutorial/Tutorial';
 // Utility function to extract public ID from Cloudinary URL
 
 const extractPublicId = (url: string): string | null => {
-  if (!url) {
-    console.log('extractPublicId: No URL provided');
-    return null;
-  }
-  
-  console.log('Extracting publicId from URL:', url);
+  if (!url) return null;
   
   try {
-    // Handle both http and https URLs
-    let path: string;
-    
-    // Handle Cloudinary URLs with or without protocol
-    if (url.includes('cloudinary.com')) {
-      const urlObj = new URL(url);
-      path = urlObj.pathname;
-    } else if (url.startsWith('/')) {
-      // Handle relative URLs
-      path = url;
-    } else {
-      console.log('extractPublicId: Not a Cloudinary URL');
-      return null;
-    }
-    
-    // Remove leading slash if present
-    if (path.startsWith('/')) {
-      path = path.substring(1);
-    }
-    
-    // Split the path into parts
-    const parts = path.split('/');
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/');
     
     // Find the index of 'upload' in the path
-    const uploadIndex = parts.findIndex(part => part === 'upload');
-    if (uploadIndex === -1) {
-      console.log('extractPublicId: No upload segment found in URL');
-      return null;
-    }
+    const uploadIndex = pathParts.findIndex(part => part === 'upload');
+    if (uploadIndex === -1) return null;
     
-    // The public ID is everything after the version number (which is the next part after 'upload')
-    const publicIdParts = [];
-    for (let i = uploadIndex + 2; i < parts.length; i++) {
-      // Skip empty parts
-      if (parts[i] && parts[i] !== '') {
-        publicIdParts.push(parts[i]);
-      }
-    }
-    
-    if (publicIdParts.length === 0) {
-      console.log('extractPublicId: No public ID parts found after upload segment');
-      return null;
-    }
-    
-    // Join the parts to form the public ID with path
-    let publicIdWithExtension = publicIdParts.join('/');
-    
-    // Remove any query parameters
-    const queryParamIndex = publicIdWithExtension.indexOf('?');
-    if (queryParamIndex !== -1) {
-      publicIdWithExtension = publicIdWithExtension.substring(0, queryParamIndex);
-    }
+    // The public ID is everything after the version number (if present)
+    const publicIdWithExtension = pathParts.slice(uploadIndex + 2).join('/');
+    if (!publicIdWithExtension) return null;
     
     // Remove file extension if present
-    const lastDotIndex = publicIdWithExtension.lastIndexOf('.');
-    const publicId = lastDotIndex > 0 
-      ? publicIdWithExtension.substring(0, lastDotIndex)
-      : publicIdWithExtension;
-    
-    // Special case: If the public ID contains a version number at the end (e.g., v1234567890/...)
-    // We need to include the version in the public ID
-    if (uploadIndex + 1 < parts.length) {
-      const versionPart = parts[uploadIndex + 1];
-      if (versionPart && versionPart.startsWith('v') && /^\d+$/.test(versionPart.substring(1))) {
-        return `${versionPart}/${publicId}`;
-      }
-    }
-    
-    console.log('Extracted publicId:', publicId);
-    return publicId;
-    
+    return publicIdWithExtension.split('.')[0];
   } catch (e) {
-    console.error('Error in extractPublicId:', {
-      error: e instanceof Error ? e.message : 'Unknown error',
-      stack: e instanceof Error ? e.stack : undefined,
-      url: url
-    });
+    console.error('Error parsing URL:', e);
     return null;
   }
 };
@@ -116,22 +49,10 @@ const NewBlogPostPage = () => {
   
   // Function to delete image from Cloudinary
   const deleteImage = useCallback(async (imageUrl: string | null) => {
-    console.log('deleteImage called with URL:', imageUrl);
+    if (!imageUrl) return;
     
-    if (!imageUrl) {
-      console.log('No image URL provided, nothing to delete');
-      return;
-    }
-    
-    console.log('Extracting publicId from URL:', imageUrl);
     const publicId = extractPublicId(imageUrl);
-    
-    if (!publicId) {
-      console.error('Could not extract publicId from URL:', imageUrl);
-      throw new Error('Invalid image URL: Could not extract public ID');
-    }
-    
-    console.log('Deleting image with publicId:', publicId);
+    if (!publicId) return;
     
     try {
       const response = await fetch('/api/delete-image', {
@@ -139,39 +60,17 @@ const NewBlogPostPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          publicId,
-          originalUrl: imageUrl,
-          timestamp: new Date().toISOString()
-        }),
-      });
-      
-      const responseData = await response.json().catch(() => ({
-        error: 'Invalid JSON response',
-        status: response.status,
-        statusText: response.statusText
-      }));
-      
-      console.log('Delete API response:', {
-        status: response.status,
-        statusText: response.statusText,
-        data: responseData
+        body: JSON.stringify({ publicId }),
       });
       
       if (!response.ok) {
-        throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete image');
       }
       
-      console.log('Successfully deleted image:', publicId);
-      return responseData;
-      
+      return await response.json();
     } catch (error) {
-      console.error('Error in deleteImage:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        publicId,
-        originalUrl: imageUrl
-      });
+      console.error('Error deleting image:', error);
       throw error; // Re-throw to allow handling in the calling function
     }
   }, []);
@@ -245,28 +144,20 @@ const NewBlogPostPage = () => {
       // Store the old image URL before we start the upload
       const oldImageUrl = coverImage;
       
-      // Delete the old image if it exists before opening the upload widget
+      // Clear the current cover image to show loading state
+      setCoverImage(null);
+      
+      // Delete the old image if it exists
       if (oldImageUrl) {
         try {
-          console.log('Attempting to delete old image:', oldImageUrl);
           await deleteImage(oldImageUrl);
           console.log('Old cover image deleted successfully');
         } catch (error) {
           console.error('Error deleting old cover image:', error);
-          // Don't proceed with upload if deletion fails
-          setError('Failed to remove old image. Please try again.');
-          setIsUploading(false);
-          return;
+          // Continue with upload even if deletion fails
         }
       }
-      
-      // Clear the current cover image to show loading state
-      // Only do this after successful deletion
-      setCoverImage(null);
 
-      // Store the current state to use in the callback
-      const currentCoverImage = coverImage;
-      
       const uploadWidget = window.cloudinary.createUploadWidget(
         {
           cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -309,10 +200,6 @@ const NewBlogPostPage = () => {
         async (error: any, result: any) => {
           if (error) {
             console.error('Upload error details:', error);
-            // If there was an error, revert to the previous image if it existed
-            if (currentCoverImage) {
-              setCoverImage(currentCoverImage);
-            }
             setError('Failed to upload image. ' + (error.message || 'Please try again.'));
             setIsUploading(false);
             return;
@@ -320,21 +207,10 @@ const NewBlogPostPage = () => {
 
           if (result.event === 'success') {
             try {
-              const newImageUrl = result.info.secure_url;
-              console.log('New cover image uploaded successfully:', newImageUrl);
-              
-              // Only update the state if we have a new image URL
-              if (newImageUrl) {
-                setCoverImage(newImageUrl);
-              } else {
-                throw new Error('No image URL returned from upload');
-              }
+              setCoverImage(result.info.secure_url);
+              console.log('New cover image uploaded successfully:', result.info.secure_url);
             } catch (err) {
               console.error('Error setting new cover image:', err);
-              // Revert to previous image on error
-              if (currentCoverImage) {
-                setCoverImage(currentCoverImage);
-              }
               setError('Failed to set the new cover image. Please try again.');
             } finally {
               setIsUploading(false);
@@ -343,10 +219,6 @@ const NewBlogPostPage = () => {
             console.log('Widget display changed:', result);
           } else if (result.event === 'close') {
             console.log('Widget closed');
-            // If the widget is closed without uploading, revert to the previous image
-            if (currentCoverImage && !coverImage) {
-              setCoverImage(currentCoverImage);
-            }
             setIsUploading(false);
           }
         }

@@ -8,14 +8,18 @@ interface UserAvatarProps {
   displayName?: string | null;
   size?: number;
   className?: string;
+  compact?: boolean;
 }
 
 export function UserAvatar({ 
   photoURL, 
   displayName, 
   size = 128,
-  className = '' 
+  className = '',
+  compact = false
 }: UserAvatarProps) {
+  // Adjust size for compact mode
+  const effectiveSize = compact ? 24 : size;
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
 
@@ -101,19 +105,22 @@ export function UserAvatar({
   // If there was an error or no valid photoURL, show initials
   if (hasError || !photoURL || photoURL === 'undefined') {
     const initials = (displayName || 'U').match(/\b\w/g)?.join('').toUpperCase() || 'U';
-    const fontSize = Math.min(size / 2, 48); // Scale font size based on avatar size
+    const fontSize = compact ? 10 : Math.min(size / 2, 48); // Scale font size based on avatar size
     
     return (
       <div 
-        className={`rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${className}`}
+        className={`rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${className} ${
+          compact ? 'text-xs' : ''
+        }`}
         style={{ 
-          width: `${size}px`, 
-          height: `${size}px`,
+          width: `${effectiveSize}px`, 
+          height: `${effectiveSize}px`,
           fontSize: `${fontSize}px`,
-          fontWeight: 'bold'
+          fontWeight: compact ? 'normal' : 'bold',
+          minWidth: `${effectiveSize}px`
         }}
       >
-        {initials.slice(0, 2)}
+        {initials.slice(0, compact ? 1 : 2)}
       </div>
     );
   }
@@ -122,12 +129,14 @@ export function UserAvatar({
   if (imgSrc) {
     return (
       <div 
-        className={`relative rounded-full overflow-hidden ${className}`}
+        className={`relative rounded-full overflow-hidden ${className} ${
+          compact ? 'ring-1 ring-white dark:ring-gray-800' : ''
+        }`}
         style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          minWidth: `${size}px`,
-          minHeight: `${size}px`
+          width: `${effectiveSize}px`,
+          height: `${effectiveSize}px`,
+          minWidth: `${effectiveSize}px`,
+          minHeight: `${effectiveSize}px`
         }}
       >
         <Image

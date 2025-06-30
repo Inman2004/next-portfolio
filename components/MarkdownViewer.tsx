@@ -373,7 +373,7 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
             <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
-            <div className="overflow-x-auto my-1 rounded-lg border border-gray-300 dark:border-gray-700">
+            <div className="overflow-x-auto my-6 rounded-lg border border-gray-300 dark:border-gray-700">
               <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700" {...props} />
             </div>
           ),
