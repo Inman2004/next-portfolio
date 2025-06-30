@@ -304,7 +304,7 @@ export default function PostPage({ params }: PostPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-900 dark:text-white overflow-x-hidden w-full transition-colors duration-200">
-      <div className="pt-24 px-6 max-w-4xl mx-auto">
+      <div className="pt-24 px-6 max-w-5xl mx-auto">
         <motion.article 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
