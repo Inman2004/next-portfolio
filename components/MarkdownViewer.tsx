@@ -462,7 +462,7 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
             <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
-            <div className="overflow-x-auto my-8 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+            <div className="overflow-x-auto my-8 rounded-xl border border-indigo-200 dark:border-teal-700 shadow-sm">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props} />
             </div>
           ),
@@ -474,7 +474,7 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
           ),
           th: (props) => (
             <th 
-              className="px-6 py-3 text-left text-xs font-medium text-indigo-700 dark:text-indigo-300 uppercase tracking-wider"
+              className="px-6 py-3 text-left text-xs font-medium text-indigo-700 dark:text-teal-300  border-b border-indigo-200 dark:border-teal-700 uppercase tracking-wider"
               style={{ whiteSpace: 'nowrap' }}
               {...props}
             />

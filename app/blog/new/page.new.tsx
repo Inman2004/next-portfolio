@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import BlogPostForm from '@/components/BlogPostForm';
-import { MarkdownEditorProvider } from '@/components/MarkdownEditorContext';
 
 export default function NewBlogPostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,13 +42,11 @@ export default function NewBlogPostPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6">Create New Post</h1>
-      <MarkdownEditorProvider>
-        <BlogPostForm 
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-          isEditing={false}
-        />
-      </MarkdownEditorProvider>
+      <BlogPostForm 
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        isEditing={false}
+      />
     </div>
   );
 }

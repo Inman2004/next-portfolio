@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getBlogPostById } from '@/lib/blog';
 import { toast } from 'sonner';
 import BlogPostForm from '@/components/BlogPostForm';
-import { MarkdownEditorProvider } from '@/components/MarkdownEditorContext';
 
 function EditPostWithForm({ postId }: { postId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,18 +73,12 @@ function EditPostWithForm({ postId }: { postId: string }) {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6">Edit Post</h1>
-      {initialData ? (
-        <MarkdownEditorProvider>
-          <BlogPostForm 
-            initialData={initialData}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            isEditing={true}
-          />
-        </MarkdownEditorProvider>
-      ) : (
-        <div>Loading...</div>
-      )}
+      <BlogPostForm 
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        isEditing={true}
+      />
     </div>
   );
 }
