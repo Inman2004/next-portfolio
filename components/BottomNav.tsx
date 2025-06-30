@@ -444,7 +444,7 @@ export function BottomNav() {
         {!user && (
           <div className="flex flex-col space-y-2 p-4">
             <Link
-              href="/login"
+              href="/signin"
               className={cn(
                 buttonVariants({ variant: 'outline', size: 'sm' }),
                 'w-full flex items-center justify-center'
@@ -454,7 +454,7 @@ export function BottomNav() {
               <span className={isExpanded ? 'block' : 'hidden'}>Login</span>
             </Link>
             <Link
-              href="/register"
+              href="/signup"
               className={cn(
                 buttonVariants({ variant: 'default', size: 'sm' }),
                 'w-full flex items-center justify-center'
