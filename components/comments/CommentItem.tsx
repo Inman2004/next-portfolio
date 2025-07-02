@@ -1,8 +1,8 @@
 import { memo, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Trash2, Pin, Crown } from 'lucide-react';
-import Image from 'next/image';
 import { formatNumber } from '@/lib/formatNumber';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import Link from 'next/link';
 import { CommentItemProps, ADMIN_EMAIL } from './types';
 import { isValidUrl } from '@/lib/urlUtils';
@@ -81,92 +81,19 @@ export const CommentItem = memo(({
                 <Crown className="w-5 h-5 text-yellow-500" />
               </motion.div>
             )}
-            {comment.username ? (
-              <Link 
-                href={`/users/${comment.username}`}
-                className="relative group block w-10 h-10 rounded-full overflow-hidden bg-gray-700"
-                onClick={(e) => {
-                  console.log('Avatar clicked for user:', comment.username);
-                  e.stopPropagation();
-                }}
-                title={`View ${comment.user?.displayName || comment.displayName || 'user'}'s profile`}
-              >
-                <div className="absolute inset-0 rounded-full group-hover:ring-2 group-hover:ring-blue-500 group-hover:ring-opacity-50 transition-all duration-200 pointer-events-none"></div>
-                {(() => {
-                  const photoURL = comment.user?.photoURL || comment.photoURL;
-                  const displayName = comment.user?.displayName || comment.displayName || 'User';
-                  
-                  if (!photoURL || !isValidUrl(photoURL)) {
-                    return (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
-                        {displayName.charAt(0).toUpperCase()}
-                      </div>
-                    );
-                  }
-                  
-                  return (
-                    <>
-                      <Image
-                        src={photoURL}
-                        alt={displayName}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) {
-                            fallback.style.display = 'flex';
-                          }
-                        }}
-                      />
-                      <div className="hidden absolute inset-0 items-center justify-center bg-gray-600 text-white">
-                        {displayName.charAt(0).toUpperCase()}
-                      </div>
-                    </>
-                  );
-                })()}
-              </Link>
-            ) : (
-              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-700">
-                {(() => {
-                  const photoURL = comment.user?.photoURL || comment.photoURL;
-                  const displayName = comment.user?.displayName || comment.displayName || 'User';
-                  
-                  if (!photoURL || !isValidUrl(photoURL)) {
-                    return (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-600 text-white">
-                        {displayName.charAt(0).toUpperCase()}
-                      </div>
-                    );
-                  }
-                  
-                  return (
-                    <>
-                      <Image
-                        src={photoURL}
-                        alt={displayName}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) {
-                            fallback.style.display = 'flex';
-                          }
-                        }}
-                      />
-                      <div className="hidden absolute inset-0 items-center justify-center bg-gray-600 text-white">
-                        {displayName.charAt(0).toUpperCase()}
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            )}
+            <UserAvatar
+              photoURL={comment.user?.photoURL || comment.photoURL}
+              displayName={comment.user?.displayName || comment.displayName || 'User'}
+              size={40}
+              asLink={!!comment.username}
+              linkHref={comment.username ? `/users/${comment.username}` : undefined}
+              onClick={(e) => {
+                console.log('Avatar clicked for user:', comment.username);
+                e?.stopPropagation();
+              }}
+              className={`group ${comment.username ? 'hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50' : ''}`}
+              title={comment.username ? `View ${comment.user?.displayName || comment.displayName || 'user'}'s profile` : undefined}
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">

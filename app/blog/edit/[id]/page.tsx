@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { getBlogPostById } from '@/lib/blog';
+import { getBlogPostById, updateBlogPost } from '@/lib/blog';
+import { BlogPost } from '@/types/blog';
+import { blogPostSchema, BlogPostFormValues } from '@/lib/schemas/blog';
 import { toast } from 'sonner';
 import BlogPostForm from '@/components/BlogPostForm';
 import { MarkdownEditorProvider } from '@/components/MarkdownEditorContext';
@@ -48,16 +50,48 @@ function EditPostWithForm({ postId }: { postId: string }) {
     }
   }, [postId, user?.uid, router]);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (formData: BlogPostFormValues) => {
+    if (!user) {
+      toast.error('You must be logged in to update a post');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      // TODO: Implement update logic
-      // await updateBlogPost(postId, data, user?.uid);
+      
+      // Format tags if they exist
+      const tags = formData.tags && typeof formData.tags === 'string' 
+        ? formData.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean)
+        : Array.isArray(formData.tags) 
+          ? formData.tags.filter(Boolean)
+          : [];
+      
+      // Create update data with only the fields that can be updated
+      const updateData: Partial<BlogPost> = {
+        title: formData.title,
+        content: formData.content,
+        excerpt: formData.excerpt || '',
+        coverImage: formData.coverImage || null,
+        published: formData.published ?? true,
+        tags: tags,
+        updatedAt: new Date(),
+        slug: formData.title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-'),
+        readingTime: Math.ceil((formData.content || '').split(/\s+/).length / 200) + ' min read'
+      };
+
+      // Call the update function with the typed data
+      await updateBlogPost(postId, updateData);
+      
       toast.success('Post updated successfully');
       router.push(`/blog/${postId}`);
+      router.refresh(); // Refresh the page to show the updated post
     } catch (error) {
       console.error('Error updating post:', error);
-      toast.error('Failed to update post');
+      toast.error(error instanceof Error ? error.message : 'Failed to update post');
     } finally {
       setIsSubmitting(false);
     }
@@ -70,6 +104,21 @@ function EditPostWithForm({ postId }: { postId: string }) {
       </div>
     );
   }
+  
+  // Ensure initialData has all required fields with defaults
+  // Prepare initial form data with proper types
+  const formInitialData: BlogPostFormValues = {
+    title: initialData.title || '',
+    content: initialData.content || '',
+    excerpt: initialData.excerpt || '',
+    coverImage: initialData.coverImage || null,
+    published: initialData.published ?? true,
+    tags: Array.isArray(initialData.tags) 
+      ? initialData.tags.join(', ')
+      : typeof initialData.tags === 'string'
+        ? initialData.tags
+        : ''
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -77,7 +126,7 @@ function EditPostWithForm({ postId }: { postId: string }) {
       {initialData ? (
         <MarkdownEditorProvider>
           <BlogPostForm 
-            initialData={initialData}
+            initialData={formInitialData}
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             isEditing={true}

@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import emailjs from '@emailjs/browser';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
+import { BlogCacheProvider } from '@/contexts/BlogCacheContext';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -56,19 +57,23 @@ export default function Providers({
 
   return (
     <AuthProvider>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-        themes={['light', 'dark']}
-      >
-        <ThemeWrapper>
-          <main className="min-h-screen bg-background text-foreground transition-colors duration-200">
-            {children}
-          </main>
-        </ThemeWrapper>
-      </ThemeProvider>
+      <BlogCacheProvider>
+        <NextThemesProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          themes={['light', 'dark', 'system']}
+        >
+          <ThemeProvider>
+            <ThemeWrapper>
+              <main className="min-h-screen bg-background text-foreground transition-colors duration-200">
+                {children}
+              </main>
+            </ThemeWrapper>
+          </ThemeProvider>
+        </NextThemesProvider>
+      </BlogCacheProvider>
     </AuthProvider>
   );
 }

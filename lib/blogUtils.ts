@@ -60,13 +60,20 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
     const usersQuery = query(usersCollection, where('__name__', 'in', userIds));
     const usersSnapshot = await getDocs(usersQuery);
     
-    const userDataMap = new Map<string, { displayName?: string; photoURL?: string }>();
+    interface UserData {
+      displayName?: string;
+      photoURL?: string;
+      socials?: Record<string, string>;
+    }
+    
+    const userDataMap = new Map<string, UserData>();
     
     usersSnapshot.forEach(doc => {
       const data = doc.data();
       userDataMap.set(doc.id, {
         displayName: data.displayName,
-        photoURL: data.photoURL
+        photoURL: data.photoURL,
+        socials: data.socials || {}
       });
     });
     
@@ -74,21 +81,45 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
     return posts.map(post => {
       const userData = userDataMap.get(post.authorId) || {};
       
-      // Always use the latest user data if available, otherwise fall back to post data
-      const displayName = userData.displayName || post.author || 'Anonymous';
-      const photoURL = userData.photoURL || post.authorPhotoURL || '';
+      // Handle case where post.author might be a string or an object
+      const existingAuthor = typeof post.author === 'object' ? post.author : 
+                           { 
+                             name: post.author as string, 
+                             photoURL: post.authorPhotoURL,
+                             socials: {}
+                           } as const;
       
-      return {
+      // Always use the latest user data if available, otherwise fall back to post data
+      const displayName = userData.displayName || existingAuthor.name || 'Anonymous';
+      const photoURL = userData.photoURL || existingAuthor.photoURL || '';
+      const socials = userData.socials || (existingAuthor as any).socials || {};
+      
+      // Create the author object with proper typing
+      const author = {
+        id: post.authorId,
+        name: displayName,
+        photoURL: photoURL,
+        socials: socials
+      };
+      
+      // Create the user object for the post
+      const user = {
+        displayName,
+        photoURL,
+        socials
+      };
+      
+      // Create the enriched post
+      const enrichedPost = {
         ...post,
-        author: displayName,
+        author,
         authorPhotoURL: photoURL,
-        user: {
-          displayName,
-          photoURL
-        },
+        user,
         // Keep any existing unsubscribe function
         _userUnsubscribe: (post as any)._userUnsubscribe
-      } as T & EnrichedBlogPost;
+      };
+      
+      return enrichedPost as unknown as T & EnrichedBlogPost;
     });
   } catch (error) {
     console.error('Error enriching blog posts:', error);

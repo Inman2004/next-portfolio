@@ -4,6 +4,7 @@ import { createContext, useContext, useRef, ReactNode } from 'react';
 
 interface MarkdownEditorContextType {
   editor: HTMLTextAreaElement | null;
+  editorRef: React.RefObject<HTMLTextAreaElement | null>;
   setEditor: (editor: HTMLTextAreaElement | null) => void;
   insertText: (text: string) => void;
 }
@@ -41,7 +42,8 @@ export function MarkdownEditorProvider({ children }: { children: ReactNode }) {
   return (
     <MarkdownEditorContext.Provider 
       value={{ 
-        editor: editorRef.current, 
+        editor: editorRef.current,
+        editorRef,
         setEditor, 
         insertText 
       }}

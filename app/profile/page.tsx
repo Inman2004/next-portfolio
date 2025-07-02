@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProfileSettings from '@/components/ui/ProfileSettings';
+import { SocialLinksForm } from '@/components/profile/SocialLinksForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -152,7 +153,7 @@ export default function ProfilePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div>
                         <h3 className="text-sm font-medium mb-2">Email</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -165,6 +166,13 @@ export default function ProfilePage() {
                           {user.metadata?.creationTime}
                         </p>
                       </div>
+                      
+                      <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                        <SocialLinksForm 
+                          initialData={user.socials || {}}
+                        />
+                      </div>
+                      
                       <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
                         <Button variant="destructive">Delete Account</Button>
                         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,23 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Loader2, Image as ImageIcon, X, Plus } from 'lucide-react';
 import { BlogPost } from '@/types/blog';
+import { blogPostSchema, BlogPostFormValues } from '@/lib/schemas/blog';
 import EditorToolbar from './EditorToolbar';
 import { useMarkdownEditor } from './MarkdownEditorContext';
 
-const blogPostSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  excerpt: z.string().optional(),
-  content: z.string().min(1, 'Content is required'),
-  coverImage: z.string().nullable().optional(),
-  published: z.boolean().default(true),
-  tags: z.string().optional(),
-});
-
-type BlogPostFormValues = z.infer<typeof blogPostSchema>;
-
 interface BlogPostFormProps {
-  initialData?: BlogPost;
-  onSubmit: (data: BlogPost) => Promise<void>;
+  initialData?: BlogPostFormValues;
+  onSubmit: (data: BlogPostFormValues) => Promise<void>;
   isSubmitting: boolean;
   isEditing?: boolean;
 }
@@ -49,6 +38,16 @@ export default function BlogPostForm({
   const { setEditor, insertText } = useMarkdownEditor();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  const defaultValues: BlogPostFormValues = {
+    title: '',
+    excerpt: '',
+    content: '',
+    coverImage: null,
+    published: true,
+    tags: '',
+    ...initialData
+  };
+
   const {
     register,
     handleSubmit,
@@ -58,14 +57,7 @@ export default function BlogPostForm({
     formState: { errors }
   } = useForm<BlogPostFormValues>({
     resolver: zodResolver(blogPostSchema),
-    defaultValues: {
-      title: initialData?.title || '',
-      excerpt: initialData?.excerpt || '',
-      content: initialData?.content || '',
-      coverImage: initialData?.coverImage || null,
-      published: initialData?.published ?? true,
-      tags: initialData?.tags?.join(', ') || '',
-    },
+    defaultValues,
   });
 
   const content = watch('content');
@@ -178,29 +170,22 @@ export default function BlogPostForm({
       }
 
       // Create a complete blog post object with required fields
-      const blogPost: BlogPost = {
-        ...(initialData || {}),
-        ...formData,
+      // Prepare the form values for submission
+      const formValues: BlogPostFormValues = {
         title: formData.title.trim(),
         content: formData.content.trim(),
         excerpt: formData.excerpt?.trim() || '',
         coverImage: formData.coverImage || null,
-        author: initialData?.author || '',
-        authorId: initialData?.authorId || '',
-        authorPhotoURL: initialData?.authorPhotoURL || null,
-        createdAt: initialData?.createdAt || new Date(),
-        updatedAt: new Date(),
         published: formData.published ?? true,
-        tags: formData.tags
-          ? formData.tags
-            .split(',')
-            .map(tag => tag.trim())
-            .filter(tag => tag.length > 0)
-          : []
+        tags: formData.tags && typeof formData.tags === 'string' 
+          ? formData.tags 
+          : Array.isArray(formData.tags) 
+            ? formData.tags.join(', ') 
+            : ''
       };
 
-      // Call the parent's onSubmit handler
-      await onSubmit(blogPost);
+      // Call the parent's onSubmit handler with the form values
+      await onSubmit(formValues);
     } catch (error) {
       console.error('Error in form submission:', error);
       toast.error(`Failed to save post: ${error instanceof Error ? error.message : 'Unknown error'}`);

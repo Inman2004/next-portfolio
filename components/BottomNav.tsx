@@ -390,10 +390,11 @@ export function BottomNav() {
                 aria-haspopup="true"
               >
                 <UserAvatar
-                  photoURL={user.photoURL || undefined}
+                  photoURL={user.photoURL?.startsWith('user://') ? `user_${user.uid}` : user.photoURL || undefined}
                   displayName={user.displayName || 'User'}
                   compact
                   className="h-8 w-8"
+                  title={user.displayName || 'User'}
                 />
               </button>
 

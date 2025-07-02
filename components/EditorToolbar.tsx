@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     Bold,
     Italic,
@@ -23,11 +23,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useMarkdownEditor } from './MarkdownEditorContext';
 import toast from 'react-hot-toast';
 import { Toaster } from 'sonner';
-import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tutorial } from '@/app/blog/tutorial/Tutorial';
 
 type EditorProxy = {
     insertText: (text: string) => void;
@@ -46,31 +46,57 @@ type MarkdownAction = {
 };
 
 interface EditorToolbarProps {
-    onImageUpload: () => void;
+    onImageUpload: (file: File) => Promise<string>;
     onAddLink: () => void;
 }
 
 export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolbarProps) {
-    const { insertText } = useMarkdownEditor();
+    const { insertText, editorRef } = useMarkdownEditor();
     const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+    const [isTableDialogOpen, setIsTableDialogOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [altText, setAltText] = useState('');
-    const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'url'
+    const [activeTab, setActiveTab] = useState('upload');
+    const [rows, setRows] = useState(3);
+    const [columns, setColumns] = useState(3);
+    
+    if (!insertText) return null;
 
     // Create a proxy object that provides the required methods
     const editorProxy = useMemo(() => ({
-        insertText: (text: string) => {
-            if (insertText) {
-                insertText(text);
-            }
-        },
-        focus: () => {
-            // The focus is handled by the MarkdownEditorContext
-        }
-    }), [insertText]);
+        insertText: (text: string) => insertText?.(text),
+        focus: () => editorRef.current?.focus()
+    }), [insertText, editorRef]);
+
+    const getCurrentLine = useCallback((): string => {
+        if (!editorRef?.current) return '';
+        const textarea = editorRef.current;
+        const start = textarea.selectionStart;
+        const value = textarea.value;
+        const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+        const lineEnd = value.indexOf('\n', start);
+        return value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+    }, [editorRef]);
 
     const handleAction = useCallback((action: MarkdownAction) => {
         if (!insertText) return;
+
+        // Handle list actions with smart continuation
+        if (['ul', 'ol', 'task'].includes(action.id)) {
+            const currentLine = getCurrentLine();
+            const isListLine = /^\s*[-*+]\s|^\s*\d+\.\s|^\s*-\s*\[\s*[xX]?\s*\]\s/.test(currentLine);
+            
+            if (isListLine) {
+                // If we're already in a list, add a new line with the same indentation
+                const match = currentLine.match(/^(\s*)/);
+                const indent = match ? match[0] : '';
+                const newLine = action.id === 'ul' ? `${indent}- ` : 
+                              action.id === 'ol' ? `${indent}1. ` : 
+                              `${indent}- [ ] `;
+                insertText(`\n${newLine}`);
+                return;
+            }
+        }
 
         if (action.action) {
             action.action(editorProxy);
@@ -79,15 +105,47 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
         if (action.onClick) {
             action.onClick();
         }
-    }, [insertText, editorProxy]);
+    }, [insertText, editorProxy, getCurrentLine]);
+
+    // Handle keyboard events for smart list continuation
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            const currentLine = getCurrentLine();
+            const listMatch = currentLine.match(/^(\s*)([-*+]|\d+\.)\s/);
+            const taskMatch = currentLine.match(/^(\s*)- \[(\s*[xX]?\s*)\]\s/);
+            
+            if (listMatch || taskMatch) {
+                e.preventDefault();
+                const indent = listMatch ? listMatch[1] : taskMatch?.[1] || '';
+                let newLine = '\n' + indent;
+                
+                if (taskMatch) {
+                    // Continue task list with proper spacing
+                    const isChecked = taskMatch[2].trim().toLowerCase() === 'x';
+                    newLine += `- [${isChecked ? 'x' : ' '}] `;
+                } else if (listMatch) {
+                    // Continue regular list
+                    const isNumbered = /\d+\./.test(listMatch[2]);
+                    if (isNumbered) {
+                        const num = parseInt(listMatch[2]) + 1;
+                        newLine += `${num}. `;
+                    } else {
+                        newLine += `${listMatch[2]} `;
+                    }
+                }
+                
+                insertText?.(newLine);
+            }
+        }
+    }, [insertText]);
 
     const handleImageUpload = useCallback(async (file?: File) => {
-        if (!file) return;
+        if (!file || !onImageUpload) return;
 
         try {
-            const imageUrl = await handleFileUpload(file);
-            if (imageUrl) {
-                const markdown = `![${altText || 'image'}](${imageUrl})`;
+            const uploadedImageUrl = await onImageUpload(file);
+            if (uploadedImageUrl) {
+                const markdown = `![${altText || 'image'}](${uploadedImageUrl})`;
                 insertText?.(markdown);
                 toast.success('Image uploaded successfully');
                 setIsImageDialogOpen(false);
@@ -97,23 +155,23 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
             console.error('Error uploading image:', error);
             toast.error('Failed to upload image');
         }
-    }, [altText, insertText]);
+    }, [altText, insertText, onImageUpload]);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             handleImageUpload(file);
         }
-    };
+    }, [handleImageUpload]);
 
-    const handleUrlInsert = () => {
+    const handleUrlInsert = useCallback(() => {
         if (!imageUrl) return;
         const markdown = `![${altText || 'image'}](${imageUrl})`;
         insertText?.(markdown);
         setImageUrl('');
         setAltText('');
         setIsImageDialogOpen(false);
-    };
+    }, [imageUrl, altText, insertText]);
 
     const actions = useMemo<MarkdownAction[]>(() => [
         {
@@ -182,7 +240,24 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
             id: 'task',
             label: 'Task List',
             icon: <ListTodo className="h-4 w-4" />,
-            action: (editor) => editor.insertText('- [ ] '),
+            action: (editor) => {
+                const currentLine = getCurrentLine();
+                if (/^\s*$/.test(currentLine)) {
+                    // If line is empty, insert task list item with proper spacing
+                    editor.insertText('- [ ] ');
+                } else {
+                    // If there's text, convert it to a task list item with proper spacing
+                    const match = currentLine.match(/^(\s*)(.*)/);
+                    if (match) {
+                        const [_, indent, text] = match;
+                        // Ensure there's a space after the brackets
+                        const taskText = text.trim().startsWith('- [') 
+                            ? text.replace(/^\s*-\s*\[\s*([xX\s]?)\s*\]\s*/, '- [ $1 ] ') 
+                            : `- [ ] ${text}`;
+                        editor.insertText(`\n${indent}${taskText}`);
+                    }
+                }
+            },
             variant: 'toggle' as const
         },
         {
@@ -197,9 +272,8 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
             label: 'Insert Link',
             shortcut: 'Ctrl+K',
             icon: <LinkIcon className="h-4 w-4" />,
-            action: () => { },
-            variant: 'button' as const,
-            onClick: onAddLink
+            action: () => onAddLink(),
+            variant: 'button' as const
         },
         {
             id: 'image',
@@ -242,47 +316,15 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
             id: 'table',
             label: 'Insert Table',
             icon: <TableIcon className="h-4 w-4" />,
-            action: (editor) => {
-                const getInput = (message: string, defaultValue: string): Promise<string> => {
-                    return new Promise((resolve) => {
-                        const input = window.prompt(message, defaultValue);
-                        resolve(input || defaultValue);
-                    });
-                };
-
-                const createTable = async () => {
-                    try {
-                        const rowsInput = await getInput('Enter number of rows (2-10):', '3');
-                        const colsInput = await getInput('Enter number of columns (1-6):', '3');
-
-                        const rows = parseInt(rowsInput) || 3;
-                        const cols = parseInt(colsInput) || 3;
-
-                        // Validate input
-                        const validRows = Math.max(2, Math.min(10, rows));
-                        const validCols = Math.max(1, Math.min(6, cols));
-
-                        // Generate table
-                        let table = '\n\n';
-                        table += '|' + ' Header   |'.repeat(validCols) + '\n';
-                        table += '|' + '----------|'.repeat(validCols) + '\n';
-
-                        for (let i = 0; i < validRows; i++) {
-                            table += '|' + ' Cell     |'.repeat(validCols) + '\n';
-                        }
-                        table += '\n';
-
-                        editor.insertText(table);
-
-                    } catch (error) {
-                        toast.error('Error creating table');
-                        console.error('Error creating table:', error);
-                    }
-                };
-
-                createTable();
-            },
+            action: () => setIsTableDialogOpen(true),
             variant: 'button' as const
+        },
+        {
+            id: 'divider-6',
+            label: 'Divider',
+            icon: null,
+            action: () => { },
+            separator: true
         },
         {
             id: 'quote',
@@ -291,22 +333,11 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
             icon: <Quote className="h-4 w-4" />,
             action: (editor) => editor.insertText('> '),
             variant: 'toggle' as const
-        },
-        {
-            id: 'divider',
-            label: 'Divider',
-            shortcut: '--- + Enter',
-            icon: <Minus className="h-4 w-4" />,
-            action: (editor) => editor.insertText('\n---\n'),
-            variant: 'toggle' as const
         }
-    ], [onAddLink, onImageUpload]);
-
-    if (!insertText) return null;
+    ], [getCurrentLine, onAddLink, setIsImageDialogOpen, setIsTableDialogOpen]);
 
     return (
-        <div className="flex flex-wrap items-center gap-1 p-1 border-b bg-muted/50 relative">
-            <Toaster position="top-center" />
+        <>
             <TooltipProvider>
                 <div className="flex flex-wrap items-center gap-1 p-1 border-b bg-muted/50">
                     {actions.map((action) => {
@@ -318,7 +349,11 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
                             'aria-label': action.label,
                             'data-tooltip-id': `tooltip-${action.id}`,
                             className: 'h-8 w-8 p-0 flex items-center justify-center',
-                            onClick: () => handleAction(action)
+                            onClick: (e: React.MouseEvent) => {
+                                e.preventDefault();
+                                handleAction(action);
+                            },
+                            type: 'button' as const
                         };
 
                         return (
@@ -349,8 +384,9 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
                                 </TooltipContent>
                             </Tooltip>
                         );
-                    })}
+                    })}<Tutorial />
                 </div>
+                
             </TooltipProvider>
             <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
                 <DialogContent>
@@ -423,6 +459,63 @@ export default function EditorToolbar({ onImageUpload, onAddLink }: EditorToolba
                     </Tabs>
                 </DialogContent>
             </Dialog>
-        </div>
+
+            {/* Table Insertion Dialog */}
+            <Dialog open={isTableDialogOpen} onOpenChange={setIsTableDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Insert Table</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 pt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="rows">Rows</Label>
+                                <Input
+                                    id="rows"
+                                    type="number"
+                                    min="1"
+                                    max="10"
+                                    value={rows}
+                                    onChange={(e) => setRows(parseInt(e.target.value) || 1)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="columns">Columns</Label>
+                                <Input
+                                    id="columns"
+                                    type="number"
+                                    min="1"
+                                    max="6"
+                                    value={columns}
+                                    onChange={(e) => setColumns(parseInt(e.target.value) || 1)}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex justify-end pt-2">
+                            <Button
+                                onClick={() => {
+                                    const validRows = Math.max(1, Math.min(10, rows));
+                                    const validCols = Math.max(1, Math.min(6, columns));
+
+                                    // Generate table markdown
+                                    let table = '\n\n';
+                                    table += '|' + ' Header   |'.repeat(validCols) + '\n';
+                                    table += '|' + '----------|'.repeat(validCols) + '\n';
+                                    
+                                    for (let i = 0; i < validRows; i++) {
+                                        table += '|' + ' Cell     |'.repeat(validCols) + '\n';
+                                    }
+                                    
+                                    insertText?.(table);
+                                    setIsTableDialogOpen(false);
+                                }}
+                            >
+                                Insert Table
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }

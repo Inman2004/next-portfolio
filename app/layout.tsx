@@ -10,6 +10,7 @@ import WelcomePopup from '@/components/WelcomePopupClient';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { FontLoader } from '@/components/FontLoader';
 import { BottomNav } from "@/components/BottomNav";
+import { Toaster } from 'react-hot-toast';
 
 // Base URL for the site
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.app/';
@@ -209,6 +210,7 @@ export default function RootLayout({
               <WelcomePopup />
               <PerformanceMonitor />
               <FontLoader />
+              <Toaster position="top-center" />
             </ErrorBoundary>
           </Providers>
         </PageLoadingProvider>

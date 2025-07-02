@@ -117,7 +117,7 @@ export default function SocialShare({ url, title, description = '', isCompact = 
           onClick={handleShare}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="p-2 text-gray-300 hover:text-blue-400 transition-colors relative bg-gray-800/50 rounded-full"
+          className="p-2 text-gray-300 dark:text-gray-800 hover:text-white dark:hover:text-gray-900 transition-colors relative bg-gray-800/50 dark:bg-gray-400/50 rounded-full"
           aria-label="Share this post"
           title="Share this post"
         >

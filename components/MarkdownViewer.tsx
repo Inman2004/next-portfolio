@@ -392,8 +392,8 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
               className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 text-indigo-700 dark:text-gray-100"
               {...props}
             >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-blue-900/50 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-blue-400"></span>
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-teal-900/50 flex items-center justify-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
               </span>
               {props.children}
             </h2>
@@ -449,15 +449,62 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
               </p>
             );
           },
-          ul: (props) => (
-            <ul className="list-disc pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" {...props} />
+          // Custom checkbox input for task lists
+          input: (inputProps: React.InputHTMLAttributes<HTMLInputElement> & { node?: any }) => {
+            const { node, ...props } = inputProps;
+            if (props.type === 'checkbox') {
+              const isChecked = props.checked || false;
+              const checkmarkSvg = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3E%3C/svg%3E") no-repeat center';
+              
+              return (
+                <input 
+                  type="checkbox" 
+                  disabled={true} 
+                  checked={isChecked}
+                  className={`h-4 w-4 rounded border mr-2 mt-0.5 cursor-pointer transition-colors ${
+                    isChecked 
+                      ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' 
+                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                  }`}
+                  style={{
+                    backgroundImage: isChecked ? checkmarkSvg : 'none',
+                  }}
+                  {...props}
+                />
+              );
+            }
+            return <input {...props} />;
+          },
+          // Custom list components
+          ul: (ulProps: React.HTMLAttributes<HTMLUListElement>) => {
+            const { className, ...props } = ulProps;
+            const isTaskList = className?.includes('contains-task-list');
+            return (
+              <ul 
+                className={`${isTaskList ? 'space-y-2' : 'list-disc space-y-2'} pl-6 my-4`}
+                {...props} 
+              />
+            );
+          },
+          ol: (olProps: React.OlHTMLAttributes<HTMLOListElement>) => (
+            <ol 
+              className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" 
+              {...olProps} 
+            />
           ),
-          ol: (props) => (
-            <ol className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" {...props} />
-          ),
-          li: (props) => (
-            <li className="my-1 pl-1 text-gray-700 dark:text-gray-300" {...props} />
-          ),
+          li: (liProps: React.LiHTMLAttributes<HTMLLIElement>) => {
+            const { className, ...props } = liProps;
+            const isTaskItem = className?.includes('task-list-item');
+            return (
+              <li 
+                className={`relative pl-2 my-1 text-gray-700 dark:text-gray-300 ${
+                  isTaskItem ? 'flex items-start' : ''
+                }`}
+                {...props} 
+              />
+            );
+          },
+
           blockquote: (props) => (
             <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
           ),

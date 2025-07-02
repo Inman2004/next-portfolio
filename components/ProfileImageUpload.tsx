@@ -5,23 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Camera, User, Loader2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-
-interface CloudinaryUploadResult {
-  secure_url: string;
-  public_id: string;
-  width: number;
-  height: number;
-  format: string;
-  resource_type: string;
-  created_at: string;
-  tags: string[];
-  bytes: number;
-  type: string;
-  etag: string;
-  url: string;
-  signature: string;
-  original_filename: string;
-}
+import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 interface ProfileImageUploadProps {
   onImageUpdate?: () => void;
@@ -164,156 +149,152 @@ const ProfileImageUpload = ({
     }
   }, []);
 
+  // Helper function to compress image to under 200KB
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+          
+          // Set maximum dimensions
+          const MAX_WIDTH = 300;  // Reduced from 400
+          const MAX_HEIGHT = 300; // Reduced from 400
+          let width = img.width;
+          let height = img.height;
+          
+          // Calculate new dimensions while maintaining aspect ratio
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          
+          // Set canvas dimensions
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Draw image on canvas with higher quality settings
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Try multiple quality levels to get under 200KB
+          const tryCompress = (quality: number): string | null => {
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            // Check if the base64 string is under 200KB (200 * 1024 * 0.75 for base64 overhead)
+            if (dataUrl.length < 150000) { // ~200KB in base64
+              return dataUrl;
+            }
+            return null;
+          };
+          
+          // Try different quality levels
+          const qualities = [0.85, 0.7, 0.6, 0.5, 0.4, 0.3];
+          for (const quality of qualities) {
+            const result = tryCompress(quality);
+            if (result) {
+              resolve(result);
+              return;
+            }
+          }
+          
+          // If still too large, try further reducing dimensions
+          const reducedCanvas = document.createElement('canvas');
+          const reducedCtx = reducedCanvas.getContext('2d');
+          if (!reducedCtx) {
+            reject(new Error('Could not create reduced canvas'));
+            return;
+          }
+          
+          reducedCanvas.width = Math.floor(width * 0.8);
+          reducedCanvas.height = Math.floor(height * 0.8);
+          reducedCtx.imageSmoothingQuality = 'high';
+          reducedCtx.drawImage(canvas, 0, 0, reducedCanvas.width, reducedCanvas.height);
+          
+          const finalQuality = 0.5; // Start with medium quality for final attempt
+          const finalResult = reducedCanvas.toDataURL('image/jpeg', finalQuality);
+          
+          if (finalResult.length > 200000) {
+            reject(new Error('Image is too large after compression. Please try a smaller image.'));
+          } else {
+            resolve(finalResult);
+          }
+        };
+        
+        img.onerror = () => reject(new Error('Failed to load image'));
+      };
+      
+      reader.onerror = () => reject(new Error('Failed to read file'));
+    });
+  };
+
   const handleUpload = useCallback(async (file: File, objectUrl: string) => {
-    if (!user) {
+    if (!user || !user.uid) {
       toast.error('You must be logged in to upload an image');
-      return;
-    }
-    
-    if (!user.uid) {
-      toast.error('User information is incomplete');
-      return;
+      return { success: false, error: 'Not authenticated' };
     }
     
     setIsUploading(true);
     
     try {
-      // First, delete the old profile image
-      await deleteOldProfileImage(user.uid);
+      // Compress the image first
+      const compressedImage = await compressImage(file);
       
-      // Use user ID as public_id - the 'profile-images/' folder is set in the Cloudinary upload preset
-      const publicId = user.uid;
-      const tags = ['profile', 'user-avatar'];
-      const context = `user_id=${user.uid}|username=${user.displayName || 'user'}`;
-      
-      console.log('Uploading new profile image for user:', user.uid);
-      console.log('Using Cloudinary preset: profile_pictures_unsigned');
-      
-      // Create FormData with all required fields
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'profile_pictures_unsigned');
-      formData.append('public_id', publicId);
-      formData.append('context', context);
-      formData.append('tags', tags.join(','));
-      // Removed 'invalidate' parameter as it's not allowed in unsigned uploads
-      
-      // Note: Transformation parameters are not allowed in unsigned uploads.
-      // They should be configured in the Cloudinary upload preset instead.
-      // Add folder to ensure consistent organization
-      formData.append('folder', 'profile-images');
-      
-      console.log('Uploading to Cloudinary with settings:', {
-        publicId,
-        tags,
-        context,
-        timestamp: Date.now()
-      });
-      
-      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
-      console.log('Sending upload request to Cloudinary...');
-      // First, upload the image
-      const uploadResponse = await fetch(cloudinaryUrl, {
-        method: 'POST',
-        body: formData,
-      });
-      
-      let result;
-      try {
-        result = await uploadResponse.json();
-      } catch (jsonError) {
-        console.error('Failed to parse Cloudinary response as JSON:', jsonError);
-        const errorText = await uploadResponse.text();
-        console.error('Raw Cloudinary response:', errorText);
-        throw new Error(`Failed to parse Cloudinary response: ${uploadResponse.status} ${uploadResponse.statusText}`);
+      // Check if the compressed image is still too large
+      if (compressedImage.length > 900000) { // Leave some buffer under 1MB
+        throw new Error('Image is too large after compression. Please try a smaller image.');
       }
-      
-      console.log('Cloudinary response:', result);
-      
-      if (!uploadResponse.ok) {
-        console.error('Upload failed with status:', uploadResponse.status, uploadResponse.statusText);
-        console.error('Error details:', result);
-        throw new Error(`Upload failed: ${result?.error?.message || 'Unknown error'}`);
-      }
-      
-      // Handle pending status by polling for completion
-      if (result.status === 'pending' && result.public_id) {
-        console.log('Upload is pending, polling for completion...');
-        const maxAttempts = 10;
-        const delayMs = 1000;
-        
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-          console.log(`Polling attempt ${attempt}/${maxAttempts}...`);
-          await new Promise(resolve => setTimeout(resolve, delayMs));
-          
-          const statusUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/resources/image/upload/${result.public_id}`;
-          const statusResponse = await fetch(statusUrl);
-          
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            console.log('Polling status:', statusData);
-            
-            if (statusData.secure_url || statusData.url) {
-              result = statusData;
-              break;
-            }
-          }
-          
-          if (attempt === maxAttempts) {
-            throw new Error('Image processing is taking too long. Please try again.');
-          }
-        }
-      }
-      
-      // Make sure we have a valid secure_url or url
-      if (!result.secure_url && !result.url) {
-        console.error('No secure_url or url in Cloudinary response:', result);
-        throw new Error('No image URL returned from Cloudinary');
-      }
-      
-      // Use secure_url if available, otherwise fall back to url
-      const imageUrl = result.secure_url || result.url;
-      
-      console.log('Final image URL:', imageUrl);
 
-      // Update user profile with new image URL
-      console.log('Updating user profile with new image URL...');
+      // Store the compressed base64 image in Firestore
+      const db = getFirestore();
+      const userRef = doc(db, 'users', user.uid);
+      
+      await setDoc(userRef, {
+        photoBase64: compressedImage,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      
+      // Store a reference in the auth profile using a non-URL format
       const updateResult = await updateUserProfile({
-        photoURL: imageUrl,
-        displayName: user.displayName || '' // Include displayName to ensure it's preserved
+        photoURL: `user_${user.uid}`, // Using underscore instead of :// to avoid being treated as URL
+        displayName: user.displayName || ''
       });
       
-      console.log('Profile update result:', updateResult);
-      
-      if (updateResult?.success) {
-        // Update the preview URL with the new image URL and cache-busting parameter
-        const timestamp = new Date().getTime();
-        const updatedUrl = `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}v=${timestamp}`;
-        setPreviewUrl(updatedUrl);
-        
+      if (updateResult.success) {
+        setPreviewUrl(compressedImage);
         toast.success('Profile image updated successfully');
         
-        // Call the onImageUpdate callback if provided
         if (onImageUpdate) {
-          console.log('Calling onImageUpdate callback');
           onImageUpdate();
-        } else {
-          console.log('No onImageUpdate callback provided');
         }
         
-        // Force a small delay to ensure the UI updates
-        await new Promise(resolve => setTimeout(resolve, 500));
+        return { success: true, url: compressedImage };
       } else {
-        throw new Error(updateResult?.error || 'Failed to update profile');
+        throw new Error(updateResult.error || 'Failed to update profile');
       }
     } catch (error) {
-      console.error('Upload failed:', error);
-      toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      setPreviewUrl('');
+      console.error('Error uploading image:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
+      return { success: false, error };
     } finally {
       setIsUploading(false);
-      // Clean up object URL
-      URL.revokeObjectURL(objectUrl);
     }
   }, [user, updateUserProfile, onImageUpdate]);
 

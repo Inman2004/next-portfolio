@@ -25,7 +25,7 @@ export function Tutorial() {
   }: {
     title: string;
     example: string;
-    preview: string;
+    preview: React.ReactNode;
     className?: string;
   }) => {
     const [copied, setCopied] = useState(false);
@@ -183,6 +183,68 @@ export function Tutorial() {
                     example="![Alt text](/image.jpg)"
                     preview="[Image: Alt text]"
                     className="text-sm text-muted-foreground"
+                  />
+                </div>
+              </div>
+
+              {/* Tables */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2">Tables</h3>
+                <div className="space-y-4">
+                  <MarkdownExample
+                    title="Basic Table"
+                    example={"| Header 1 | Header 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |\n| Cell 3   | Cell 4   |"}
+                    preview={
+                      <div className="overflow-x-auto">
+                        <table className="border-collapse w-full">
+                          <thead>
+                            <tr>
+                              <th className="border p-2 text-left">Header 1</th>
+                              <th className="border p-2 text-left">Header 2</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border p-2">Cell 1</td>
+                              <td className="border p-2">Cell 2</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2">Cell 3</td>
+                              <td className="border p-2">Cell 4</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    }
+                  />
+                  <MarkdownExample
+                    title="Aligned Columns"
+                    example={"| Left-aligned | Center-aligned | Right-aligned |\n|:------------|:---------------:|--------------:|\n| Left        |     Center      |         Right |\n| Text        |     Text        |         Text  |"}
+                    preview={
+                      <div className="overflow-x-auto">
+                        <table className="border-collapse w-full">
+                          <thead>
+                            <tr>
+                              <th className="border p-2 text-left">Left-aligned</th>
+                              <th className="border p-2 text-center">Center-aligned</th>
+                              <th className="border p-2 text-right">Right-aligned</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border p-2 text-left">Left</td>
+                              <td className="border p-2 text-center">Center</td>
+                              <td className="border p-2 text-right">Right</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2 text-left">Text</td>
+                              <td className="border p-2 text-center">Text</td>
+                              <td className="border p-2 text-right">Text</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    }
                   />
                 </div>
               </div>

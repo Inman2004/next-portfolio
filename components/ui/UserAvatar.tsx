@@ -1,172 +1,202 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface UserAvatarProps {
-  photoURL: string | null | undefined;
+  photoURL?: string | null;
   displayName?: string | null;
   size?: number;
   className?: string;
   compact?: boolean;
+  asLink?: boolean;
+  linkHref?: string;
+  onClick?: (e: React.MouseEvent) => void;
+  title?: string;
 }
 
 export function UserAvatar({ 
   photoURL, 
   displayName, 
-  size = 128,
+  size = 40, 
   className = '',
-  compact = false
+  compact = false,
+  asLink = false,
+  linkHref,
+  onClick,
+  title = ''
 }: UserAvatarProps) {
-  // Adjust size for compact mode
-  const effectiveSize = compact ? 24 : size;
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
+  const effectiveSize = compact ? size - 8 : size;
 
   useEffect(() => {
     // Reset state when photoURL changes
     setHasError(false);
     
-    // If no photoURL or it's an empty string, use fallback
-    if (!photoURL) {
-      console.log('No photoURL provided, using fallback');
+    if (!photoURL || photoURL === 'undefined') {
       setHasError(true);
       return;
     }
     
-    // If photoURL is explicitly set to 'undefined' as a string, treat as no photo
-    if (photoURL === 'undefined') {
-      console.log('photoURL is string "undefined", using fallback');
-      setHasError(true);
+    // Check if this is a base64 data URL
+    if (photoURL.startsWith('data:image/')) {
+      setImgSrc(photoURL);
       return;
     }
-    
-    let processedUrl = photoURL;
-    
-    try {
-      // If it's a Cloudinary URL, ensure it has the proper format
-      if (typeof photoURL === 'string' && photoURL.includes('cloudinary.com')) {
-        // Skip processing if it already has transformations or is a data URL
-        if (!photoURL.includes('upload/') && !photoURL.startsWith('data:')) {
-          const parts = photoURL.split('/upload/');
-          if (parts.length === 2) {
-            processedUrl = `${parts[0]}/upload/c_fill,g_face,w_400,h_400/${parts[1]}`;
-            console.log('Processed Cloudinary URL:', processedUrl);
+
+    // Handle old format user reference (user://UID)
+    if (photoURL.startsWith('user://')) {
+      const userId = photoURL.replace('user://', '');
+      const fetchUserImage = async () => {
+        try {
+          const db = getFirestore();
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData.photoBase64) {
+              setImgSrc(userData.photoBase64);
+              return;
+            }
           }
+          setHasError(true);
+        } catch (error) {
+          console.error('Error fetching user image:', error);
+          setHasError(true);
         }
-      }
-    } catch (error) {
-      console.error('Error processing photoURL:', error);
-      setHasError(true);
+      };
+      fetchUserImage();
       return;
     }
     
-    // Create a test image to check if the URL is valid
-    const testImg = new window.Image();
-    
-    const handleLoad = () => {
-      // If image loads successfully, use it
-      setImgSrc(processedUrl);
-    };
-    
-    const handleError = () => {
-      console.log('Image failed to load:', processedUrl);
-      setHasError(true);
-    };
-    
-    testImg.onload = handleLoad;
-    testImg.onerror = handleError;
-    
-    try {
-      // Check if the URL is valid before creating a URL object
-      if (!processedUrl || typeof processedUrl !== 'string' || !processedUrl.match(/^https?:\/\//)) {
-        throw new Error('Invalid URL format');
-      }
-      
-      // Add cache-busting parameter
-      const url = new URL(processedUrl);
-      url.searchParams.set('v', Date.now().toString());
-      
-      // Start loading the test image
-      testImg.src = url.toString();
-    } catch (error) {
-      console.error('Invalid image URL:', processedUrl, error);
-      setHasError(true);
+    // Handle our custom user reference (user_UID)
+    if (photoURL.startsWith('user_')) {
+      const userId = photoURL.replace('user_', '');
+      const fetchUserImage = async () => {
+        try {
+          const db = getFirestore();
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData.photoBase64) {
+              setImgSrc(userData.photoBase64);
+              return;
+            }
+          }
+          setHasError(true);
+        } catch (error) {
+          console.error('Error fetching user image:', error);
+          setHasError(true);
+        }
+      };
+      fetchUserImage();
       return;
     }
     
-    return () => {
-      // Cleanup
-      testImg.onload = null;
-      testImg.onerror = null;
-    };
+    // Handle regular URLs
+    setImgSrc(photoURL);
   }, [photoURL]);
-
-  // If there was an error or no valid photoURL, show initials
-  if (hasError || !photoURL || photoURL === 'undefined') {
-    const initials = (displayName || 'U').match(/\b\w/g)?.join('').toUpperCase() || 'U';
-    const fontSize = compact ? 10 : Math.min(size / 2, 48); // Scale font size based on avatar size
-    
-    return (
-      <div 
-        className={`rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${className} ${
-          compact ? 'text-xs' : ''
-        }`}
-        style={{ 
-          width: `${effectiveSize}px`, 
-          height: `${effectiveSize}px`,
-          fontSize: `${fontSize}px`,
-          fontWeight: compact ? 'normal' : 'bold',
-          minWidth: `${effectiveSize}px`
-        }}
-      >
-        {initials.slice(0, compact ? 1 : 2)}
-      </div>
-    );
-  }
-
-  // If we have a valid image URL, use Next.js Image component
-  if (imgSrc) {
-    return (
-      <div 
-        className={`relative rounded-full overflow-hidden ${className} ${
-          compact ? 'ring-1 ring-white dark:ring-gray-800' : ''
-        }`}
-        style={{
-          width: `${effectiveSize}px`,
-          height: `${effectiveSize}px`,
-          minWidth: `${effectiveSize}px`,
-          minHeight: `${effectiveSize}px`
-        }}
-      >
-        <Image
-          src={imgSrc}
-          alt={displayName || 'User avatar'}
-          width={size}
-          height={size}
-          className="object-cover w-full h-full"
-          onError={() => setHasError(true)}
-          unoptimized={imgSrc.startsWith('blob:')}
-        />
-      </div>
-    );
-  }
   
-  // Fallback to initials if imgSrc is not available yet
-  const initials = (displayName || 'U').match(/\b\w/g)?.join('').toUpperCase() || 'U';
-  const fontSize = Math.min(size / 2, 48);
-  
-  return (
+  // Get user initials for fallback
+  const getInitials = () => {
+    try {
+      if (!displayName) return '?';
+      
+      // Handle case where displayName is an object with a name property
+      const nameString = typeof displayName === 'object' && displayName !== null 
+        ? (displayName as any).name || '?'
+        : String(displayName);
+      
+      return nameString
+        .split(' ')
+        .filter(Boolean) // Filter out any empty strings
+        .map((n: string) => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2) || '?';
+    } catch (error) {
+      console.error('Error getting initials:', error);
+      return '?';
+    }
+  };
+
+  // If we have an error or no image, show fallback with initials
+  const avatarContent = hasError || !imgSrc ? (
     <div 
-      className={`rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white ${className}`}
-      style={{ 
-        width: `${size}px`, 
-        height: `${size}px`,
-        fontSize: `${fontSize}px`,
-        fontWeight: 'bold'
+      className={`relative rounded-full bg-muted flex items-center justify-center ${
+        compact ? 'ring-1 ring-muted-foreground/20' : ''
+      } ${className}`}
+      style={{
+        width: '100%',
+        height: '100%',
+        minWidth: '100%',
+        minHeight: '100%'
       }}
     >
-      {initials.slice(0, 2)}
+      <span 
+        className="text-muted-foreground font-medium"
+        style={{ fontSize: `${Math.max(12, effectiveSize * 0.4)}px` }}
+      >
+        {getInitials()}
+      </span>
+    </div>
+  ) : (
+    // Determine if we should use a regular img tag (for data URLs, blobs, or our custom scheme)
+    imgSrc.startsWith('data:') || 
+    imgSrc.startsWith('blob:') || 
+    imgSrc.startsWith('user_') ? (
+      <img
+        src={imgSrc}
+        alt={displayName || 'User avatar'}
+        className="object-cover w-full h-full"
+        onError={() => setHasError(true)}
+      />
+    ) : (
+      <Image
+        src={imgSrc}
+        alt={displayName || 'User avatar'}
+        width={size}
+        height={size}
+        className="object-cover w-full h-full"
+        onError={() => setHasError(true)}
+      />
+    )
+  );
+
+  const containerClass = `relative rounded-full overflow-hidden ${className} ${
+    compact ? 'ring-1 ring-white dark:ring-gray-800' : ''
+  }`;
+
+  const containerStyle = {
+    width: `${effectiveSize}px`,
+    height: `${effectiveSize}px`,
+    minWidth: `${effectiveSize}px`,
+    minHeight: `${effectiveSize}px`
+  };
+
+  const avatarElement = (
+    <div 
+      className={containerClass}
+      style={containerStyle}
+      onClick={onClick}
+      title={title}
+    >
+      {avatarContent}
     </div>
   );
+
+  if (asLink && linkHref) {
+    return (
+      <Link href={linkHref} className="block" onClick={onClick}>
+        {avatarElement}
+      </Link>
+    );
+  }
+
+  return avatarElement;
+
+
 }

@@ -13,6 +13,7 @@ import { collection, query, where, orderBy, limit, startAfter, getDocs, Document
 import { Eye, Clock, Calendar, Search, Filter, X, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight, Loader } from 'lucide-react';
 import { BlogLoadingSkeleton } from '@/components/ui/blog-loading-skeleton';
 import { formatNumber } from '@/lib/formatNumber';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { toast } from 'react-hot-toast';
 import type { BlogPost, EnrichedBlogPost, BlogPostUserData } from '@/types/blog';
 import { getViewCounts } from '@/lib/views';
@@ -779,43 +780,41 @@ export default function BlogPage() {
                         <div className="mt-4 pt-4 border-t border-gray-200/70 dark:border-gray-700/50">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                              {(post.authorPhotoURL || post.user?.photoURL) ? (
-                                <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2.5 border border-gray-200/50 dark:border-gray-600/50">
-                                  <Image 
-                                    src={(post.authorPhotoURL || post.user?.photoURL) as string} 
-                                    alt={post.author || 'Author'} 
-                                    width={32} 
-                                    height={32}
-                                    className="object-cover w-full h-full"
-                                    onError={(e) => {
-                                      // Fallback to initials if image fails to load
-                                      const target = e.target as HTMLImageElement;
-                                      target.style.display = 'none';
-                                      const fallback = target.parentElement?.querySelector('.avatar-fallback') as HTMLElement;
-                                      if (fallback) fallback.style.display = 'flex';
-                                    }}
-                                  />
-                                  <div className="avatar-fallback hidden w-full h-full bg-blue-600 items-center justify-center text-white font-bold">
-                                    {post.author?.charAt(0)?.toUpperCase() || 'A'}
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mr-2.5 shadow-sm">
-                                  {post.author?.charAt(0)?.toUpperCase() || 'A'}
-                                </div>
-                              )}
+                              <div className="flex-shrink-0 mr-2.5">
+                                <UserAvatar
+                                  photoURL={(
+                                    (post.author && typeof post.author === 'object' && 'photoURL' in post.author ? (post.author as any).photoURL : null) || 
+                                    post.authorPhotoURL || 
+                                    post.user?.photoURL
+                                  ) as string | undefined}
+                                  displayName={
+                                    (post.author && typeof post.author === 'object' && 'name' in post.author ? (post.author as any).name : null) || 
+                                    (typeof post.author === 'string' ? post.author : 'Author')
+                                  }
+                                  size={32}
+                                  className="border border-gray-200/50 dark:border-gray-600/50"
+                                />
+                              </div>
                               <div>
-                                {post.username ? (
+                                {(post.author && typeof post.author === 'object' && 'username' in post.author ? (post.author as any).username : post.username) ? (
                                   <Link 
-                                    href={`/users/${post.username}`}
+                                    href={`/users/${
+                                      (post.author && typeof post.author === 'object' && 'username' in post.author 
+                                        ? (post.author as any).username 
+                                        : post.username)
+                                    }`}
                                     className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                     onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                   >
-                                    {post.author || 'Anonymous'}
+                                    {post.author && typeof post.author === 'object' && 'name' in post.author 
+                                      ? (post.author as any).name 
+                                      : (typeof post.author === 'string' ? post.author : 'Anonymous')}
                                   </Link>
                                 ) : (
                                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                    {post.author || 'Anonymous'}
+                                    {post.author && typeof post.author === 'object' && 'name' in post.author
+                                      ? (post.author as any).name
+                                      : (typeof post.author === 'string' ? post.author : 'Anonymous')}
                                   </p>
                                 )}
                                 <p className="text-xs text-gray-500 dark:text-gray-400">

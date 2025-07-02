@@ -372,13 +372,19 @@ export default function Header() {
                     .substring(0, 2);
 
                   // Use UserAvatar component for consistent avatar display
+                  // Ensure photoURL is in the correct format for UserAvatar
+                  const formattedPhotoURL = user.photoURL?.startsWith('user://') 
+                    ? `user_${user.uid}` 
+                    : user.photoURL;
+                    
                   return (
                     <div className="w-8 h-8">
                       <UserAvatar 
-                        photoURL={user.photoURL || ''} 
+                        photoURL={formattedPhotoURL || ''} 
                         displayName={displayName} 
                         size={32}
                         className="w-full h-full"
+                        title={displayName || 'User'}
                       />
                     </div>
                   );

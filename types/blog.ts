@@ -38,6 +38,16 @@ export interface BaseBlogPost {
 export interface BlogPostUserData {
   displayName?: string;
   photoURL?: string | null;
+  socials?: {
+    twitter?: string;
+    github?: string;
+    linkedin?: string;
+    instagram?: string;
+    youtube?: string;
+    facebook?: string;
+    website?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 // Interface for blog posts with user data and subscription management
