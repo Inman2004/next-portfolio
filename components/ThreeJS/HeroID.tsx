@@ -102,15 +102,25 @@ const InteractiveCard3DContent = () => {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   return (
+    <>
     <div style={{ 
       width: isMobile ? '100%' : '50vw', 
       height: isMobile ? '90vh' : '90vh',
-      borderRadius: '5%', 
+      borderRadius: '.5%', 
       overflow: 'hidden', 
-      borderTop: 'solid 5px #f1f1',
+      position: 'relative',
       margin: isMobile ? '0 auto' : '0',
       maxWidth: isMobile ? '100%' : 'none'
     }}>
+      <span style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '5px',
+        background: 'linear-gradient(90deg, rgba(241,241,241,0) 0%, rgba(241,241,241,0) 20%, rgba(100,100,241,.4) 40%, rgba(100,241,241,.4) 60%, rgba(241,241,241,0) 80%, rgba(241,241,241,0) 100%)',
+        zIndex: 2
+      }} />
       <Canvas camera={{ position: [0, 0, 13], fov: 25 }}>
         <ambientLight intensity={Math.PI} />
         <Physics debug={false} interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
@@ -149,6 +159,7 @@ const InteractiveCard3DContent = () => {
         </Environment>
       </Canvas>
     </div>
+    </>
   )
 }
 
