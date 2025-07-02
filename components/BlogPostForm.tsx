@@ -1,19 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Loader2, Image as ImageIcon, X, Plus } from 'lucide-react';
-import { BlogPost } from '@/types/blog';
-import { blogPostSchema, BlogPostFormValues } from '@/lib/schemas/blog';
-import EditorToolbar from './EditorToolbar';
+import { BlogPostFormValues } from '@/lib/schemas/blog';
+import { blogPostSchema } from '@/lib/schemas/blog';
 import { useMarkdownEditor } from './MarkdownEditorContext';
+import MarkdownEditor from './MarkdownEditor';
 
 interface BlogPostFormProps {
   initialData?: BlogPostFormValues;
@@ -35,30 +34,30 @@ export default function BlogPostForm({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
 
-  const { setEditor, insertText } = useMarkdownEditor();
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const defaultValues: BlogPostFormValues = {
-    title: '',
-    excerpt: '',
-    content: '',
-    coverImage: null,
-    published: true,
-    tags: '',
-    ...initialData
-  };
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    getValues,
-    formState: { errors }
-  } = useForm<BlogPostFormValues>({
+  // Initialize form with default values
+  const form = useForm<BlogPostFormValues>({
     resolver: zodResolver(blogPostSchema),
-    defaultValues,
+    defaultValues: {
+      title: '',
+      excerpt: '',
+      content: '',
+      coverImage: null,
+      published: true,
+      tags: '',
+      ...initialData
+    },
   });
+
+  const { 
+    register, 
+    handleSubmit, 
+    setValue, 
+    watch, 
+    formState: { errors } 
+  } = form;
+
+  const { setEditor } = useMarkdownEditor();
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const content = watch('content');
   const coverImage = watch('coverImage');
@@ -143,16 +142,41 @@ export default function BlogPostForm({
   };
 
   const handleAddLink = useCallback(() => {
+    // Focus the textarea first to ensure we have the correct cursor position
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
     setShowLinkDialog(true);
   }, []);
 
   const handleInsertLink = useCallback(() => {
     const markdownLink = `[${linkText || 'link'}](${linkUrl})`;
-    insertText(markdownLink);
+    
+    // Insert at cursor position if editor is available
+    if (textareaRef.current) {
+      const start = textareaRef.current.selectionStart;
+      const end = textareaRef.current.selectionEnd;
+      const currentValue = textareaRef.current.value;
+      const newValue = currentValue.substring(0, start) + markdownLink + currentValue.substring(end);
+      
+      // Update the form value
+      setValue('content', newValue, { shouldValidate: true });
+      
+      // Move cursor to the end of the inserted text
+      setTimeout(() => {
+        if (textareaRef.current) {
+          const newCursorPos = start + markdownLink.length;
+          textareaRef.current.selectionStart = newCursorPos;
+          textareaRef.current.selectionEnd = newCursorPos;
+          textareaRef.current.focus();
+        }
+      }, 0);
+    }
+    
     setShowLinkDialog(false);
     setLinkUrl('');
     setLinkText('');
-  }, [linkUrl, linkText, insertText]);
+  }, [linkUrl, linkText, setValue]);
 
   const handleFormSubmit = async (formData: BlogPostFormValues) => {
     console.log('=== Form submission started ===');
@@ -218,32 +242,16 @@ export default function BlogPostForm({
 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <Label htmlFor="content">Content</Label>
-          <div className="text-sm text-muted-foreground">
-            Markdown supported
-          </div>
+          <Label>Content</Label>
         </div>
 
-        <div className="border rounded-md overflow-hidden">
-          <EditorToolbar
-            onImageUpload={() => document.getElementById('cover-image-upload')?.click()}
-            onAddLink={handleAddLink}
-          />
-          <Textarea
-            id="content"
-            {...register('content')}
-            ref={(e) => {
-              // Register the ref with react-hook-form
-              const { ref } = register('content');
-              if (ref) {
-                ref(e);
-              }
-
-              // Store the ref for cleanup and updates
-              textareaRef.current = e;
-            }}
+        <div className="rounded-md overflow-hidden">
+          <MarkdownEditor
+            value={content || ''}
+            onChange={(value) => setValue('content', value, { shouldValidate: true })}
             placeholder="Write your post content here..."
-            className={`min-h-[300px] rounded-t-none border-t-0 focus-visible:ring-0 ${errors.content ? 'border-red-500' : ''}`}
+            className={errors.content ? 'border-red-500' : ''}
+            label=""
           />
         </div>
 

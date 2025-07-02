@@ -328,7 +328,7 @@ interface MarkdownViewerProps {
   className?: string;
 }
 
-export default function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
+function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
   return (
     <div className={`prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
       <ReactMarkdown
@@ -573,3 +573,5 @@ export default function MarkdownViewer({ content, className = '' }: MarkdownView
     </div>
   );
 }
+
+export default MarkdownViewer;
