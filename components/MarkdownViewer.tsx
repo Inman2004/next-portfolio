@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { Copy, Check, ArrowUpRight } from 'lucide-react';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
+import Mermaid from './Mermaid';
 // Import the Prism component type from react-syntax-highlighter
 import type { PrismLight } from 'react-syntax-highlighter';
 
@@ -224,6 +225,11 @@ const CustomCode: React.FC<CustomCodeProps> = ({
   children, 
   ...props 
 }: CustomCodeProps) => {
+  // Check if this is a mermaid diagram
+  if (className === 'language-mermaid' || className === 'mermaid') {
+    const code = String(children).trim();
+    return <Mermaid chart={code} />;
+  }
   const match = /language-(\w+)/.exec(className || '');
   let language = match ? match[1].toLowerCase() : '';
   
@@ -329,6 +335,28 @@ interface MarkdownViewerProps {
 }
 
 function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
+  // Process content to handle mermaid code blocks
+  const processedContent = useMemo(() => {
+    // Convert mermaid code blocks to a format we can handle
+    return content.replace(/```mermaid\n([\s\S]*?)\n```/g, (_, code) => {
+      return `\`\`\`mermaid\n${code}\n\`\`\``;
+    });
+  }, [content]);
+
+  // Initialize mermaid on component mount
+  useEffect(() => {
+    // @ts-ignore - Mermaid types might not be available
+    if (typeof window !== 'undefined' && window.mermaid) {
+      // @ts-ignore
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+        fontFamily: 'inherit',
+      });
+    }
+  }, []);
+
   return (
     <div className={`prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
       <ReactMarkdown
