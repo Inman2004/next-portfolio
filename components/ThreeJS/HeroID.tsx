@@ -26,39 +26,50 @@ interface BandProps {
   minSpeed?: number
 }
 
+// Import Rapier types
+type Rapier = typeof import('@react-three/rapier')
+
 // Import Rapier components with SSR disabled
 const Physics = dynamic(
   () => import('@react-three/rapier').then((mod) => mod.Physics),
   { ssr: false }
-) as any
+) as React.FC<React.ComponentProps<Rapier['Physics']>>
 
 const RigidBody = dynamic(
   () => import('@react-three/rapier').then((mod) => mod.RigidBody),
   { ssr: false }
-) as any
+) as React.FC<React.ComponentProps<Rapier['RigidBody']>>
 
 const BallCollider = dynamic(
   () => import('@react-three/rapier').then((mod) => mod.BallCollider),
   { ssr: false }
-) as any
+) as React.FC<React.ComponentProps<Rapier['BallCollider']>>
 
 const CuboidCollider = dynamic(
   () => import('@react-three/rapier').then((mod) => mod.CuboidCollider),
   { ssr: false }
-) as any
+) as React.FC<React.ComponentProps<Rapier['CuboidCollider']>>
 
-const useRopeJoint = (
-  ...args: Parameters<typeof import('@react-three/rapier').useRopeJoint>
-) => {
-  const rapier = require('@react-three/rapier')
-  return rapier.useRopeJoint(...args)
-}
+const useRopeJoint: Rapier['useRopeJoint'] = ((...args: [any, any, any]) => {
+  const rapier = require('@react-three/rapier') as Rapier
+  return rapier.useRopeJoint(args[0], args[1], args[2])
+}) as any
 
-const useSphericalJoint = (
-  ...args: Parameters<typeof import('@react-three/rapier').useSphericalJoint>
-) => {
-  const rapier = require('@react-three/rapier')
-  return rapier.useSphericalJoint(...args)
+const useSphericalJoint: Rapier['useSphericalJoint'] = ((...args: [any, any, any]) => {
+  const rapier = require('@react-three/rapier') as Rapier
+  return rapier.useSphericalJoint(args[0], args[1], args[2])
+}) as any
+
+declare global {
+  // Extend the JSX namespace for Rapier components
+  namespace JSX {
+    interface IntrinsicElements {
+      physics: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+      rigidBody: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+      ballCollider: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+      cuboidCollider: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+    }
+  }
 }
 
 // Preload assets
@@ -87,8 +98,19 @@ const InteractiveCard3DContent = () => {
     )
   }
 
+  // Check if the screen is mobile (less than 768px wide)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
-    <div style={{ width: '50vw', height: '90vh', borderRadius: '5%', overflow: 'hidden', borderTop: 'solid 5px #f1f1' }}>
+    <div style={{ 
+      width: isMobile ? '100%' : '50vw', 
+      height: isMobile ? '90vh' : '90vh',
+      borderRadius: '5%', 
+      overflow: 'hidden', 
+      borderTop: 'solid 5px #f1f1',
+      margin: isMobile ? '0 auto' : '0',
+      maxWidth: isMobile ? '100%' : 'none'
+    }}>
       <Canvas camera={{ position: [0, 0, 13], fov: 25 }}>
         <ambientLight intensity={Math.PI} />
         <Physics debug={false} interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
