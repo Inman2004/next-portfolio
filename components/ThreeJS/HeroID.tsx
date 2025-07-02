@@ -1,12 +1,11 @@
 'use client'
 
+import { useState, useEffect, Suspense, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import * as THREE from 'three'
-import { useEffect, useRef, useState } from 'react'
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber'
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei'
-import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier'
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
-import { useControls } from 'leva'
 
 // Extend the fiber namespace with MeshLine components
 extend({ MeshLineGeometry, MeshLineMaterial })
@@ -21,24 +20,78 @@ declare global {
   }
 }
 
-// Preload assets
-useGLTF.preload('/assets/tag.glb')
-useTexture.preload('/assets/band.jpg')
-
 // Type definitions
 interface BandProps {
   maxSpeed?: number
   minSpeed?: number
 }
 
-export default function InteractiveCard3D() {
-  const { debug } = useControls({ debug: false })
-  
+// Import Rapier components with SSR disabled
+const Physics = dynamic(
+  () => import('@react-three/rapier').then((mod) => mod.Physics),
+  { ssr: false }
+) as any
+
+const RigidBody = dynamic(
+  () => import('@react-three/rapier').then((mod) => mod.RigidBody),
+  { ssr: false }
+) as any
+
+const BallCollider = dynamic(
+  () => import('@react-three/rapier').then((mod) => mod.BallCollider),
+  { ssr: false }
+) as any
+
+const CuboidCollider = dynamic(
+  () => import('@react-three/rapier').then((mod) => mod.CuboidCollider),
+  { ssr: false }
+) as any
+
+const useRopeJoint = (
+  ...args: Parameters<typeof import('@react-three/rapier').useRopeJoint>
+) => {
+  const rapier = require('@react-three/rapier')
+  return rapier.useRopeJoint(...args)
+}
+
+const useSphericalJoint = (
+  ...args: Parameters<typeof import('@react-three/rapier').useSphericalJoint>
+) => {
+  const rapier = require('@react-three/rapier')
+  return rapier.useSphericalJoint(...args)
+}
+
+// Preload assets
+useGLTF.preload('/assets/tag.glb')
+useTexture.preload('/assets/band.jpg')
+
+const InteractiveCard3DContent = () => {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div style={{ 
+        width: '50vw', 
+        height: '90vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        backgroundColor: 'black'
+      }}>
+        <div className="loading-spinner">Loading...</div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ width: '50vw', height: '90vh', borderRadius: '5%', overflow: 'hidden', borderTop: 'solid 5px #f1f1' }}>
       <Canvas camera={{ position: [0, 0, 13], fov: 25 }}>
         <ambientLight intensity={Math.PI} />
-        <Physics debug={debug} interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
+        <Physics debug={false} interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
           <Band />
         </Physics>
         <Environment blur={0.75}>
@@ -74,6 +127,25 @@ export default function InteractiveCard3D() {
         </Environment>
       </Canvas>
     </div>
+  )
+}
+
+export default function InteractiveCard3D() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        width: '50vw', 
+        height: '90vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        backgroundColor: 'black'
+      }}>
+        <div className="loading-spinner">Loading...</div>
+      </div>
+    }>
+      <InteractiveCard3DContent />
+    </Suspense>
   )
 }
 
