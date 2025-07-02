@@ -31,6 +31,11 @@ export default function MarkdownEditor({
 }: MarkdownEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [activeTab, setActiveTab] = useState('edit');
+  
+  // Memoize the onChange handler to prevent unnecessary re-renders
+  const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+  }, [onChange]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -308,7 +313,7 @@ export default function MarkdownEditor({
         value={activeTab}
         onValueChange={setActiveTab}
       >
-        <TabsList className="grid w-full grid-cols-3 bg-background/50 backdrop-blur-sm border-x border-b rounded-none">
+        <TabsList className="grid w-full grid-cols-3 dark:bg-card/50 bg-gray-200/50 backdrop-blur-sm border-x border-b rounded">
           <TabsTrigger value="edit" className="py-1.5 rounded-none">Edit</TabsTrigger>
           <TabsTrigger value="preview" className="py-1.5 rounded-none">Preview</TabsTrigger>
           <TabsTrigger value="both" className="py-1.5 rounded-none">Split View</TabsTrigger>
@@ -326,7 +331,7 @@ export default function MarkdownEditor({
             <Textarea
               ref={textareaRef}
               value={value}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               className={cn(

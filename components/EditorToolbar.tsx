@@ -349,6 +349,7 @@ export default function EditorToolbar({ onFormatAction, onImageUpload }: EditorT
                         );
                     })}
                 </div>
+                <Tutorial />
             </TooltipProvider>
 
             {/* Image Insertion Dialog */}

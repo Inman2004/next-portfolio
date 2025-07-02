@@ -401,7 +401,7 @@ export default function BlogPostForm({
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isSubmitting ? 'Saving...' : 'Save Post'}
+          {isSubmitting ? 'Publishing...' : 'Publish'}
         </Button>
       </div>
     </form>

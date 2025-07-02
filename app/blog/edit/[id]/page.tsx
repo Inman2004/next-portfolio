@@ -122,7 +122,7 @@ function EditPostWithForm({ postId }: { postId: string }) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6">Edit Post</h1>
+      <h1 className="text-3xl  text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-blue-500 dark:to-teal-400 font-bold mb-6">Edit Post</h1>
       {initialData ? (
         <MarkdownEditorProvider>
           <BlogPostForm 
