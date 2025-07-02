@@ -14,7 +14,6 @@ import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
 
-
 export default function Home() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
