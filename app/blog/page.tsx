@@ -553,11 +553,11 @@ export default function BlogPage() {
           >
             <h1 className="text-xl font-thin tracking-tight text-gray-600 dark:text-gray-400 sm:text-2xl">
               <span className="block">
-                Use the power of social proof to
+              Harness the power of social proof to 
+
                 <span className="text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-teal-400">
-                &nbsp;Create. Share. Belong. Build a space where developers and designers 
+                &nbsp;inspire one another as you create, share, and learn together.
                 </span>
-                &nbsp;inspire each other.
               </span>
             </h1>
           </motion.div>
