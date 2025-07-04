@@ -13,6 +13,7 @@ import Footer from '@/components/Footer';
 import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
+import SkillRoadMap from "@/components/SkillRoadMap";
 
 export default function Home() {
   const { resolvedTheme } = useTheme();
@@ -49,9 +50,9 @@ export default function Home() {
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
           <Projects showAll={false} maxItems={3} />
+          <SkillRoadMap />
           <Skills />
           <Experience />
-          <Services />
           <Testimonials />
           <Comments />
           <Contact />

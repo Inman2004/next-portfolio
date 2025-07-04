@@ -79,27 +79,58 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
         return;
       }
       
-      // Render the diagram
+      // Calculate the width based on viewport width - use 90% of viewport width for mobile, but not more than 1000px
+      const maxWidth = Math.min(window.innerWidth * 0.9, 1000);
+      
+      // Get the current config
+      const currentConfig = window.mermaid.mermaidAPI.getConfig();
+      
+      // Create a new config with updated theme and variables
+      const config: import('mermaid').MermaidConfig = {
+        ...currentConfig,
+        theme: (resolvedTheme === 'dark' ? 'dark' : 'default') as 'dark' | 'default',
+        themeVariables: {
+          ...(currentConfig.themeVariables || {}),
+          fontSize: window.innerWidth < 768 ? '12px' : '14px',
+        },
+      };
+      
+      // Temporarily override mermaid config
+      const originalConfig = { ...window.mermaid.mermaidAPI.getConfig() };
+      window.mermaid.mermaidAPI.initialize(config);
+      
+      // Render the diagram with the current config
       const { svg: renderedSvg } = await window.mermaid.render(
         'mermaid-' + Math.floor(Math.random() * 10000),
         chart
       );
       
+      // Restore original config
+      window.mermaid.mermaidAPI.initialize(originalConfig);
+      
       setSvg(renderedSvg);
       setError('');
     } catch (err) {
       console.error('Error rendering mermaid diagram:', err);
-      setError('Error rendering diagram');
+      setError('Error rendering diagram. Try viewing on a larger screen.');
     }
   };
 
-  // Re-render when chart or theme changes
+  // Re-render when chart, theme, or window size changes
   useEffect(() => {
+    const handleResize = () => {
+      renderDiagram();
+    };
+    
     const timer = setTimeout(() => {
       renderDiagram();
+      window.addEventListener('resize', handleResize);
     }, 100); // Small delay to ensure mermaid is initialized
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [chart, resolvedTheme]);
 
   if (error) {
@@ -111,13 +142,17 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
   }
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`mermaid bg-white dark:bg-gray-800 p-4 rounded-md my-4 transition-colors duration-200 ${className}`}
-      style={{
-        backgroundColor: resolvedTheme === 'dark' ? '#1f2937' : '#ffffff',
-      }}
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <div className="w-full overflow-x-auto my-4">
+      <div 
+        ref={containerRef} 
+        className={`mermaid bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-md transition-colors duration-200 inline-block min-w-full ${className}`}
+        style={{
+          backgroundColor: resolvedTheme === 'dark' ? '#1f2937' : '#ffffff',
+        }}
+        dangerouslySetInnerHTML={{ 
+          __html: svg ? svg.replace('<svg', '<svg style="max-width: 100%; height: auto;"') : '' 
+        }}
+      />
+    </div>
   );
 }

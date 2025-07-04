@@ -189,11 +189,18 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
   const j2 = useRef<any>(null)
   const j3 = useRef<any>(null)
   const card = useRef<any>(null)
+  const isDragging = useRef(false)
+  const lastTouchPosition = useRef({ x: 0, y: 0 })
+  const velocity = useRef({ x: 0, y: 0 })
+  const lastTime = useRef(0)
 
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
   const dir = new THREE.Vector3()
+  
+  // Check if device is mobile
+  const isMobile = typeof window !== 'undefined' ? 'ontouchstart' in window : false
 
   const segmentProps = { 
     type: 'dynamic' as const, 
@@ -233,18 +240,43 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
 
   useFrame((state, delta) => {
     if (dragged && card.current) {
-      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
-      dir.copy(vec).sub(state.camera.position).normalize()
-      vec.add(dir.multiplyScalar(state.camera.position.length()))
+      // Handle both mouse and touch inputs
+      let pointerX, pointerY
       
-      // Wake up all rigid bodies
-      ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
+      if (state.pointer.x !== undefined && state.pointer.y !== undefined) {
+        pointerX = state.pointer.x
+        pointerY = state.pointer.y
+      } else if (isMobile && isDragging.current) {
+        // For touch devices, use the last touch position
+        const rect = state.gl.domElement.getBoundingClientRect()
+        pointerX = ((lastTouchPosition.current.x - rect.left) / rect.width) * 2 - 1
+        pointerY = -((lastTouchPosition.current.y - rect.top) / rect.height) * 2 + 1
+      }
       
-      card.current.setNextKinematicTranslation({ 
-        x: vec.x - dragged.x, 
-        y: vec.y - dragged.y, 
-        z: vec.z - dragged.z 
-      })
+      if (pointerX !== undefined && pointerY !== undefined) {
+        vec.set(pointerX, pointerY, 0.5).unproject(state.camera)
+        dir.copy(vec).sub(state.camera.position).normalize()
+        vec.add(dir.multiplyScalar(state.camera.position.length()))
+        
+        // Wake up all rigid bodies
+        ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
+        
+        // Apply smooth movement with easing
+        const currentPos = card.current.translation()
+        const targetX = vec.x - (isMobile ? 0 : dragged.x)
+        const targetY = vec.y - (isMobile ? 0 : dragged.y)
+        const targetZ = vec.z - (isMobile ? 0 : dragged.z)
+        
+        const newX = currentPos.x + (targetX - currentPos.x) * (isMobile ? 0.2 : 0.5)
+        const newY = currentPos.y + (targetY - currentPos.y) * (isMobile ? 0.2 : 0.5)
+        const newZ = currentPos.z + (targetZ - currentPos.z) * 0.5
+        
+        card.current.setNextKinematicTranslation({ 
+          x: newX,
+          y: newY,
+          z: newZ
+        })
+      }
     }
 
     if (fixed.current && j1.current && j2.current && j3.current && card.current) {
@@ -280,20 +312,77 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping
 
   const handlePointerDown = (e: any) => {
+    e.stopPropagation()
+    if (isMobile) {
+      const touch = e.touches ? e.touches[0] : e
+      lastTouchPosition.current = { x: touch.clientX, y: touch.clientY }
+      velocity.current = { x: 0, y: 0 }
+      lastTime.current = performance.now()
+      isDragging.current = true
+    }
     e.target.setPointerCapture(e.pointerId)
     if (card.current) {
       drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())))
     }
   }
 
+  const handlePointerMove = (e: any) => {
+    if (isMobile && isDragging.current) {
+      const touch = e.touches ? e.touches[0] : e
+      const now = performance.now()
+      const deltaTime = now - lastTime.current
+      
+      if (deltaTime > 0) {
+        const deltaX = touch.clientX - lastTouchPosition.current.x
+        const deltaY = touch.clientY - lastTouchPosition.current.y
+        
+        // Update velocity with low-pass filter for smoothing
+        velocity.current = {
+          x: velocity.current.x * 0.7 + (deltaX / deltaTime) * 0.3,
+          y: velocity.current.y * 0.7 + (deltaY / deltaTime) * 0.3
+        }
+        
+        lastTouchPosition.current = { x: touch.clientX, y: touch.clientY }
+        lastTime.current = now
+      }
+    }
+  }
+
   const handlePointerUp = (e: any) => {
+    e.stopPropagation()
+    if (isDragging.current) {
+      // Apply velocity when releasing
+      if (card.current && (Math.abs(velocity.current.x) > 10 || Math.abs(velocity.current.y) > 10)) {
+        const impulse = { x: velocity.current.x * 0.1, y: -velocity.current.y * 0.1, z: 0 }
+        card.current.applyImpulse(impulse, true)
+      }
+      isDragging.current = false
+    }
     e.target.releasePointerCapture(e.pointerId)
     drag(false)
   }
 
+  // Add haptic feedback for mobile devices
+  useEffect(() => {
+    if (isMobile && 'vibrate' in navigator) {
+      if (hovered) {
+        navigator.vibrate?.(10)
+      }
+    }
+  }, [hovered, isMobile])
+
   return (
     <>
       <group position={[0, 4, 0]}>
+        {/* Add visual feedback for dragging */}
+        {hovered && (
+          <pointLight 
+            position={[2, 0, 1]} 
+            color="#4f8dff" 
+            intensity={1} 
+            distance={5}
+          />
+        )}
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
@@ -318,6 +407,11 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
             onPointerOut={() => hover(false)}
             onPointerUp={handlePointerUp}
             onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onTouchStart={handlePointerDown}
+            onTouchMove={handlePointerMove}
+            onTouchEnd={handlePointerUp}
+            onTouchCancel={handlePointerUp}
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial 

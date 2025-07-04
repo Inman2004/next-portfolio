@@ -20,7 +20,8 @@ import {
   ChevronLeft,
   Home,
   Pen,
-  Rss
+  Rss,
+  Wrench
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -74,9 +75,9 @@ const DATA: { navbar: NavItem[]; contact: { email: string; social: NavItem[] } }
       icon: (props: IconProps) => <BriefcaseBusiness {...props} className="w-4 h-4 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" /> 
     },
     { 
-      href: "#services", 
-      label: "Services", 
-      icon: (props: IconProps) => <Handshake {...props} className="w-4 h-4 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-colors" /> 
+      href: "#skills", 
+      label: "Skills", 
+      icon: (props: IconProps) => <Wrench {...props} className="w-4 h-4 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-colors" /> 
     },
     { 
       href: "#contact", 
