@@ -486,12 +486,12 @@ export default function PostPage({ params }: PostPageProps) {
                   src={post.coverImage}
                   alt={post.title}
                   fill
-                  className="object-cover rounded-t-lg md:rounded-t-2xl shadow-xl"
+                  className="object-cover opacity-40 hover:opacity-90 transition-opacity rounded-t-lg md:rounded-t-2xl shadow-xl"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                   priority
                 />
-              </div>
               <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-gray-900/80 dark:from-black/80 to-transparent" />
+              </div>
             </div>
           )}
 

@@ -46,9 +46,10 @@ type MarkdownAction = {
 interface EditorToolbarProps {
     onFormatAction: (action: string) => void;
     onImageUpload: (file: File) => Promise<string>;
+    onAddLink: () => void;
 }
 
-export default function EditorToolbar({ onFormatAction, onImageUpload }: EditorToolbarProps) {
+export default function EditorToolbar({ onFormatAction, onImageUpload, onAddLink }: EditorToolbarProps) {
     const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
     const [isTableDialogOpen, setIsTableDialogOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
@@ -104,7 +105,7 @@ export default function EditorToolbar({ onFormatAction, onImageUpload }: EditorT
         }
 
         if (action.id === 'link') {
-            onFormatAction('link');
+            onAddLink();
             return;
         }
 
@@ -308,7 +309,7 @@ export default function EditorToolbar({ onFormatAction, onImageUpload }: EditorT
     return (
         <>
             <TooltipProvider>
-                <div className="flex flex-wrap items-center gap-1 p-1 border-b bg-muted/50">
+                <div className="flex flex-wrap items-center rounded mx-3 gap-1 p-1 border-b bg-muted/50">
                     {actions.map((action) => {
                         if (action.separator) {
                             return <div key={action.id} className="h-6 w-px bg-border mx-0.5" />;
