@@ -599,16 +599,27 @@ function MarkdownEditorComponent({
     action, 
     icon, 
     title, 
-    shortcut = '' 
+    shortcut = '',
+    type = 'button' 
   }: { 
     action: string; 
     icon: React.ReactNode; 
     title: string; 
-    shortcut?: string; 
+    shortcut?: string;
+    type?: 'button' | 'submit' | 'reset';
   }) => (
     <button
-      onClick={() => handleFormatAction(action)}
-      className="p-1.5 rounded hover:bg-accent text-foreground/80 hover:text-foreground transition-colors"
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleFormatAction(action);
+      }}
+      onMouseDown={(e) => {
+        // Prevent focus from being taken away from the editor
+        e.preventDefault();
+      }}
+      className="p-1.5 rounded hover:bg-accent text-foreground/80 hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
       title={`${title}${shortcut ? ` (${shortcut})` : ''}`}
     >
       {icon}
@@ -713,41 +724,48 @@ function MarkdownEditorComponent({
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        // Prevent focus from being taken away from the editor
+        e.preventDefault();
+      }}
     >
       {/* Text Formatting */}
-      <FormatButton action="bold" icon={<Icons.Bold />} title="Bold" shortcut="Ctrl+B" />
-      <FormatButton action="italic" icon={<Icons.Italic />} title="Italic" shortcut="Ctrl+I" />
+      <FormatButton type="button" action="bold" icon={<Icons.Bold />} title="Bold" shortcut="Ctrl+B" />
+      <FormatButton type="button" action="italic" icon={<Icons.Italic />} title="Italic" shortcut="Ctrl+I" />
       
       <div className="h-5 w-px bg-border/50 mx-0.5"></div>
       
       {/* Headings */}
-      <FormatButton action="heading1" icon={<Icons.Heading1 />} title="Heading 1" />
-      <FormatButton action="heading2" icon={<Icons.Heading2 />} title="Heading 2" />
-      <FormatButton action="heading3" icon={<Icons.Heading3 />} title="Heading 3" />
-      <FormatButton action="heading4" icon={<Icons.Heading4 />} title="Heading 4" />
+      <FormatButton type="button" action="heading1" icon={<Icons.Heading1 />} title="Heading 1" />
+      <FormatButton type="button" action="heading2" icon={<Icons.Heading2 />} title="Heading 2" />
+      <FormatButton type="button" action="heading3" icon={<Icons.Heading3 />} title="Heading 3" />
+      <FormatButton type="button" action="heading4" icon={<Icons.Heading4 />} title="Heading 4" />
       
       <div className="h-5 w-px bg-border/50 mx-0.5"></div>
       
       {/* Lists */}
-      <FormatButton action="ul" icon={<Icons.List />} title="Bullet List" />
-      <FormatButton action="ol" icon={<Icons.ListOrdered />} title="Numbered List" />
-      <FormatButton action="task" icon={<Icons.Task />} title="Task List" />
+      <FormatButton type="button" action="ul" icon={<Icons.List />} title="Bullet List" />
+      <FormatButton type="button" action="ol" icon={<Icons.ListOrdered />} title="Numbered List" />
+      <FormatButton type="button" action="task" icon={<Icons.Task />} title="Task List" />
       
       <div className="h-5 w-px bg-border/50 mx-0.5"></div>
       
       {/* Code & Blocks */}
-      <FormatButton action="code" icon={<Icons.Code />} title="Inline Code" shortcut="`" />
-      <FormatButton action="codeBlock" icon={<Icons.Code />} title="Code Block" shortcut="```" />
-      <FormatButton action="quote" icon={<Icons.Quote />} title="Blockquote" shortcut=">" />
-      <FormatButton action="hr" icon={<Icons.HorizontalRule />} title="Horizontal Rule" />
+      <FormatButton type="button" action="code" icon={<Icons.Code />} title="Inline Code" shortcut="`" />
+      <FormatButton type="button" action="codeBlock" icon={<Icons.Code />} title="Code Block" shortcut="```" />
+      <FormatButton type="button" action="quote" icon={<Icons.Quote />} title="Blockquote" shortcut=">" />
+      <FormatButton type="button" action="hr" icon={<Icons.HorizontalRule />} title="Horizontal Rule" />
       
       <div className="h-5 w-px bg-border/50 mx-0.5"></div>
       
       {/* Media & Tables */}
-      <FormatButton action="link" icon={<Icons.Link />} title="Insert Link" shortcut="Ctrl+K" />
-      <FormatButton action="image" icon={<Icons.Image />} title="Insert Image" />
-      <FormatButton action="table" icon={<Icons.Table />} title="Insert Table" />
+      <FormatButton type="button" action="link" icon={<Icons.Link />} title="Insert Link" shortcut="Ctrl+K" />
+      <FormatButton type="button" action="image" icon={<Icons.Image />} title="Insert Image" />
+      <FormatButton type="button" action="table" icon={<Icons.Table />} title="Insert Table" />
     </div>
   ), [showFloatingToolbar, toolbarPosition, handleFormatAction]);
 
