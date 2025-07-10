@@ -23,21 +23,21 @@ interface SiteConfig {
 }
 
 export const SITE_CONFIG: SiteConfig = {
-  name: 'Your Blog Name',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com',
+  name: 'blog',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rvimmandev.vercel.app',
   description: 'A modern blog with great content',
   themeColor: '#ffffff',
   author: {
-    name: 'Your Name',
-    twitter: '@yourtwitter',
+    name: 'rvimman',
+    twitter: '@rvimman_',
   },
   socials: {
-    twitter: 'https://twitter.com/yourtwitter',
-    github: 'https://github.com/yourusername',
+    twitter: 'https://twitter.com/rvimman_',
+    github: 'https://github.com/Inman2004',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'Your Blog Name',
+    siteName: 'Blog Name',
   },
 };
