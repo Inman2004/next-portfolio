@@ -43,8 +43,8 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -366,19 +366,19 @@
   --card-foreground: 240 10% 3.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 3.9%;
-  --primary: 59 130 246;     /* blue-500 */
+  --primary: 217 91% 60%;     /* blue-500 - Updated to match our theme */
   --primary-foreground: 0 0% 98%;
   --secondary: 229 231 235;  /* gray-200 */
   --secondary-foreground: 240 5.9% 10%;
   --muted: 229 231 235;      /* gray-200 */
   --muted-foreground: 240 3.8% 46.1%;
-  --accent: 99 102 241;      /* indigo-500 */
-  --accent-foreground: 240 5.9% 10%;
+  --accent: 217 91% 60%;     /* Updated to match primary color */
+  --accent-foreground: 0 0% 98%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
   --border: 229 231 235;     /* gray-200 */
   --input: 240 5.9% 90%;
-  --ring: 59 130 246;        /* blue-500 */
+  --ring: 217 91% 60%;       /* Updated to match primary color */
 
   /* Gradient Variables - Dark Mode */
 --dark-main-gradient:radial-gradient(circle, #522377, #401c62, #2f154d, #200e39, #150026);
@@ -416,19 +416,19 @@
   --card-foreground: 255 255 255; /* white */
   --popover: 240 10% 3.9%;
   --popover-foreground: 255 255 255; /* white */
-  --primary: 96 165 250;    /* blue-400 */
+  --primary: 191 219 254;    /* lighter blue-200 for dark mode */
   --primary-foreground: 15 23 42; /* slate-900 */
   --secondary: 55 65 81;    /* gray-700 */
   --secondary-foreground: 255 255 255; /* white */
   --muted: 55 65 81;        /* gray-700 */
   --muted-foreground: 156 163 175; /* gray-400 */
-  --accent: 129 140 248;    /* indigo-400 */
+  --accent: 191 219 254;    /* Match primary for dark mode */
   --accent-foreground: 255 255 255; /* white */
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 255 255 255; /* white */
   --border: 55 65 81;       /* gray-700 */
   --input: 55 65 81;        /* gray-700 */
-  --ring: 129 140 248;      /* indigo-400 */
+  --ring: 191 219 254;      /* Match primary for dark mode */
 
   /* Dark Theme Gradients */
   --main-gradient: var(--dark-main-gradient);

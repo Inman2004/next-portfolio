@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight, Flame } from 'lucide-react';
+import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight, Flame, Eye } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -127,6 +127,7 @@ const calculateDuration = (startDate: Date, endDate: Date | 'Present'): string =
 
 import { projects, type ProjectStatus } from '@/data/projects';
 import { InteractiveHoverButton } from './magicui/interactive-hover-button';
+import { Card } from './ui/card';
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -351,6 +352,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           transition={{ duration: 0.2 }}
           className="p-6 space-y-4"
         >
+          <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={(e) => e.stopPropagation()}>
           <div className="p-5 flex flex-col relative z-10" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
               {project.title}
@@ -364,7 +366,6 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           <p className="text-gray-600 dark:text-gray-300 line-clamp-3 transition-colors duration-300">
             {project.description}
           </p>
-          
           <div className="flex flex-wrap gap-2 transition-colors duration-300">
             {project.technologies.map((tech, i) => {
               const { bg, text, border } = getTechColor(tech);
@@ -453,7 +454,8 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                 </motion.a>
               </div>
             )}
-          </div>
+            
+          </div></Link>
         </motion.div>
       </div>
       
