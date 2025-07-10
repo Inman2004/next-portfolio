@@ -351,11 +351,18 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           animate={isHovered ? { y: -8 } : { y: 0 }}
           transition={{ duration: 0.2 }}
           className="p-6 space-y-4"
+          onClick={() => window.location.href = `/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}
+          style={{ cursor: 'pointer' }}
         >
-          <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`} onClick={(e) => e.stopPropagation()}>
-          <div className="p-5 flex flex-col relative z-10" onClick={(e) => e.stopPropagation()}>
+          <div className="p-5 flex flex-col relative z-10">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-              {project.title}
+              <Link 
+                href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}
+                className="hover:opacity-80 transition-opacity"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {project.title}
+              </Link>
             </h3>
             <div className="flex items-center text-sm text-gray-400 space-x-4">
               <span>{formatDate(project.startDate)} - {formatDate(project.endDate)}</span>
@@ -389,7 +396,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
             })}
           </div>
 
-          <div className="flex gap-4 pt-2 relative z-10">
+          <div className="flex gap-4 pt-2 relative z-10" onClick={e => e.stopPropagation()}>
             {project.github && (
               <div className="relative">
                 <motion.a
@@ -398,6 +405,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                   rel="noopener noreferrer"
                   className="inline-block text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-110 transition-colors"
                   whileHover={{ scale: 1.1 }}
+                  onClick={e => e.stopPropagation()}
                   whileTap={{ scale: 0.95 }}
                   title="View on GitHub"
                 >
@@ -455,7 +463,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
               </div>
             )}
             
-          </div></Link>
+          </div>
         </motion.div>
       </div>
       
