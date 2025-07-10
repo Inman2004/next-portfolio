@@ -355,15 +355,15 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           style={{ cursor: 'pointer' }}
         >
           <div className="p-5 flex flex-col relative z-10">
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-              <Link 
-                href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}
-                className="hover:opacity-80 transition-opacity"
-                onClick={(e) => e.stopPropagation()}
-              >
+            <Link 
+              href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`}
+              onClick={(e) => e.stopPropagation()}
+              className="group"
+            >
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
                 {project.title}
-              </Link>
-            </h3>
+              </h3>
+            </Link>
             <div className="flex items-center text-sm text-gray-400 space-x-4">
               <span>{formatDate(project.startDate)} - {formatDate(project.endDate)}</span>
               <span className="h-1 w-1 rounded-full bg-gray-600"></span>
