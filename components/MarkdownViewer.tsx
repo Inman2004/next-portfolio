@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo, useState, useRef, memo, ReactNode, useEffect, useCallback } from 'react';
+import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLAttributes, CSSProperties, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
-import { Copy, Check, ArrowUpRight, Download } from 'lucide-react';
+import { Copy, Check, ArrowUpRight } from 'lucide-react';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import Mermaid from './Mermaid';
+// Import the Prism component type from react-syntax-highlighter
 import type { PrismLight } from 'react-syntax-highlighter';
 
 // Lazy load heavy components
@@ -14,15 +15,6 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: true });
 // Import the Prism component and styles
 import { Prism as PrismHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-
-// Import remark and rehype plugins
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeRaw from 'rehype-raw';
-
-// Import KaTeX CSS
-import 'katex/dist/katex.min.css';
 
 // Define the props type for the syntax highlighter
 type SyntaxHighlighterProps = {
@@ -82,23 +74,6 @@ const ThemedSyntaxHighlighter = ({ children, ...props }: SyntaxHighlighterProps)
   );
 };
 
-// Copy to clipboard hook
-const useCopyToClipboard = () => {
-  const [isCopied, setIsCopied] = useState(false);
-  
-  const copyToClipboard = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  }, []);
-  
-  return { isCopied, copyToClipboard };
-};
-
 // Lazy load the syntax highlighter with code splitting
 const LazySyntaxHighlighter = dynamic<SyntaxHighlighterProps>(
   () => Promise.resolve(ThemedSyntaxHighlighter),
@@ -116,6 +91,18 @@ const LazySyntaxHighlighter = dynamic<SyntaxHighlighterProps>(
 // Export the lazy-loaded syntax highlighter
 const SyntaxHighlighter = LazySyntaxHighlighter;
 
+// Import remark and rehype plugins
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+
+// Import KaTeX CSS
+import 'katex/dist/katex.min.css';
+
+// Custom light theme with better contrast
+// Note: Theme is now loaded dynamically based on the current theme
+
 // Custom components for better styling
 interface CustomLinkProps {
   node?: unknown;
@@ -129,17 +116,25 @@ const CustomLink = memo(({ node, children, ...props }: CustomLinkProps) => {
   return (
     <a 
       {...props} 
-      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-4 decoration-2 hover:decoration-blue-500 transition-all duration-200 inline-flex items-center gap-1"
+      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-4 transition-colors inline-flex items-center gap-1"
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
     >
       {children}
-      {isExternal && <ArrowUpRight className="w-3 h-3 flex-shrink-0" />}
+      {isExternal && <ArrowUpRight className="w-3 h-3" />}
     </a>
   );
 });
 
 CustomLink.displayName = 'CustomLink';
+
+interface CustomCodeProps extends HTMLAttributes<HTMLElement> {
+  node?: unknown;
+  inline?: boolean;
+  className?: string;
+  children?: ReactNode | ReactNode[];
+  [key: string]: any;
+}
 
 // Map of common file extensions to language names
 const languageMap: Record<string, string> = {
@@ -153,7 +148,6 @@ const languageMap: Record<string, string> = {
   java: 'java',
   c: 'c',
   cpp: 'cpp',
-  'c++': 'cpp',
   h: 'cpp',
   hpp: 'cpp',
   cs: 'csharp',
@@ -162,7 +156,6 @@ const languageMap: Record<string, string> = {
   php: 'php',
   swift: 'swift',
   kt: 'kotlin',
-  scala: 'scala',
   
   // Web Technologies
   html: 'htmlbars',
@@ -177,7 +170,6 @@ const languageMap: Record<string, string> = {
   sh: 'bash',
   zsh: 'bash',
   bash: 'bash',
-  fish: 'bash',
   yml: 'yaml',
   yaml: 'yaml',
   toml: 'toml',
@@ -194,100 +186,39 @@ const languageMap: Record<string, string> = {
   
   // Other
   diff: 'diff',
-  patch: 'diff',
   txt: 'text',
-  log: 'text',
 };
 
-// Map of languages to their display names and extensions
-const languageDisplayMap: Record<string, { name: string; ext: string }> = {
-  javascript: { name: 'JavaScript', ext: 'js' },
-  jsx: { name: 'JSX', ext: 'jsx' },
-  typescript: { name: 'TypeScript', ext: 'ts' },
-  tsx: { name: 'TSX', ext: 'tsx' },
-  python: { name: 'Python', ext: 'py' },
-  ruby: { name: 'Ruby', ext: 'rb' },
-  java: { name: 'Java', ext: 'java' },
-  c: { name: 'C', ext: 'c' },
-  cpp: { name: 'C++', ext: 'cpp' },
-  csharp: { name: 'C#', ext: 'cs' },
-  go: { name: 'Go', ext: 'go' },
-  rust: { name: 'Rust', ext: 'rs' },
-  php: { name: 'PHP', ext: 'php' },
-  swift: { name: 'Swift', ext: 'swift' },
-  kotlin: { name: 'Kotlin', ext: 'kt' },
-  html: { name: 'HTML', ext: 'html' },
-  css: { name: 'CSS', ext: 'css' },
-  scss: { name: 'SCSS', ext: 'scss' },
-  sass: { name: 'Sass', ext: 'sass' },
-  json: { name: 'JSON', ext: 'json' },
-  markdown: { name: 'Markdown', ext: 'md' },
-  yaml: { name: 'YAML', ext: 'yaml' },
-  bash: { name: 'Bash', ext: 'sh' },
-  shell: { name: 'Shell', ext: 'sh' },
-  dockerfile: { name: 'Dockerfile', ext: 'Dockerfile' },
-  sql: { name: 'SQL', ext: 'sql' },
-  diff: { name: 'Diff', ext: 'diff' },
-  text: { name: 'Text', ext: 'txt' },
-};
-
-// Code block header component
-const CodeBlockHeader = ({ language, children }: { language: string; children: string }) => {
-  const { isCopied, copyToClipboard } = useCopyToClipboard();
-  const displayInfo = languageDisplayMap[language] || { name: language, ext: 'txt' };
-  const lineCount = String(children).split('\n').length;
-  
-  const handleCopy = () => {
-    copyToClipboard(String(children));
+// Map of languages to their common file extensions
+const extensionMap: Record<string, string> = {
+    'javascript': 'js',
+    'jsx': 'jsx',
+    'typescript': 'ts',
+    'tsx': 'tsx',
+    'python': 'py',
+    'ruby': 'rb',
+    'java': 'java',
+    'c': 'c',
+    'cpp': 'cpp',
+    'csharp': 'cs',
+    'go': 'go',
+    'rust': 'rs',
+    'php': 'php',
+    'swift': 'swift',
+    'kotlin': 'kt',
+    'html': 'html',
+    'css': 'css',
+    'json': 'json',
+    'markdown': 'md',
+    'yaml': 'yaml',
+    'bash': 'sh',
+    'shell': 'sh',
+    'dockerfile': 'Dockerfile',
+    'gitignore': '.gitignore'
   };
-  
-  return (
-    <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-      <div className="flex items-center">
-        <div className="flex space-x-2 mr-3">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
-        <span className="font-medium text-gray-900 dark:text-gray-200">
-          {displayInfo.name}
-        </span>
-      </div>
-      <div className="flex items-center space-x-3">
-        <span className="text-xs text-gray-600 dark:text-gray-400">
-          {lineCount} lines
-        </span>
-        <button
-          onClick={handleCopy}
-          className="flex items-center space-x-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          title="Copy code"
-        >
-          {isCopied ? (
-            <>
-              <Check className="w-3 h-3" />
-              <span>Copied!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-3 h-3" />
-              <span>Copy</span>
-            </>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-};
-
-interface CustomCodeProps {
-  node?: unknown;
-  inline?: boolean;
-  className?: string;
-  children?: ReactNode | ReactNode[];
-  [key: string]: any;
-}
-
-// Enhanced CustomCode component
+              
+// This component now only handles block code (with language specified)
+// Inline code is handled directly in the ReactMarkdown components prop
 const CustomCode: React.FC<CustomCodeProps> = ({ 
   node, 
   className = '', 
@@ -299,7 +230,6 @@ const CustomCode: React.FC<CustomCodeProps> = ({
     const code = String(children).trim();
     return <Mermaid chart={code} />;
   }
-  
   const match = /language-(\w+)/.exec(className || '');
   let language = match ? match[1].toLowerCase() : '';
   
@@ -311,9 +241,9 @@ const CustomCode: React.FC<CustomCodeProps> = ({
   // For code blocks without a specified language
   if (!match) {
     return (
-      <div className="rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-        <pre className="overflow-x-auto m-0 p-4">
-          <code className="text-sm font-mono text-gray-800 dark:text-gray-200" {...props}>
+      <div className=" rounded-lg overflow-hidden ">
+        <pre className="overflow-x-auto m-0 bg-white dark:bg-transparent">
+          <code className="text-sm font-mono text-teal-600 dark:text-gray-200" {...props}>
             {children}
           </code>
         </pre>
@@ -322,116 +252,82 @@ const CustomCode: React.FC<CustomCodeProps> = ({
   }
 
   return (
-    <div className="my-6 rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-      <CodeBlockHeader language={language} children={String(children)} />
-      <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">
-        <ScrollArea className="w-full" type="always">
-          <div className="min-w-max">
-            <SyntaxHighlighter
-              language={language}
-              showLineNumbers={true}
-              wrapLines={false}
-              wrapLongLines={false}
-              customStyle={{
-                margin: 0,
-                padding: '1rem',
-                backgroundColor: 'transparent',
-                background: 'transparent',
-              }}
-              lineNumberStyle={{
-                color: '#6b7280',
-                paddingRight: '1em',
-                userSelect: 'none',
-                minWidth: '2.5em',
-                textAlign: 'right',
-                opacity: 0.7,
-                position: 'sticky',
-                left: 0,
-                backgroundColor: 'inherit',
-              }}
-              lineProps={{
-                style: {
-                  whiteSpace: 'pre',
-                  wordBreak: 'normal',
-                  wordWrap: 'normal',
-                },
-              }}
-              codeTagProps={{
-                className: 'font-mono text-sm',
-                style: {
-                  fontFamily: 'inherit',
-                  color: 'inherit',
-                },
-              }}
-              PreTag={({ children, ...preProps }: { children: ReactNode; [key: string]: any }) => (
-                <pre 
-                  className="!m-0 !p-0 !bg-transparent" 
-                  {...preProps}
-                >
-                  {children}
-                </pre>
-              )}
-            >
-              {String(children).replace(/\n$/, '')}
-            </SyntaxHighlighter>
+    <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="flex space-x-2 mr-3">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+          <span className="font-medium text-gray-900 dark:text-gray-200">
+            {(() => {
+              const ext = extensionMap[language] || 'txt';
+              return `${language}.${ext}`;
+            })()}
+          </span>
+        </div>
+        <div className="text-xs text-gray-800 dark:text-gray-300">
+          {match[1]} • {String(children).split('\n').length} lines
+        </div>
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">
+        <div className="relative">
+          <ScrollArea className="w-full" type="always">
+            <div className="min-w-max p-4">
+              <div className="relative">
+                <div className="relative">
+                  <SyntaxHighlighter
+                    language={language}
+                    showLineNumbers={true}
+                    wrapLines={false}
+                    wrapLongLines={false}
+                    lineNumberStyle={{
+                      color: '#6b7280',
+                      paddingRight: '1em',
+                      userSelect: 'none',
+                      minWidth: '2.5em',
+                      textAlign: 'right',
+                      opacity: 0.7,
+                      position: 'sticky',
+                      left: 0,
+                      backgroundColor: 'inherit',
+                    }}
+                    lineProps={{
+                      style: {
+                        whiteSpace: 'pre',
+                        wordBreak: 'normal',
+                        wordWrap: 'normal',
+                      },
+                    }}
+                    codeTagProps={{
+                      className: 'font-mono text-sm',
+                      style: {
+                        fontFamily: 'inherit',
+                        color: 'inherit',
+                      },
+                    }}
+                    PreTag={({ children, ...preProps }: { children: ReactNode; [key: string]: any }) => (
+                      <pre 
+                        className="!m-0 !p-0 !bg-transparent dark:!bg-gray-800 !text-gray-900 dark:!text-gray-200" 
+                        {...preProps}
+                      >
+                        {children}
+                      </pre>
+                    )}
+                  >
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                </div>
+              </div>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </div>
     </div>
   );
 };
-
-// Enhanced inline code component
-const InlineCode = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => {
-  return (
-    <code 
-      className="inline-code font-mono text-sm px-1.5 py-0.5 rounded border transition-all duration-150 bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700"
-      {...props}
-    >
-      {children}
-    </code>
-  );
-};
-
-// Enhanced table components
-const Table = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
-  <div className="overflow-x-auto my-8 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props}>
-      {children}
-    </table>
-  </div>
-);
-
-const TableHeader = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
-  <thead className="bg-gray-50 dark:bg-gray-800/50" {...props}>
-    {children}
-  </thead>
-);
-
-const TableBody = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
-  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" {...props}>
-    {children}
-  </tbody>
-);
-
-const TableRow = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
-  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150" {...props}>
-    {children}
-  </tr>
-);
-
-const TableCell = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
-  <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300" {...props}>
-    {children}
-  </td>
-);
-
-const TableHeaderCell = ({ children, ...props }: { children: ReactNode; [key: string]: any }) => (
-  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider" {...props}>
-    {children}
-  </th>
-);
 
 interface MarkdownViewerProps {
   content: string;
@@ -449,8 +345,10 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
 
   // Initialize mermaid on component mount
   useEffect(() => {
+    // @ts-ignore - Mermaid types might not be available
     if (typeof window !== 'undefined' && window.mermaid) {
-      window.mermaid.initialize({
+      // @ts-ignore
+      mermaid.initialize({
         startOnLoad: true,
         theme: 'default',
         securityLevel: 'loose',
@@ -460,7 +358,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
   }, []);
 
   return (
-    <div className={`prose prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
+    <div className={`prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeRaw, rehypeKatex]}
@@ -469,167 +367,236 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           code: (props) => {
             // If it's an inline code block (no className means it's inline)
             if (!props.className) {
-              return <InlineCode {...props} />;
+              return (
+                <code 
+                  className="inline-code font-mono text-sm px-1.5 py-0.5 rounded hover:bg-opacity-70 transition-all duration-150"
+                  style={{
+                    // @ts-ignore - CSS custom properties
+                    '--bg-color': 'rgba(243, 244, 246, 0.5)',
+                    // @ts-ignore - CSS custom properties
+                    '--text-color': 'rgba(13, 148, 136, 0.9)',
+                    // @ts-ignore - CSS custom properties
+                    '--border-color': 'rgba(209, 213, 219, 0.5)',
+                    // @ts-ignore - CSS custom properties
+                    '--dark-bg-color': 'rgba(31, 41, 55, 0.5)',
+                    // @ts-ignore - CSS custom properties
+                    '--dark-text-color': 'rgba(94, 234, 212, 0.9)',
+                    // @ts-ignore - CSS custom properties
+                    '--dark-border-color': 'rgba(55, 65, 81, 0.5)',
+                    
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)',
+                    border: '1px solid var(--border-color)',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.25',
+                    verticalAlign: 'baseline',
+                    transition: 'all 150ms ease',
+                  } as React.CSSProperties}
+                  {...props}
+                />
+              );
             }
             // For code blocks, use our CustomCode component
             return <CustomCode {...props} />;
           },
-          
-          // Links
+          text: ({ children }) => {
+            // Just return children for text nodes
+            return children;
+          },
           a: CustomLink,
-          
-          // Headings with improved styling
-          h1: ({ node, ...props }) => (
+          h1: ({node, ...props}) => (
             <h1 
               className="text-4xl md:text-5xl font-extrabold tracking-tight mt-12 mb-8 relative group"
               {...props}
             >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 dark:from-blue-400 dark:via-purple-400 dark:to-teal-400">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-700 dark:from-teal-400 dark:to-blue-400">
                 {props.children}
               </span>
-              <div className="absolute -bottom-2 left-0 w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
             </h1>
           ),
-          
-          h2: ({ node, ...props }) => (
+          h2: ({node, ...props}) => (
             <h2 
-              className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 text-gray-900 dark:text-gray-100"
+              className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 text-indigo-700 dark:text-gray-100"
               {...props}
             >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
-                <span className="w-2 h-2 rounded-full bg-white"></span>
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-teal-900/50 flex items-center justify-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
               </span>
               {props.children}
             </h2>
           ),
-          
-          h3: ({ node, ...props }) => (
+          h3: ({node, ...props}) => (
             <h3 
-              className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
+              className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-gray-200 dark:border-gray-700 text-indigo-700 dark:text-teal-300"
               {...props}
             >
-              <span className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></span>
+              <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
               {props.children}
             </h3>
           ),
-          
-          // Paragraphs
-          p: ({ node, children, ...props }) => {
-            // Check if this paragraph only contains a single code element
+          h4: ({node, ...props}) => (
+            <h4 
+              className="text-xl md:text-2xl font-semibold mt-8 mb-3 pl-4 relative text-indigo-600 dark:text-blue-300"
+              {...props}
+            >
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-500 dark:bg-blue-400"></span>
+              {props.children}
+            </h4>
+          ),
+          h5: ({node, ...props}) => (
+            <h5 
+              className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-indigo-600 dark:text-gray-300"
+              {...props}
+            >
+              {props.children}
+            </h5>
+          ),
+          h6: ({node, ...props}) => (
+            <h6 
+              className="text-base font-medium mt-4 mb-2 pl-2 text-indigo-500 dark:text-gray-400"
+              {...props}
+            />
+          ),
+          p: (props: any) => {
+            const { node, children, ...restProps } = props;
+            
+            // Check if this paragraph only contains a single code element without a language class
             const isOnlyInlineCode = node?.children?.length === 1 && 
-                                   node.children[0].type === 'element' && 
-                                   node.children[0].tagName === 'code' && 
-                                   !node.children[0].properties?.className?.includes('language-');
+                                 node.children[0].type === 'element' && 
+                                 node.children[0].tagName === 'code' && 
+                                 !node.children[0].properties?.className?.includes('language-');
             
             if (isOnlyInlineCode) {
-              return <span className="inline">{children}</span>;
+              return <span style={{ display: 'inline' }}>{children}</span>;
             }
             
             return (
-              <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...props}>
+              <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...restProps}>
                 {children}
               </p>
             );
           },
-          
-          // Lists
-          ul: ({ className, ...props }) => {
+          // Custom checkbox input for task lists
+          input: (inputProps: React.InputHTMLAttributes<HTMLInputElement> & { node?: any }) => {
+            const { node, ...props } = inputProps;
+            if (props.type === 'checkbox') {
+              const isChecked = props.checked || false;
+              const checkmarkSvg = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3E%3C/svg%3E") no-repeat center';
+              
+              return (
+                <input 
+                  type="checkbox" 
+                  disabled={true} 
+                  checked={isChecked}
+                  className={`h-4 w-4 rounded border mr-2 mt-0.5 cursor-pointer transition-colors ${
+                    isChecked 
+                      ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' 
+                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                  }`}
+                  style={{
+                    backgroundImage: isChecked ? checkmarkSvg : 'none',
+                  }}
+                  {...props}
+                />
+              );
+            }
+            return <input {...props} />;
+          },
+          // Custom list components
+          ul: (ulProps: React.HTMLAttributes<HTMLUListElement>) => {
+            const { className, ...props } = ulProps;
             const isTaskList = className?.includes('contains-task-list');
             return (
               <ul 
-                className={`${isTaskList ? 'space-y-2' : 'list-disc space-y-2'} pl-6 my-4 marker:text-indigo-500 dark:marker:text-indigo-400`}
+                className={`${isTaskList ? 'space-y-2' : 'list-disc space-y-2'} pl-6 my-4`}
                 {...props} 
               />
             );
           },
-          
-          ol: (props) => (
+          ol: (olProps: React.OlHTMLAttributes<HTMLOListElement>) => (
             <ol 
-              className="list-decimal pl-6 my-4 space-y-2 marker:text-indigo-500 dark:marker:text-indigo-400 marker:font-semibold" 
-              {...props} 
+              className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" 
+              {...olProps} 
             />
           ),
-          
-          li: ({ className, ...props }) => {
+          li: (liProps: React.LiHTMLAttributes<HTMLLIElement>) => {
+            const { className, ...props } = liProps;
             const isTaskItem = className?.includes('task-list-item');
             return (
               <li 
-                className={`text-gray-700 dark:text-gray-300 ${
-                  isTaskItem ? 'flex items-start list-none' : 'my-1'
+                className={`relative pl-2 my-1 text-gray-700 dark:text-gray-300 ${
+                  isTaskItem ? 'flex items-start' : ''
                 }`}
                 {...props} 
               />
             );
           },
-          
-          // Enhanced checkbox for task lists
-          input: ({ type, checked, ...props }) => {
-            if (type === 'checkbox') {
-              return (
-                <input 
-                  type="checkbox" 
-                  disabled={true} 
-                  checked={checked}
-                  className={`h-4 w-4 rounded border mr-3 mt-1 cursor-pointer transition-colors ${
-                    checked 
-                      ? 'bg-indigo-600 border-indigo-600 text-white' 
-                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                  }`}
-                  {...props}
-                />
-              );
-            }
-            return <input type={type} {...props} />;
-          },
-          
-          // Blockquotes
+
           blockquote: (props) => (
-            <blockquote 
-              className="border-l-4 border-indigo-500 dark:border-indigo-400 pl-6 my-6 italic text-gray-700 dark:text-gray-300 bg-gradient-to-r from-indigo-50 to-transparent dark:from-indigo-900/20 dark:to-transparent py-4 rounded-r-lg" 
-              {...props} 
+            <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
+          ),
+          table: (props) => (
+            <div className="overflow-x-auto my-8 rounded-xl border border-indigo-200 dark:border-teal-700 shadow-sm">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props} />
+            </div>
+          ),
+          thead: (props) => (
+            <thead className="bg-indigo-50 dark:bg-indigo-900/20 border-b border-gray-200 dark:border-gray-700" {...props} />
+          ),
+          tbody: (props) => (
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50" {...props} />
+          ),
+          th: (props) => (
+            <th 
+              className="px-6 py-3 text-left text-xs font-medium text-indigo-700 dark:text-teal-300  border-b border-indigo-200 dark:border-teal-700 uppercase tracking-wider"
+              style={{ whiteSpace: 'nowrap' }}
+              {...props}
             />
           ),
-          
-          // Enhanced table components
-          table: Table,
-          thead: TableHeader,
-          tbody: TableBody,
-          tr: TableRow,
-          td: TableCell,
-          th: TableHeaderCell,
-          
-          // Enhanced image handling
-          img: ({ alt, className = '', ...props }) => {
+          td: (props) => (
+            <td 
+              className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap"
+              {...props}
+            />
+          ),
+          tr: (props) => (
+            <tr 
+              className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors duration-150"
+              {...props}
+            />
+          ),
+          img: (props) => {
+            const { alt, className = '', ...imgProps } = props;
+            
+            // Create the image with proper styling
             const image = (
               <img 
-                {...props}
+                {...imgProps}
                 className={`rounded-lg shadow-lg w-full max-w-full h-auto border border-gray-200 dark:border-gray-700 ${className}`}
                 alt={alt || 'Image'}
                 loading="lazy"
               />
             );
             
+            // If there's an alt text, treat it as a caption using a figure
             if (alt) {
               return (
-                <figure className="my-8">
+                <figure className="my-6">
                   {image}
-                  <figcaption className="text-center text-sm text-gray-600 dark:text-gray-400 mt-3 italic">
+                  <figcaption className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
                     {alt}
                   </figcaption>
                 </figure>
               );
             }
             
-            return <div className="my-8">{image}</div>;
+            // For images without alt text, return the image wrapped in a div
+            return <div className="my-6">{image}</div>;
           },
-          
-          // Horizontal rules
-          hr: (props) => (
-            <hr className="my-8 border-0 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" {...props} />
-          ),
         }}
       >
-        {processedContent}
+        {content}
       </ReactMarkdown>
     </div>
   );
