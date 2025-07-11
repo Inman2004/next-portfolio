@@ -1,605 +1,383 @@
 'use client';
 
-import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLAttributes, CSSProperties, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import { useMemo, useState, useRef, memo, ReactNode, useCallback, lazy, Suspense } from 'react';
 import { useTheme } from 'next-themes';
 import { Copy, Check, ArrowUpRight } from 'lucide-react';
-import { ScrollArea, ScrollBar } from './ui/scroll-area';
-import Mermaid from './Mermaid';
-// Import the Prism component type from react-syntax-highlighter
-import type { PrismLight } from 'react-syntax-highlighter';
 
-// Lazy load heavy components
-const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: true });
+// Lazy load ALL heavy components
+const ReactMarkdown = lazy(() => import('react-markdown'));
+const PrismHighlighter = lazy(() => 
+  import('react-syntax-highlighter').then(mod => ({ default: mod.Prism }))
+);
+const Mermaid = lazy(() => import('./Mermaid'));
 
-// Import the Prism component and styles
-import { Prism as PrismHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-
-// Define the props type for the syntax highlighter
-type SyntaxHighlighterProps = {
-  children: string;
-  language: string;
-  style?: any;
-  [key: string]: any;
+// Lazy load styles only when needed
+const loadPrismStyles = () => {
+  return Promise.all([
+    import('react-syntax-highlighter/dist/cjs/styles/prism/vsc-dark-plus'),
+    import('react-syntax-highlighter/dist/cjs/styles/prism/vs')
+  ]);
 };
 
-// Create a wrapper component that handles theming
-const ThemedSyntaxHighlighter = ({ children, ...props }: SyntaxHighlighterProps) => {
-  const { resolvedTheme } = useTheme();
-  
-  return (
-    <div className="relative">
-      <PrismHighlighter 
-        style={resolvedTheme === 'dark' ? vscDarkPlus : vs}
-        customStyle={{
-          margin: 0,
-          padding: '1rem',
-          backgroundColor: 'transparent',
-          background: 'transparent',
-        }}
-        codeTagProps={{
-          className: 'font-mono text-sm',
-          style: {
-            fontFamily: 'inherit',
-            color: 'inherit',
-          },
-        }}
-        showLineNumbers={true}
-        wrapLines={false}
-        wrapLongLines={false}
-        lineNumberStyle={{
-          color: '#6b7280',
-          paddingRight: '1em',
-          userSelect: 'none',
-          minWidth: '2.5em',
-          textAlign: 'right',
-          opacity: 0.7,
-          position: 'sticky',
-          left: 0,
-          backgroundColor: 'inherit',
-        }}
-        lineProps={{
-          style: {
-            whiteSpace: 'pre',
-            wordBreak: 'normal',
-            wordWrap: 'normal',
-          },
-        }}
-        {...props}
-      >
-        {String(children).replace(/\n$/, '')}
-      </PrismHighlighter>
-    </div>
-  );
-};
-
-// Lazy load the syntax highlighter with code splitting
-const LazySyntaxHighlighter = dynamic<SyntaxHighlighterProps>(
-  () => Promise.resolve(ThemedSyntaxHighlighter),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 animate-pulse">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-      </div>
-    )
-  }
+// Lightweight loading components
+const CodeBlockSkeleton = () => (
+  <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 animate-pulse">
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+  </div>
 );
 
-// Export the lazy-loaded syntax highlighter
-const SyntaxHighlighter = LazySyntaxHighlighter;
+const MarkdownSkeleton = () => (
+  <div className="animate-pulse space-y-4">
+    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+    <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+  </div>
+);
 
-// Import remark and rehype plugins
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeRaw from 'rehype-raw';
-
-// Import KaTeX CSS
-import 'katex/dist/katex.min.css';
-
-// Custom light theme with better contrast
-// Note: Theme is now loaded dynamically based on the current theme
-
-// Custom components for better styling
-interface CustomLinkProps {
-  node?: unknown;
-  children?: React.ReactNode;
-  [key: string]: any;
-}
-
-const CustomLink = memo(({ node, children, ...props }: CustomLinkProps) => {
-  const isExternal = props.href?.startsWith('http');
-  
-  return (
-    <a 
-      {...props} 
-      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-4 transition-colors inline-flex items-center gap-1"
-      target={isExternal ? '_blank' : undefined}
-      rel={isExternal ? 'noopener noreferrer' : undefined}
-    >
-      {children}
-      {isExternal && <ArrowUpRight className="w-3 h-3" />}
-    </a>
-  );
-});
-
-CustomLink.displayName = 'CustomLink';
-
-interface CustomCodeProps extends HTMLAttributes<HTMLElement> {
-  node?: unknown;
-  inline?: boolean;
-  className?: string;
-  children?: ReactNode | ReactNode[];
-  [key: string]: any;
-}
-
-// Map of common file extensions to language names
+// Minimal language mapping (only common ones)
 const languageMap: Record<string, string> = {
-  // Programming Languages
   js: 'javascript',
-  jsx: 'jsx',
   ts: 'typescript',
-  tsx: 'tsx',
   py: 'python',
-  rb: 'ruby',
-  java: 'java',
-  c: 'c',
-  cpp: 'cpp',
-  h: 'cpp',
-  hpp: 'cpp',
-  cs: 'csharp',
-  go: 'go',
-  rs: 'rust',
-  php: 'php',
-  swift: 'swift',
-  kt: 'kotlin',
-  
-  // Web Technologies
-  html: 'htmlbars',
+  html: 'markup',
   css: 'css',
-  scss: 'scss',
-  sass: 'sass',
-  less: 'less',
   json: 'json',
-  graphql: 'graphql',
-  
-  // Shell & Config
-  sh: 'bash',
-  zsh: 'bash',
-  bash: 'bash',
-  yml: 'yaml',
-  yaml: 'yaml',
-  toml: 'toml',
-  env: 'ini',
-  ini: 'ini',
-  dockerfile: 'dockerfile',
-  gitignore: 'gitignore',
-  
-  // Markup & Data
   md: 'markdown',
-  mdx: 'markdown',
-  xml: 'xml',
-  sql: 'sql',
-  
-  // Other
-  diff: 'diff',
-  txt: 'text',
+  sh: 'bash',
+  yml: 'yaml',
 };
 
-// Map of languages to their common file extensions
-const extensionMap: Record<string, string> = {
-    'javascript': 'js',
-    'jsx': 'jsx',
-    'typescript': 'ts',
-    'tsx': 'tsx',
-    'python': 'py',
-    'ruby': 'rb',
-    'java': 'java',
-    'c': 'c',
-    'cpp': 'cpp',
-    'csharp': 'cs',
-    'go': 'go',
-    'rust': 'rs',
-    'php': 'php',
-    'swift': 'swift',
-    'kotlin': 'kt',
-    'html': 'html',
-    'css': 'css',
-    'json': 'json',
-    'markdown': 'md',
-    'yaml': 'yaml',
-    'bash': 'sh',
-    'shell': 'sh',
-    'dockerfile': 'Dockerfile',
-    'gitignore': '.gitignore'
-  };
-              
-// This component now only handles block code (with language specified)
-// Inline code is handled directly in the ReactMarkdown components prop
-const CustomCode: React.FC<CustomCodeProps> = ({ 
-  node, 
-  className = '', 
-  children, 
-  ...props 
-}: CustomCodeProps) => {
-  // Check if this is a mermaid diagram
-  if (className === 'language-mermaid' || className === 'mermaid') {
-    const code = String(children).trim();
-    return <Mermaid chart={code} />;
-  }
-  const match = /language-(\w+)/.exec(className || '');
-  let language = match ? match[1].toLowerCase() : '';
+// Simple copy hook without heavy dependencies
+const useCopyToClipboard = () => {
+  const [copied, setCopied] = useState(false);
   
-  // Map the language to a known one if needed
-  if (language in languageMap) {
-    language = languageMap[language];
-  }
+  const copy = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, []);
+  
+  return { copied, copy };
+};
 
-  // For code blocks without a specified language
-  if (!match) {
+// Lightweight syntax highlighter component
+const LightweightSyntaxHighlighter = memo(({ 
+  children, 
+  language, 
+  showLineNumbers = false 
+}: { 
+  children: string; 
+  language: string; 
+  showLineNumbers?: boolean; 
+}) => {
+  const { resolvedTheme } = useTheme();
+  const [styles, setStyles] = useState<any>(null);
+  const [highlighter, setHighlighter] = useState<any>(null);
+  
+  // Load styles and highlighter only when needed
+  const loadComponents = useCallback(async () => {
+    try {
+      const [stylesModule, highlighterModule] = await Promise.all([
+        loadPrismStyles(),
+        import('react-syntax-highlighter').then(mod => mod.Prism)
+      ]);
+      
+      setStyles({
+        dark: stylesModule[0].default,
+        light: stylesModule[1].default
+      });
+      setHighlighter(() => highlighterModule);
+    } catch (error) {
+      console.warn('Failed to load syntax highlighter:', error);
+    }
+  }, []);
+  
+  // Load on mount
+  React.useEffect(() => {
+    loadComponents();
+  }, [loadComponents]);
+  
+  // Fallback to simple pre/code if highlighter not loaded
+  if (!highlighter || !styles) {
     return (
-      <div className=" rounded-lg overflow-hidden ">
-        <pre className="overflow-x-auto m-0 bg-white dark:bg-transparent">
-          <code className="text-sm font-mono text-teal-600 dark:text-gray-200" {...props}>
-            {children}
-          </code>
+      <div className="bg-gray-50 dark:bg-gray-900 rounded border overflow-x-auto">
+        <pre className="p-4 text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+          <code>{children}</code>
         </pre>
       </div>
     );
   }
-
+  
+  const HighlighterComponent = highlighter;
+  
   return (
-    <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg">
-      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="flex space-x-2 mr-3">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          </div>
-          <span className="font-medium text-gray-900 dark:text-gray-200">
-            {(() => {
-              const ext = extensionMap[language] || 'txt';
-              return `${language}.${ext}`;
-            })()}
-          </span>
-        </div>
-        <div className="text-xs text-gray-800 dark:text-gray-300">
-          {match[1]} • {String(children).split('\n').length} lines
-        </div>
-      </div>
-      <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">
-        <div className="relative">
-          <ScrollArea className="w-full" type="always">
-            <div className="min-w-max p-4">
-              <div className="relative">
-                <div className="relative">
-                  <SyntaxHighlighter
-                    language={language}
-                    showLineNumbers={true}
-                    wrapLines={false}
-                    wrapLongLines={false}
-                    lineNumberStyle={{
-                      color: '#6b7280',
-                      paddingRight: '1em',
-                      userSelect: 'none',
-                      minWidth: '2.5em',
-                      textAlign: 'right',
-                      opacity: 0.7,
-                      position: 'sticky',
-                      left: 0,
-                      backgroundColor: 'inherit',
-                    }}
-                    lineProps={{
-                      style: {
-                        whiteSpace: 'pre',
-                        wordBreak: 'normal',
-                        wordWrap: 'normal',
-                      },
-                    }}
-                    codeTagProps={{
-                      className: 'font-mono text-sm',
-                      style: {
-                        fontFamily: 'inherit',
-                        color: 'inherit',
-                      },
-                    }}
-                    PreTag={({ children, ...preProps }: { children: ReactNode; [key: string]: any }) => (
-                      <pre 
-                        className="!m-0 !p-0 !bg-transparent dark:!bg-gray-800 !text-gray-900 dark:!text-gray-200" 
-                        {...preProps}
-                      >
-                        {children}
-                      </pre>
-                    )}
-                  >
-                    {String(children).replace(/\n$/, '')}
-                  </SyntaxHighlighter>
-                </div>
-              </div>
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-      </div>
+    <div className="bg-white dark:bg-gray-900 rounded border overflow-hidden">
+      <HighlighterComponent
+        language={language}
+        style={resolvedTheme === 'dark' ? styles.dark : styles.light}
+        showLineNumbers={showLineNumbers}
+        customStyle={{
+          margin: 0,
+          padding: '1rem',
+          backgroundColor: 'transparent',
+          fontSize: '14px',
+        }}
+        codeTagProps={{
+          style: { fontFamily: 'inherit' }
+        }}
+      >
+        {children}
+      </HighlighterComponent>
     </div>
   );
-};
+});
 
-interface MarkdownViewerProps {
+LightweightSyntaxHighlighter.displayName = 'LightweightSyntaxHighlighter';
+
+// Simplified code block component
+const SimpleCodeBlock = memo(({ 
+  children, 
+  language, 
+  className = '' 
+}: { 
+  children: string; 
+  language?: string; 
+  className?: string; 
+}) => {
+  const { copied, copy } = useCopyToClipboard();
+  
+  // Check for mermaid
+  if (language === 'mermaid' || className.includes('mermaid')) {
+    return (
+      <Suspense fallback={<CodeBlockSkeleton />}>
+        <Mermaid chart={children.trim()} />
+      </Suspense>
+    );
+  }
+  
+  // Simple code block without syntax highlighting for unknown languages
+  if (!language || !languageMap[language]) {
+    return (
+      <div className="bg-gray-50 dark:bg-gray-900 rounded border my-4">
+        <div className="flex justify-between items-center p-2 border-b bg-gray-100 dark:bg-gray-800">
+          <span className="text-xs text-gray-600 dark:text-gray-400">Code</span>
+          <button
+            onClick={() => copy(children)}
+            className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-1"
+          >
+            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+        <pre className="p-4 text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">
+          <code>{children}</code>
+        </pre>
+      </div>
+    );
+  }
+  
+  const mappedLanguage = languageMap[language] || language;
+  
+  return (
+    <div className="my-4">
+      <div className="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-t border">
+        <span className="text-xs text-gray-600 dark:text-gray-400 font-mono">
+          {language}
+        </span>
+        <button
+          onClick={() => copy(children)}
+          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-1"
+        >
+          {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+          {copied ? 'Copied!' : 'Copy'}
+        </button>
+      </div>
+      <Suspense fallback={<CodeBlockSkeleton />}>
+        <LightweightSyntaxHighlighter language={mappedLanguage} showLineNumbers={false}>
+          {children}
+        </LightweightSyntaxHighlighter>
+      </Suspense>
+    </div>
+  );
+});
+
+SimpleCodeBlock.displayName = 'SimpleCodeBlock';
+
+// Lightweight link component
+const SimpleLink = memo(({ href, children, ...props }: any) => {
+  const isExternal = href?.startsWith('http');
+  
+  return (
+    <a 
+      href={href}
+      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      {...props}
+    >
+      {children}
+      {isExternal && <ArrowUpRight className="w-3 h-3 inline ml-1" />}
+    </a>
+  );
+});
+
+SimpleLink.displayName = 'SimpleLink';
+
+// Main component with minimal plugins
+interface OptimizedMarkdownViewerProps {
   content: string;
   className?: string;
 }
 
-function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
-  // Process content to handle mermaid code blocks
+const OptimizedMarkdownViewer = memo(({ content, className = '' }: OptimizedMarkdownViewerProps) => {
+  // Process content with minimal operations
   const processedContent = useMemo(() => {
-    // Convert mermaid code blocks to a format we can handle
     return content.replace(/```mermaid\n([\s\S]*?)\n```/g, (_, code) => {
       return `\`\`\`mermaid\n${code}\n\`\`\``;
     });
   }, [content]);
-
-  // Initialize mermaid on component mount
-  useEffect(() => {
-    // @ts-ignore - Mermaid types might not be available
-    if (typeof window !== 'undefined' && window.mermaid) {
-      // @ts-ignore
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: 'default',
-        securityLevel: 'loose',
-        fontFamily: 'inherit',
-      });
-    }
-  }, []);
-
+  
+  // Minimal markdown components
+  const components = useMemo(() => ({
+    code: ({ node, inline, className, children, ...props }: any) => {
+      if (inline) {
+        return (
+          <code 
+            className="px-1 py-0.5 bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 rounded text-sm font-mono"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+      
+      const match = /language-(\w+)/.exec(className || '');
+      const language = match ? match[1] : '';
+      
+      return (
+        <SimpleCodeBlock 
+          language={language} 
+          className={className}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SimpleCodeBlock>
+      );
+    },
+    
+    a: SimpleLink,
+    
+    h1: ({ children, ...props }: any) => (
+      <h1 className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100" {...props}>
+        {children}
+      </h1>
+    ),
+    
+    h2: ({ children, ...props }: any) => (
+      <h2 className="text-2xl font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100" {...props}>
+        {children}
+      </h2>
+    ),
+    
+    h3: ({ children, ...props }: any) => (
+      <h3 className="text-xl font-medium mt-4 mb-2 text-gray-900 dark:text-gray-100" {...props}>
+        {children}
+      </h3>
+    ),
+    
+    p: ({ children, ...props }: any) => (
+      <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...props}>
+        {children}
+      </p>
+    ),
+    
+    ul: ({ children, ...props }: any) => (
+      <ul className="list-disc pl-6 mb-4 space-y-1" {...props}>
+        {children}
+      </ul>
+    ),
+    
+    ol: ({ children, ...props }: any) => (
+      <ol className="list-decimal pl-6 mb-4 space-y-1" {...props}>
+        {children}
+      </ol>
+    ),
+    
+    li: ({ children, ...props }: any) => (
+      <li className="text-gray-700 dark:text-gray-300" {...props}>
+        {children}
+      </li>
+    ),
+    
+    blockquote: ({ children, ...props }: any) => (
+      <blockquote className="border-l-4 border-blue-500 pl-4 italic my-4 text-gray-600 dark:text-gray-400" {...props}>
+        {children}
+      </blockquote>
+    ),
+    
+    table: ({ children, ...props }: any) => (
+      <div className="overflow-x-auto my-4">
+        <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded" {...props}>
+          {children}
+        </table>
+      </div>
+    ),
+    
+    th: ({ children, ...props }: any) => (
+      <th className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 border-b" {...props}>
+        {children}
+      </th>
+    ),
+    
+    td: ({ children, ...props }: any) => (
+      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b" {...props}>
+        {children}
+      </td>
+    ),
+    
+    img: ({ alt, ...props }: any) => (
+      <img 
+        className="max-w-full h-auto rounded border my-4"
+        alt={alt || 'Image'}
+        loading="lazy"
+        {...props}
+      />
+    ),
+    
+    hr: ({ ...props }: any) => (
+      <hr className="my-6 border-gray-200 dark:border-gray-700" {...props} />
+    ),
+  }), []);
+  
   return (
-    <div className={`prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeRaw, rehypeKatex]}
-        components={{
-          // Handle code blocks and inline code
-          code: (props) => {
-            // If it's an inline code block (no className means it's inline)
-            if (!props.className) {
-              return (
-                <code 
-                  className="inline-code font-mono text-sm px-1.5 py-0.5 rounded hover:bg-opacity-70 transition-all duration-150"
-                  style={{
-                    // @ts-ignore - CSS custom properties
-                    '--bg-color': 'rgba(243, 244, 246, 0.5)',
-                    // @ts-ignore - CSS custom properties
-                    '--text-color': 'rgba(13, 148, 136, 0.9)',
-                    // @ts-ignore - CSS custom properties
-                    '--border-color': 'rgba(209, 213, 219, 0.5)',
-                    // @ts-ignore - CSS custom properties
-                    '--dark-bg-color': 'rgba(31, 41, 55, 0.5)',
-                    // @ts-ignore - CSS custom properties
-                    '--dark-text-color': 'rgba(94, 234, 212, 0.9)',
-                    // @ts-ignore - CSS custom properties
-                    '--dark-border-color': 'rgba(55, 65, 81, 0.5)',
-                    
-                    backgroundColor: 'var(--bg-color)',
-                    color: 'var(--text-color)',
-                    border: '1px solid var(--border-color)',
-                    fontFamily: 'inherit',
-                    lineHeight: '1.25',
-                    verticalAlign: 'baseline',
-                    transition: 'all 150ms ease',
-                  } as React.CSSProperties}
-                  {...props}
-                />
-              );
-            }
-            // For code blocks, use our CustomCode component
-            return <CustomCode {...props} />;
-          },
-          text: ({ children }) => {
-            // Just return children for text nodes
-            return children;
-          },
-          a: CustomLink,
-          h1: ({node, ...props}) => (
-            <h1 
-              className="text-4xl md:text-5xl font-extrabold tracking-tight mt-12 mb-8 relative group"
-              {...props}
-            >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-700 dark:from-teal-400 dark:to-blue-400">
-                {props.children}
-              </span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
-            </h1>
-          ),
-          h2: ({node, ...props}) => (
-            <h2 
-              className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 text-indigo-700 dark:text-gray-100"
-              {...props}
-            >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-teal-900/50 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
-              </span>
-              {props.children}
-            </h2>
-          ),
-          h3: ({node, ...props}) => (
-            <h3 
-              className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-gray-200 dark:border-gray-700 text-indigo-700 dark:text-teal-300"
-              {...props}
-            >
-              <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
-              {props.children}
-            </h3>
-          ),
-          h4: ({node, ...props}) => (
-            <h4 
-              className="text-xl md:text-2xl font-semibold mt-8 mb-3 pl-4 relative text-indigo-600 dark:text-blue-300"
-              {...props}
-            >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-500 dark:bg-blue-400"></span>
-              {props.children}
-            </h4>
-          ),
-          h5: ({node, ...props}) => (
-            <h5 
-              className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-indigo-600 dark:text-gray-300"
-              {...props}
-            >
-              {props.children}
-            </h5>
-          ),
-          h6: ({node, ...props}) => (
-            <h6 
-              className="text-base font-medium mt-4 mb-2 pl-2 text-indigo-500 dark:text-gray-400"
-              {...props}
-            />
-          ),
-          p: (props: any) => {
-            const { node, children, ...restProps } = props;
-            
-            // Check if this paragraph only contains a single code element without a language class
-            const isOnlyInlineCode = node?.children?.length === 1 && 
-                                 node.children[0].type === 'element' && 
-                                 node.children[0].tagName === 'code' && 
-                                 !node.children[0].properties?.className?.includes('language-');
-            
-            if (isOnlyInlineCode) {
-              return <span style={{ display: 'inline' }}>{children}</span>;
-            }
-            
-            return (
-              <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...restProps}>
-                {children}
-              </p>
-            );
-          },
-          // Custom checkbox input for task lists
-          input: (inputProps: React.InputHTMLAttributes<HTMLInputElement> & { node?: any }) => {
-            const { node, ...props } = inputProps;
-            if (props.type === 'checkbox') {
-              const isChecked = props.checked || false;
-              const checkmarkSvg = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3E%3C/svg%3E") no-repeat center';
-              
-              return (
-                <input 
-                  type="checkbox" 
-                  disabled={true} 
-                  checked={isChecked}
-                  className={`h-4 w-4 rounded border mr-2 mt-0.5 cursor-pointer transition-colors ${
-                    isChecked 
-                      ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' 
-                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                  }`}
-                  style={{
-                    backgroundImage: isChecked ? checkmarkSvg : 'none',
-                  }}
-                  {...props}
-                />
-              );
-            }
-            return <input {...props} />;
-          },
-          // Custom list components
-          ul: (ulProps: React.HTMLAttributes<HTMLUListElement>) => {
-            const { className, ...props } = ulProps;
-            const isTaskList = className?.includes('contains-task-list');
-            return (
-              <ul 
-                className={`${isTaskList ? 'space-y-2' : 'list-disc space-y-2'} pl-6 my-4`}
-                {...props} 
-              />
-            );
-          },
-          ol: (olProps: React.OlHTMLAttributes<HTMLOListElement>) => (
-            <ol 
-              className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" 
-              {...olProps} 
-            />
-          ),
-          li: (liProps: React.LiHTMLAttributes<HTMLLIElement>) => {
-            const { className, ...props } = liProps;
-            const isTaskItem = className?.includes('task-list-item');
-            return (
-              <li 
-                className={`relative pl-2 my-1 text-gray-700 dark:text-gray-300 ${
-                  isTaskItem ? 'flex items-start' : ''
-                }`}
-                {...props} 
-              />
-            );
-          },
-
-          blockquote: (props) => (
-            <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
-          ),
-          table: (props) => (
-            <div className="overflow-x-auto my-8 rounded-xl border border-indigo-200 dark:border-teal-700 shadow-sm">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props} />
-            </div>
-          ),
-          thead: (props) => (
-            <thead className="bg-indigo-50 dark:bg-indigo-900/20 border-b border-gray-200 dark:border-gray-700" {...props} />
-          ),
-          tbody: (props) => (
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50" {...props} />
-          ),
-          th: (props) => (
-            <th 
-              className="px-6 py-3 text-left text-xs font-medium text-indigo-700 dark:text-teal-300  border-b border-indigo-200 dark:border-teal-700 uppercase tracking-wider"
-              style={{ whiteSpace: 'nowrap' }}
-              {...props}
-            />
-          ),
-          td: (props) => (
-            <td 
-              className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap"
-              {...props}
-            />
-          ),
-          tr: (props) => (
-            <tr 
-              className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors duration-150"
-              {...props}
-            />
-          ),
-          img: (props) => {
-            const { alt, className = '', ...imgProps } = props;
-            
-            // Create the image with proper styling
-            const image = (
-              <img 
-                {...imgProps}
-                className={`rounded-lg shadow-lg w-full max-w-full h-auto border border-gray-200 dark:border-gray-700 ${className}`}
-                alt={alt || 'Image'}
-                loading="lazy"
-              />
-            );
-            
-            // If there's an alt text, treat it as a caption using a figure
-            if (alt) {
-              return (
-                <figure className="my-6">
-                  {image}
-                  <figcaption className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
-                    {alt}
-                  </figcaption>
-                </figure>
-              );
-            }
-            
-            // For images without alt text, return the image wrapped in a div
-            return <div className="my-6">{image}</div>;
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+    <div className={`prose max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
+      <Suspense fallback={<MarkdownSkeleton />}>
+        <ReactMarkdown
+          components={components}
+          // Minimal plugins only
+          remarkPlugins={[]}
+          rehypePlugins={[]}
+        >
+          {processedContent}
+        </ReactMarkdown>
+      </Suspense>
     </div>
   );
-}
+});
+
+MarkdownViewer.displayName = 'MarkdownViewer';
 
 export default MarkdownViewer;
