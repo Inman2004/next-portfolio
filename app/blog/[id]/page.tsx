@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User } from 'firebase/auth';
@@ -59,35 +59,48 @@ export default function PostPage({ params }: PostPageProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [paramsResolved, setParamsResolved] = useState(false);
   const [postId, setPostId] = useState<string | null>(null);
   const [views, setViews] = useState<number>(0);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
+  // Use refs to track if operations have been performed
+  const viewTrackedRef = useRef(false);
+  const unsubscribeViewRef = useRef<(() => void) | null>(null);
+  const fetchedPostRef = useRef<string | null>(null);
 
-  // Resolve the async params
+  // Resolve the async params - FIXED: Remove dependency on params in useEffect
   useEffect(() => {
+    let isMounted = true;
+    
     const resolveParams = async () => {
       try {
         const resolvedParams = await params;
-        setPostId(resolvedParams.id);
-        setParamsResolved(true);
+        if (isMounted) {
+          setPostId(resolvedParams.id);
+        }
       } catch (err) {
-        setError('Failed to load post parameters');
-        setLoading(false);
+        if (isMounted) {
+          setError('Failed to load post parameters');
+          setLoading(false);
+        }
       }
     };
+    
     resolveParams();
-  }, [params]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - params is stable
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (!post) {
       setError('Post not found');
       return;
     }
     setIsConfirmOpen(true);
-  };
+  }, [post]);
 
-  const handleConfirm = async () => {
+  const handleConfirm = useCallback(async () => {
     if (!post) {
       setError('Post not found');
       return;
@@ -104,70 +117,13 @@ export default function PostPage({ params }: PostPageProps) {
     } finally {
       setIsDeleting(false);
     }
-  };
+  }, [post, router]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsConfirmOpen(false);
-  };
+  }, []);
 
-  // Track views
-  useEffect(() => {
-    if (!postId) return;
-    
-    const trackView = async () => {
-      try {
-        const newViewCount = await incrementViewCount(postId);
-        setViews(prev => prev || newViewCount);
-      } catch (error) {
-        console.error('Error tracking view:', error);
-      }
-    };
-    
-    // Track view when component mounts
-    trackView();
-    
-    // Set up real-time updates for view count
-    const viewRef = doc(db, 'post_views', postId);
-    const unsubscribeView = onSnapshot(viewRef, (doc) => {
-      if (doc.exists()) {
-        setViews(doc.data().count || 0);
-      }
-    });
-    
-    // Initial view count fetch
-    const fetchInitialViews = async () => {
-      try {
-        const initialViews = await getViewCount(postId);
-        setViews(initialViews);
-      } catch (error) {
-        console.error('Error fetching initial view count:', error);
-      }
-    };
-    
-    fetchInitialViews();
-    
-    return () => {
-      unsubscribeView();
-    };
-  }, [postId]);
-  
-  // Check cache first when postId changes
-  useEffect(() => {
-    if (!postId) return;
-    
-    // Check if we have this post in cache
-    const cachedPost = getCachedPost(postId);
-    if (cachedPost) {
-      setPost(cachedPost);
-      setLoading(false);
-      setIsInitialLoad(false);
-    } else if (isInitialLoad) {
-      // Only fetch if this is the initial load and not in cache
-      fetchPost();
-    }
-  }, [postId]);
-
-  // Single effect for auth state
+  // FIXED: Simplified auth state management
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
@@ -175,33 +131,45 @@ export default function PostPage({ params }: PostPageProps) {
       if (currentUser) {
         // Set admin status based on user email
         const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
-        if (currentUser.email === adminEmail) {
-          setIsAdmin(true);
-        }
+        setIsAdmin(currentUser.email === adminEmail);
+      } else {
+        setIsAdmin(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  const fetchPost = useCallback(async () => {
-    if (!postId) return;
+  // FIXED: Optimized fetchPost to avoid unnecessary re-creations
+  const fetchPost = useCallback(async (id: string) => {
+    // Avoid refetching the same post
+    if (fetchedPostRef.current === id) {
+      return;
+    }
+    
+    // Check cache first
+    const cachedPost = getCachedPost(id);
+    if (cachedPost) {
+      setPost(cachedPost);
+      setLoading(false);
+      fetchedPostRef.current = id;
+      return;
+    }
     
     try {
       setLoading(true);
       setError(null);
 
       // Use the new getBlogPost utility function
-      const postData = await getBlogPost(postId);
+      const postData = await getBlogPost(id);
 
       if (!postData) {
         setError('Post not found');
         return;
       }
 
-      // Helper function to safely get author data
+      // FIXED: Simplified author data processing
       const getAuthorData = (): PostAuthorData => {
-        // Helper function to safely get a string value
         const getStringValue = (value: any, defaultValue: string = ''): string => {
           if (value === null || value === undefined) return defaultValue;
           if (typeof value === 'string') return value;
@@ -213,7 +181,6 @@ export default function PostPage({ params }: PostPageProps) {
           return String(value);
         };
 
-        // Default values with explicit type casting to ensure string
         const defaultAuthor: PostAuthorData = {
           id: postData.authorId ? String(postData.authorId) : 'unknown',
           name: 'Anonymous',
@@ -221,7 +188,6 @@ export default function PostPage({ params }: PostPageProps) {
           photoURL: undefined
         };
 
-        // Extract user data safely
         const userDisplayName = postData.user?.displayName || 
                               (typeof postData.user === 'object' && postData.user !== null 
                                 ? (postData.user as any).name 
@@ -237,7 +203,6 @@ export default function PostPage({ params }: PostPageProps) {
                              ? (postData.user as any).username 
                              : null);
 
-        // Handle case where author is a string
         if (typeof postData.author === 'string') {
           return {
             ...defaultAuthor,
@@ -247,7 +212,6 @@ export default function PostPage({ params }: PostPageProps) {
           };
         }
         
-        // Handle case where author is an object
         if (postData.author && typeof postData.author === 'object') {
           const authorObj = postData.author as Record<string, unknown>;
           const authorId = postData.authorId || 
@@ -262,7 +226,6 @@ export default function PostPage({ params }: PostPageProps) {
           };
         }
         
-        // Fallback to user data if available
         if (postData.user) {
           let userId: string;
           if (postData.authorId) {
@@ -287,7 +250,6 @@ export default function PostPage({ params }: PostPageProps) {
         return defaultAuthor;
       };
 
-      // Map to the expected PostData type
       const authorData = getAuthorData();
       const authorSocials = postData.author && typeof postData.author === 'object' && 'socials' in postData.author
         ? (postData.author as any).socials || {}
@@ -297,7 +259,6 @@ export default function PostPage({ params }: PostPageProps) {
         id: typeof postData.id === 'string' ? postData.id : 'unknown',
         title: postData.title,
         content: postData.content,
-        // Ensure author has required fields with proper fallbacks
         author: {
           id: authorData.id || 'unknown',
           name: authorData.name || 'Unknown Author',
@@ -305,13 +266,11 @@ export default function PostPage({ params }: PostPageProps) {
           photoURL: authorData.photoURL,
           socials: authorSocials
         },
-        // Add direct access to author properties for convenience
         authorId: authorData.id || 'unknown',
         authorName: authorData.name || 'Unknown Author',
         authorPhotoURL: authorData.photoURL,
         authorUsername: authorData.username,
         authorSocials: authorSocials,
-        // Add post metadata
         createdAt: postData.createdAt,
         coverImage: postData.coverImage,
         excerpt: postData.excerpt,
@@ -320,30 +279,97 @@ export default function PostPage({ params }: PostPageProps) {
         tags: Array.isArray(postData.tags) ? postData.tags : []
       };
 
-      // Update cache and state
       cachePost(formattedPost);
       setPost(formattedPost);
-      setIsInitialLoad(false);
+      fetchedPostRef.current = id;
     } catch (err) {
       console.error('Error fetching post:', err);
       setError('Failed to load post');
     } finally {
       setLoading(false);
     }
-  }, [postId]);
+  }, [getCachedPost, cachePost]);
 
-  // Format date for display
-  const formatCreatedAt = (date: Date | { toDate: () => Date } | undefined) => {
-    if (!date) return '';
-    const dateObj = date instanceof Date ? date : date.toDate();
-    return format(dateObj, 'MMMM d, yyyy');
-  };
+  // FIXED: Separate effect for fetching post when postId changes
+  useEffect(() => {
+    if (postId) {
+      fetchPost(postId);
+    }
+  }, [postId, fetchPost]);
 
-  const getPostDateTime = (date: Date | { toDate: () => Date } | undefined) => {
-    if (!date) return '';
-    const dateObj = date instanceof Date ? date : date.toDate();
-    return dateObj.toISOString();
-  };
+  // FIXED: Optimized view tracking with proper cleanup
+  useEffect(() => {
+    if (!postId || viewTrackedRef.current) return;
+    
+    const trackView = async () => {
+      try {
+        // Track view only once
+        await incrementViewCount(postId);
+        viewTrackedRef.current = true;
+      } catch (error) {
+        console.error('Error tracking view:', error);
+      }
+    };
+    
+    // Get initial view count
+    const fetchInitialViews = async () => {
+      try {
+        const initialViews = await getViewCount(postId);
+        setViews(initialViews);
+      } catch (error) {
+        console.error('Error fetching initial view count:', error);
+      }
+    };
+    
+    // Set up real-time updates for view count
+    const viewRef = doc(db, 'post_views', postId);
+    const unsubscribeView = onSnapshot(viewRef, (doc) => {
+      if (doc.exists()) {
+        setViews(doc.data().count || 0);
+      }
+    }, (error) => {
+      console.error('Error in view snapshot:', error);
+    });
+    
+    unsubscribeViewRef.current = unsubscribeView;
+    
+    // Track view and fetch initial count
+    trackView();
+    fetchInitialViews();
+    
+    return () => {
+      if (unsubscribeViewRef.current) {
+        unsubscribeViewRef.current();
+        unsubscribeViewRef.current = null;
+      }
+    };
+  }, [postId]); // Only depend on postId
+
+  // FIXED: Memoized date formatting to avoid recalculation
+  const formatCreatedAt = useMemo(() => {
+    return (date: Date | { toDate: () => Date } | undefined) => {
+      if (!date) return '';
+      const dateObj = date instanceof Date ? date : date.toDate();
+      return format(dateObj, 'MMMM d, yyyy');
+    };
+  }, []);
+
+  const getPostDateTime = useMemo(() => {
+    return (date: Date | { toDate: () => Date } | undefined) => {
+      if (!date) return '';
+      const dateObj = date instanceof Date ? date : date.toDate();
+      return dateObj.toISOString();
+    };
+  }, []);
+
+  // FIXED: Memoized formatted date and datetime
+  const formattedCreatedAt = useMemo(() => {
+    return formatCreatedAt(post?.createdAt);
+  }, [post?.createdAt, formatCreatedAt]);
+
+  const postDateTime = useMemo(() => {
+    return getPostDateTime(post?.createdAt);
+  }, [post?.createdAt, getPostDateTime]);
 
   if (loading) {
     return (
@@ -427,7 +453,7 @@ export default function PostPage({ params }: PostPageProps) {
                   )}
                 </span>
                 <span className="hidden sm:inline">•</span>
-                <span>{formatCreatedAt(post.createdAt)}</span>
+                <span>{formattedCreatedAt}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4 flex-shrink-0" />
@@ -539,4 +565,4 @@ export default function PostPage({ params }: PostPageProps) {
       </div>
     </div>
   );
-}
+                        }
