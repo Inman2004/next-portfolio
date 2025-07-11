@@ -243,7 +243,7 @@ interface OptimizedMarkdownViewerProps {
   className?: string;
 }
 
-const OptimizedMarkdownViewer = memo(({ content, className = '' }: OptimizedMarkdownViewerProps) => {
+const MarkdownViewer = memo(({ content, className = '' }: OptimizedMarkdownViewerProps) => {
   // Process content with minimal operations
   const processedContent = useMemo(() => {
     return content.replace(/```mermaid\n([\s\S]*?)\n```/g, (_, code) => {
