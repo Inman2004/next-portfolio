@@ -68,8 +68,17 @@ export async function generateMetadata(
     const excerpt = postData.excerpt?.trim() || '';
     const content = postData.content || '';
     
-    // Process author name with type safety first
+    // Process author name with type safety - prioritize the blog post's uploaded user
     const getAuthorName = (): string => {
+      // First check for the user who uploaded the post
+      if (postData.user?.displayName) {
+        return postData.user.displayName;
+      }
+      if (postData.user?.name) {
+        return postData.user.name;
+      }
+      
+      // Fall back to post author data if user data is not available
       if (typeof postData.author === 'string') {
         return postData.author;
       }
@@ -79,25 +88,26 @@ export async function generateMetadata(
       if (postData.author?.name) {
         return postData.author.name;
       }
-      if (postData.user?.displayName) {
-        return postData.user.displayName;
-      }
-      if (postData.user?.name) {
-        return postData.user.name;
-      }
+      
+      // Final fallback to site config
       return SITE_CONFIG.author.name;
     };
 
     const authorName = getAuthorName();
 
-    // Process Twitter handle with type safety
+    // Process Twitter handle with type safety - prioritize the blog post's uploaded user
     const getAuthorTwitter = (): string => {
-      if (typeof postData.author === 'object' && postData.author?.twitter) {
-        return postData.author.twitter.replace(/^@/, '');
-      }
+      // First check for the user who uploaded the post
       if (postData.user?.twitter) {
         return postData.user.twitter.replace(/^@/, '');
       }
+      
+      // Fall back to post author data if user data is not available
+      if (typeof postData.author === 'object' && postData.author?.twitter) {
+        return postData.author.twitter.replace(/^@/, '');
+      }
+      
+      // Final fallback to site config
       return SITE_CONFIG.author.twitter.replace(/^@/, '');
     };
 
@@ -187,15 +197,21 @@ export async function generateMetadata(
         ? String(postData.categories[0])
         : 'General');
 
+    // Format the title to include author name for better SEO and social sharing
+    const seoTitle = `${title} | by ${authorName} | ${SITE_CONFIG.name}`;
+    
     return {
-      title: `${title} | ${SITE_CONFIG.name}`,
-      description,
+      title: seoTitle,
+      description: `${description} - Written by ${authorName} on ${SITE_CONFIG.name}`,
       applicationName: SITE_CONFIG.name,
       authors: [{
         name: authorName,
-        ...(authorTwitter && { url: `https://twitter.com/${authorTwitter}` })
+        ...(authorTwitter && { 
+          url: `https://twitter.com/${authorTwitter}`,
+          twitter: `@${authorTwitter}`
+        })
       }],
-      keywords: tagList.length ? tagList : undefined,
+      keywords: [...(tagList || []), authorName, ...(category ? [category] : [])],
       creator: authorTwitter ? `@${authorTwitter}` : `@${SITE_CONFIG.author.twitter}`,
       publisher: SITE_CONFIG.name,
       formatDetection: {
@@ -211,11 +227,12 @@ export async function generateMetadata(
         },
       },
       openGraph: {
-        title: title,
-        description,
+        title: seoTitle,
+        description: `${description} - Written by ${authorName} on ${SITE_CONFIG.name}`,
         type: 'article',
         publishedTime,
         modifiedTime,
+        authors: [authorName],
         url,
         locale: 'en_US',
         siteName: SITE_CONFIG.name,
@@ -250,8 +267,8 @@ export async function generateMetadata(
       },
       twitter: {
         card: 'summary_large_image',
-        title: title,
-        description,
+        title: seoTitle,
+        description: `${description} - Written by ${authorName} on ${SITE_CONFIG.name}`,
         images: [{
           url: imageUrl,
           width: 1200,
@@ -261,6 +278,7 @@ export async function generateMetadata(
         creator: authorTwitter ? `@${authorTwitter}` : `@${SITE_CONFIG.author.twitter}`,
         site: `@${SITE_CONFIG.author.twitter}`,
       },
+
       // Robots configuration
       robots: {
         index: true,
@@ -273,30 +291,39 @@ export async function generateMetadata(
           'max-snippet': -1,
         },
       },
+      // Additional meta tags
       other: {
-        // Article structured data
-        'article:published_time': publishedTime,
-        'article:modified_time': modifiedTime,
-        'article:author': authorName,
-        'article:section': category || 'General',
-        ...(tagList.length > 0 ? { 'article:tag': tagList } : {}),
-        
-        // Additional meta tags
-        'theme-color': SITE_CONFIG.themeColor,
-        'msapplication-TileColor': SITE_CONFIG.themeColor,
-        'msapplication-config': '/browserconfig.xml',
-        'apple-mobile-web-app-title': SITE_CONFIG.name,
-        'application-name': SITE_CONFIG.name,
-        
-        // Additional OpenGraph tags
+        // OpenGraph meta
+        'og:site_name': SITE_CONFIG.name,
+        'og:type': 'article',
+        'og:title': seoTitle,
+        'og:description': `${description} - Written by ${authorName} on ${SITE_CONFIG.name}`,
+        'og:url': url,
+        'og:image': imageUrl,
+        'og:image:secure_url': imageUrl,
         'og:image:width': '1200',
         'og:image:height': '630',
-        'og:image:alt': title,
-        'og:image:type': 'image/jpeg',
-        'og:site_name': SITE_CONFIG.name,
+        'og:image:alt': `Cover image for ${title}`,
+        'og:image:type': 'image/png',
         'og:locale': 'en_US',
+        'og:updated_time': new Date().toISOString(),
         
-        // Additional meta for other platforms
+        // Article meta
+        'article:author': authorName,
+        'article:published_time': publishedTime,
+        'article:modified_time': modifiedTime,
+        'article:section': category || 'General',
+        'article:tag': tagList,
+        
+        // Twitter meta
+        'twitter:image:src': imageUrl,
+        'twitter:label1': 'Written by',
+        'twitter:data1': authorName,
+        'twitter:label2': 'Filed under',
+        'twitter:data2': category || 'General',
+        'twitter:app:name:iphone': SITE_CONFIG.name,
+        'twitter:app:name:ipad': SITE_CONFIG.name,
+        'twitter:app:name:googleplay': SITE_CONFIG.name,
         'pinterest-rich-pin': 'true',
         'pinterest-rich-pin:title': title,
         'pinterest-rich-pin:description': description,
