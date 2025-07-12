@@ -125,56 +125,71 @@ export async function generateMetadata(
         ? String(postData.categories[0])
         : 'General');
 
+    // Generate social media metadata
+    const siteName = SITE_CONFIG.name;
+    const siteUrl = new URL(SITE_CONFIG.url);
+    const baseUrl = process.env.NODE_ENV === 'production' ? siteUrl.origin : 'https://your-production-url.com';
+    const canonicalUrl = new URL(`/blog/${params.id}`, baseUrl).toString();
+    const authorUrl = new URL(`/author/${authorName.toLowerCase().replace(/\s+/g, '-')}`, baseUrl).toString();
+    
+    // Ensure image URL is absolute
+    const absoluteImageUrl = postData.coverImage 
+      ? new URL(postData.coverImage.startsWith('http') ? postData.coverImage : postData.coverImage, baseUrl).toString()
+      : new URL('/default-og-image.jpg', baseUrl).toString();
+    
     return {
-      title: `${title} | ${SITE_CONFIG.name}`,
-      description,
-      applicationName: SITE_CONFIG.name,
+      title: title,
+      description: description,
+      applicationName: siteName,
       authors: [{ 
         name: authorName,
-        url: new URL(`/author/${authorName.toLowerCase().replace(/\s+/g, '-')}`, SITE_CONFIG.url).toString()
+        url: authorUrl
       }],
       keywords: tagList.length ? tagList : undefined,
       creator: authorName,
-      publisher: SITE_CONFIG.name,
+      publisher: siteName,
       formatDetection: {
         email: false,
         address: false,
         telephone: false,
       },
-      metadataBase: new URL(SITE_CONFIG.url),
+      metadataBase: new URL(baseUrl),
       alternates: {
-        canonical: url,
+        canonical: canonicalUrl,
         languages: {
-          'en-US': url,
+          'en-US': canonicalUrl,
         },
       },
       openGraph: {
-        title,
-        description,
+        title: title,
+        description: description,
         type: 'article',
-        publishedTime,
-        modifiedTime,
-        url,
+        publishedTime: publishedTime,
+        modifiedTime: modifiedTime,
+        url: canonicalUrl,
         locale: 'en_US',
-        siteName: SITE_CONFIG.name,
+        siteName: siteName,
+        authors: [authorName],
+        section: category,
+        tags: tagList,
         images: [
           {
-            url: imageUrl,
+            url: absoluteImageUrl,
             width: 1200,
             height: 630,
             alt: title,
             type: 'image/jpeg',
-            secureUrl: imageUrl,
+            secureUrl: absoluteImageUrl,
           },
           ...(previousImages as any[]),
         ],
       },
       twitter: {
         card: 'summary_large_image',
-        title,
-        description,
+        title: title,
+        description: description,
         images: [{
-          url: imageUrl,
+          url: absoluteImageUrl,
           width: 1200,
           height: 630,
           alt: title,
@@ -182,6 +197,7 @@ export async function generateMetadata(
         creator: authorTwitter ? `@${authorTwitter}` : undefined,
         site: SITE_CONFIG.author.twitter ? `@${SITE_CONFIG.author.twitter.replace('@', '')}` : undefined,
       },
+      // Additional meta tags for better social sharing
       robots: {
         index: true,
         follow: true,
@@ -201,21 +217,27 @@ export async function generateMetadata(
         'article:section': category,
         ...(tagList.length > 0 ? { 'article:tag': tagList } : {}),
         
-        // Additional meta tags
-        'theme-color': SITE_CONFIG.themeColor,
-        'msapplication-TileColor': SITE_CONFIG.themeColor,
-        'msapplication-config': '/browserconfig.xml',
-        'apple-mobile-web-app-title': SITE_CONFIG.name,
-        'application-name': SITE_CONFIG.name,
-        
         // Additional OpenGraph tags
+        'og:site_name': siteName,
         'og:image:width': '1200',
         'og:image:height': '630',
         'og:image:alt': title,
         'og:image:type': 'image/jpeg',
+        'og:image:secure_url': imageUrl,
         
         // Twitter card
         'twitter:image:alt': title,
+        'twitter:label1': 'Written by',
+        'twitter:data1': authorName,
+        'twitter:label2': 'Filed under',
+        'twitter:data2': category,
+        
+        // Additional meta
+        'theme-color': SITE_CONFIG.themeColor,
+        'msapplication-TileColor': SITE_CONFIG.themeColor,
+        'msapplication-config': '/browserconfig.xml',
+        'apple-mobile-web-app-title': siteName,
+        'application-name': siteName,
       },
     };
   } catch (error) {
