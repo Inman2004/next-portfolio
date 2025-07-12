@@ -35,8 +35,7 @@ const ThemedSyntaxHighlighter = ({ children, ...props }: SyntaxHighlighterProps)
         customStyle={{
           margin: 0,
           padding: '1rem',
-          backgroundColor: 'transparent',
-          background: 'transparent',
+          backgroundColor: 'transparent'
         }}
         codeTagProps={{
           className: 'font-mono text-sm',
@@ -266,34 +265,34 @@ const CustomCode: React.FC<CustomCodeProps> = ({
 
   return (
     <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg group">
-      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="flex space-x-2 mr-3">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-3 sm:px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div className="flex items-center overflow-hidden">
+          <div className="flex space-x-1.5 sm:space-x-2 mr-2 sm:mr-3 flex-shrink-0">
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></div>
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
           </div>
-          <span className="font-medium text-gray-900 dark:text-gray-200">
+          <span className="font-medium text-gray-900 dark:text-gray-200 truncate text-ellipsis max-w-[120px] sm:max-w-none">
             {(() => {
               const ext = extensionMap[language] || 'txt';
               return `${language}.${ext}`;
             })()}
           </span>
         </div>
-        <div className="flex items-center space-x-3">
-          <span className="text-xs text-gray-800 dark:text-gray-300">
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+          <span className="text-xs text-gray-800 dark:text-gray-300 hidden sm:inline">
             {match[1]} • {codeString.split('\n').length} lines
           </span>
           <button
             onClick={handleCopy}
-            className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="p-1.5 sm:p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             title="Copy to clipboard"
             aria-label="Copy code"
           >
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-green-500" />
+              <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
             ) : (
-              <Copy className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" />
+              <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" />
             )}
           </button>
         </div>
@@ -301,9 +300,9 @@ const CustomCode: React.FC<CustomCodeProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">
         <div className="relative">
           <ScrollArea className="w-full" type="always">
-            <div className="min-w-max p-4">
+            <div className="min-w-max p-2 sm:p-3 md:p-4">
               <div className="relative">
-                <div className="relative">
+                <div className="relative text-xs sm:text-sm">
                   <SyntaxHighlighter
                     language={language}
                     showLineNumbers={true}
@@ -311,33 +310,46 @@ const CustomCode: React.FC<CustomCodeProps> = ({
                     wrapLongLines={false}
                     lineNumberStyle={{
                       color: '#6b7280',
-                      paddingRight: '1em',
+                      paddingRight: '0.75em',
                       userSelect: 'none',
-                      minWidth: '2.5em',
+                      minWidth: '2em',
                       textAlign: 'right',
                       opacity: 0.7,
                       position: 'sticky',
                       left: 0,
                       backgroundColor: 'inherit',
+                      fontSize: '0.9em',
+                      lineHeight: '1.5',
                     }}
                     lineProps={{
                       style: {
                         whiteSpace: 'pre',
                         wordBreak: 'normal',
                         wordWrap: 'normal',
+                        lineHeight: '1.5',
                       },
                     }}
                     codeTagProps={{
-                      className: 'font-mono text-sm',
+                      className: 'font-mono',
                       style: {
                         fontFamily: 'inherit',
                         color: 'inherit',
+                        fontSize: 'inherit',
+                        lineHeight: 'inherit',
                       },
+                    }}
+                    customStyle={{
+                      margin: 0,
+                      padding: 0,
+                      backgroundColor: 'transparent',
+                      fontSize: 'inherit',
+                      lineHeight: '1.5',
                     }}
                     PreTag={({ children, ...preProps }: { children: ReactNode; [key: string]: any }) => (
                       <pre 
-                        className="!m-0 !p-0 !bg-transparent dark:!bg-gray-800 !text-gray-900 dark:!text-gray-200" 
+                        className="!m-0 !p-0 bg-white dark:bg-gray-800 !text-gray-900 dark:!text-gray-200" 
                         {...preProps}
+                        style={{ background: 'transparent' }}
                       >
                         {children}
                       </pre>

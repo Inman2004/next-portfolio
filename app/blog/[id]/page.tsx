@@ -396,7 +396,7 @@ export default function PostPage({ params }: PostPageProps) {
     if (user?.uid !== post.author.id) return null;
     
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col items-center gap-2">
         <Link
           href={`/blog/edit/${post.id}`}
           className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200 group"
@@ -471,15 +471,15 @@ export default function PostPage({ params }: PostPageProps) {
       <motion.div
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: isScrolled ? 0 : 100, opacity: isScrolled ? 1 : 0 }}
-        className="fixed bottom-6 left-3/4 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 px-4 py-3 flex items-center gap-3 min-w-[320px] max-w-[90vw]"
+        className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md sm:backdrop-blur-lg rounded-lg sm:rounded-2xl shadow sm:shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-1.5 sm:px-3 sm:py-2 flex flex-col items-center gap-1 sm:gap-2 min-w-[32px] sm:min-w-[36px] max-w-[14vw]"
       >
         <button
           onClick={scrollToTop}
           className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200 group"
           aria-label="Scroll to top"
         >
-          <ChevronUp className="w-4 h-4 flex-shrink-0 group-hover:-translate-y-1 transition-transform" />
-          <span className="hidden sm:inline">Top</span>
+          <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 group-hover:-translate-y-0.5 sm:group-hover:-translate-y-1 transition-transform" />
+          <span className="hidden sm:inline text-xs">Top</span>
         </button>
         
         <div className="flex-1 min-w-0">
