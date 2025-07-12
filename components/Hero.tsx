@@ -11,6 +11,8 @@ import { Github, Linkedin, Quote } from "lucide-react";
 import { SkillBadge } from "./skillColors";
 import AvatarCard3D from "./ThreeJS/AvatarCard3d";
 import InteractiveCard3D from "./ThreeJS/HeroID";
+import { getBlogPosts } from "@/lib/blogUtils";
+import Link from "next/link";
 
 interface QuoteType {
   quote: string;
@@ -123,7 +125,28 @@ export default function Hero() {
   //     setIsLoading(false);
   //   }
   // }, [localQuotes, quote]);
+  const [latestPost, setLatestPost] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchLatestPost = async () => {
+      try {
+        const posts = await getBlogPosts({
+          limit: 1,
+          publishedOnly: true
+        });
+        if (posts.length > 0) {
+          setLatestPost(posts[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching latest blog post:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
+    fetchLatestPost();
+  }, []);
   return (
     <section
       id="home"
@@ -207,18 +230,35 @@ export default function Hero() {
               </div>
 
               {/* Featured Project Teaser */}
-              {/* <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="group relative mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/50 dark:to-indigo-900/20 border border-blue-100 dark:border-indigo-900/50 cursor-pointer transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="absolute -top-2 -right-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  New
-                </div>
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Latest Project</p>
-                <p className="text-sm text-blue-600 dark:text-blue-300 group-hover:text-blue-700 dark:group-hover:text-blue-200 transition-colors">
-                  Check out my work on <span className="font-medium">Interactive 3D Portfolio</span> →
-                </p>
-              </motion.div> */}
+              {!isLoading && latestPost ? (
+    <Link href={`/blog/${latestPost.id}`}>
+      <motion.div 
+        whileHover={{ scale: 1.02 }}
+        className="group relative mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/50 dark:to-indigo-900/20 border border-blue-100 dark:border-indigo-900/50 cursor-pointer transition-all duration-300 hover:shadow-lg"
+      >
+        <div className="absolute -top-2 -right-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          New
+        </div>
+        <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Latest Blog</p>
+        <h3 className="font-medium text-gray-900 dark:text-white mb-1 line-clamp-1">
+          {latestPost.title}
+        </h3>
+        <p className="text-xs text-blue-600 dark:text-blue-300 group-hover:text-blue-700 dark:group-hover:text-blue-200 transition-colors">
+          {latestPost.createdAt?.toDate 
+            ? new Date(latestPost.createdAt.toDate()).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+              })
+            : 'Read now'} →
+        </p>
+      </motion.div>
+    </Link>
+  ) : (
+    <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/50 dark:to-indigo-900/20 border border-blue-100 dark:border-indigo-900/50">
+      <p className="text-sm text-gray-500 dark:text-gray-400">Loading latest post...</p>
+    </div>
+  )}
 
               {/* Personal Touch */}
               <p className="text-sm text-gray-500 dark:text-gray-400 italic mt-4 max-w-lg">
