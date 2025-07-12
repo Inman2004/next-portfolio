@@ -104,11 +104,26 @@ export async function generateMetadata(
       ? updatedDate.toISOString()
       : publishedTime;
     
-    // Handle images
-    const defaultImage = new URL('/default-og-image.jpg', SITE_CONFIG.url).toString();
-    const imageUrl = postData.coverImage 
-      ? new URL(postData.coverImage, SITE_CONFIG.url).toString()
-      : defaultImage;
+    // Handle images with better defaults and multiple sizes
+    const defaultImage = new URL('/images/og-default.jpg', SITE_CONFIG.url).toString();
+    let imageUrl = defaultImage;
+    
+    // If there's a cover image, use it
+    if (postData.coverImage) {
+      try {
+        // If it's already a full URL, use it directly
+        if (postData.coverImage.startsWith('http')) {
+          imageUrl = postData.coverImage;
+        } else {
+          // Otherwise, prepend the site URL
+          imageUrl = new URL(postData.coverImage.startsWith('/') 
+            ? postData.coverImage 
+            : `/${postData.coverImage}`, SITE_CONFIG.url).toString();
+        }
+      } catch (e) {
+        console.warn('Invalid cover image URL:', postData.coverImage);
+      }
+    }
     
     // Generate canonical URL
     const url = new URL(`/blog/${params.id}`, SITE_CONFIG.url).toString();
@@ -149,14 +164,15 @@ export async function generateMetadata(
         },
       },
       openGraph: {
-        title,
-        description,
+        title: title,
+        description: description || `${title} - ${SITE_CONFIG.name}`,
         type: 'article',
         publishedTime,
         modifiedTime,
         url,
         locale: 'en_US',
         siteName: SITE_CONFIG.name,
+        authors: [authorName],
         images: [
           {
             url: imageUrl,
@@ -166,13 +182,28 @@ export async function generateMetadata(
             type: 'image/jpeg',
             secureUrl: imageUrl,
           },
+          // Additional image sizes for different platforms
+          {
+            url: imageUrl,
+            width: 800,
+            height: 418,
+            alt: title,
+            type: 'image/jpeg',
+          },
+          {
+            url: imageUrl,
+            width: 600,
+            height: 314,
+            alt: title,
+            type: 'image/jpeg',
+          },
           ...(previousImages as any[]),
         ],
       },
       twitter: {
         card: 'summary_large_image',
-        title,
-        description,
+        title: title,
+        description: description || `${title} - ${SITE_CONFIG.name}`,
         images: [{
           url: imageUrl,
           width: 1200,
@@ -182,6 +213,7 @@ export async function generateMetadata(
         creator: authorTwitter ? `@${authorTwitter}` : undefined,
         site: SITE_CONFIG.author.twitter ? `@${SITE_CONFIG.author.twitter.replace('@', '')}` : undefined,
       },
+      // Robots configuration
       robots: {
         index: true,
         follow: true,
@@ -198,7 +230,7 @@ export async function generateMetadata(
         'article:published_time': publishedTime,
         'article:modified_time': modifiedTime,
         'article:author': authorName,
-        'article:section': category,
+        'article:section': category || 'General',
         ...(tagList.length > 0 ? { 'article:tag': tagList } : {}),
         
         // Additional meta tags
@@ -213,9 +245,13 @@ export async function generateMetadata(
         'og:image:height': '630',
         'og:image:alt': title,
         'og:image:type': 'image/jpeg',
+        'og:site_name': SITE_CONFIG.name,
+        'og:locale': 'en_US',
         
-        // Twitter card
-        'twitter:image:alt': title,
+        // Additional meta for other platforms
+        'pinterest-rich-pin': 'true',
+        'pinterest-rich-pin:title': title,
+        'pinterest-rich-pin:description': description,
       },
     };
   } catch (error) {

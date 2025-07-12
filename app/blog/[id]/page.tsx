@@ -607,8 +607,7 @@ export default function PostPage({ params }: PostPageProps) {
                   <SocialShare 
                     url={`/blog/${post.id}`}
                     title={post.title}
-                    description={post.excerpt || post.content?.substring(0, 200) + '...'}
-                    image={post.coverImage || undefined}
+                    description={post.content?.substring(0, 200) + '...'}
                     isCompact={true}
                   />
                 </div>
@@ -622,8 +621,7 @@ export default function PostPage({ params }: PostPageProps) {
                     <SocialShare 
                       url={`/blog/${post.id}`}
                       title={post.title}
-                      description={post.excerpt || post.content?.substring(0, 200) + '...'}
-                      image={post.coverImage || undefined}
+                      description={post.content?.substring(0, 200) + '...'}
                       isCompact={true}
                     />
                   </div>
