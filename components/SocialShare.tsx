@@ -9,10 +9,11 @@ interface SocialShareProps {
   url: string;
   title: string;
   description?: string;
+  image?: string;
   isCompact?: boolean;
 }
 
-export default function SocialShare({ url, title, description = '', isCompact = false }: SocialShareProps) {
+export default function SocialShare({ url, title, description = '', image = '', isCompact = false }: SocialShareProps) {
   const [isClient, setIsClient] = useState(false);
   const [currentUrl, setCurrentUrl] = useState('');
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -22,10 +23,27 @@ export default function SocialShare({ url, title, description = '', isCompact = 
     setCurrentUrl(window.location.origin + (url.startsWith('/') ? url : `/${url}`));
   }, [url]);
 
+  // Ensure the image URL is absolute
+  const getAbsoluteImageUrl = (imgUrl: string | undefined): string | undefined => {
+    if (!imgUrl) return undefined;
+    try {
+      // If it's already an absolute URL, return as is
+      new URL(imgUrl);
+      return imgUrl;
+    } catch {
+      // If it's a relative URL, make it absolute
+      const baseUrl = window.location.origin;
+      return imgUrl.startsWith('/') ? `${baseUrl}${imgUrl}` : `${baseUrl}/${imgUrl}`;
+    }
+  };
+
+  const absoluteImageUrl = getAbsoluteImageUrl(image);
+  
   const shareData = {
     title,
     text: description,
     url: currentUrl,
+    ...(absoluteImageUrl && { image: absoluteImageUrl })
   };
 
   const handleShare = async () => {
@@ -41,8 +59,9 @@ export default function SocialShare({ url, title, description = '', isCompact = 
   };
 
   const shareOnTwitter = () => {
+    const text = `${title}${description ? ` - ${description.substring(0, 100)}` : ''}`;
     window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareData.url)}`,
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareData.url)}`,
       '_blank',
       'noopener,noreferrer'
     );
@@ -59,10 +78,20 @@ export default function SocialShare({ url, title, description = '', isCompact = 
   };
 
   const shareOnFacebook = () => {
+    const facebookUrl = new URL('https://www.facebook.com/sharer/sharer.php');
+    facebookUrl.searchParams.append('u', shareData.url);
+    if (shareData.image) {
+      facebookUrl.searchParams.append('picture', shareData.image);
+    }
+    facebookUrl.searchParams.append('title', title);
+    if (description) {
+      facebookUrl.searchParams.append('description', description.substring(0, 200));
+    }
+    
     window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}`,
+      facebookUrl.toString(),
       '_blank',
-      'noopener,noreferrer'
+      'width=600,height=400,left=100,top=100'
     );
     setShowShareOptions(false);
   };
