@@ -63,30 +63,60 @@ export async function generateMetadata(
     // Get the previous metadata (from parent)
     const previousImages = (await parent).openGraph?.images || [];
     
-    // Process post data
-    const title = postData.title || 'Untitled Post';
-    const excerpt = postData.excerpt || '';
+    // Process post data with better defaults
+    const title = postData.title?.trim() || 'Untitled Post';
+    const excerpt = postData.excerpt?.trim() || '';
     const content = postData.content || '';
-    const description = excerpt || (content ? `${content.substring(0, 155).trim()}...` : 'Read this blog post');
     
-    // Handle author data
-    let authorName = authorData?.name || SITE_CONFIG.author.name;
-    let authorTwitter = authorData?.twitter?.replace('@', '') || SITE_CONFIG.author.twitter?.replace('@', '') || '';
+    // Generate description from content or excerpt
+    const generateDescription = (content: string, excerpt: string, title: string, authorName: string): string => {
+      if (excerpt) return excerpt;
+      if (!content) return `Read "${title}" by ${authorName} on ${SITE_CONFIG.name}`;
+      
+      return content
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/<[^>]*>?/gm, '')
+        .replace(/\n/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 157) + '...';
+    };
     
-    // Fallback to post author if available
-    if (!authorName && postData.author) {
+    // Process author name with type safety
+    const getAuthorName = (): string => {
       if (typeof postData.author === 'string') {
-        authorName = postData.author;
-      } else {
-        const author = postData.author as Author;
-        if (author.name) {
-          authorName = author.name;
-          if (author.twitter) {
-            authorTwitter = String(author.twitter).replace('@', '');
-          }
-        }
+        return postData.author;
       }
-    }
+      if (postData.author?.displayName) {
+        return postData.author.displayName;
+      }
+      if (postData.author?.name) {
+        return postData.author.name;
+      }
+      if (postData.user?.displayName) {
+        return postData.user.displayName;
+      }
+      if (postData.user?.name) {
+        return postData.user.name;
+      }
+      return SITE_CONFIG.author.name;
+    };
+
+    const authorName = getAuthorName();
+
+    // Process Twitter handle with type safety
+    const getAuthorTwitter = (): string => {
+      if (typeof postData.author === 'object' && postData.author?.twitter) {
+        return postData.author.twitter.replace(/^@/, '');
+      }
+      if (postData.user?.twitter) {
+        return postData.user.twitter.replace(/^@/, '');
+      }
+      return SITE_CONFIG.author.twitter.replace(/^@/, '');
+    };
+
+    const authorTwitter = getAuthorTwitter();
     
     // Handle dates with proper validation
     const getValidDate = (dateValue: Date | string | undefined): Date => {
@@ -116,13 +146,27 @@ export async function generateMetadata(
           imageUrl = postData.coverImage;
         } else {
           // Otherwise, prepend the site URL
-          imageUrl = new URL(postData.coverImage.startsWith('/') 
-            ? postData.coverImage 
-            : `/${postData.coverImage}`, SITE_CONFIG.url).toString();
+          imageUrl = new URL(
+            postData.coverImage.startsWith('/') 
+              ? postData.coverImage 
+              : `/${postData.coverImage}`, 
+            SITE_CONFIG.url
+          ).toString();
         }
       } catch (e) {
         console.warn('Invalid cover image URL:', postData.coverImage);
       }
+    } else {
+      // If no cover image, use a default with title and author
+      const defaultImageUrl = new URL('/api/og', SITE_CONFIG.url);
+      defaultImageUrl.searchParams.set('title', title);
+      defaultImageUrl.searchParams.set('author', authorName);
+      if (postData.tags && Array.isArray(postData.tags) && postData.tags.length > 0) {
+        defaultImageUrl.searchParams.set('tags', postData.tags.join(','));
+      } else if (typeof postData.tags === 'string') {
+        defaultImageUrl.searchParams.set('tags', postData.tags);
+      }
+      imageUrl = defaultImageUrl.toString();
     }
     
     // Generate canonical URL
@@ -142,14 +186,14 @@ export async function generateMetadata(
 
     return {
       title: `${title} | ${SITE_CONFIG.name}`,
-      description,
+      description: generateDescription(content, excerpt, title, authorName),
       applicationName: SITE_CONFIG.name,
-      authors: [{ 
+      authors: [{
         name: authorName,
-        url: new URL(`/author/${authorName.toLowerCase().replace(/\s+/g, '-')}`, SITE_CONFIG.url).toString()
+        ...(authorTwitter && { url: `https://twitter.com/${authorTwitter}` })
       }],
       keywords: tagList.length ? tagList : undefined,
-      creator: authorName,
+      creator: authorTwitter ? `@${authorTwitter}` : `@${SITE_CONFIG.author.twitter}`,
       publisher: SITE_CONFIG.name,
       formatDetection: {
         email: false,
@@ -165,14 +209,15 @@ export async function generateMetadata(
       },
       openGraph: {
         title: title,
-        description: description || `${title} - ${SITE_CONFIG.name}`,
+        description: generateDescription(content, excerpt, title, authorName),
         type: 'article',
         publishedTime,
         modifiedTime,
         url,
         locale: 'en_US',
         siteName: SITE_CONFIG.name,
-        authors: [authorName],
+        section: category || 'General',
+        tags: tagList,
         images: [
           {
             url: imageUrl,
@@ -203,15 +248,15 @@ export async function generateMetadata(
       twitter: {
         card: 'summary_large_image',
         title: title,
-        description: description || `${title} - ${SITE_CONFIG.name}`,
+        description: generateDescription(content, excerpt, title, authorName),
         images: [{
           url: imageUrl,
           width: 1200,
           height: 630,
           alt: title,
         }],
-        creator: authorTwitter ? `@${authorTwitter}` : undefined,
-        site: SITE_CONFIG.author.twitter ? `@${SITE_CONFIG.author.twitter.replace('@', '')}` : undefined,
+        creator: authorTwitter ? `@${authorTwitter}` : `@${SITE_CONFIG.author.twitter}`,
+        site: `@${SITE_CONFIG.author.twitter}`,
       },
       // Robots configuration
       robots: {

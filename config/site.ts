@@ -23,13 +23,13 @@ interface SiteConfig {
 }
 
 export const SITE_CONFIG: SiteConfig = {
-  name: 'blog',
+  name: 'Rv Imman | Blog',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rvimmandev.vercel.app',
-  description: 'A modern blog with great content',
+  description: 'Personal blog of Rv Imman - Full Stack Developer',
   themeColor: '#ffffff',
   author: {
-    name: 'rvimman',
-    twitter: '@rvimman_',
+    name: 'Rv Imman',
+    twitter: 'rvimman_',
   },
   socials: {
     twitter: 'https://twitter.com/rvimman_',
@@ -38,6 +38,6 @@ export const SITE_CONFIG: SiteConfig = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'Blog Name',
+    siteName: 'Rv Imman | Blog',
   },
 };
