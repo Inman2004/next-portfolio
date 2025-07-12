@@ -1,9 +1,10 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Twitter, Linkedin, Link2, Facebook } from 'lucide-react';
+import { Share2, Twitter, Linkedin, Link2, Facebook, MessageSquare } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
+import { SITE_CONFIG } from '@/config/site';
 
 interface SocialShareProps {
   url: string;
@@ -23,19 +24,42 @@ export default function SocialShare({ url, title, description = '', isCompact = 
   }, [url]);
 
   const shareData = {
-    title,
+    title: `${title} - ${SITE_CONFIG.name}`,
     text: description,
     url: currentUrl,
+    // Add these for better WhatsApp sharing
+    quote: description,
+    hashtag: SITE_CONFIG.name.replace(/\s+/g, ''),
+  };
+
+  const shareOnWhatsApp = () => {
+    const text = `${title}%0A%0A${description}%0A%0A${currentUrl}`;
+    window.open(
+      `https://wa.me/?text=${text}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+    setShowShareOptions(false);
   };
 
   const handleShare = async () => {
-    if (navigator.share) {
+    // Check if on mobile and WhatsApp is the main app
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isWhatsApp = navigator.userAgent.match(/WhatsApp/i);
+
+    if ((isMobile || isWhatsApp) && navigator.share) {
       try {
         await navigator.share(shareData);
       } catch (err) {
         console.error('Error sharing:', err);
+        // Fallback to custom share options
+        setShowShareOptions(true);
       }
+    } else if (isMobile) {
+      // On mobile but no Web Share API, use WhatsApp directly
+      shareOnWhatsApp();
     } else {
+      // On desktop, show share options
       setShowShareOptions(!showShareOptions);
     }
   };
@@ -79,6 +103,12 @@ export default function SocialShare({ url, title, description = '', isCompact = 
   };
 
   const shareButtons = [
+    { 
+      icon: <MessageSquare className="w-4 h-4" />, 
+      label: 'Share on WhatsApp', 
+      onClick: shareOnWhatsApp,
+      className: 'hover:bg-green-500/20 hover:text-green-500'
+    },
     { 
       icon: <Twitter className="w-4 h-4" />, 
       label: 'Share on Twitter', 
