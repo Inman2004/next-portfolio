@@ -130,14 +130,14 @@ const InteractiveCard3DContent = () => {
           <color attach="background" args={['black']} />
           <Lightformer 
             intensity={2} 
-            color="white" 
+            color="black" 
             position={[0, -1, 5]} 
             rotation={[0, 0, Math.PI / 3]} 
             scale={[100, 0.1, 1]} 
           />
           <Lightformer 
             intensity={3} 
-            color="white" 
+            color="gray" 
             position={[-1, -1, 1]} 
             rotation={[0, 0, Math.PI / 3]} 
             scale={[100, 0.1, 1]} 
@@ -151,7 +151,7 @@ const InteractiveCard3DContent = () => {
           />
           <Lightformer 
             intensity={10} 
-            color="indigo" 
+            color="teal" 
             position={[-10, 0, 14]} 
             rotation={[0, Math.PI / 2, Math.PI / 3]} 
             scale={[100, 10, 1]} 
