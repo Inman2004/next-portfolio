@@ -68,22 +68,7 @@ export async function generateMetadata(
     const excerpt = postData.excerpt?.trim() || '';
     const content = postData.content || '';
     
-    // Generate description from content or excerpt
-    const generateDescription = (content: string, excerpt: string, title: string, authorName: string): string => {
-      if (excerpt) return excerpt;
-      if (!content) return `Read "${title}" by ${authorName} on ${SITE_CONFIG.name}`;
-      
-      return content
-        .replace(/!\[.*?\]\(.*?\)/g, '')
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .replace(/<[^>]*>?/gm, '')
-        .replace(/\n/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .substring(0, 157) + '...';
-    };
-    
-    // Process author name with type safety
+    // Process author name with type safety first
     const getAuthorName = (): string => {
       if (typeof postData.author === 'string') {
         return postData.author;
@@ -117,6 +102,24 @@ export async function generateMetadata(
     };
 
     const authorTwitter = getAuthorTwitter();
+    
+    // Generate description from content or excerpt
+    const generateDescription = (postContent: string, postExcerpt: string, postTitle: string, postAuthorName: string): string => {
+      if (postExcerpt) return postExcerpt;
+      if (!postContent) return `Read "${postTitle}" by ${postAuthorName} on ${SITE_CONFIG.name}`;
+      
+      return postContent
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/<[^>]*>?/gm, '')
+        .replace(/\n/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 157) + '...';
+    };
+    
+    // Generate the description once and reuse it
+    const description = generateDescription(content, excerpt, title, authorName);
     
     // Handle dates with proper validation
     const getValidDate = (dateValue: Date | string | undefined): Date => {
@@ -186,7 +189,7 @@ export async function generateMetadata(
 
     return {
       title: `${title} | ${SITE_CONFIG.name}`,
-      description: generateDescription(content, excerpt, title, authorName),
+      description,
       applicationName: SITE_CONFIG.name,
       authors: [{
         name: authorName,
@@ -209,7 +212,7 @@ export async function generateMetadata(
       },
       openGraph: {
         title: title,
-        description: generateDescription(content, excerpt, title, authorName),
+        description,
         type: 'article',
         publishedTime,
         modifiedTime,
@@ -248,7 +251,7 @@ export async function generateMetadata(
       twitter: {
         card: 'summary_large_image',
         title: title,
-        description: generateDescription(content, excerpt, title, authorName),
+        description,
         images: [{
           url: imageUrl,
           width: 1200,

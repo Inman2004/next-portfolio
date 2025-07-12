@@ -8,15 +8,6 @@ export const runtime = 'edge';
 const width = 1200;
 const height = 630;
 
-// Fonts
-const interRegular = fetch(
-  new URL('../../../../public/fonts/Inter-Regular.ttf', import.meta.url)
-).then((res) => res.arrayBuffer());
-
-const interBold = fetch(
-  new URL('../../../../public/fonts/Inter-Bold.ttf', import.meta.url)
-).then((res) => res.arrayBuffer());
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -26,25 +17,20 @@ export async function GET(request: NextRequest) {
     const author = searchParams.get('author')?.slice(0, 50) || 'Author';
     const tags = searchParams.get('tags')?.split(',').slice(0, 3) || [];
 
-    // Load fonts
-    const [interRegularFont, interBoldFont] = await Promise.all([
-      interRegular,
-      interBold,
-    ]);
-
     return new ImageResponse(
       (
         <div
           style={{
+            height: '100%',
+            width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
-            width: '100%',
-            height: '100%',
-            padding: '4rem',
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)',
+            padding: '48px',
             color: 'white',
-            fontFamily: 'Inter',
+            fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
           {/* Logo or site name */}
@@ -110,20 +96,6 @@ export async function GET(request: NextRequest) {
       {
         width,
         height,
-        fonts: [
-          {
-            name: 'Inter',
-            data: interRegularFont,
-            weight: 400,
-            style: 'normal',
-          },
-          {
-            name: 'Inter',
-            data: interBoldFont,
-            weight: 700,
-            style: 'normal',
-          },
-        ],
       }
     );
   } catch (error) {
