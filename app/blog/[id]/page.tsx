@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User } from 'firebase/auth';
@@ -8,7 +8,7 @@ import { PostData } from '@/types';
 import { doc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getBlogPost } from '@/lib/blogUtils';
-import { Crown, Edit, Eye, ArrowLeft, Trash2 } from 'lucide-react';
+import { Crown, Edit, Eye, ArrowLeft, Trash2, Share2, ExternalLink, MoreHorizontal } from 'lucide-react';
 import SocialShare from '@/components/SocialShare';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -59,35 +59,49 @@ export default function PostPage({ params }: PostPageProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [paramsResolved, setParamsResolved] = useState(false);
   const [postId, setPostId] = useState<string | null>(null);
   const [views, setViews] = useState<number>(0);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  
+  // Use refs to track if operations have been performed
+  const viewTrackedRef = useRef(false);
+  const unsubscribeViewRef = useRef<(() => void) | null>(null);
+  const fetchedPostRef = useRef<string | null>(null);
 
-  // Resolve the async params
+  // Resolve the async params - FIXED: Remove dependency on params in useEffect
   useEffect(() => {
+    let isMounted = true;
+    
     const resolveParams = async () => {
       try {
         const resolvedParams = await params;
-        setPostId(resolvedParams.id);
-        setParamsResolved(true);
+        if (isMounted) {
+          setPostId(resolvedParams.id);
+        }
       } catch (err) {
-        setError('Failed to load post parameters');
-        setLoading(false);
+        if (isMounted) {
+          setError('Failed to load post parameters');
+          setLoading(false);
+        }
       }
     };
+    
     resolveParams();
-  }, [params]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - params is stable
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (!post) {
       setError('Post not found');
       return;
     }
     setIsConfirmOpen(true);
-  };
+  }, [post]);
 
-  const handleConfirm = async () => {
+  const handleConfirm = useCallback(async () => {
     if (!post) {
       setError('Post not found');
       return;
@@ -104,70 +118,13 @@ export default function PostPage({ params }: PostPageProps) {
     } finally {
       setIsDeleting(false);
     }
-  };
+  }, [post, router]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsConfirmOpen(false);
-  };
+  }, []);
 
-  // Track views
-  useEffect(() => {
-    if (!postId) return;
-    
-    const trackView = async () => {
-      try {
-        const newViewCount = await incrementViewCount(postId);
-        setViews(prev => prev || newViewCount);
-      } catch (error) {
-        console.error('Error tracking view:', error);
-      }
-    };
-    
-    // Track view when component mounts
-    trackView();
-    
-    // Set up real-time updates for view count
-    const viewRef = doc(db, 'post_views', postId);
-    const unsubscribeView = onSnapshot(viewRef, (doc) => {
-      if (doc.exists()) {
-        setViews(doc.data().count || 0);
-      }
-    });
-    
-    // Initial view count fetch
-    const fetchInitialViews = async () => {
-      try {
-        const initialViews = await getViewCount(postId);
-        setViews(initialViews);
-      } catch (error) {
-        console.error('Error fetching initial view count:', error);
-      }
-    };
-    
-    fetchInitialViews();
-    
-    return () => {
-      unsubscribeView();
-    };
-  }, [postId]);
-  
-  // Check cache first when postId changes
-  useEffect(() => {
-    if (!postId) return;
-    
-    // Check if we have this post in cache
-    const cachedPost = getCachedPost(postId);
-    if (cachedPost) {
-      setPost(cachedPost);
-      setLoading(false);
-      setIsInitialLoad(false);
-    } else if (isInitialLoad) {
-      // Only fetch if this is the initial load and not in cache
-      fetchPost();
-    }
-  }, [postId]);
-
-  // Single effect for auth state
+  // FIXED: Simplified auth state management
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
@@ -175,33 +132,45 @@ export default function PostPage({ params }: PostPageProps) {
       if (currentUser) {
         // Set admin status based on user email
         const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
-        if (currentUser.email === adminEmail) {
-          setIsAdmin(true);
-        }
+        setIsAdmin(currentUser.email === adminEmail);
+      } else {
+        setIsAdmin(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  const fetchPost = useCallback(async () => {
-    if (!postId) return;
+  // FIXED: Optimized fetchPost to avoid unnecessary re-creations
+  const fetchPost = useCallback(async (id: string) => {
+    // Avoid refetching the same post
+    if (fetchedPostRef.current === id) {
+      return;
+    }
+    
+    // Check cache first
+    const cachedPost = getCachedPost(id);
+    if (cachedPost) {
+      setPost(cachedPost);
+      setLoading(false);
+      fetchedPostRef.current = id;
+      return;
+    }
     
     try {
       setLoading(true);
       setError(null);
 
       // Use the new getBlogPost utility function
-      const postData = await getBlogPost(postId);
+      const postData = await getBlogPost(id);
 
       if (!postData) {
         setError('Post not found');
         return;
       }
 
-      // Helper function to safely get author data
+      // FIXED: Simplified author data processing
       const getAuthorData = (): PostAuthorData => {
-        // Helper function to safely get a string value
         const getStringValue = (value: any, defaultValue: string = ''): string => {
           if (value === null || value === undefined) return defaultValue;
           if (typeof value === 'string') return value;
@@ -213,7 +182,6 @@ export default function PostPage({ params }: PostPageProps) {
           return String(value);
         };
 
-        // Default values with explicit type casting to ensure string
         const defaultAuthor: PostAuthorData = {
           id: postData.authorId ? String(postData.authorId) : 'unknown',
           name: 'Anonymous',
@@ -221,7 +189,6 @@ export default function PostPage({ params }: PostPageProps) {
           photoURL: undefined
         };
 
-        // Extract user data safely
         const userDisplayName = postData.user?.displayName || 
                               (typeof postData.user === 'object' && postData.user !== null 
                                 ? (postData.user as any).name 
@@ -237,7 +204,6 @@ export default function PostPage({ params }: PostPageProps) {
                              ? (postData.user as any).username 
                              : null);
 
-        // Handle case where author is a string
         if (typeof postData.author === 'string') {
           return {
             ...defaultAuthor,
@@ -247,7 +213,6 @@ export default function PostPage({ params }: PostPageProps) {
           };
         }
         
-        // Handle case where author is an object
         if (postData.author && typeof postData.author === 'object') {
           const authorObj = postData.author as Record<string, unknown>;
           const authorId = postData.authorId || 
@@ -262,7 +227,6 @@ export default function PostPage({ params }: PostPageProps) {
           };
         }
         
-        // Fallback to user data if available
         if (postData.user) {
           let userId: string;
           if (postData.authorId) {
@@ -287,7 +251,6 @@ export default function PostPage({ params }: PostPageProps) {
         return defaultAuthor;
       };
 
-      // Map to the expected PostData type
       const authorData = getAuthorData();
       const authorSocials = postData.author && typeof postData.author === 'object' && 'socials' in postData.author
         ? (postData.author as any).socials || {}
@@ -297,7 +260,6 @@ export default function PostPage({ params }: PostPageProps) {
         id: typeof postData.id === 'string' ? postData.id : 'unknown',
         title: postData.title,
         content: postData.content,
-        // Ensure author has required fields with proper fallbacks
         author: {
           id: authorData.id || 'unknown',
           name: authorData.name || 'Unknown Author',
@@ -305,13 +267,11 @@ export default function PostPage({ params }: PostPageProps) {
           photoURL: authorData.photoURL,
           socials: authorSocials
         },
-        // Add direct access to author properties for convenience
         authorId: authorData.id || 'unknown',
         authorName: authorData.name || 'Unknown Author',
         authorPhotoURL: authorData.photoURL,
         authorUsername: authorData.username,
         authorSocials: authorSocials,
-        // Add post metadata
         createdAt: postData.createdAt,
         coverImage: postData.coverImage,
         excerpt: postData.excerpt,
@@ -320,30 +280,97 @@ export default function PostPage({ params }: PostPageProps) {
         tags: Array.isArray(postData.tags) ? postData.tags : []
       };
 
-      // Update cache and state
       cachePost(formattedPost);
       setPost(formattedPost);
-      setIsInitialLoad(false);
+      fetchedPostRef.current = id;
     } catch (err) {
       console.error('Error fetching post:', err);
       setError('Failed to load post');
     } finally {
       setLoading(false);
     }
-  }, [postId]);
+  }, [getCachedPost, cachePost]);
 
-  // Format date for display
-  const formatCreatedAt = (date: Date | { toDate: () => Date } | undefined) => {
-    if (!date) return '';
-    const dateObj = date instanceof Date ? date : date.toDate();
-    return format(dateObj, 'MMMM d, yyyy');
-  };
+  // FIXED: Separate effect for fetching post when postId changes
+  useEffect(() => {
+    if (postId) {
+      fetchPost(postId);
+    }
+  }, [postId, fetchPost]);
 
-  const getPostDateTime = (date: Date | { toDate: () => Date } | undefined) => {
-    if (!date) return '';
-    const dateObj = date instanceof Date ? date : date.toDate();
-    return dateObj.toISOString();
-  };
+  // FIXED: Optimized view tracking with proper cleanup
+  useEffect(() => {
+    if (!postId || viewTrackedRef.current) return;
+    
+    const trackView = async () => {
+      try {
+        // Track view only once
+        await incrementViewCount(postId);
+        viewTrackedRef.current = true;
+      } catch (error) {
+        console.error('Error tracking view:', error);
+      }
+    };
+    
+    // Get initial view count
+    const fetchInitialViews = async () => {
+      try {
+        const initialViews = await getViewCount(postId);
+        setViews(initialViews);
+      } catch (error) {
+        console.error('Error fetching initial view count:', error);
+      }
+    };
+    
+    // Set up real-time updates for view count
+    const viewRef = doc(db, 'post_views', postId);
+    const unsubscribeView = onSnapshot(viewRef, (doc) => {
+      if (doc.exists()) {
+        setViews(doc.data().count || 0);
+      }
+    }, (error) => {
+      console.error('Error in view snapshot:', error);
+    });
+    
+    unsubscribeViewRef.current = unsubscribeView;
+    
+    // Track view and fetch initial count
+    trackView();
+    fetchInitialViews();
+    
+    return () => {
+      if (unsubscribeViewRef.current) {
+        unsubscribeViewRef.current();
+        unsubscribeViewRef.current = null;
+      }
+    };
+  }, [postId]); // Only depend on postId
+
+  // FIXED: Memoized date formatting to avoid recalculation
+  const formatCreatedAt = useMemo(() => {
+    return (date: Date | { toDate: () => Date } | undefined) => {
+      if (!date) return '';
+      const dateObj = date instanceof Date ? date : date.toDate();
+      return format(dateObj, 'MMMM d, yyyy');
+    };
+  }, []);
+
+  const getPostDateTime = useMemo(() => {
+    return (date: Date | { toDate: () => Date } | undefined) => {
+      if (!date) return '';
+      const dateObj = date instanceof Date ? date : date.toDate();
+      return dateObj.toISOString();
+    };
+  }, []);
+
+  // FIXED: Memoized formatted date and datetime
+  const formattedCreatedAt = useMemo(() => {
+    return formatCreatedAt(post?.createdAt);
+  }, [post?.createdAt, formatCreatedAt]);
+
+  const postDateTime = useMemo(() => {
+    return getPostDateTime(post?.createdAt);
+  }, [post?.createdAt, getPostDateTime]);
 
   if (loading) {
     return (
@@ -427,7 +454,7 @@ export default function PostPage({ params }: PostPageProps) {
                   )}
                 </span>
                 <span className="hidden sm:inline">•</span>
-                <span>{formatCreatedAt(post.createdAt)}</span>
+                <span>{formattedCreatedAt}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4 flex-shrink-0" />
@@ -437,16 +464,139 @@ export default function PostPage({ params }: PostPageProps) {
             </div>
           </div>
 
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-gray-50/80 dark:bg-gray-900/30 p-3 sm:p-4 rounded-xl border border-gray-200/70 dark:border-gray-800">
-            <div className="w-full flex justify-center items-center sm:w-auto">
-              <SocialShare 
-                url={`/blog/${post.id}`}
-                title={post.title}
-                description={post.content?.substring(0, 200) + '...'}
-                isCompact={true}
-              />
+          {/* Modern Action Bar */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="relative mb-8"
+          >
+            {/* Desktop Action Bar */}
+            <div className="hidden md:flex items-center justify-between p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl border border-blue-200/30 dark:border-gray-700/30 backdrop-blur-sm">
+              {/* Left side - Social sharing */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+                  <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Share</span>
+                </div>
+                <SocialShare 
+                  url={`/blog/${post.id}`}
+                  title={post.title}
+                  description={post.content?.substring(0, 200) + '...'}
+                  isCompact={true}
+                />
+                {post.author.socials && typeof post.author.socials === 'object' && (
+                  <div className="flex items-center gap-2 pl-3 ml-3 border-l border-gray-300/50 dark:border-gray-600/50">
+                    <ExternalLink className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <SocialLinks 
+                      socials={post.author.socials} 
+                      authorName={typeof post.author.name === 'string' ? post.author.name : undefined}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              {/* Right side - Author actions */}
+              {user?.uid === post.author.id && (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/blog/edit/${post.id}`}
+                    className="group flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+                    aria-label="Edit this post"
+                  >
+                    <Edit className="w-4 h-4 transition-transform group-hover:scale-110" />
+                    <span className="font-medium">Edit</span>
+                  </Link>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="group flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    aria-label="Delete this post"
+                  >
+                    {isDeleting ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 transition-transform group-hover:scale-110" />
+                    )}
+                    <span className="font-medium">Delete</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Action Bar */}
+            <div className="md:hidden">
+              {/* Main mobile bar */}
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl border border-blue-200/30 dark:border-gray-700/30 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+                    <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Share</span>
+                  </div>
+                  <SocialShare 
+                    url={`/blog/${post.id}`}
+                    title={post.title}
+                    description={post.content?.substring(0, 200) + '...'}
+                    isCompact={true}
+                  />
+                </div>
+                
+                {/* Mobile menu button for author actions */}
+                {user?.uid === post.author.id && (
+                  <button
+                    onClick={() => setShowMobileMenu(!showMobileMenu)}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                    aria-label="More options"
+                    aria-expanded={showMobileMenu}
+                  >
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Mobile dropdown menu */}
+              {showMobileMenu && user?.uid === post.author.id && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-2 p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
+                >
+                  <Link
+                    href={`/blog/edit/${post.id}`}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Edit className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <span className="font-medium">Edit Post</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      handleDelete();
+                    }}
+                    disabled={isDeleting}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isDeleting ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-600 border-t-transparent" />
+                    ) : (
+                      <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    )}
+                    <span className="font-medium">Delete Post</span>
+                  </button>
+                </motion.div>
+              )}
+
+              {/* Mobile author socials */}
               {post.author.socials && typeof post.author.socials === 'object' && (
-                <div className="mx-2">
+                <div className="mt-3 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ExternalLink className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                      Follow {typeof post.author.name === 'string' ? post.author.name : 'Author'}
+                    </span>
+                  </div>
                   <SocialLinks 
                     socials={post.author.socials} 
                     authorName={typeof post.author.name === 'string' ? post.author.name : undefined}
@@ -454,30 +604,7 @@ export default function PostPage({ params }: PostPageProps) {
                 </div>
               )}
             </div>
-            {user?.uid === post.author.id && (
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-normal border-t border-gray-200 dark:border-gray-700 pt-3 sm:pt-0 sm:border-t-0 sm:pl-3 sm:border-l">
-                <Link
-                  href={`/blog/edit/${post.id}`}
-                  className="flex items-center gap-2 px-4 py-2 text-sm sm:text-base text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100/70 dark:hover:bg-gray-800/50 rounded-lg transition-colors whitespace-nowrap"
-                >
-                  <Edit className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                  <span>Edit Post</span>
-                </Link>
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="flex items-center gap-2 px-4 py-2 text-sm sm:text-base text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100/70 dark:hover:bg-gray-800/50 rounded-lg transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isDeleting ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current flex-shrink-0"></div>
-                  ) : (
-                    <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                  )}
-                  <span>Delete</span>
-                </button>
-              </div>
-            )}
-          </div>
+          </motion.div>
 
           {post.coverImage && (
             <div className="relative mb-8 -mx-6 md:-mx-8 lg:-mt-6 md:-mt-8 border-b-2 border-indigo-500">
@@ -539,4 +666,4 @@ export default function PostPage({ params }: PostPageProps) {
       </div>
     </div>
   );
-}
+            }
