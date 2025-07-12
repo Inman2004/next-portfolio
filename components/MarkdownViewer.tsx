@@ -251,8 +251,21 @@ const CustomCode: React.FC<CustomCodeProps> = ({
     );
   }
 
+  const [copied, setCopied] = useState(false);
+  const codeString = String(children).replace(/\n$/, '');
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(codeString);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy code:', err);
+    }
+  };
+
   return (
-    <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg">
+    <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg group">
       <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center">
           <div className="flex space-x-2 mr-3">
@@ -267,8 +280,22 @@ const CustomCode: React.FC<CustomCodeProps> = ({
             })()}
           </span>
         </div>
-        <div className="text-xs text-gray-800 dark:text-gray-300">
-          {match[1]} • {String(children).split('\n').length} lines
+        <div className="flex items-center space-x-3">
+          <span className="text-xs text-gray-800 dark:text-gray-300">
+            {match[1]} • {codeString.split('\n').length} lines
+          </span>
+          <button
+            onClick={handleCopy}
+            className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            title="Copy to clipboard"
+            aria-label="Copy code"
+          >
+            {copied ? (
+              <Check className="w-3.5 h-3.5 text-green-500" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" />
+            )}
+          </button>
         </div>
       </div>
       <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">

@@ -322,7 +322,7 @@ const ProfileImageUpload = ({
     <div className={`relative ${sizeClasses[size]} ${className}`}>
       <div 
         className={`relative w-full h-full rounded-full overflow-hidden border-2 border-dashed ${
-          isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-200 dark:border-gray-700'
+          isDragging ? 'border-blue-500 bg-blue-50' : 'border-blue-500 dark:border-gray-700'
         } transition-colors duration-200 flex items-center justify-center cursor-pointer`}
         onClick={() => !isUploading && fileInputRef.current?.click()}
         onDragOver={handleDragOver}

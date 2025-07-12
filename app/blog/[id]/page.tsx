@@ -8,7 +8,7 @@ import { PostData } from '@/types';
 import { doc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getBlogPost } from '@/lib/blogUtils';
-import { Crown, Edit, Eye, ArrowLeft, Trash2, Share2, ExternalLink, MoreHorizontal } from 'lucide-react';
+import { Crown, Edit, Eye, ArrowLeft, Trash2, Share2, MoreHorizontal, Calendar, User as UserIcon, ChevronUp } from 'lucide-react';
 import SocialShare from '@/components/SocialShare';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -61,7 +61,8 @@ export default function PostPage({ params }: PostPageProps) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [postId, setPostId] = useState<string | null>(null);
   const [views, setViews] = useState<number>(0);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showMobileActions, setShowMobileActions] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   
   // Use refs to track if operations have been performed
   const viewTrackedRef = useRef(false);
@@ -93,6 +94,16 @@ export default function PostPage({ params }: PostPageProps) {
     };
   }, []); // Empty dependency array - params is stable
 
+  // Scroll detection for floating action bar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleDelete = useCallback(() => {
     if (!post) {
       setError('Post not found');
@@ -122,6 +133,10 @@ export default function PostPage({ params }: PostPageProps) {
 
   const handleCancel = useCallback(() => {
     setIsConfirmOpen(false);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   // FIXED: Simplified auth state management
@@ -372,23 +387,72 @@ export default function PostPage({ params }: PostPageProps) {
     return getPostDateTime(post?.createdAt);
   }, [post?.createdAt, getPostDateTime]);
 
+  // Memoized author actions with proper null checks
+  const AuthorActions = useMemo(() => {
+    // Return null if post or author data isn't loaded yet
+    if (!post || !post.author) return null;
+    
+    // Only show actions if the current user is the author
+    if (user?.uid !== post.author.id) return null;
+    
+    return (
+      <div className="flex items-center gap-2">
+        <Link
+          href={`/blog/edit/${post.id}`}
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200 group"
+          aria-label="Edit post"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Edit className="w-4 h-4 flex-shrink-0 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline">Edit</span>
+        </Link>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
+          disabled={isDeleting}
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+          aria-label="Delete post"
+        >
+          {isDeleting ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current flex-shrink-0"></div>
+          ) : (
+            <Trash2 className="w-4 h-4 flex-shrink-0 group-hover:scale-110 transition-transform" />
+          )}
+          <span className="hidden sm:inline">Delete</span>
+        </button>
+      </div>
+    );
+  }, [user?.uid, post?.author?.id, post?.id, handleDelete, isDeleting, post]);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-spin mb-4">
+            <div className="w-3 h-3 bg-white rounded-full"></div>
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">Loading post...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Error</h2>
-          <p className="text-red-600 dark:text-red-400">{error}</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-black flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Oops! Something went wrong</h2>
+          <p className="text-red-600 dark:text-red-400 mb-6">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             Try Again
           </button>
@@ -402,92 +466,133 @@ export default function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-900 dark:text-white overflow-x-hidden w-full transition-colors duration-200">
-      <div className="pt-24 px-6 max-w-7xl mx-auto">
-        <motion.article 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl dark:shadow-2xl border border-gray-200/70 dark:border-gray-700/50"
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-black text-gray-900 dark:text-white transition-all duration-300">
+      {/* Floating Action Bar */}
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: isScrolled ? 0 : 100, opacity: isScrolled ? 1 : 0 }}
+        className="fixed bottom-6 left-3/4 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 px-4 py-3 flex items-center gap-3 min-w-[320px] max-w-[90vw]"
+      >
+        <button
+          onClick={scrollToTop}
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200 group"
+          aria-label="Scroll to top"
         >
-          <Link 
-            href="/blog" 
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blog
-          </Link>
-          
-          <div className="flex items-center gap-4 mb-8">
-            <div className="flex-shrink-0">
-              <UserAvatar
-                photoURL={typeof post.author.photoURL === 'string' ? post.author.photoURL : undefined}
-                displayName={typeof post.author.name === 'string' ? post.author.name : 
-                           (post.author as any)?.displayName || '?'}
-                size={48}
-                className={post.author.username ? 'hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50 transition-all' : ''}
-                asLink={!!post.author.username}
-                linkHref={post.author.username ? `/users/${post.author.username}` : undefined}
-                onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                title={typeof post.author.name === 'string' ? post.author.name : 
-                      (post.author as any)?.name || 'Author'}
-              />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-1 truncate">{post.title}</h1>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
-                <span>
-                  By{' '}
-                  {post.author.username ? (
-                    <Link 
-                      href={`/users/${post.author.username}`}
-                      className="text-blue-600 hover:underline dark:text-blue-400"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {typeof post.author.name === 'string' ? post.author.name : 
-                       (post.author as any)?.displayName || 'Anonymous'}
-                    </Link>
-                  ) : (
-                    <span>
-                      {typeof post.author.name === 'string' ? post.author.name : 
-                       (post.author as any)?.displayName || 'Anonymous'}
-                    </span>
-                  )}
-                </span>
-                <span className="hidden sm:inline">•</span>
-                <span>{formattedCreatedAt}</span>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <Eye className="w-4 h-4 flex-shrink-0" />
-                  <span>{formatNumber(views)} {views === 1 ? 'view' : 'views'}</span>
-                </span>
-              </div>
-            </div>
-          </div>
+          <ChevronUp className="w-4 h-4 flex-shrink-0 group-hover:-translate-y-1 transition-transform" />
+          <span className="hidden sm:inline">Top</span>
+        </button>
+        
+        <div className="flex-1 min-w-0">
+          <SocialShare 
+            url={`/blog/${post.id}`}
+            title={post.title}
+            description={post.content?.substring(0, 200) + '...'}
+            isCompact={true}
+          />
+        </div>
+        
+        {AuthorActions}
+      </motion.div>
 
-          {/* Modern Action Bar */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="relative mb-8"
+      <div className="pt-10 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Back Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-8"
           >
-            {/* Desktop Action Bar */}
-            <div className="hidden md:flex items-center justify-between p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl border border-blue-200/30 dark:border-gray-700/30 backdrop-blur-sm">
-              {/* Left side - Social sharing */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
-                  <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Share</span>
-                </div>
-                <SocialShare 
-                  url={`/blog/${post.id}`}
-                  title={post.title}
-                  description={post.content?.substring(0, 200) + '...'}
-                  isCompact={true}
+            <Link 
+              href="/blog" 
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-medium">Back to Blog</span>
+            </Link>
+          </motion.div>
+
+          {/* Main Article */}
+          <motion.article 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+          >
+            {/* Cover Image */}
+            {post.coverImage && (
+              <div className="relative h-48 sm:h-64 lg:h-80 overflow-hidden">
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  fill
+                  className="object-cover transition-all duration-700 hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  priority
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight">
+                    {post.title}
+                  </h1>
+                </div>
+              </div>
+            )}
+
+            <div className="p-6 sm:p-8 lg:p-10">
+              {/* Title (if no cover image) */}
+              {!post.coverImage && (
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-8 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-tight">
+                  {post.title}
+                </h1>
+              )}
+
+              {/* Author Info */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-gray-50/80 dark:bg-gray-900/30 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <UserAvatar
+                    photoURL={typeof post.author.photoURL === 'string' ? post.author.photoURL : undefined}
+                    displayName={typeof post.author.name === 'string' ? post.author.name : 
+                               (post.author as any)?.displayName || '?'}
+                    size={56}
+                    className="hover:ring-4 hover:ring-blue-500/30 transition-all duration-200 flex-shrink-0"
+                    asLink={!!post.author.username}
+                    linkHref={post.author.username ? `/users/${post.author.username}` : undefined}
+                    title={typeof post.author.name === 'string' ? post.author.name : 
+                          (post.author as any)?.name || 'Author'}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <UserIcon className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                      {post.author.username ? (
+                        <Link 
+                          href={`/users/${post.author.username}`}
+                          className="text-lg font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors truncate"
+                        >
+                          {typeof post.author.name === 'string' ? post.author.name : 
+                           (post.author as any)?.displayName || 'Anonymous'}
+                        </Link>
+                      ) : (
+                        <span className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                          {typeof post.author.name === 'string' ? post.author.name : 
+                           (post.author as any)?.displayName || 'Anonymous'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
+                        <span>{formattedCreatedAt}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4 flex-shrink-0" />
+                        <span>{formatNumber(views)} view{views === 1 ? '' : 's'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Links */}
                 {post.author.socials && typeof post.author.socials === 'object' && (
-                  <div className="flex items-center gap-2 pl-3 ml-3 border-l border-gray-300/50 dark:border-gray-600/50">
-                    <ExternalLink className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <div className="flex justify-center sm:justify-end">
                     <SocialLinks 
                       socials={post.author.socials} 
                       authorName={typeof post.author.name === 'string' ? post.author.name : undefined}
@@ -495,44 +600,10 @@ export default function PostPage({ params }: PostPageProps) {
                   </div>
                 )}
               </div>
-              
-              {/* Right side - Author actions */}
-              {user?.uid === post.author.id && (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/blog/edit/${post.id}`}
-                    className="group flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
-                    aria-label="Edit this post"
-                  >
-                    <Edit className="w-4 h-4 transition-transform group-hover:scale-110" />
-                    <span className="font-medium">Edit</span>
-                  </Link>
-                  <button
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className="group flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                    aria-label="Delete this post"
-                  >
-                    {isDeleting ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                    ) : (
-                      <Trash2 className="w-4 h-4 transition-transform group-hover:scale-110" />
-                    )}
-                    <span className="font-medium">Delete</span>
-                  </button>
-                </div>
-              )}
-            </div>
 
-            {/* Mobile Action Bar */}
-            <div className="md:hidden">
-              {/* Main mobile bar */}
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl border border-blue-200/30 dark:border-gray-700/30 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
-                    <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Share</span>
-                  </div>
+              {/* Desktop Action Bar */}
+              <div className="hidden sm:flex items-center justify-between gap-4 mb-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl border border-blue-200/50 dark:border-blue-700/50">
+                <div className="flex items-center gap-4">
                   <SocialShare 
                     url={`/blog/${post.id}`}
                     title={post.title}
@@ -540,130 +611,115 @@ export default function PostPage({ params }: PostPageProps) {
                     isCompact={true}
                   />
                 </div>
+                {AuthorActions}
+              </div>
+
+              {/* Mobile Action Bar */}
+              <div className="sm:hidden mb-8">
+                <div className="flex items-center justify-between gap-2 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl border border-blue-200/50 dark:border-blue-700/50">
+                  <div className="flex-1 min-w-0">
+                    <SocialShare 
+                      url={`/blog/${post.id}`}
+                      title={post.title}
+                      description={post.content?.substring(0, 200) + '...'}
+                      isCompact={true}
+                    />
+                  </div>
+                  {user?.uid === post.author.id && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setShowMobileActions(!showMobileActions)}
+                        className="p-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
+                        aria-label="Show actions"
+                      >
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
                 
-                {/* Mobile menu button for author actions */}
-                {user?.uid === post.author.id && (
-                  <button
-                    onClick={() => setShowMobileMenu(!showMobileMenu)}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                    aria-label="More options"
-                    aria-expanded={showMobileMenu}
+                {/* Mobile Actions Dropdown */}
+                {showMobileActions && user?.uid === post.author.id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-2 p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700"
                   >
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/blog/edit/${post.id}`}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200 flex-1 justify-center"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit Post
+                      </Link>
+                      <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                      >
+                        {isDeleting ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        Delete Post
+                      </button>
+                    </div>
+                  </motion.div>
                 )}
               </div>
 
-              {/* Mobile dropdown menu */}
-              {showMobileMenu && user?.uid === post.author.id && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-2 p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
-                >
-                  <Link
-                    href={`/blog/edit/${post.id}`}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                    onClick={() => setShowMobileMenu(false)}
-                  >
-                    <Edit className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <span className="font-medium">Edit Post</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setShowMobileMenu(false);
-                      handleDelete();
-                    }}
-                    disabled={isDeleting}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isDeleting ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-600 border-t-transparent" />
-                    ) : (
-                      <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
-                    )}
-                    <span className="font-medium">Delete Post</span>
-                  </button>
-                </motion.div>
-              )}
-
-              {/* Mobile author socials */}
-              {post.author.socials && typeof post.author.socials === 'object' && (
-                <div className="mt-3 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <ExternalLink className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                      Follow {typeof post.author.name === 'string' ? post.author.name : 'Author'}
-                    </span>
-                  </div>
-                  <SocialLinks 
-                    socials={post.author.socials} 
-                    authorName={typeof post.author.name === 'string' ? post.author.name : undefined}
-                  />
+              {/* Content */}
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <div className="text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <MarkdownViewer content={post.content || ''} className="w-full" />
                 </div>
-              )}
-            </div>
-          </motion.div>
-
-          {post.coverImage && (
-            <div className="relative mb-8 -mx-6 md:-mx-8 lg:-mt-6 md:-mt-8 border-b-2 border-indigo-500">
-              <div className="relative w-full h-64 md:h-96">
-                <Image
-                  src={post.coverImage}
-                  alt={post.title}
-                  fill
-                  className="object-cover opacity-40 hover:opacity-90 transition-opacity rounded-t-lg md:rounded-t-2xl shadow-xl"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                  priority
-                />
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-gray-900/80 dark:from-black/80 to-transparent" />
               </div>
             </div>
-          )}
-
-          <div className="mt-8">
-            <MarkdownViewer content={post.content || ''} className="max-w-4xl mx-auto" />
-          </div>
-        </motion.article>
-        
-        <motion.div
-          className="mt-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl dark:shadow-2xl border border-gray-200/70 dark:border-gray-700/50"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white mb-6 transition-colors"
+          </motion.article>
+          
+          {/* Bottom Navigation */}
+          <motion.div
+            className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
           >
-            <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to all posts
-          </Link>
-
-          <div className="flex justify-end">
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="p-2 rounded-full bg-gray-200/70 hover:bg-gray-300/70 dark:bg-gray-700/50 dark:hover:bg-gray-600/50 transition-colors"
-              aria-label="Back to top"
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group font-medium"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-            </button>
-          </div>
-        </motion.div>
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              Back to all posts
+            </Link>
 
-        <ConfirmationDialog
-          isOpen={isConfirmOpen}
-          onClose={handleCancel}
-          onConfirm={handleConfirm}
-          title="Delete Post"
-          message="Are you sure you want to delete this post? This action cannot be undone."
-        />
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Enjoyed this post?
+              </div>
+              <div className="flex items-center gap-2">
+                <SocialShare 
+                  url={`/blog/${post.id}`}
+                  title={post.title}
+                  description={post.content?.substring(0, 200) + '...'}
+                  isCompact={true}
+                />
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmOpen}
+        onClose={handleCancel}
+        onConfirm={handleConfirm}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+      />
     </div>
   );
-            }
+}

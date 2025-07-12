@@ -58,7 +58,7 @@ export default function ProfileSettings() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-md mx-auto"
     >
-      <div className="bg-white/80 dark:bg-gray-800/50 rounded-xl p-8 backdrop-blur-sm border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-gray-900/20">
+      <div className="rounded-2xl shadow-xl ring-2 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200/50 dark:border-blue-700/50">
         <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-600 bg-clip-text text-transparent">
           Edit Profile
         </h2>

@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import Header from '@/components/Header';
+import { Mail, Calendar, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { getBlogPost } from '@/lib/blogUtils';
 
 // This is a Client Component
 export default function ProfilePage() {
@@ -88,7 +91,7 @@ export default function ProfilePage() {
 
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black p-4 md:p-8 my-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black p-4 md:p-8 ml-10">
       <div className="max-w-8xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
@@ -104,9 +107,54 @@ export default function ProfilePage() {
                   />
                 </div>
                 <CardTitle className="text-xl">{user.displayName || 'User'}</CardTitle>
-                <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
-                  {user.email}
-                </CardDescription>
+                <div className="w-full space-y-3 mt-2">
+                  {/* Email */}
+                  <div className="flex items-center justify-center text-sm">
+                    <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                    <span className="text-gray-600 dark:text-gray-300">{user.email}</span>
+                  </div>
+                  
+                  {/* Join Date */}
+                  <div className="flex items-center justify-center text-sm">
+                    <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                    <span className="text-gray-600 dark:text-gray-300">
+                      Joined {user.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : 'N/A'}
+                    </span>
+                  </div>
+                  
+                  {/* Role */}
+                  <div className="flex items-center justify-center text-sm">
+                    <Shield className="w-4 h-4 mr-2 text-gray-400" />
+                    <div className="flex items-center">
+                      <span className="text-gray-600 dark:text-gray-300 mr-2">Role:</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        {user?.role || 'User'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Email Verification Status */}
+                  <div className="flex items-center justify-center text-sm">
+                    {user?.emailVerified ? (
+                      <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 mr-2 text-amber-500" />
+                    )}
+                    <span className={cn(
+                      "text-sm",
+                      user?.emailVerified 
+                        ? "text-green-600 dark:text-green-400" 
+                        : "text-amber-600 dark:text-amber-400"
+                    )}>
+                      {user?.emailVerified ? 'Email Verified' : 'Email Not Verified'}
+                    </span>
+                  </div>
+                </div>
+                
                 <Button 
                   variant="outline" 
                   className="mt-4"
@@ -121,9 +169,12 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="w-full md:w-3/4">
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 max-w-xs mb-6">
+              <TabsList className="grid w-full grid-cols-3 max-w-xs mb-6">
                 <TabsTrigger value="profile" onClick={() => setActiveTab('profile')}>
                   Profile
+                </TabsTrigger>
+                <TabsTrigger value="posts" onClick={() => setActiveTab('posts')}>
+                  Posts
                 </TabsTrigger>
                 <TabsTrigger value="settings" onClick={() => setActiveTab('settings')}>
                   Settings
@@ -144,7 +195,27 @@ export default function ProfilePage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="settings" className="space-y-6">
+              
+              <TabsContent value="posts" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Blogs</CardTitle>
+                    <CardDescription>
+                      Manage your blogs
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-sm font-medium mb-2">Blogs</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent><TabsContent value="settings" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Account Settings</CardTitle>
