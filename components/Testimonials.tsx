@@ -89,7 +89,7 @@ const ReviewCard = ({
       <div
         className={cn(
           "relative h-full flex flex-col overflow-hidden rounded-xl border p-5",
-          "bg-gray-50 dark:bg-gray-900/80 dark:backdrop-blur-sm",
+          "bg-gray-50 ring-1 dark:ring-gray-700 dark:bg-gray-900/80 dark:backdrop-blur-sm",
           "border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500/50",
           "transition-all duration-300 shadow-sm hover:shadow-lg group/card"
         )}

@@ -78,7 +78,7 @@ export const CommentForm = ({
 
   const formClasses = [
     'w-full min-h-[100px] p-4 pr-12 rounded-lg border',
-    'bg-white/90 dark:bg-gray-900/50 backdrop-blur-sm',
+    'bg-white/90 dark:bg-gray-900/50 border-gray-700/80 dark:border-blue-300/50 backdrop-blur-sm',
     'text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400',
     'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent',
     'resize-none transition-all duration-200',

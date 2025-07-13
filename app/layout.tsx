@@ -196,7 +196,10 @@ export default function RootLayout({
         
         {/* Add preload for critical images here */}
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${elegantScript.variable} font-sans antialiased min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
+      <body 
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} ${elegantScript.variable} font-sans antialiased min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
+      >
         <PageLoadingProvider>
           <Providers>
             <ErrorBoundary>

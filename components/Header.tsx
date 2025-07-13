@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, BookOpen, Code2, LogOut, User, Settings, LayoutDashboard, FileText, Image as ImageIcon, Plus, Handshake, Flame } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { ThemeSwitcher } from './ui/ThemeSwitcher';
+import { FaBlog } from 'react-icons/fa6';
 
 interface NavLink {
   href: string;
@@ -24,12 +24,12 @@ const navigationLinks: NavLink[] = [
   { href: '#home', label: 'Intro', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
   { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
   { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
-  { href: '#services', label: 'Services', icon: <Handshake className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
+  { href: '#skills', label: 'Skills', icon: <Wrench className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
   { href: '#contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
   {
     href: '/blog',
     label: 'Blog',
-    icon: <Flame className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
+    icon: <FaBlog className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
     className: 'group/blog',
   },
 ];
@@ -405,7 +405,7 @@ export default function Header() {
                   >
                     <div className="py-1" role="none">
                       {dashboardLinks
-                        .filter(link => !link.adminOnly || (user?.email === 'rvimman@gmail.com'))
+                        .filter(link => !link.adminOnly || (user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL))
                         .map((link) => (
                           <Link
                             key={link.href}

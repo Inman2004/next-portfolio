@@ -102,7 +102,7 @@ const Personel = () => {
               </div>
               <div className="text-center md:text-left">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-                  Rv Imman
+                  Immanuvel B
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 mt-2">
                   Web Developer & Tech Enthusiast
@@ -139,7 +139,7 @@ const Personel = () => {
             </div>
             <div className="mt-4">
               <button
-                onClick={() => handleDownload('Immanuvel_B_2025.pdf')}
+                onClick={() => handleDownload('Immanuvel_B_latest.pdf')}
                 disabled={loading}
                 className={`inline-flex items-center px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
                   loading
@@ -382,7 +382,7 @@ const Personel = () => {
 
   return (
     <>
-    <div className="max-w-full mx-auto my-12 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-full mx-auto my-12 py-12 px-4 sm:px-6 lg:px-8 ml-16">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
           Personal Space
@@ -412,7 +412,7 @@ const Personel = () => {
                         fill 
                         className="object-cover" 
                         sizes="(max-width: 768px) 100vw, 33vw" 
-                        src="/images/anime1-tnp.png" 
+                        src="/images/avatar.png" 
                         alt="Profile" 
                     />
                   </div>

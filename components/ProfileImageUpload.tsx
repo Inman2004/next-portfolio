@@ -2,7 +2,17 @@
 
 import { useState, useRef, useCallback, useEffect, ChangeEvent, DragEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Camera, User, Loader2, X } from 'lucide-react';
+import { Camera, User, Loader2, X, Crop } from 'lucide-react';
+import ReactCrop, { type Crop as CropType, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
@@ -12,6 +22,7 @@ interface ProfileImageUploadProps {
   onImageUpdate?: () => void;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  aspect?: number; // Optional aspect ratio for cropping (width/height)
 }
 
 const sizeClasses = {
@@ -29,6 +40,11 @@ const ProfileImageUpload = ({
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(user?.photoURL || '');
   const [isDragging, setIsDragging] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [imgSrc, setImgSrc] = useState('');
+  const [crop, setCrop] = useState<CropType | undefined>();
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop | undefined>();
+  const imgRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Update preview URL when user's photoURL changes
@@ -57,7 +73,7 @@ const ProfileImageUpload = ({
   }, []);
 
   // Handle file selection with validation
-  const handleFileSelect = useCallback(async (file: File) => {
+  const handleFileSelect = useCallback((file: File) => {
     try {
       // Validate file type
       if (!file.type.startsWith('image/')) {
@@ -71,16 +87,13 @@ const ProfileImageUpload = ({
         return;
       }
 
-      // Create preview URL
-      const objectUrl = URL.createObjectURL(file);
-      console.log('Created preview URL:', objectUrl);
-      setPreviewUrl(objectUrl);
-
-      // Upload the file
-      await handleUpload(file, objectUrl);
-      
-      // Clean up the object URL after upload is complete
-      URL.revokeObjectURL(objectUrl);
+      // Create preview URL for cropping
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setImgSrc(reader.result?.toString() || '');
+        setShowCropModal(true);
+      });
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error handling file select:', error);
       toast.error('Failed to process image. Please try again.');
@@ -318,6 +331,107 @@ const ProfileImageUpload = ({
   const displayImage = previewUrl || user?.photoURL || '';
   const showRemoveButton = !isUploading && (previewUrl || user?.photoURL);
 
+  // Function to create a center crop
+  function centerAspectCrop(
+    mediaWidth: number,
+    mediaHeight: number,
+    aspect: number,
+  ) {
+    return centerCrop(
+      makeAspectCrop(
+        {
+          unit: '%',
+          width: 90,
+        },
+        aspect,
+        mediaWidth,
+        mediaHeight,
+      ),
+      mediaWidth,
+      mediaHeight,
+    );
+  }
+
+  // Handle image load for cropping
+  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    const { width, height } = e.currentTarget;
+    setCrop(centerAspectCrop(width, height, 1)); // 1:1 aspect ratio for profile images
+  }
+
+  // Get cropped image as blob
+  const getCroppedImg = (): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      if (!imgRef.current || !completedCrop) {
+        reject(new Error('No image or crop data'));
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
+      const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
+      const pixelRatio = window.devicePixelRatio || 1;
+      
+      canvas.width = completedCrop.width * pixelRatio;
+      canvas.height = completedCrop.height * pixelRatio;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('No 2d context'));
+        return;
+      }
+
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      ctx.imageSmoothingQuality = 'high';
+
+      ctx.drawImage(
+        imgRef.current,
+        completedCrop.x * scaleX,
+        completedCrop.y * scaleY,
+        completedCrop.width * scaleX,
+        completedCrop.height * scaleY,
+        0,
+        0,
+        completedCrop.width,
+        completedCrop.height
+      );
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Canvas is empty'));
+          return;
+        }
+        resolve(blob);
+      }, 'image/jpeg', 0.9);
+    });
+  };
+
+  // Handle crop and upload
+  const handleCropAndUpload = async () => {
+    if (!imgSrc || !completedCrop) return;
+    
+    try {
+      setIsUploading(true);
+      const blob = await getCroppedImg();
+      const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+      
+      // Create preview URL
+      const objectUrl = URL.createObjectURL(blob);
+      setPreviewUrl(objectUrl);
+      
+      // Upload the file
+      await handleUpload(file, objectUrl);
+      
+      // Clean up
+      setShowCropModal(false);
+      setImgSrc('');
+    } catch (error) {
+      console.error('Error cropping image:', error);
+      toast.error('Failed to crop image. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className={`relative ${sizeClasses[size]} ${className}`}>
       <div 
@@ -384,6 +498,60 @@ const ProfileImageUpload = ({
         accept="image/*"
         disabled={isUploading}
       />
+
+      {/* Crop Modal */}
+      <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Crop your profile picture</DialogTitle>
+          </DialogHeader>
+          <div className="relative w-full max-h-[60vh] overflow-auto flex justify-center">
+            {imgSrc && (
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c as PixelCrop)}
+                aspect={1} // Force 1:1 aspect ratio for profile images
+                circularCrop={true}
+                className="max-w-full max-h-[50vh]"
+              >
+                <img
+                  ref={imgRef}
+                  src={imgSrc}
+                  onLoad={onImageLoad}
+                  alt="Crop preview"
+                  className="max-w-full max-h-[50vh] object-contain"
+                />
+              </ReactCrop>
+            )}
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCropModal(false);
+                setImgSrc('');
+              }}
+              disabled={isUploading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCropAndUpload}
+              disabled={isUploading || !completedCrop}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

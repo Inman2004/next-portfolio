@@ -128,6 +128,7 @@ const calculateDuration = (startDate: Date, endDate: Date | 'Present'): string =
 import { projects, type ProjectStatus } from '@/data/projects';
 import { InteractiveHoverButton } from './magicui/interactive-hover-button';
 import { Card } from './ui/card';
+import { FaBlog } from 'react-icons/fa6';
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -457,7 +458,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
                   whileTap={{ scale: 0.95 }}
                   title="Read Blog Post"
                 >
-                  <Flame className="w-6 h-6" />
+                  <FaBlog className="w-6 h-6" />
                   <span className="sr-only">Blog Post</span>
                 </motion.a>
               </div>

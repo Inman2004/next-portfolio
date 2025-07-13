@@ -191,7 +191,8 @@ const steps = [
   }
 ];
 
-const StatusIcon = ({ status }) => {
+const StatusIcon = ({ status }: { status?: string }) => {
+  if (!status) return null;
   switch (status) {
     case 'completed':
       return <CheckCircle className="w-4 h-4 text-green-500" />;
@@ -238,11 +239,11 @@ export default function RoadmapTimeline() {
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Full Stack Developer Roadmap
+           My Full Stack Development Journey 
           </span>
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
-          Step by step guide to becoming a modern full stack developer
+        <p className="text-gray-600 dark:text-gray-400 text-lg l max-w-3xl mx-auto">
+          Each step is a checkpoint in my journey to becoming a modern full stack developer
         </p>
       </div>
 

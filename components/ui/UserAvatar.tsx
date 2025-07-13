@@ -197,6 +197,4 @@ export function UserAvatar({
   }
 
   return avatarElement;
-
-
 }
