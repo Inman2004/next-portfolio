@@ -27,7 +27,7 @@ export const CommentItem = memo(({
   const contentClasses = 'mt-3 text-gray-800 dark:text-gray-200 leading-relaxed break-words text-base';
   const actionClasses = 'flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors px-2 py-1.5 rounded-md hover:bg-gray-100/50 dark:hover:bg-gray-700/50';
   const buttonClasses = 'flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-2 py-1.5 rounded-md hover:bg-gray-100/50 dark:hover:bg-gray-700/50';
-  const iconClasses = 'w-4 h-4 flex-shrink-0';
+  const iconClasses = (isActive: boolean) => `w-4 h-4 flex-shrink-0 ${isActive ? 'fill-blue-600 dark:fill-blue-400' : ''} ${isActive && userVote === 'down' ? 'fill-red-500 dark:fill-red-400' : ''}`;
   const voteButtonClasses = (isActive: boolean) => `flex items-center gap-1.5 text-sm px-2 py-1.5 rounded-md transition-colors ${
     isActive 
       ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20' 
@@ -156,7 +156,7 @@ export const CommentItem = memo(({
               className="text-gray-600 dark:text-gray-300 text-sm mt-1"
               aria-label="Delete comment"
             >
-              <Trash2 className={iconClasses} />
+              <Trash2 className={iconClasses(false)} />
             </motion.button>
           )}
         </div>
@@ -174,7 +174,7 @@ export const CommentItem = memo(({
               className={voteButtonClasses(userVote === 'up')}
               disabled={!currentUser}
             >
-              <ThumbsUp className={iconClasses} />
+              <ThumbsUp className={iconClasses(userVote === 'up')} />
               <span>{formatNumber(comment.upvotes || 0)}</span>
             </motion.button>
             {comment.upvoters?.includes(ADMIN_EMAIL) && (
@@ -194,11 +194,11 @@ export const CommentItem = memo(({
             whileTap={{ scale: 0.95 }}
             onClick={() => onVote(comment.id, 'down')}
             className={`flex items-center gap-2 transition-colors ${
-              userVote === 'down' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'
+              userVote === 'down' ? 'text-red-400 dark:text-red-500' : 'text-gray-400 dark:text-gray-500 hover:text-red-400 dark:hover:text-red-500'
             }`}
             disabled={!currentUser}
           >
-            <ThumbsDown className="w-4 h-4" />
+            <ThumbsDown className={iconClasses(userVote === 'down')} />
             <span>{formatNumber(comment.downvotes || 0)}</span>
           </motion.button>
         </div>

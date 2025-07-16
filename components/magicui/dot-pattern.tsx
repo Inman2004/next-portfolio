@@ -253,7 +253,7 @@ export function CssDotPattern({
           })}
         </div>
       )}
-      <style jsx global>{`
+      <style jsx={true} global={true}>{`
         @keyframes pulse {
           0%, 100% {
             opacity: ${isDarkMode ? 0.3 : 0.9};

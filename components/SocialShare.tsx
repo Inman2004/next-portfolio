@@ -1,264 +1,200 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Twitter, Linkedin, Link2, Facebook, MessageSquare } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Share2, Twitter, Linkedin, Link2, Facebook, MessageSquare, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { SITE_CONFIG } from '@/config/site';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface SocialShareProps {
   url: string;
   title: string;
   description?: string;
-  isCompact?: boolean;
 }
 
-export default function SocialShare({ url, title, description = '', isCompact = false }: SocialShareProps) {
-  const [isClient, setIsClient] = useState(false);
+export default function SocialShare({ url, title, description = '' }: SocialShareProps) {
   const [currentUrl, setCurrentUrl] = useState('');
-  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    setCurrentUrl(window.location.origin + (url.startsWith('/') ? url : `/${url}`));
+    if (typeof window !== 'undefined') {
+      const baseUrl = window.location.origin;
+      const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+      setCurrentUrl(`${baseUrl}${cleanUrl}`);
+    }
   }, [url]);
-
-  const shareData = {
-    title: `${title} - ${SITE_CONFIG.name}`,
-    text: description,
+  
+  const shareData = useMemo(() => ({
+    title: title ? `${title} - ${SITE_CONFIG.name}` : SITE_CONFIG.name,
+    text: description || '',
     url: currentUrl,
-    // Add these for better WhatsApp sharing
-    quote: description,
+    quote: description || '',
     hashtag: SITE_CONFIG.name.replace(/\s+/g, ''),
-  };
+  }), [title, description, currentUrl]);
 
-  const shareOnWhatsApp = () => {
-    const text = `${title}%0A%0A${description}%0A%0A${currentUrl}`;
-    window.open(
-      `https://wa.me/?text=${text}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
-    setShowShareOptions(false);
-  };
-
-  const handleShare = async () => {
-    // Check if on mobile and WhatsApp is the main app
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isWhatsApp = navigator.userAgent.match(/WhatsApp/i);
-
-    if ((isMobile || isWhatsApp) && navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.error('Error sharing:', err);
-        // Fallback to custom share options
-        setShowShareOptions(true);
+  const shareOnPlatform = (platform: string) => {
+    if (!isClient || !currentUrl) return;
+    
+    const text = [title, description, currentUrl].filter(Boolean).join('\n\n');
+    let shareUrl = '';
+    
+    try {
+      switch (platform) {
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+          break;
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(description || '')}`;
+          break;
+        case 'linkedin':
+          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+          break;
+        case 'whatsapp':
+          shareUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+          break;
+        default:
+          return;
       }
-    } else if (isMobile) {
-      // On mobile but no Web Share API, use WhatsApp directly
-      shareOnWhatsApp();
-    } else {
-      // On desktop, show share options
-      setShowShareOptions(!showShareOptions);
+    
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      setIsOpen(false);
+    } catch (err) {
+      console.error('Error sharing:', err);
+      toast.error('Failed to share. Please try again.');
     }
   };
 
-  const shareOnTwitter = () => {
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareData.url)}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
-    setShowShareOptions(false);
-  };
-
-  const shareOnLinkedIn = () => {
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareData.url)}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
-    setShowShareOptions(false);
-  };
-
-  const shareOnFacebook = () => {
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
-    setShowShareOptions(false);
-  };
-
-  const copyLink = async () => {
+  const handleNativeShare = async () => {
+    if (!isClient) return;
+    
     try {
-      await navigator.clipboard.writeText(shareData.url);
-      toast.success('Link copied to clipboard!');
-      setShowShareOptions(false);
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(currentUrl);
+        toast.success('Link copied to clipboard!');
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = currentUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        toast.success('Link copied to clipboard!');
+      }
     } catch (err) {
-      toast.error('Failed to copy link');
-      console.error('Failed to copy:', err);
+      console.error('Error sharing:', err);
+      toast.error('Failed to share. Please try again.');
+    } finally {
+      setIsOpen(false);
     }
   };
 
   const shareButtons = [
-    { 
-      icon: <MessageSquare className="w-4 h-4" />, 
-      label: 'Share on WhatsApp', 
-      onClick: shareOnWhatsApp,
-      className: 'hover:bg-green-500/20 hover:text-green-500'
+    {
+      name: 'Twitter',
+      icon: <Twitter className="w-6 h-6" />,
+      onClick: () => shareOnPlatform('twitter'),
+      label: 'Twitter'
     },
-    { 
-      icon: <Twitter className="w-4 h-4" />, 
-      label: 'Share on Twitter', 
-      onClick: shareOnTwitter,
-      className: 'hover:bg-blue-500/20 hover:text-blue-400'
+    {
+      name: 'Facebook',
+      icon: <Facebook className="w-6 h-6" />,
+      onClick: () => shareOnPlatform('facebook'),
+      label: 'Facebook'
     },
-    { 
-      icon: <Linkedin className="w-4 h-4" />, 
-      label: 'Share on LinkedIn', 
-      onClick: shareOnLinkedIn,
-      className: 'hover:bg-blue-600/20 hover:text-blue-500'
+    {
+      name: 'LinkedIn',
+      icon: <Linkedin className="w-6 h-6" />,
+      onClick: () => shareOnPlatform('linkedin'),
+      label: 'LinkedIn'
     },
-    { 
-      icon: <Facebook className="w-4 h-4" />, 
-      label: 'Share on Facebook', 
-      onClick: shareOnFacebook,
-      className: 'hover:bg-blue-700/20 hover:text-blue-600'
+    {
+      name: 'WhatsApp',
+      icon: <MessageSquare className="w-6 h-6" />,
+      onClick: () => shareOnPlatform('whatsapp'),
+      label: 'WhatsApp'
     },
-    { 
-      icon: <Link2 className="w-4 h-4" />, 
-      label: 'Copy link', 
-      onClick: copyLink,
-      className: 'hover:bg-gray-600/20 hover:text-gray-400'
-    },
+    {
+      name: 'Copy Link',
+      icon: <Link2 className="w-6 h-6" />,
+      onClick: async () => {
+        await navigator.clipboard.writeText(currentUrl);
+        toast.success('Link copied to clipboard!');
+        setIsOpen(false);
+      },
+      label: 'Copy link'
+    }
   ];
 
-  // Check if Web Share API is available
-  const canShare = isClient && navigator.share;
+  const canShare = isClient && typeof navigator !== 'undefined' && navigator.share;
 
   if (!isClient) return null;
 
-  if (isCompact) {
-    return (
-      <div className="relative">
-        <motion.button
-          onClick={handleShare}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="p-2 text-gray-300 dark:text-gray-800 hover:text-white dark:hover:text-gray-900 transition-colors relative bg-gray-800/50 dark:bg-gray-400/50 rounded-full"
-          aria-label="Share this post"
-          title="Share this post"
-        >
-          <Share2 className="w-5 h-5" />
-        </motion.button>
-        
-        <AnimatePresence>
-          {showShareOptions && (
-            <>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-40"
-                onClick={() => setShowShareOptions(false)}
-              />
-              <motion.div 
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-                className="absolute right-0 mt-2 w-56 bg-gray-800 rounded-xl shadow-2xl border border-gray-700 z-50 overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="p-3">
-                  <p className="text-sm font-medium text-gray-300 px-2 py-2 mb-2 border-b border-gray-700">Share this post</p>
-                  <div className="grid grid-cols-4 gap-2 p-2">
-                    {shareButtons.map((button, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          button.onClick();
-                        }}
-                        className={`p-2.5 rounded-lg flex items-center justify-center ${button.className} bg-gray-700/50 hover:bg-gray-700/80 transition-colors`}
-                        aria-label={button.label}
-                        title={button.label}
-                        whileHover={{ scale: 1.1, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {button.icon}
-                      </motion.button>
-                    ))}
-                  </div>
-                  <div className="mt-3 p-2 bg-gray-700/30 rounded-lg">
-                    <p className="text-xs text-gray-400 mb-1">Share link</p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        readOnly
-                        value={currentUrl}
-                        className="flex-1 text-xs bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        onClick={(e) => e.currentTarget.select()}
-                      />
-                      <button
-                        onClick={copyLink}
-                        className="p-2 text-gray-300 hover:text-white hover:bg-gray-600/50 rounded-lg transition-colors"
-                        title="Copy link"
-                      >
-                        <Link2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
   return (
-    <div className="mt-8 pt-6 border-t border-gray-700/50">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-gray-300">
-          <Share2 className="w-5 h-5 text-blue-400" />
-          <span className="font-medium">Share this post</span>
-        </div>
-        
         <div className="flex flex-wrap items-center gap-3">
-          {canShare && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg hover:shadow-blue-500/30"
-              aria-label="Share"
-            >
-              <Share2 className="w-4 h-4" />
-              Share
-            </motion.button>
-          )}
-          
-          <div className="flex items-center gap-3 bg-gray-800/50 p-1.5 rounded-full">
-            {shareButtons.map((button, index) => (
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
               <motion.button
-                key={index}
-                whileHover={{ scale: 1.15, y: -2 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={button.onClick}
-                className={`p-2 rounded-full text-gray-300 hover:text-white transition-all ${button.className} hover:shadow-lg`}
-                aria-label={button.label}
-                title={button.label}
+                className="p-2 flex items-center gap-2 text-gray-800 dark:text-gray-300 hover:text-blue-500 transition-colors relative rounded-full"
+                aria-label="Share this post"
+                title="Share this post"
               >
-                {button.icon}
+                <Share2 className="w-5 h-5" />
+                <span>Share</span>
+                <span className="sr-only">Share this post</span>
               </motion.button>
-            ))}
-          </div>
+            </DialogTrigger>
+            
+            <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Share this post
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-6">
+                <div className="flex items-center justify-center gap-6">
+                  {shareButtons.map((button) => (
+                    <Button
+                      key={button.name}
+                      onClick={button.onClick}
+                      variant="ghost"
+                      size="icon"
+                      className="h-12 w-12 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                      aria-label={`Share on ${button.label}`}
+                      title={`Share on ${button.label}`}
+                    >
+                      {button.icon}
+                    </Button>
+                  ))}
+                </div>
+                
+                {canShare && (
+                  <Button
+                    onClick={handleNativeShare}
+                    className="w-full gap-2"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>Share via system dialog</span>
+                  </Button>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
-      </div>
-    </div>
   );
 }

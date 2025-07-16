@@ -408,10 +408,7 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
             onPointerUp={handlePointerUp}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
-            onTouchStart={handlePointerDown}
-            onTouchMove={handlePointerMove}
-            onTouchEnd={handlePointerUp}
-            onTouchCancel={handlePointerUp}
+            onPointerLeave={handlePointerUp}
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial 
