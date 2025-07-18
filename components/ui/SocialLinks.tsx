@@ -1,4 +1,5 @@
 import { SocialLinks as SocialLinksType } from '@/types';
+import { SiPinterest } from 'react-icons/si';
 
 interface SocialLinksProps {
   socials: SocialLinksType;
@@ -99,6 +100,17 @@ export function SocialLinks({ socials, authorName, className = 'flex justify-cen
               />
             }
             hoverClass="hover:text-purple-600 dark:hover:text-purple-400"
+            isStroke
+          />
+        )}
+        {socials.pinterest && (
+          <SocialLink
+            href={`https://pinterest.com/${socials.pinterest}`}
+            label="Pinterest"
+            icon={
+              <SiPinterest />
+            }
+            hoverClass="hover:text-red-600 dark:hover:text-red-400"
             isStroke
           />
         )}

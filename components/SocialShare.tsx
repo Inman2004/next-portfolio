@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { SiWhatsapp, SiX } from 'react-icons/si';
 
 interface SocialShareProps {
   url: string;
@@ -104,27 +105,31 @@ export default function SocialShare({ url, title, description = '' }: SocialShar
   const shareButtons = [
     {
       name: 'Twitter',
-      icon: <Twitter className="w-6 h-6" />,
+      icon: <SiX className="w-6 h-6" />,
       onClick: () => shareOnPlatform('twitter'),
-      label: 'Twitter'
+      label: 'Twitter',
+      className: 'h-12 w-12 rounded-full hover:bg-zinc-500 dark:hover:bg-zinc-900'
     },
     {
       name: 'Facebook',
       icon: <Facebook className="w-6 h-6" />,
       onClick: () => shareOnPlatform('facebook'),
-      label: 'Facebook'
+      label: 'Facebook',
+      className: 'h-12 w-12 rounded-full hover:bg-blue-500 dark:hover:bg-blue-700'
     },
     {
       name: 'LinkedIn',
       icon: <Linkedin className="w-6 h-6" />,
       onClick: () => shareOnPlatform('linkedin'),
-      label: 'LinkedIn'
+      label: 'LinkedIn',
+      className: 'h-12 w-12 rounded-full hover:bg-blue-500 dark:hover:bg-blue-500'
     },
     {
       name: 'WhatsApp',
-      icon: <MessageSquare className="w-6 h-6" />,
+      icon: <SiWhatsapp className="w-6 h-6" />,
       onClick: () => shareOnPlatform('whatsapp'),
-      label: 'WhatsApp'
+      label: 'WhatsApp',
+      className: 'h-12 w-12 rounded-full hover:bg-green-500 dark:hover:bg-green-700'
     },
     {
       name: 'Copy Link',
@@ -134,7 +139,8 @@ export default function SocialShare({ url, title, description = '' }: SocialShar
         toast.success('Link copied to clipboard!');
         setIsOpen(false);
       },
-      label: 'Copy link'
+      label: 'Copy link',
+      className: 'h-12 w-12 rounded-full hover:bg-gray-500 dark:hover:bg-gray-700'
     }
   ];
 
@@ -162,7 +168,7 @@ export default function SocialShare({ url, title, description = '' }: SocialShar
             <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg">
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Share this post
+                  Share to
                 </DialogTitle>
               </DialogHeader>
               
@@ -174,7 +180,7 @@ export default function SocialShare({ url, title, description = '' }: SocialShar
                       onClick={button.onClick}
                       variant="ghost"
                       size="icon"
-                      className="h-12 w-12 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className={`h-12 w-12 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 ${button.className}`}
                       aria-label={`Share on ${button.label}`}
                       title={`Share on ${button.label}`}
                     >
@@ -189,7 +195,7 @@ export default function SocialShare({ url, title, description = '' }: SocialShar
                     className="w-full gap-2"
                   >
                     <Share2 className="w-4 h-4" />
-                    <span>Share via system dialog</span>
+                    <span>More share option</span>
                   </Button>
                 )}
               </div>

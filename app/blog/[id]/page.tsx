@@ -529,8 +529,8 @@ export default function PostPage({ params }: PostPageProps) {
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight">
+                <div className="absolute opacity-0 hover:opacity-100 bottom-6 left-6 right-6 transition-all duration-200">
+                  <h1 className="text-2xl uppercase sm:text-lg lg:text-xl font-bold text-white mb-2 leading-tight">
                     {post.title}
                   </h1>
                 </div>

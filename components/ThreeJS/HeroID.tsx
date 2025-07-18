@@ -408,7 +408,8 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
             onPointerUp={handlePointerUp}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
-            onPointerLeave={handlePointerUp}
+            // Use pointer events for touch interactions as well
+            // They handle both mouse and touch events
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial 

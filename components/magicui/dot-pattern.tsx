@@ -253,35 +253,36 @@ export function CssDotPattern({
           })}
         </div>
       )}
-      <style jsx={true} global={true}>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: ${isDarkMode ? 0.3 : 0.9};
-            transform: translate(-50%, -50%) scale(${isDarkMode ? 0.9 : 1}) 
-                       rotate(${isDarkMode ? '0deg' : '5deg'});
-            filter: ${isDarkMode ? 'none' : 'drop-shadow(0 0 5px rgba(99, 102, 241, 0.5))'};
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes pulse {
+            0%, 100% {
+              opacity: ${isDarkMode ? 0.3 : 0.9};
+              transform: translate(-50%, -50%) scale(${isDarkMode ? 0.9 : 1}) 
+                         rotate(${isDarkMode ? '0deg' : '5deg'});
+              filter: ${isDarkMode ? 'none' : 'drop-shadow(0 0 5px rgba(99, 102, 241, 0.5))'};
+            }
+            50% {
+              opacity: ${isDarkMode ? 0.8 : 1};
+              transform: translate(-50%, -50%) scale(${isDarkMode ? 1.1 : 1.4}) 
+                         rotate(${isDarkMode ? '0deg' : '-5deg'});
+              filter: ${isDarkMode ? 'none' : 'drop-shadow(0 0 15px rgba(99, 102, 241, 0.8))'};
+            }
           }
-          50% {
-            opacity: ${isDarkMode ? 0.8 : 1};
-            transform: translate(-50%, -50%) scale(${isDarkMode ? 1.1 : 1.4}) 
-                       rotate(${isDarkMode ? '0deg' : '-5deg'});
-            filter: ${isDarkMode ? 'none' : 'drop-shadow(0 0 15px rgba(99, 102, 241, 0.8))'};
-          }
-        }
-
-        ${!isDarkMode ? `
-          .dot-pattern-container::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, 
-              transparent 0%, 
-              rgba(255,255,255,0.7) 100%);
-            mix-blend-mode: overlay;
-            pointer-events: none;
-          }
-        ` : ''}
-      `}</style>
+          ${!isDarkMode ? `
+            .dot-pattern-container::before {
+              content: '';
+              position: absolute;
+              inset: 0;
+              background: radial-gradient(circle at center, 
+                transparent 0%, 
+                rgba(255,255,255,0.7) 100%);
+              mix-blend-mode: overlay;
+              pointer-events: none;
+            }
+          ` : ''}
+        `
+      }} />
     </div>
   );
 }

@@ -30,9 +30,11 @@ type BlogPostWithAuthor = {
 };
 
 export async function generateMetadata(
-  { params, searchParams }: Props,
+  { params: paramsPromise, searchParams }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  // Ensure params is resolved before using it
+  const params = await paramsPromise;
   // Ensure we have a valid post ID
   if (!params?.id) {
     return {

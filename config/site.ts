@@ -22,32 +22,22 @@ interface SiteConfig {
   [key: string]: any;
 }
 
-// Use a function to get the site config that can handle both server and client side
-export function getSiteConfig(): SiteConfig {
-  const siteUrl = 
-    typeof window !== 'undefined' 
-      ? window.location.origin 
-      : process.env.NEXT_PUBLIC_SITE_URL || 'https://rvimmandev.vercel.app';
-
-  return {
-    name: 'Rv Imman | Blog',
-    url: siteUrl,
-    description: 'Personal blog of Rv Imman - Full Stack Developer',
-    themeColor: '#000000',
-    author: {
-      name: 'Rv Imman',
-      twitter: 'rvimman',
-    },
-    socials: {
-      twitter: 'https://twitter.com/rvimman',
-      github: 'https://github.com/Inman2004',
-    },
-    openGraph: {
-      type: 'website',
-      locale: 'en_US',
-      siteName: 'Rv Imman | Blog',
-    },
-  };
-}
-
-export const SITE_CONFIG = getSiteConfig();
+export const SITE_CONFIG: SiteConfig = {
+  name: 'Rv Imman | Blog',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rvimmandev.vercel.app',
+  description: 'Personal blog of Rv Imman - Full Stack Developer',
+  themeColor: '#ffffff',
+  author: {
+    name: 'Rv Imman',
+    twitter: 'rvimman_',
+  },
+  socials: {
+    twitter: 'https://twitter.com/rvimman_',
+    github: 'https://github.com/Inman2004',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'Rv Imman | Blog',
+  },
+};
