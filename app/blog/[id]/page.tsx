@@ -466,7 +466,7 @@ export default function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-slate-900 dark:to-black text-gray-900 dark:text-white transition-all duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-100 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-black text-gray-900 dark:text-white transition-all duration-300">
       {/* Floating Action Bar */}
       <motion.div
         initial={{ y: 100, opacity: 0 }}
@@ -487,7 +487,6 @@ export default function PostPage({ params }: PostPageProps) {
             url={`/blog/${post.id}`}
             title={post.title}
             description={post.content?.substring(0, 200) + '...'}
-            isCompact={true}
           />
         </div>
         
@@ -495,7 +494,7 @@ export default function PostPage({ params }: PostPageProps) {
       </motion.div>
 
       <div className="pt-10 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Back Button */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -546,7 +545,7 @@ export default function PostPage({ params }: PostPageProps) {
               )}
 
               {/* Author Info */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-gray-50/80 dark:bg-gray-900/30 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-gradient-to-l from-blue-100 shadow-sm to-blue-50 dark:from-teal-900/10 dark:to-blue-900/5 rounded-2xl">
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                   <UserAvatar
                     photoURL={typeof post.author.photoURL === 'string' ? post.author.photoURL : undefined}
@@ -602,7 +601,7 @@ export default function PostPage({ params }: PostPageProps) {
               </div>
 
               {/* Desktop Action Bar */}
-              <div className="hidden sm:flex items-center justify-between gap-4 mb-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl border border-blue-200/50 dark:border-blue-700/50">
+              <div className="hidden sm:flex items-center justify-between gap-4 mb-8 p-4 bg-gradient-to-r from-blue-100 shadow-sm to-blue-50 dark:from-teal-900/10 dark:to-blue-900/5 rounded-2xl">
                 <div className="flex items-center gap-4">
                   <SocialShare 
                     url={`/blog/${post.id}`}

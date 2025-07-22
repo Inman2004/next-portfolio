@@ -229,13 +229,12 @@ const CustomCode: React.FC<CustomCodeProps> = ({
     const code = String(children).trim();
     return <Mermaid chart={code} />;
   }
-  const match = /language-(\w+)/.exec(className || '');
-  let language = match ? match[1].toLowerCase() : '';
-  
+  // Determine the language and filename from the className
+  const match = /language-(\w+)(?::(.+))?/.exec(className || '');
+  const languageFromMatch = match ? match[1] : '';
+  const filename = match?.[2] || '';
   // Map the language to a known one if needed
-  if (language in languageMap) {
-    language = languageMap[language];
-  }
+  const language = languageMap[languageFromMatch] || languageFromMatch;
 
   // For code blocks without a specified language
   if (!match) {
@@ -264,8 +263,8 @@ const CustomCode: React.FC<CustomCodeProps> = ({
   };
 
   return (
-    <div className="rounded-lg overflow-hidden bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg group">
-      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-3 sm:px-4 py-2 font-mono border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+    <div className="rounded-lg overflow-hidden bg-gray-400/40 dark:bg-gray-700 border border-gray-400/40 dark:border-gray-700 shadow-lg group">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-3 sm:px-4 py-2 font-mono border-b border-gray-400/50 dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center overflow-hidden">
           <div className="flex space-x-1.5 sm:space-x-2 mr-2 sm:mr-3 flex-shrink-0">
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></div>
@@ -273,7 +272,7 @@ const CustomCode: React.FC<CustomCodeProps> = ({
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
           </div>
           <span className="font-medium text-gray-900 dark:text-gray-200 truncate text-ellipsis max-w-[120px] sm:max-w-none">
-            {(() => {
+            {filename || (() => {
               const ext = extensionMap[language] || 'txt';
               return `${language}.${ext}`;
             })()}
@@ -467,7 +466,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           ),
           h3: ({node, ...props}) => (
             <h3 
-              className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-gray-200 dark:border-gray-700 text-indigo-700 dark:text-teal-300"
+              className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-indigo-300 dark:border-teal-700/50 text-indigo-700 dark:text-teal-300"
               {...props}
             >
               <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
@@ -576,19 +575,19 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
-            <div className="overflow-x-auto my-8 rounded-xl border border-indigo-200 dark:border-teal-700 shadow-sm">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props} />
+            <div className="overflow-x-auto my-8 rounded-xl border border-indigo-300 dark:border-teal-700/50 shadow-sm">
+              <table className="min-w-full divide-y divide-gray-400 dark:divide-gray-700" {...props} />
             </div>
           ),
           thead: (props) => (
             <thead className="bg-indigo-50 dark:bg-indigo-900/20 border-b border-gray-200 dark:border-gray-700" {...props} />
           ),
           tbody: (props) => (
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50" {...props} />
+            <tbody className="divide-y divide-gray-400/50 dark:divide-gray-700/50" {...props} />
           ),
           th: (props) => (
             <th 
-              className="px-6 py-3 text-left text-xs font-medium text-indigo-700 dark:text-teal-300  border-b border-indigo-200 dark:border-teal-700 uppercase tracking-wider"
+              className="px-6 py-4 text-left text-xs font-medium text-indigo-700 dark:text-teal-300  border-b border-indigo-300 dark:border-teal-700 uppercase tracking-wider"
               style={{ whiteSpace: 'nowrap' }}
               {...props}
             />
@@ -601,7 +600,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           ),
           tr: (props) => (
             <tr 
-              className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors duration-150"
+              className="hover:bg-indigo-400/40 dark:hover:bg-gray-800/30 transition-colors duration-150"
               {...props}
             />
           ),
@@ -633,6 +632,10 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             // For images without alt text, return the image wrapped in a div
             return <div className="my-6">{image}</div>;
           },
+          // Horizontal rule with gradient styling
+          hr: () => (
+            <hr className="my-8 border-0 h-px bg-gray-400/50 dark:bg-gray-600/50" />
+          ),
         }}
       >
         {content}

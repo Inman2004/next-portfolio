@@ -19,9 +19,10 @@ interface SocialShareProps {
   url: string;
   title: string;
   description?: string;
+  isCompact?: boolean;
 }
 
-export default function SocialShare({ url, title, description = '' }: SocialShareProps) {
+export default function SocialShare({ url, title, description = '', isCompact = false }: SocialShareProps) {
   const [currentUrl, setCurrentUrl] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -149,21 +150,21 @@ export default function SocialShare({ url, title, description = '' }: SocialShar
   if (!isClient) return null;
 
   return (
-        <div className="flex flex-wrap items-center gap-3">
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-2 flex items-center gap-2 text-gray-800 dark:text-gray-300 hover:text-blue-500 transition-colors relative rounded-full"
-                aria-label="Share this post"
-                title="Share this post"
-              >
-                <Share2 className="w-5 h-5" />
-                <span>Share</span>
-                <span className="sr-only">Share this post</span>
-              </motion.button>
-            </DialogTrigger>
+    <div className="flex flex-wrap items-center gap-3">
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2 flex items-center gap-2 text-gray-800 dark:text-gray-300 hover:text-blue-500 transition-colors relative rounded-full"
+            aria-label="Share this post"
+            title="Share this post"
+          >
+            <Share2 className="w-5 h-5" />
+            <span>Share</span>
+            <span className="sr-only">Share this post</span>
+          </motion.button>
+        </DialogTrigger>
             
             <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg">
               <DialogHeader>

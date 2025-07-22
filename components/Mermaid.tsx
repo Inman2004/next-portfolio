@@ -33,14 +33,35 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
           fontFamily: 'inherit',
           themeVariables: {
             darkMode: resolvedTheme === 'dark',
-            background: resolvedTheme === 'dark' ? '#1f2937' : '#ffffff',
-            primaryColor: resolvedTheme === 'dark' ? '#1e40af' : '#3b82f6',
-            secondaryColor: resolvedTheme === 'dark' ? '#1e3a8a' : '#bfdbfe',
-            tertiaryColor: resolvedTheme === 'dark' ? '#1e1b4b' : '#dbeafe',
-            primaryBorderColor: resolvedTheme === 'dark' ? '#3b82f6' : '#2563eb',
-            lineColor: resolvedTheme === 'dark' ? '#9ca3af' : '#6b7280',
-            textColor: resolvedTheme === 'dark' ? '#e5e7eb' : '#1f2937',
+            // Background colors
+            background: resolvedTheme === 'dark' ? 'hsl(177, 47%, 20%)' : 'hsl(251, 91%, 95%)',
+            mainBkg: resolvedTheme === 'dark' ? 'hsl(177, 77%, 15%)' : 'hsl(251, 91%, 93%)',
+            secondBkg: resolvedTheme === 'dark' ? 'hsl(177, 44%, 30%, 0.5)' : 'hsl(251, 91%, 90%)',
+            // Text colors
+            textColor: resolvedTheme === 'dark' ? 'hsl(270, 100%, 91%)' : 'hsl(258, 68%, 34%)',
+            // Border colors
+            border1: resolvedTheme === 'dark' ? 'hsl(177, 68%, 34%)' : 'hsl(251, 91%, 80%)',
+            border2: resolvedTheme === 'dark' ? 'hsl(177, 70%, 42%)' : 'hsl(252, 94%, 73%)',
+            lineColor: resolvedTheme === 'dark' ? 'hsl(177, 68%, 74%)' : 'hsl(252, 94%, 65%)',
+            // Node colors
+            primaryColor: resolvedTheme === 'dark' ? 'hsl(177, 68%, 34%)' : 'hsl(270, 100%, 91%)',
+            primaryTextColor: resolvedTheme === 'dark' ? 'hsl(270, 100%, 91%)' : 'hsl(258, 68%, 34%)',
+            primaryBorderColor: resolvedTheme === 'dark' ? 'hsl(177, 68%, 34%)' : 'hsl(252, 94%, 65%)',
+            // Secondary colors
+            secondaryColor: resolvedTheme === 'dark' ? 'hsl(177, 44%, 36%)' : 'hsl(253, 100%, 93%)',
+            secondaryTextColor: resolvedTheme === 'dark' ? 'hsl(254, 96%, 87%)' : 'hsl(261, 70%, 42%)',
+            secondaryBorderColor: resolvedTheme === 'dark' ? 'hsl(261, 70%, 42%)' : 'hsl(252, 94%, 65%)',
+            // Tertiary colors
+            tertiaryColor: resolvedTheme === 'dark' ? 'hsl(177, 47%, 20%)' : 'hsl(251, 78%, 95%)',
+            tertiaryTextColor: resolvedTheme === 'dark' ? 'hsl(252, 94%, 73%)' : 'hsl(261, 70%, 42%)',
+            tertiaryBorderColor: resolvedTheme === 'dark' ? 'hsl(177, 68%, 34%)' : 'hsl(252, 94%, 65%)',
+            // Other elements
+            noteBkgColor: resolvedTheme === 'dark' ? 'hsla(177, 44%, 36%, 0.1)' : 'hsl(270, 100%, 91%)',
+            noteTextColor: resolvedTheme === 'dark' ? 'hsl(270, 100%, 91%)' : 'hsl(258, 68%, 34%)',
+            noteBorderColor: resolvedTheme === 'dark' ? 'hsl(177, 68%, 34%)' : 'hsl(251, 91%, 80%)',
+            // Font
             fontSize: '14px',
+            fontFamily: 'inherit',
           },
         };
         
