@@ -1,3 +1,68 @@
+import { Metadata, ResolvingMetadata } from 'next';
+import { getBlogPost } from '@/lib/blogUtils';
+
+// Generate dynamic metadata for the blog post
+export async function generateMetadata(
+  { params }: { params: { id: string } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  try {
+    const post = await getBlogPost(params.id);
+    if (!post) {
+      return {
+        title: 'Post Not Found',
+        description: 'The requested blog post could not be found.',
+      };
+    }
+
+    // Get the base URL from environment variables or use a fallback
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.app';
+    
+    // Get the first few words of the content for the description
+    const description = post.content
+      .replace(/[#*`~>\[\]]/g, '') // Remove markdown syntax
+      .split('\n')
+      .filter(line => line.trim().length > 0)[0] // Get first non-empty line
+      ?.substring(0, 160) || 'Read this blog post on rvimm.dev';
+
+    // Get the first 3 tags or default to 'ai'
+    const tags = post.tags?.slice(0, 3).join(',') || 'ai,programming,mathematics';
+
+    return {
+      title: `${post.title} | rvimm.dev`,
+      description: description,
+      openGraph: {
+        title: post.title,
+        description: description,
+        type: 'article',
+        publishedTime: post.createdAt?.toDate().toISOString(),
+        authors: [post.author?.name || 'rv imm'],
+        url: `${baseUrl}/blog/${params.id}`,
+        images: [
+          {
+            url: `${baseUrl}/api/og?title=${encodeURIComponent(post.title)}&author=${encodeURIComponent(post.author?.name || 'rv imm')}&tags=${encodeURIComponent(tags)}`,
+            width: 1200,
+            height: 630,
+            alt: post.title,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: post.title,
+        description: description,
+        images: [`${baseUrl}/api/og?title=${encodeURIComponent(post.title)}&author=${encodeURIComponent(post.author?.name || 'rv imm')}&tags=${encodeURIComponent(tags)}`],
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
+    return {
+      title: 'Blog Post | rvimm.dev',
+      description: 'Read this interesting blog post on rvimm.dev',
+    };
+  }
+}
+
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';

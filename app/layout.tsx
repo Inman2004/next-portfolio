@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     description: 'Portfolio of rv imman - Full Stack Developer specializing in modern web technologies.',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/images/web ui.png`,
         width: 1200,
         height: 630,
         alt: 'rv imman - Full Stack Developer',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'rv imman | Full Stack Developer',
     description: 'Portfolio of rv imman - Full Stack Developer specializing in modern web technologies.',
-    images: [`${baseUrl}/og-image.jpg`],
+    images: [`${baseUrl}/images/web ui.png`],
     creator: '@rvimman',
   },
   robots: {
