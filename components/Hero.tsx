@@ -152,7 +152,7 @@ export default function Hero() {
     <Link href={`/blog/${latestPost.id}`}>
       <motion.div 
         whileHover={{ scale: 1.02 }}
-        className="group relative mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/50 dark:to-indigo-900/20 border border-blue-100 dark:border-indigo-900/50 cursor-pointer transition-all duration-300 hover:shadow-lg"
+        className="group relative mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/50 dark:to-indigo-900/20 border border-blue-900 dark:border-indigo-900/50 cursor-pointer transition-all duration-300 hover:shadow-lg"
       >
         <span className="absolute -top-2 -right-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
           New <FaBlog className="inline text-lg text-orange-500 dark:text-orange-400" />
@@ -181,9 +181,9 @@ export default function Hero() {
   )}
 
               {/* Personal Touch */}
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic mt-4 max-w-lg">
+              {/* <p className="text-sm text-gray-500 dark:text-gray-400 italic mt-4 max-w-lg">
                 "I transform complex problems into elegant, user-centered solutions through clean code and thoughtful design."
-              </p>
+              </p> */}
             </div>
             <div className="flex flex-col my-4 sm:flex-row gap-4 w-full sm:w-auto justify-center lg:justify-start">
               <motion.a
@@ -202,16 +202,16 @@ export default function Hero() {
               >
                 Get to know me
               </motion.a>
-            </div>
+            
 
             {/* Social Links */}
-            <div className="mt-6 lg:mt-12 sm:mt-10 flex items-center gap-4 sm:gap-6 justify-center lg:justify-start flex-wrap">
+            <div className="flex ml-6 items-center gap-1 sm:gap-2 justify-center lg:justify-start flex-wrap">
               <motion.a
                 href="https://github.com/Inman2004"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#6d28d9] dark:text-[#a930d5] hover:opacity-80 transition-opacity"
+                className="text-[rgb(109,40,217)] dark:text-[#a930d5] hover:bg-purple-500 dark:hover:bg-purple-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
               >
                 <Github className="w-6 h-6" />
               </motion.a>
@@ -220,7 +220,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#0a5cb4] dark:text-[#0A66C2] hover:opacity-80 transition-opacity"
+                className="text-[rgb(10,92,180)] dark:text-[#0A66C2] hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
               >
                 <Linkedin className="w-6 h-6" />
               </motion.a>
@@ -229,7 +229,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-gray-800 dark:text-[#fff] hover:opacity-80 transition-opacity"
+                className="text-[rgb(0,0,0)] dark:text-[#fff] hover:bg-black dark:hover:bg-black hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
               >
                 <FaXTwitter className="w-6 h-6" />
               </motion.a>
@@ -238,10 +238,11 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1 }}
-                className="text-[#d93025] dark:text-[#cf594e] hover:opacity-80 transition-opacity"
+                className="text-[rgb(217,48,37)] dark:text-[#cf594e] hover:bg-red-500 dark:hover:bg-red-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
               >
                 <SiGmail className="w-6 h-6" />
               </motion.a>
+            </div>
             </div>
           </motion.div>
           </div>

@@ -98,7 +98,7 @@ const SkillCard = React.memo(({ skill, index }: { skill: Skill; index: number })
       variants={containerVariants}
       className="h-full"
     >
-      <div className="h-full rounded-xl bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-gray-900/20">
+      <div className="h-full rounded-xl bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-900 dark:border-gray-700/50 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-gray-900/20">
         <div className="p-6 md:p-8 space-y-6">
           <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
             {skill.category}

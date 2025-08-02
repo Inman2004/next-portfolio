@@ -161,7 +161,7 @@ export default function Testimonials() {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
-            Certifications & Achievements
+            Certifications & Courses
           </h2>
           <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
             A showcase of my professional certifications and the skills I've acquired through dedicated learning and hands-on experience.

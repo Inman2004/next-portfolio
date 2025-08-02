@@ -295,7 +295,7 @@ const CommentListComponent = ({
           <div 
             ref={parentRef}
             className={`
-              border border-blue-500/30 dark:border-blue-500/30 rounded-lg overflow-auto 
+              border border-gray-900 dark:border-gray-800/30 rounded-lg overflow-auto 
               bg-white/80 dark:bg-gray-900/30 backdrop-blur-sm
               scrollbar-thin scrollbar-thumb-gray-400/50 dark:scrollbar-thumb-gray-700/50 
               scrollbar-track-transparent hover:scrollbar-thumb-gray-500/50 

@@ -195,7 +195,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
       <div className="h-full">
         {/* Card content */}
         <div 
-          className="h-full overflow-hidden rounded-xl bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 
+          className="h-full overflow-hidden rounded-xl bg-white dark:bg-gray-900 border-2 border-gray-900 dark:border-gray-800 
                    transition-all duration-300 shadow-sm dark:shadow-gray-900/20 relative
                    hover:border-blue-500 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-500/20"
           onClick={(e) => {

@@ -57,8 +57,8 @@ export const CommentItem = memo(({
     'hover:shadow-md hover:-translate-y-0.5',
     'backdrop-blur-sm',
     isAdminComment 
-      ? 'border-amber-300/60 dark:border-amber-500/40 shadow-[0_0_25px_rgba(234,179,8,0.15)] dark:shadow-[0_0_25px_rgba(234,179,8,0.25)]' 
-      : 'border-gray-200/80 dark:border-gray-700/50 hover:border-gray-300/70 dark:hover:border-gray-600/50'
+      ? 'border-amber-300 dark:border-amber-500 shadow-[0_0_25px_rgba(234,179,8,0.25)] dark:shadow-[0_0_25px_rgba(234,179,8,0.5)]' 
+      : 'border-gray-500/80 dark:border-gray-700/50 hover:border-gray-900/70 dark:hover:border-gray-600/50'
   ].join(' ');
 
   return (

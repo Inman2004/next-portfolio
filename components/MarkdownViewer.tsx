@@ -442,37 +442,76 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             return children;
           },
           a: CustomLink,
-          h1: ({node, ...props}) => (
-            <h1 
-              className="text-4xl md:text-5xl font-extrabold tracking-tight mt-12 mb-8 relative group"
-              {...props}
-            >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-700 dark:from-teal-400 dark:to-blue-400">
-                {props.children}
-              </span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
-            </h1>
-          ),
-          h2: ({node, ...props}) => (
-            <h2 
-              className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 text-indigo-700 dark:text-gray-100"
-              {...props}
-            >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-teal-900/50 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
-              </span>
-              {props.children}
-            </h2>
-          ),
-          h3: ({node, ...props}) => (
-            <h3 
-              className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-indigo-300 dark:border-teal-700/50 text-indigo-700 dark:text-teal-300"
-              {...props}
-            >
-              <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
-              {props.children}
-            </h3>
-          ),
+          h1: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = text
+              .toLowerCase()
+              .replace(/[^\w\s-]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/-+/g, '-')
+              .replace(/^-+|-+$/g, '');
+              
+            return (
+              <h1 
+                id={id}
+                className="text-4xl md:text-5xl font-extrabold tracking-tight mt-12 mb-8 relative group scroll-mt-24"
+                {...props}
+              >
+                <a href={`#${id}`} className="no-underline group-hover:underline">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-700 dark:from-teal-400 dark:to-blue-400">
+                    {props.children}
+                  </span>
+                </a>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
+              </h1>
+            );
+          },
+          h2: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = text
+              .toLowerCase()
+              .replace(/[^\w\s-]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/-+/g, '-')
+              .replace(/^-+|-+$/g, '');
+              
+            return (
+              <h2 
+                id={id}
+                className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 text-indigo-700 dark:text-gray-100 scroll-mt-20"
+                {...props}
+              >
+                <a href={`#${id}`} className="no-underline hover:underline">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-teal-900/50 flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
+                  </span>
+                  {props.children}
+                </a>
+              </h2>
+            );
+          },
+          h3: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = text
+              .toLowerCase()
+              .replace(/[^\w\s-]/g, '')
+              .replace(/\s+/g, '-')
+              .replace(/-+/g, '-')
+              .replace(/^-+|-+$/g, '');
+              
+            return (
+              <h3 
+                id={id}
+                className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-indigo-300 dark:border-teal-700/50 text-indigo-700 dark:text-teal-300 scroll-mt-16"
+                {...props}
+              >
+                <a href={`#${id}`} className="no-underline hover:underline">
+                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
+                  {props.children}
+                </a>
+              </h3>
+            );
+          },
           h4: ({node, ...props}) => (
             <h4 
               className="text-xl md:text-2xl font-semibold mt-8 mb-3 pl-4 relative text-indigo-600 dark:text-blue-300"

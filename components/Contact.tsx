@@ -101,7 +101,7 @@ const Contact = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-gray-900 dark:border-gray-600 bg-gray-300 dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
@@ -115,7 +115,7 @@ const Contact = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-gray-900 dark:border-gray-600 bg-gray-300 dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
@@ -129,7 +129,7 @@ const Contact = () => {
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-gray-900 dark:border-gray-600 bg-gray-300 dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
 
@@ -179,7 +179,7 @@ const Contact = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="space-y-8"
           >
-            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-900 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Connect With Me
               </h3>
@@ -192,7 +192,7 @@ const Contact = () => {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors group border border-gray-200 dark:border-gray-700"
+                    className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors group border border-gray-900 dark:border-gray-700"
                   >
                     <link.icon 
                       style={{
@@ -207,7 +207,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-900 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Location
               </h3>

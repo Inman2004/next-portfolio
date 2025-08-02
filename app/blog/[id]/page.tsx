@@ -1,68 +1,3 @@
-import { Metadata, ResolvingMetadata } from 'next';
-import { getBlogPost } from '@/lib/blogUtils';
-
-// Generate dynamic metadata for the blog post
-export async function generateMetadata(
-  { params }: { params: { id: string } },
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  try {
-    const post = await getBlogPost(params.id);
-    if (!post) {
-      return {
-        title: 'Post Not Found',
-        description: 'The requested blog post could not be found.',
-      };
-    }
-
-    // Get the base URL from environment variables or use a fallback
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.app';
-    
-    // Get the first few words of the content for the description
-    const description = post.content
-      .replace(/[#*`~>\[\]]/g, '') // Remove markdown syntax
-      .split('\n')
-      .filter(line => line.trim().length > 0)[0] // Get first non-empty line
-      ?.substring(0, 160) || 'Read this blog post on rvimm.dev';
-
-    // Get the first 3 tags or default to 'ai'
-    const tags = post.tags?.slice(0, 3).join(',') || 'ai,programming,mathematics';
-
-    return {
-      title: `${post.title} | rvimm.dev`,
-      description: description,
-      openGraph: {
-        title: post.title,
-        description: description,
-        type: 'article',
-        publishedTime: post.createdAt?.toDate().toISOString(),
-        authors: [post.author?.name || 'rv imm'],
-        url: `${baseUrl}/blog/${params.id}`,
-        images: [
-          {
-            url: `${baseUrl}/api/og?title=${encodeURIComponent(post.title)}&author=${encodeURIComponent(post.author?.name || 'rv imm')}&tags=${encodeURIComponent(tags)}`,
-            width: 1200,
-            height: 630,
-            alt: post.title,
-          },
-        ],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: post.title,
-        description: description,
-        images: [`${baseUrl}/api/og?title=${encodeURIComponent(post.title)}&author=${encodeURIComponent(post.author?.name || 'rv imm')}&tags=${encodeURIComponent(tags)}`],
-      },
-    };
-  } catch (error) {
-    console.error('Error generating metadata:', error);
-    return {
-      title: 'Blog Post | rvimm.dev',
-      description: 'Read this interesting blog post on rvimm.dev',
-    };
-  }
-}
-
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
@@ -88,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useBlogCache } from '@/contexts/BlogCacheContext';
+import { TableOfContents } from '@/components/blog/TableOfContents';
 
 // Define types for author data
 interface AuthorData {
@@ -461,7 +397,7 @@ export default function PostPage({ params }: PostPageProps) {
     if (user?.uid !== post.author.id) return null;
     
     return (
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex items-center">
         <Link
           href={`/blog/edit/${post.id}`}
           className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200 group"
@@ -536,7 +472,7 @@ export default function PostPage({ params }: PostPageProps) {
       <motion.div
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: isScrolled ? 0 : 100, opacity: isScrolled ? 1 : 0 }}
-        className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md sm:backdrop-blur-lg rounded-lg sm:rounded-2xl shadow sm:shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-1.5 sm:px-3 sm:py-2 flex flex-col items-center gap-1 sm:gap-2 min-w-[32px] sm:min-w-[36px] max-w-[14vw]"
+        className="fixed top-2 right-2 hidden lg:flex sm:top-3 sm:right-3 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md sm:backdrop-blur-lg rounded-lg sm:rounded-2xl shadow sm:shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-1.5 sm:px-2 sm:py-2  items-center gap-1 sm:gap-1 min-w-[36px] sm:min-w-[36px] max-w-[24vw]"
       >
         <button
           onClick={scrollToTop}
@@ -559,7 +495,8 @@ export default function PostPage({ params }: PostPageProps) {
       </motion.div>
 
       <div className="pt-10 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12">
+          <div className="lg:pr-1 max-w-5xl">
           {/* Back Button */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -744,36 +681,42 @@ export default function PostPage({ params }: PostPageProps) {
             </div>
           </motion.article>
           
-          {/* Bottom Navigation */}
-          <motion.div
-            className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group font-medium"
-            >
-              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              Back to all posts
-            </Link>
-
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Enjoyed this post?
-              </div>
-              <div className="flex items-center gap-2">
-                <SocialShare 
-                  url={`/blog/${post.id}`}
-                  title={post.title}
-                  description={post.content?.substring(0, 200) + '...'}
-                  isCompact={true}
-                />
-              </div>
-            </div>
-          </motion.div>
+          </div> {/* End of main content column */}
+          
+          {/* Table of Contents */}
+          <div className="hidden lg:block">
+            <TableOfContents content={post.content} />
+          </div>
         </div>
+
+        {/* Bottom Navigation */}
+        <motion.div
+          className="mt-12 ml-12 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group font-medium"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            Back to all posts
+          </Link>
+
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Enjoyed this post?
+            </div>
+            <div className="flex items-center gap-2">
+              <SocialShare 
+                url={`/blog/${post.id}`}
+                title={post.title}
+                description={post.content?.substring(0, 200) + '...'}
+              />
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Confirmation Dialog */}

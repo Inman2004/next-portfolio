@@ -82,7 +82,7 @@ export const CommentForm = ({
     'text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400',
     'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent',
     'resize-none transition-all duration-200',
-    'border-gray-200/80 dark:border-gray-700/50',
+    'border-gray-400/80 dark:border-gray-700/50',
     'dark:focus:ring-blue-500/50',
     'shadow-sm hover:shadow-md transition-shadow',
     'text-base leading-relaxed',

@@ -192,7 +192,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
         </div>
 
         <motion.div 
-          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-blue-500/30 transition-all duration-300 cursor-pointer"
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-gray-900 hover:border-blue-500 transition-all duration-300 cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
           whileHover={{ y: -2 }}
         >

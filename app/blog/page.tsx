@@ -742,12 +742,12 @@ export default function BlogPage() {
                       whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
                       className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-500/30 ${post.isAdmin
                           ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 hover:!shadow-amber-500/30 dark:hover:!shadow-amber-500/30'
-                          : 'border-gray-200/70 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
+                          : 'border-gray-00/70 dark:border-gray-700/50 bg-card/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
                         }`}
                     >
                       <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
                         {post.isAdmin && (
-                          <div className="bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-gray-200 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700 flex items-center backdrop-blur-sm">
+                          <div className="bg-card/90 dark:bg-gray-900/90 text-gray-800 dark:text-gray-200 text-[11px] font-medium px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700 flex items-center backdrop-blur-sm">
                             <Crown className="w-3 h-3 mr-1.5 text-gray-600 dark:text-gray-400" />
                             Admin
                           </div>
@@ -822,7 +822,7 @@ export default function BlogPage() {
                             </h2>
                             {post.excerpt && (
                               <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 prose prose-sm dark:prose-invert max-w-none">
-                                <MarkdownViewer content={post.excerpt} />
+                                {/* <MarkdownViewer content={post.excerpt} /> */}
                               </div>
                             )}
                           </div>

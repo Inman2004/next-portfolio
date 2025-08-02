@@ -173,7 +173,7 @@ const Comments = () => {
   // Define common classes
   const containerClasses = 'max-w-5xl mx-auto px-4 py-8';
   const sectionTitleClasses = 'text-2xl font-bold text-gray-900 dark:text-white';
-  const sortButtonClasses = 'flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800/50 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors';
+  const sortButtonClasses = 'flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800/50 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 border border-gray-400 dark:border-gray-700/50 rounded-lg transition-colors';
   const sortOptionClasses = (isActive: boolean) => `w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
     isActive 
       ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' 
@@ -193,7 +193,7 @@ const Comments = () => {
             isSubmitting={isSubmitting}
             currentUser={currentUser}
             placeholder="Share your thoughts..."
-            className="bg-white/50 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+            className="bg-white/50 dark:bg-gray-800/50 border border-gray-900 dark:border-gray-700/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
           />
         </div>
 
@@ -220,7 +220,7 @@ const Comments = () => {
               </button>
               
               {isSortOpen && (
-                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 overflow-hidden border border-gray-200 dark:border-gray-700/50">
+                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 overflow-hidden border border-gray-400 dark:border-gray-700/50">
                   <button
                     onClick={() => handleSortChange('newest')}
                     className={sortOptionClasses(sortBy === 'newest')}
