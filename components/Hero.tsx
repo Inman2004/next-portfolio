@@ -140,10 +140,10 @@ export default function Hero() {
                   <SkillBadge skill="Next.js" proficiency="Advanced" />
                   <SkillBadge skill="React" proficiency="Advanced" />
                   <SkillBadge skill="TypeScript" proficiency="Advanced" />
-                  <SkillBadge skill="Node.js" proficiency="Intermediate" />
+                  <SkillBadge skill="Python" proficiency="Expert" />
                   <SkillBadge skill="MongoDB" proficiency="Intermediate" />
                   <SkillBadge skill="Tailwind CSS" proficiency="Advanced" />
-                  <SkillBadge skill="3D Artistry" proficiency="Expert" />
+                  <SkillBadge skill="AI/ML" proficiency="Intermediate" />
                 </div>
               </div>
 

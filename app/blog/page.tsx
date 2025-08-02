@@ -62,6 +62,7 @@ import { app, db } from '@/lib/firebase';
 import { getBlogPosts, enrichBlogPosts, cleanupBlogPostSubscriptions } from '@/lib/blogUtils';
 import { collection, query, where, orderBy, limit, startAfter, getDocs, DocumentData, Timestamp } from 'firebase/firestore';
 import { Eye, Clock, Calendar, Search, Filter, X, Trash2, Crown, Plus, ChevronDown, Check, ArrowUpDown, Flame, ArrowRight, Loader } from 'lucide-react';
+import { BlogSearch } from '@/components/blog/BlogSearch';
 import { BlogLoadingSkeleton } from '@/components/ui/blog-loading-skeleton';
 import { formatNumber } from '@/lib/formatNumber';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -89,6 +90,7 @@ export default function BlogPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
@@ -133,6 +135,38 @@ export default function BlogPage() {
     return () => unsubscribe();
   }, [auth, router]);
 
+  // Get all unique tags from posts with counts
+  const allTags = useMemo(() => {
+    const tagCounts: Record<string, number> = {};
+    
+    posts.forEach(post => {
+      post.tags?.forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+    
+    return Object.entries(tagCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [posts]);
+
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  
+  const toggleTag = (tag: string) => {
+    const newTags = new Set(selectedTags);
+    if (newTags.has(tag)) {
+      newTags.delete(tag);
+    } else {
+      newTags.add(tag);
+    }
+    setSelectedTags(newTags);
+  };
+  
+  // Clear all selected tags
+  const clearTags = () => {
+    setSelectedTags(new Set());
+  };
+
   // Format date for display
   const formatCreatedAt = (date: Date | { toDate: () => Date } | undefined) => {
     if (!date) return '';
@@ -140,15 +174,31 @@ export default function BlogPage() {
     return formatDate(dateObj);
   };
 
-  const renderPostDate = (date: Date | { toDate: () => Date } | undefined) => {
-    if (!date) return '';
-    const dateObj = date instanceof Date ? date : date.toDate();
-    return formatDate(dateObj);
-  };
+  // Filter and sort posts
+  const filteredAndSortedPosts = useMemo(() => {
+    // First filter by search query
+    let filtered = [...posts];
+    
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      filtered = filtered.filter((post) => {
+        return (
+          post.title?.toLowerCase().includes(searchLower) ||
+          post.excerpt?.toLowerCase().includes(searchLower) ||
+          post.content?.toLowerCase().includes(searchLower) ||
+          post.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+        );
+      });
+    }
+    
+    // Then filter by selected tags if any
+    if (selectedTags.size > 0) {
+      filtered = filtered.filter(post => 
+        post.tags?.some(tag => selectedTags.has(tag))
+      );
+    }
 
-  // Sort posts based on selected option
-  const sortedPosts = useMemo(() => {
-    const postsToSort = [...posts];
+    const postsToSort = [...filtered];
 
     return postsToSort.sort((a: BlogPost, b: BlogPost) => {
       switch (sortBy) {
@@ -171,7 +221,7 @@ export default function BlogPage() {
           return 0;
       }
     });
-  }, [posts, sortBy, viewCounts]);
+  }, [posts, sortBy, searchQuery, selectedTags]);
 
   // Check if user is admin
   useEffect(() => {
@@ -553,29 +603,33 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      {/* Create Post Button - Floating */}
-      <div className="fixed md:hidden flex bottom-6 right-6 z-50">
-        {user ? (
-          <Link
-            href="/blog/new"
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors hover:shadow-blue-500/30"
-          >
-            <Plus className="w-6 h-6" />
-          </Link>
-        ) : (
-          <button
-            onClick={() => router.push(`/signin?callbackUrl=${encodeURIComponent('/blog/new')}`)}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors hover:shadow-blue-500/30"
-            aria-label="Sign in to create a new post"
-          >
-            <Plus className="w-6 h-6" />
-          </button>
-        )}
-      </div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* Create Post Button - Floating */}
+        <div className="fixed md:hidden flex bottom-6 right-6 z-50">
+          {user ? (
+            <Link
+              href="/blog/new"
+              className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors hover:shadow-blue-500/30"
+            >
+              <Plus className="w-6 h-6" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.push(`/signin?callbackUrl=${encodeURIComponent('/blog/new')}`)}
+              className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors hover:shadow-blue-500/30"
+              aria-label="Sign in to create a new post"
+            >
+              <Plus className="w-6 h-6" />
+            </button>
+          )}
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
       {/* Hero Section */}
       <div className="relative overflow-hidden py-20 md:py-28">
-
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className="relative">
             <motion.span
@@ -611,23 +665,23 @@ export default function BlogPage() {
               </span>
             </h1>
           </motion.div>
-
         </div>
+      </div>
 
-        {/* Blog Content */}
-        <div className="container mx-auto px-4 py-8 pb-20 max-w-7xl">
-          {/* Header with Create Button */}
-          <motion.div
-            className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-                Latest Posts
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
+      {/* Blog Content */}
+      <div className="container mx-auto px-4 py-8 pb-20 max-w-7xl">
+        {/* Header with Create Button */}
+        <motion.div
+          className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+              Latest Posts
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
             </div>
 
             {user && (
@@ -641,45 +695,98 @@ export default function BlogPage() {
             )}
           </motion.div>
 
-          {/* Sort Controls */}
-          <motion.div
-            className="flex flex-wrap gap-2 mb-10 bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 max-w-max shadow-xl dark:shadow-none"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-          >
-            <button
-              onClick={() => setSortBy('newest')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'newest'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : 'bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-600/50 dark:hover:bg-blue-600/50 hover:text-white'
-                }`}
+          {/* Sort, Search, and Tags Controls */}
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+              <motion.div
+                className="flex flex-wrap gap-2 bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm p-1.5 rounded-xl border border-gray-900/50 dark:border-gray-700/50 shadow-xl dark:shadow-none"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+              <button
+                onClick={() => setSortBy('newest')}
+                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'newest'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-600/50 dark:hover:bg-blue-600/50 hover:text-white'
+                  }`}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Newest
+              </button>
+              <button
+                onClick={() => setSortBy('oldest')}
+                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'oldest'
+                    ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20'
+                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-600/50 dark:hover:bg-blue-600/50 hover:text-white'
+                  }`}
+              >
+                <ArrowUpDown className="w-4 h-4 mr-2" />
+                Oldest
+              </button>
+              <button
+                onClick={() => setSortBy('popular')}
+                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'popular'
+                    ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20'
+                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-600/50 dark:hover:bg-blue-600/50 hover:text-white'
+                  }`}
+              >
+                <Flame className="w-4 h-4 mr-2" />
+                Most Popular
+              </button>
+            </motion.div>
+            
+            <motion.div
+              className="w-full md:w-auto md:flex-1 max-w-md"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
             >
-              <Clock className="w-4 h-4 mr-2" />
-              Newest
-            </button>
-            <button
-              onClick={() => setSortBy('oldest')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'oldest'
-                  ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20'
-                  : 'bg-gray-300/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-600/50 dark:hover:bg-blue-600/50 hover:text-white'
-                }`}
-            >
-              <ArrowUpDown className="w-4 h-4 mr-2" />
-              Oldest
-            </button>
-            <button
-              onClick={() => setSortBy('popular')}
-              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'popular'
-                  ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20'
-                  : 'bg-gray-300/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-600/50 dark:hover:bg-blue-600/50 hover:text-white'
-                }`}
-            >
-              <Flame className="w-4 h-4 mr-2" />
-              Most Popular
-            </button>
-          </motion.div>
-
+                <BlogSearch
+                  searchQuery={searchQuery}
+                  onSearchChange={(query) => setSearchQuery(query)}
+                  placeholder="Search blog posts..."
+                  className="w-full"
+                />
+              </motion.div>
+            </div>
+            
+            {/* Tags Filter */}
+            {allTags.length > 0 && (
+              <motion.div 
+                className="flex flex-wrap gap-2 py-4 items-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+              >
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
+                  Filter by tags:
+                </span>
+                {allTags.map(({ name, count }) => (
+                  <button
+                    key={name}
+                    onClick={() => toggleTag(name)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full transition-all ${
+                      selectedTags.has(name)
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                        : 'bg-gray-200/70 dark:bg-gray-700/50 text-gray-800 dark:text-gray-200 hover:bg-gray-300/50 dark:hover:bg-gray-600/50'
+                    }`}
+                  >
+                    {name}
+                    <span className="text-xs opacity-70">{count}</span>
+                  </button>
+                ))}
+                {selectedTags.size > 0 && (
+                  <button
+                    onClick={clearTags}
+                    className="ml-2 text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </motion.div>
+            )}
+          </div>
           {/* Loading State */}
           {loading ? <BlogLoadingSkeleton /> : null}
 
@@ -692,43 +799,27 @@ export default function BlogPage() {
           )}
 
           {/* No Posts */}
-          {!loading && sortedPosts.length === 0 && !error && (
-            <motion.div
-              className="text-center py-16 bg-white/80 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-200/70 dark:border-gray-700/50 shadow-sm"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="text-6xl mb-4">📝</div>
-              <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No Posts Yet</h3>
-              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">Be the first to share your thoughts and start the conversation!</p>
-              {user ? (
-                <Link
-                  href="/blog/new"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium shadow-md hover:shadow-blue-500/20 hover:-translate-y-0.5 transform transition-all duration-200"
+          {!loading && filteredAndSortedPosts.length === 0 && !error && (
+            <div className="text-center py-12">
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                {searchQuery.trim() ? 'No matching posts found.' : 'No blog posts found.'}
+              </p>
+              {searchQuery.trim() && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create Your First Post
-                </Link>
-              ) : (
-                <Link
-                  href="/signin"
-                  className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Sign in to create a post
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </Link>
+                  Clear search
+                </button>
               )}
-            </motion.div>
+            </div>
           )}
 
           {/* Posts Grid */}
-          {!loading && sortedPosts.length > 0 && (
+          {!loading && filteredAndSortedPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence>
-                {sortedPosts.map((post, index) => {
+                {filteredAndSortedPosts.map((post, index) => {
                   const postId = post.id || '';
                   const viewCount = viewCounts[postId] || 0;
 
@@ -796,8 +887,41 @@ export default function BlogPage() {
                               <PostTitle>
                                 {post.title}
                               </PostTitle>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-1 mb-4 prose prose-sm dark:prose-invert max-w-none">{post.excerpt}</p>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-1 mb-4 prose prose-sm dark:prose-invert max-w-none">{post.tags}</p>
+                              {post.excerpt ? (
+                                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+                                  {post.excerpt}
+                                </p>
+                              ) : post.content ? (
+                                <p className="text-gray-500 dark:text-gray-500 text-sm line-clamp-2">
+                                  {post.content.replace(/<[^>]*>?/gm, '').substring(0, 150)}...
+                                </p>
+                              ) : (
+                                <p className="text-gray-400 dark:text-gray-600 text-sm italic">
+                                  No content preview available
+                                </p>
+                              )}
+                              {post.tags && post.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                  {post.tags.slice(0, 3).map(tag => (
+                                    <span 
+                                      key={tag} 
+                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200/50 dark:border-blue-800/50 cursor-pointer hover:bg-blue-200/70 dark:hover:bg-blue-800/50 transition-colors"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        toggleTag(tag);
+                                      }}
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {post.tags.length > 3 && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 self-center">
+                                      +{post.tags.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </>
                           )}
                           <div className={`absolute inset-0 bg-gradient-to-t ${post.isAdmin
@@ -884,33 +1008,33 @@ export default function BlogPage() {
                   );
                 })}
               </AnimatePresence>
+            </div>
+          ) : null}
 
-              {/* Loading indicator for infinite scroll */}
-              {loadingMore && (
-                <div className="col-span-full flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-                </div>
-              )}
+          {/* Loading indicator for infinite scroll */}
+          {loadingMore && (
+            <div className="col-span-full flex justify-center py-8">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
 
-              {/* Intersection observer target */}
-              <div ref={loadMoreRef} className="h-1 w-full col-span-full" />
+          {/* Intersection observer target */}
+          <div ref={loadMoreRef} className="h-1 w-full col-span-full" />
 
-              {!loadingMore && !hasMore && sortedPosts.length > 0 && (
-                <div className="col-span-full text-center py-6 text-gray-500 dark:text-gray-400">
-                  <Image
-                    src="/images/ui/bad.png"
-                    alt="No posts found"
-                    width={150}
-                    height={150}
-                    className="mx-auto opacity-50"
-                  />
-                  <p>No more posts</p>
-                </div>
-              )}
+          {!loadingMore && !hasMore && filteredAndSortedPosts.length > 0 && (
+            <div className="col-span-full text-center py-6 text-gray-500 dark:text-gray-400">
+              <Image
+                src="/images/ui/bad.png"
+                alt="No posts found"
+                width={150}
+                height={150}
+                className="mx-auto opacity-50"
+              />
+              <p>No more posts</p>
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

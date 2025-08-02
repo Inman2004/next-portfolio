@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Github, ExternalLink, BookOpen, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTechColor } from '@/components/skillColors';
+import MarkdownViewer from '@/components/MarkdownViewer';
 
 interface ProjectPageProps {
   params: {
@@ -160,6 +161,12 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+            {project.content && (
+              <div className="prose dark:prose-invert max-w-none">
+                <h2>Project Details</h2>
+                <MarkdownViewer content={project.content} />
               </div>
             )}
           </div>

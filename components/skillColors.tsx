@@ -45,6 +45,7 @@ export const getTechColor = (tech: string): TechColor => {
   if (techLower.includes('flask')) return { bg: 'bg-pink-500/15', text: 'text-pink-600 dark:text-pink-400', gradient: 'from-pink-500 to-pink-600', border: 'border-pink-500 dark:border-pink-400', hover: 'hover:bg-pink-500/20' };
   
   // AI/ML & Data
+  if (techLower.includes('ai/ml')) return { bg: 'bg-red-500/15', text: 'text-red-600 dark:text-red-400', gradient: 'from-red-500 to-red-600', border: 'border-red-400', hover: 'hover:bg-red-500/20' };
   if (techLower.includes('openai') || techLower.includes('gpt')) return { bg: 'bg-emerald-500/15', text: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-500 to-emerald-600', border: 'border-emerald-400', hover: 'hover:bg-emerald-500/20' };
   if (techLower.includes('langchain')) return { bg: 'bg-cyan-500/15', text: 'text-cyan-600 dark:text-cyan-400', gradient: 'from-cyan-500 to-cyan-600', border: 'border-cyan-400', hover: 'hover:bg-cyan-500/20' };
   if (techLower.includes('pytorch')) return { bg: 'bg-orange-500/15', text: 'text-orange-600 dark:text-orange-400', gradient: 'from-orange-500 to-orange-600', border: 'border-orange-400', hover: 'hover:bg-orange-500/20' };
@@ -88,13 +89,8 @@ export const SkillBadge: React.FC<SkillBadgeProps> = ({
 }) => {
   const { bg, text, border, hover } = getTechColor(skill);
   
-  // Color mapping for proficiency levels
-  const proficiencyColor = {
-    'Beginner': 'bg-blue-400',
-    'Intermediate': 'bg-green-400',
-    'Advanced': 'bg-purple-400',
-    'Expert': 'bg-yellow-400'
-  }[proficiency || 'Beginner'];
+  // Use the gradient color for the proficiency indicator
+  const { gradient } = getTechColor(skill);
   
   // Width mapping for proficiency levels
   const proficiencyWidth = {
@@ -116,7 +112,7 @@ export const SkillBadge: React.FC<SkillBadgeProps> = ({
           <div className="absolute bottom-0 left-0 w-full h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full" />
             <div 
-              className={`absolute inset-0 ${proficiencyColor} transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100 ${proficiencyWidth} rounded-full`}
+              className={`absolute inset-0 bg-gradient-to-r ${gradient} transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100 ${proficiencyWidth} rounded-full`}
             />
           </div>
         )}

@@ -472,7 +472,7 @@ export default function PostPage({ params }: PostPageProps) {
       <motion.div
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: isScrolled ? 0 : 100, opacity: isScrolled ? 1 : 0 }}
-        className="fixed top-2 right-2 hidden lg:flex sm:top-3 sm:right-3 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md sm:backdrop-blur-lg rounded-lg sm:rounded-2xl shadow sm:shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-1.5 sm:px-2 sm:py-2  items-center gap-1 sm:gap-1 min-w-[36px] sm:min-w-[36px] max-w-[24vw]"
+        className="fixed top-2 right-2 hidden lg:flex sm:top-3 sm:right-3 transform -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md sm:backdrop-blur-lg rounded-lg sm:rounded-2xl shadow sm:shadow-2xl border border-gray-900/50 dark:border-gray-700/50 p-1.5 sm:px-2 sm:py-2  items-center gap-1 sm:gap-1 min-w-[36px] sm:min-w-[36px] max-w-[24vw]"
       >
         <button
           onClick={scrollToTop}
@@ -516,7 +516,7 @@ export default function PostPage({ params }: PostPageProps) {
           <motion.article 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-500/50 dark:border-gray-700/50 overflow-hidden"
           >
             {/* Cover Image */}
             {post.coverImage && (
@@ -677,6 +677,25 @@ export default function PostPage({ params }: PostPageProps) {
                 <div className="text-gray-800 dark:text-gray-200 leading-relaxed">
                   <MarkdownViewer content={post.content || ''} className="w-full" />
                 </div>
+                
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">TAGGED IN</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <Link
+                          key={tag}
+                          href={`/blog?tag=${encodeURIComponent(tag)}`}
+                          className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200/50 dark:border-blue-800/50 hover:bg-blue-200/70 dark:hover:bg-blue-800/50 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {tag}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.article>
