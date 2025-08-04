@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { debounce } from 'lodash';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,11 @@ import { BlogPostFormValues } from '@/lib/schemas/blog';
 import { blogPostSchema } from '@/lib/schemas/blog';
 import { useMarkdownEditor } from './MarkdownEditorContext';
 import MarkdownEditor from './MarkdownEditor';
+
+interface BlogDraft extends BlogPostFormValues {
+  id: string;
+  updatedAt: string;
+}
 
 interface BlogPostFormProps {
   initialData?: BlogPostFormValues;
@@ -33,8 +39,11 @@ export default function BlogPostForm({
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
 
-  // Initialize form with default values
+  // Initialize form
   const form = useForm<BlogPostFormValues>({
     resolver: zodResolver(blogPostSchema),
     defaultValues: {
@@ -47,6 +56,73 @@ export default function BlogPostForm({
       ...initialData
     },
   });
+
+  // Generate a unique ID for this draft
+  useEffect(() => {
+    if (!draftId) {
+      setDraftId(`draft_${Date.now()}`);
+    }
+  }, [draftId]);
+
+  // Load draft from localStorage on initial render
+  useEffect(() => {
+    if (initialData?.title) return; // Skip if editing existing post
+    
+    const savedDrafts: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
+    const mostRecentDraft = Object.entries(savedDrafts)
+      .sort(([_, a], [__, b]) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )[0]?.[1];
+
+    if (mostRecentDraft) {
+      // Only include fields that exist in BlogPostFormValues
+      const { id, updatedAt, ...draftData } = mostRecentDraft;
+      form.reset(draftData);
+      setLastSaved(new Date(updatedAt));
+      setDraftId(id);
+      
+      // Ask user if they want to restore the draft
+      if (confirm('Found an unsaved draft. Would you like to restore it?')) {
+        toast.success('Draft restored');
+      }
+    }
+  }, [form, initialData]);
+
+  // Save draft to localStorage with debounce
+  const saveDraft = useCallback(
+    debounce(async (data: BlogPostFormValues) => {
+      if (!draftId) return;
+      
+      setIsDraftSaving(true);
+      
+      try {
+        const draft: BlogDraft = {
+          ...data,
+          id: draftId,
+          updatedAt: new Date().toISOString(),
+        };
+        
+        const savedDrafts: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
+        savedDrafts[draftId] = draft;
+        localStorage.setItem('blogDrafts', JSON.stringify(savedDrafts));
+        
+        setLastSaved(new Date());
+      } catch (error) {
+        console.error('Error saving draft:', error);
+      } finally {
+        setIsDraftSaving(false);
+      }
+    }, 1000), // Debounce for 1 second
+    [draftId]
+  );
+
+  // Watch for form changes to trigger autosave
+  const watchedFields = form.watch();
+  useEffect(() => {
+    if (form.formState.isDirty && draftId) {
+      saveDraft(watchedFields);
+    }
+  }, [watchedFields, form.formState.isDirty, saveDraft, draftId]);
 
   const { 
     register, 
@@ -390,19 +466,40 @@ export default function BlogPostForm({
         </div>
       )}
 
-      <div className="flex justify-end gap-4 pt-6">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isSubmitting ? 'Publishing...' : 'Publish'}
-        </Button>
+      <div className="mt-6 flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {lastSaved && !isDraftSaving && (
+            <span>Draft saved {new Date(lastSaved).toLocaleTimeString()}</span>
+          )}
+          {isDraftSaving && (
+            <span className="flex items-center">
+              <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+              Saving...
+            </span>
+          )}
+        </div>
+        <div className="space-x-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push('/blog')}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isEditing ? 'Updating...' : 'Publishing...'}
+              </>
+            ) : isEditing ? (
+              'Update Post'
+            ) : (
+              'Publish Post'
+            )}
+          </Button>
+        </div>
       </div>
     </form>
   );

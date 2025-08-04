@@ -12,17 +12,22 @@ import EditorToolbar from './EditorToolbar';
 import debounce from 'lodash/debounce';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
+import { LoadingSpinner } from '../ui/loading-spinner';
 
 // Lazy load the Monaco Editor
 const MonacoEditor = dynamic(
   () => import('@monaco-editor/react').then(mod => mod.default),
-  { ssr: false, loading: () => <div className="p-4">Loading editor...</div> }
+  { ssr: false, loading: () => <div className="p-4 flex items-center justify-center">
+    <LoadingSpinner />
+  </div> }
 );
 
 // Lazy load the MarkdownViewer to reduce initial bundle size
 const LazyMarkdownViewer = dynamic(() => import('./MarkdownViewer'), {
   ssr: false,
-  loading: () => <div className="p-4">Loading preview...</div>
+  loading: () => <div className="p-4 flex items-center justify-center">
+    <LoadingSpinner />
+  </div>
 });
 
 interface MarkdownEditorProps {

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import BlogPostForm from '@/components/blog/BlogPostForm';
 import { MarkdownEditorProvider } from '@/components/blog/MarkdownEditorContext';
 import { createBlogPost } from '@/lib/blog';
+import { calculateReadingTime } from '@/lib/readingTime';
 
 export default function NewBlogPostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,7 +68,7 @@ export default function NewBlogPostPage() {
         authorPhotoURL: user.photoURL || null,
         tags: tags,
         slug: slug,
-        readingTime: Math.ceil(data.content.split(/\s+/).length / 200) + ' min read',
+        readingTime: calculateReadingTime(data.content).text,
         viewCount: 0,
         isAdmin: user.email === 'rvimman@gmail.com' // Set admin status based on email
       });
@@ -85,7 +86,7 @@ export default function NewBlogPostPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl  text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-blue-500 dark:to-teal-400 font-bold mb-6">Create New Post</h1>
+      <h1 className="text-3xl  text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-blue-500 dark:to-blue-400 font-bold mb-6">Create New Post</h1>
       <MarkdownEditorProvider>
         <BlogPostForm 
           onSubmit={handleSubmit}

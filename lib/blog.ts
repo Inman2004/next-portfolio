@@ -134,6 +134,8 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
   }
 }
 
+import { calculateReadingTime } from './readingTime';
+
 export async function createBlogPost(postData: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>) {
   console.log('createBlogPost called with data:', { 
     ...postData, 
@@ -145,8 +147,12 @@ export async function createBlogPost(postData: Omit<BlogPost, 'id' | 'createdAt'
     const postsCollection = collection(db, BLOG_POSTS_COLLECTION);
     console.log('Collection initialized:', postsCollection);
     
+    // Calculate reading time if content exists
+    const readingTime = postData.content ? calculateReadingTime(postData.content).text : '1 min read';
+    
     const postWithTimestamps = {
       ...postData,
+      readingTime,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -179,22 +185,32 @@ export async function updateBlogPost(
   if (!id) {
     throw new Error('Post ID is required for update');
   }
-
-  const docRef = doc(db, BLOG_POSTS_COLLECTION, id);
   
-  // Only include fields that are defined in the update
-  const updateData: Record<string, any> = {
-    updatedAt: serverTimestamp(),
-  };
-
-  // Add only the fields that are defined in postData
-  Object.entries(postData).forEach(([key, value]) => {
-    if (value !== undefined) {
-      updateData[key] = value;
+  try {
+    // Create a clean update object with only defined values
+    const updateData: Record<string, any> = {};
+    
+    // Copy all defined properties from postData to updateData
+    Object.entries(postData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        updateData[key] = value;
+      }
+    });
+    
+    // If content is being updated, recalculate reading time
+    if (updateData.content) {
+      updateData.readingTime = calculateReadingTime(updateData.content).text;
     }
-  });
-
-  await updateDoc(docRef, updateData);
+    
+    // Always update the updatedAt timestamp
+    updateData.updatedAt = serverTimestamp();
+    
+    // Perform the update
+    await updateDoc(doc(db, BLOG_POSTS_COLLECTION, id), updateData);
+  } catch (error) {
+    console.error(`Error updating blog post ${id}:`, error);
+    throw new Error(`Failed to update blog post: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 export async function deleteBlogPost(id: string) {

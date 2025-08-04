@@ -40,4 +40,5 @@ export interface PostData {
   tags?: string[];
   // Keep image for backward compatibility
   image?: string;
+  readingTime?: string;
 }

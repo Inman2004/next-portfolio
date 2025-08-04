@@ -20,5 +20,6 @@ export interface BlogPost {
   createdAt: string | Date;
   updatedAt?: string | Date;
   publishedAt?: string | Date;
+  readingTime?: string;
   [key: string]: any;
 }

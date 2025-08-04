@@ -8,7 +8,7 @@ import { PostData } from '@/types';
 import { doc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getBlogPost } from '@/lib/blogUtils';
-import { Crown, Edit, Eye, ArrowLeft, Trash2, Share2, MoreHorizontal, Calendar, User as UserIcon, ChevronUp } from 'lucide-react';
+import { Crown, Edit, Eye, ArrowLeft, Trash2, Share2, MoreHorizontal, Calendar, User as UserIcon, ChevronUp, Clock } from 'lucide-react';
 import SocialShare from '@/components/SocialShare';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -547,7 +547,7 @@ export default function PostPage({ params }: PostPageProps) {
               )}
 
               {/* Author Info */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-gradient-to-l from-blue-100 shadow-sm to-blue-50 dark:from-teal-900/10 dark:to-blue-900/5 rounded-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 p-4 sm:p-6 bg-gradient-to-l from-blue-100 shadow-sm to-blue-50 dark:from-blue-900/10 dark:to-blue-900/5 rounded-2xl">
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                   <UserAvatar
                     photoURL={typeof post.author.photoURL === 'string' ? post.author.photoURL : undefined}
@@ -587,6 +587,12 @@ export default function PostPage({ params }: PostPageProps) {
                         <Eye className="w-4 h-4 flex-shrink-0" />
                         <span>{formatNumber(views)} view{views === 1 ? '' : 's'}</span>
                       </div>
+                      {post.readingTime && (
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4 flex-shrink-0" />
+                          <span>{post.readingTime}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -603,7 +609,7 @@ export default function PostPage({ params }: PostPageProps) {
               </div>
 
               {/* Desktop Action Bar */}
-              <div className="hidden sm:flex items-center justify-between gap-4 mb-8 p-4 bg-gradient-to-r from-blue-100 shadow-sm to-blue-50 dark:from-teal-900/10 dark:to-blue-900/5 rounded-2xl">
+              <div className="hidden sm:flex items-center justify-between gap-4 mb-8 p-4 bg-gradient-to-r from-blue-100 shadow-sm to-blue-50 dark:from-blue-900/10 dark:to-blue-900/5 rounded-2xl">
                 <div className="flex items-center gap-4">
                   <SocialShare 
                     url={`/blog/${post.id}`}

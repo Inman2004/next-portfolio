@@ -447,133 +447,6 @@ export default function BlogPage() {
     return dateObj.toISOString();
   };
 
-  const handleDelete = async (postId: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const toastId = toast.custom((t) => (
-      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'
-        } max-w-md w-full bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex flex-col border border-gray-700 overflow-hidden`}>
-        <div className="p-4">
-          <div className="flex items-start">
-            <div className="flex-shrink-0 pt-0.5">
-              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-400" />
-              </div>
-            </div>
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-white">Delete Post</p>
-              <p className="mt-1 text-sm text-gray-400">Are you sure you want to delete this post? This action cannot be undone.</p>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end space-x-3">
-            <button
-              onClick={() => {
-                toast.dismiss(toastId);
-              }}
-              className="px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={async () => {
-                toast.dismiss(toastId);
-                try {
-                  if (!user?.uid) {
-                    throw new Error('You must be logged in to delete posts');
-                  }
-
-                  setDeletingId(postId);
-                  const result = await deleteBlogPost(postId, user.uid);
-
-                  if (result.success) {
-                    toast.success('Post deleted successfully', { id: 'delete-success' });
-                    // Remove the deleted post from the UI
-                    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
-                  } else {
-                    throw new Error(result.error || 'Failed to delete post');
-                  }
-                } catch (error) {
-                  console.error('Error deleting post:', error);
-                  toast.error(error instanceof Error ? error.message : 'Failed to delete post', { id: 'delete-error' });
-                } finally {
-                  setDeletingId(null);
-                }
-              }}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
-            >
-              {deletingId === postId ? (
-                <span className="flex items-center">
-                  <Loader className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Deleting...
-                </span>
-              ) : 'Delete'}
-            </button>
-          </div>
-        </div>
-      </div>
-    ), {
-      id: 'delete-confirmation',
-      duration: 10000, // 10 seconds
-      position: 'bottom-center',
-    });
-  };
-
-  const handleDeletePost = (postId: string, postTitle: string) => {
-    toast(
-      (t) => (
-        <div className="p-4">
-          <p className="font-medium mb-3">Delete "{postTitle}"?</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">This action cannot be undone.</p>
-          <div className="flex justify-end space-x-3">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  if (!user) return;
-                  setDeletingId(postId);
-                  const result = await deleteBlogPost(postId, user.uid);
-
-                  if (result.success) {
-                    toast.success('Post deleted successfully', { id: 'delete-success' });
-                    // Remove the deleted post from the UI
-                    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
-                    toast.dismiss(t.id);
-                  } else {
-                    throw new Error(result.error || 'Failed to delete post');
-                  }
-                } catch (error) {
-                  console.error('Error deleting post:', error);
-                  toast.error(error instanceof Error ? error.message : 'Failed to delete post', { id: 'delete-error' });
-                } finally {
-                  setDeletingId(null);
-                }
-              }}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
-              disabled={deletingId === postId}
-            >
-              {deletingId === postId ? (
-                <span className="flex items-center">
-                  <Loader className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  Deleting...
-                </span>
-              ) : 'Delete'}
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        id: 'delete-confirmation',
-        duration: 10000, // 10 seconds
-        position: 'bottom-center',
-      }
-    );
-  };
 
   if (loading) {
     return (
@@ -629,7 +502,7 @@ export default function BlogPage() {
         </div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
       {/* Hero Section */}
-      <div className="relative overflow-hidden py-20 md:py-28">
+      <div className="relative overflow-hidden py-24 md:py-16">
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className="relative">
             <motion.span
@@ -641,7 +514,7 @@ export default function BlogPage() {
               Blogs
             </motion.span>
             <motion.h1
-              className="relative z-10 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-600 from-indigo-600 dark:to-purple-500 dark:from-indigo-500 p-2"
+              className="relative z-1 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-600 from-indigo-600 dark:to-purple-500 dark:from-indigo-500 p-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -659,7 +532,7 @@ export default function BlogPage() {
               <span className="block">
                 Harness the power of social proof to
 
-                <span className="text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-teal-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-blue-400">
                   &nbsp;inspire one another as you create, share, and learn together.
                 </span>
               </span>
@@ -807,7 +680,7 @@ export default function BlogPage() {
               {searchQuery.trim() && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  className="mt-2 text-sm text-blue-600 dark:text-violet-400 hover:underline"
                 >
                   Clear search
                 </button>
@@ -831,7 +704,7 @@ export default function BlogPage() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4, delay: index * 0.1 }}
                       whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-                      className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-500/30 ${post.isAdmin
+                      className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-gray-900/50 dark:hover:shadow-violet-500/30 ${post.isAdmin
                           ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 hover:!shadow-amber-500/30 dark:hover:!shadow-amber-500/30'
                           : 'border-gray-00/70 dark:border-gray-700/50 bg-card/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
                         }`}
@@ -843,26 +716,12 @@ export default function BlogPage() {
                             Admin
                           </div>
                         )}
-                        {isAdmin && (
-                          <button
-                            onClick={(e) => handleDelete(postId, e)}
-                            disabled={deletingId === postId}
-                            className="p-1.5 bg-red-500/90 text-white rounded-full hover:bg-red-600 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                            aria-label="Delete post"
-                          >
-                            {deletingId === postId ? (
-                              <Loader className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        )}
                       </div>
                       <Link href={`/blog/${postId}`} className="flex flex-col h-full">
                         {/* Cover Image */}
                         <div className={`h-48 relative overflow-hidden ${post.isAdmin
                             ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30'
-                            : 'bg-gradient-to-r from-blue-500/30 dark:from-blue-900/30 dark:to-purple-900/30 to-indigo-500/30'
+                            : 'bg-gradient-to-br from-gray-900/30 dark:from-violet-900/30 dark:to-gray-900/30 to-gray-500/30'
                           }`}>
                           {post.coverImage ? (
                             <div className="relative w-full h-full">
@@ -887,7 +746,7 @@ export default function BlogPage() {
                               <PostTitle>
                                 {post.title}
                               </PostTitle>
-                              {post.excerpt ? (
+                              {/* {post.excerpt ? (
                                 <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
                                   {post.excerpt}
                                 </p>
@@ -899,13 +758,13 @@ export default function BlogPage() {
                                 <p className="text-gray-400 dark:text-gray-600 text-sm italic">
                                   No content preview available
                                 </p>
-                              )}
+                              )} */}
                               {post.tags && post.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                <div className="flex flex-wrap gap-1.5 mt-2 mx-2">
                                   {post.tags.slice(0, 3).map(tag => (
                                     <span 
                                       key={tag} 
-                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200/50 dark:border-blue-800/50 cursor-pointer hover:bg-blue-200/70 dark:hover:bg-blue-800/50 transition-colors"
+                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700/50 dark:bg-violet-900/30 text-white dark:text-violet-200 border border-gray-900/50 dark:border-violet-800/50 cursor-pointer hover:bg-blue-200/70 dark:hover:bg-violet-800/50 transition-colors"
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -926,11 +785,11 @@ export default function BlogPage() {
                           )}
                           <div className={`absolute inset-0 bg-gradient-to-t ${post.isAdmin
                               ? 'from-amber-900/80 dark:from-amber-900/80'
-                              : 'from-indigo-500/50 dark:from-indigo-900/70'
+                              : 'from-gray-900/50 dark:from-violet-900/70'
                             } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}>
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all ${post.isAdmin
                                 ? 'bg-amber-400/90 hover:bg-amber-300 text-amber-900 dark:bg-yellow-500/90 dark:hover:bg-yellow-400/90 dark:text-yellow-900'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500/90 dark:hover:bg-blue-400/90'
+                                : 'bg-gray-600 hover:bg-gray-700 text-white dark:bg-violet-500/90 dark:hover:bg-violet-400/90'
                               }`}>
                               Read More
                               <ArrowRight className="w-3.5 h-3.5 ml-1.5 -mr-0.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -941,14 +800,14 @@ export default function BlogPage() {
                         {/* Post Content */}
                         <div className="p-6 flex-1 flex flex-col">
                           <div className="flex-1">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-gray-600 dark:group-hover:text-violet-400 transition-colors">
                               {post.title}
                             </h2>
-                            {post.excerpt && (
+                            {/* {post.excerpt && (
                               <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 prose prose-sm dark:prose-invert max-w-none">
-                                {/* <MarkdownViewer content={post.excerpt} /> */}
+                                <MarkdownViewer content={post.excerpt} />
                               </div>
-                            )}
+                            )} */}
                           </div>
 
                           {/* Post Meta */}
@@ -977,7 +836,7 @@ export default function BlogPage() {
                                           ? (post.author as any).username
                                           : post.username)
                                         }`}
-                                      className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                      className="text-sm font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-violet-400 transition-colors"
                                       onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                     >
                                       {post.author && typeof post.author === 'object' && 'name' in post.author
@@ -1014,7 +873,7 @@ export default function BlogPage() {
           {/* Loading indicator for infinite scroll */}
           {loadingMore && (
             <div className="col-span-full flex justify-center py-8">
-              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900 dark:border-violet-500"></div>
             </div>
           )}
 
