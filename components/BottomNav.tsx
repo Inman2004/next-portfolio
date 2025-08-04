@@ -389,14 +389,31 @@ export function BottomNav() {
                 className="flex items-center space-x-2 focus:outline-none"
                 aria-expanded={showDropdown}
                 aria-haspopup="true"
-              >
+              >                {isExpanded && (
+                <div className="flex items-center gap-2 bg-gray-100/50 dark:bg-gray-800/50 rounded-md p-2">
                 <UserAvatar
                   photoURL={user.photoURL?.startsWith('user://') ? `user_${user.uid}` : user.photoURL || undefined}
                   displayName={user.displayName || 'User'}
                   compact
-                  className="h-8 w-8"
+                  className={`h-8 w-8 cursor-pointer transition-all duration-200 ease-in-out`}
                   title={user.displayName || 'User'}
                 />
+
+                <div className="flex flex-col text-left">
+                <p className="text-xs text-muted-foreground truncate">{user.displayName || 'User'}</p>
+                <p className="text-xs text-muted truncate">{user.email}</p>
+                </div>
+              </div>
+              )}
+              {!isExpanded && (
+              <UserAvatar
+                  photoURL={user.photoURL?.startsWith('user://') ? `user_${user.uid}` : user.photoURL || undefined}
+                  displayName={user.displayName || 'User'}
+                  compact
+                  className={`h-8 w-8 cursor-pointer ${isExpanded ? 'hidden' : 'block'} transition-all duration-200 ease-in-out`}
+                  title={user.displayName || 'User'}
+                />
+              )}
               </button>
 
               <AnimatePresence>

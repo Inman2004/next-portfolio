@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import BlogPostForm from '@/components/BlogPostForm';
-import { MarkdownEditorProvider } from '@/components/MarkdownEditorContext';
+import BlogPostForm from '@/components/blog/BlogPostForm';
+import { MarkdownEditorProvider } from '@/components/blog/MarkdownEditorContext';
 import { createBlogPost } from '@/lib/blog';
 
 export default function NewBlogPostPage() {

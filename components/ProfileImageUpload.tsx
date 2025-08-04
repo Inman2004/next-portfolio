@@ -125,43 +125,6 @@ const ProfileImageUpload = ({
   }, [handleFileSelect]);
 
   // Handle the actual file upload to Cloudinary
-  // Function to delete old profile image
-  const deleteOldProfileImage = useCallback(async (userId: string) => {
-    try {
-      if (!userId) {
-        console.log('No user ID provided for image deletion');
-        return { success: false, error: 'No user ID provided' };
-      }
-      
-      console.log('Attempting to delete old profile image for user:', userId);
-      const publicId = userId; // Just the user ID, folder is handled by the preset
-      console.log('Using publicId for deletion:', publicId);
-      
-      const response = await fetch('/api/cloudinary/delete-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          publicId,
-          resourceType: 'image'
-        })
-      });
-      
-      const result = await response.json();
-      console.log('Delete API response:', result);
-      
-      if (!response.ok) {
-        console.warn('Failed to delete old profile image:', result);
-        // Don't throw error, we can still try to upload new image
-      }
-      return result;
-    } catch (error) {
-      console.error('Error in deleteOldProfileImage:', error);
-      return { success: false, error };
-    }
-  }, []);
-
   // Helper function to compress image to under 200KB
   const compressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {

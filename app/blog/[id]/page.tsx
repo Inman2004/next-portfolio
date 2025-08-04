@@ -18,7 +18,7 @@ import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { auth } from '@/lib/firebase';
 import { incrementViewCount, getViewCount } from '@/lib/views';
 import { formatNumber } from '@/lib/formatNumber';
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownViewer from '@/components/blog/MarkdownViewer';
 import { Button } from "@/components/ui/button";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { UserAvatar } from '@/components/ui/UserAvatar';

@@ -4,8 +4,8 @@ import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLA
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { Copy, Check, ArrowUpRight } from 'lucide-react';
-import { ScrollArea, ScrollBar } from './ui/scroll-area';
-import Mermaid from './Mermaid';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import Mermaid from '../Mermaid';
 // Import the Prism component type from react-syntax-highlighter
 import type { PrismLight } from 'react-syntax-highlighter';
 

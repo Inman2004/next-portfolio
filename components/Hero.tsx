@@ -44,27 +44,60 @@ export default function Hero() {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    const fetchLatestPost = async () => {
-      try {
-        const posts = await getBlogPosts({
-          limit: 1,
-          publishedOnly: true
-        });
-        if (posts.length > 0) {
-          setLatestPost(posts[0]);
-        }
-      } catch (error) {
-        console.error('Error fetching latest blog post:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Cache key for the latest post
+  const CACHE_KEY = 'latestBlogPost';
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
+  const fetchLatestPost = useCallback(async () => {
+    try {
+      // Check if we have a cached version that's still valid
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const now = new Date().getTime();
+      
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (now - timestamp < CACHE_DURATION) {
+          setLatestPost(data);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // If no valid cache, fetch fresh data
+      const posts = await getBlogPosts({
+        limit: 1,
+        publishedOnly: true
+      });
+      
+      if (posts.length > 0) {
+        const postData = posts[0];
+        setLatestPost(postData);
+        
+        // Cache the result
+        const cacheData = {
+          data: postData,
+          timestamp: now
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      }
+    } catch (error) {
+      console.error('Error fetching latest blog post:', error);
+      // If there's an error but we have cached data, use that
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data } = JSON.parse(cachedData);
+        setLatestPost(data);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     if (isClient) {
       fetchLatestPost();
     }
-  }, [isClient]);
+  }, [isClient, fetchLatestPost]);
   return (
     <section
       id="home"
@@ -154,7 +187,7 @@ export default function Hero() {
         whileHover={{ scale: 1.02 }}
         className="group relative mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/50 dark:to-indigo-900/20 border border-blue-900 dark:border-indigo-900/50 cursor-pointer transition-all duration-300 hover:shadow-lg"
       >
-        <span className="absolute -top-2 -right-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
+        <span className="absolute -top-2 -right-2 bg-gray-100 dark:bg-gray-900/50 text-orange-800 dark:text-gray-200 border border-gray-900 dark:border-gray-700 text-sm font-medium px-2.5 py-0.5 rounded-full">
           New <FaBlog className="inline text-lg text-orange-500 dark:text-orange-400" />
         </span>
         <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Latest Blog</p>
@@ -198,7 +231,7 @@ export default function Hero() {
                 href="/personal"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 sm:px-8 py-3 sm:py-4 border border-blue-500/30 dark:border-blue-500/30 rounded-lg text-base sm:text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white w-full sm:w-auto"
+                className="px-6 sm:px-8 py-3 sm:py-4 border border-blue-500 dark:border-blue-500/30 dark:hover:border-blue-500 rounded-lg text-base sm:text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white w-full sm:w-auto"
               >
                 Get to know me
               </motion.a>

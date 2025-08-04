@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { FiGithub, FiTwitter, FiLinkedin, FiGlobe, FiCalendar, FiMapPin } from 'react-icons/fi';
 import Link from 'next/link';
 import { UserAvatar } from '@/components/ui/UserAvatar';
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownViewer from '@/components/blog/MarkdownViewer';
 
 // Types
 import { BlogPost } from '@/types/blog';

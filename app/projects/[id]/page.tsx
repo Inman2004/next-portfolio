@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Github, ExternalLink, BookOpen, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTechColor } from '@/components/skillColors';
-import MarkdownViewer from '@/components/MarkdownViewer';
+import MarkdownViewer from '@/components/blog/MarkdownViewer';
 
 interface ProjectPageProps {
   params: {

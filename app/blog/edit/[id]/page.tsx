@@ -7,8 +7,8 @@ import { getBlogPostById, updateBlogPost } from '@/lib/blog';
 import { BlogPost } from '@/types/blog';
 import { blogPostSchema, BlogPostFormValues } from '@/lib/schemas/blog';
 import { toast } from 'sonner';
-import BlogPostForm from '@/components/BlogPostForm';
-import { MarkdownEditorProvider } from '@/components/MarkdownEditorContext';
+import BlogPostForm from '@/components/blog/BlogPostForm';
+import { MarkdownEditorProvider } from '@/components/blog/MarkdownEditorContext';
 
 function EditPostWithForm({ postId }: { postId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);

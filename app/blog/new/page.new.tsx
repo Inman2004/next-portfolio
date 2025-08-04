@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import BlogPostForm from '@/components/BlogPostForm';
+import BlogPostForm from '@/components/blog/BlogPostForm';
 
 export default function NewBlogPostPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);

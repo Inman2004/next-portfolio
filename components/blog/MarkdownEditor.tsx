@@ -10,8 +10,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import dynamic from 'next/dynamic';
 import EditorToolbar from './EditorToolbar';
 import debounce from 'lodash/debounce';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
-import { Label } from './ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Label } from '../ui/label';
 
 // Lazy load the Monaco Editor
 const MonacoEditor = dynamic(
@@ -299,13 +299,13 @@ function MarkdownEditorComponent({
         { token: 'attribute.value', foreground: 'A5D6A7' },
       ],
       colors: {
-        'editor.background': '#0F172A',
+        'editor.background': '#1A202C',
         'editor.foreground': '#D4D4D4',
-        'editor.lineHighlightBackground': '#042f2e',
-        'editor.lineHighlightBorder': '#134e5c',
-        'editor.selectionBackground': '#134e4a',
+        'editor.lineHighlightBackground': '#f4b5',
+        'editor.lineHighlightBorder': '#fff',
+        'editor.selectionBackground': '#f4b5',
         'editor.inactiveSelectionBackground': '#1E293B',
-        'editorCursor.foreground': '#14b8a6',
+        'editorCursor.foreground': '#f4b',
         'editorLineNumber.foreground': '#4B5563',
         'editorLineNumber.activeForeground': '#9CA3AF',
         'editor.selectionHighlightBorder': '#334155',
@@ -331,12 +331,12 @@ function MarkdownEditorComponent({
         { token: 'attribute.value', foreground: '059669' }, // green-600
       ],
       colors: {
-        'editor.background': '#F9FAFB',
+        'editor.background': '#E5E7EB',
         'editor.foreground': '#1F2937',
-        'editor.lineHighlightBackground': '#F168F6',
-        'editor.lineHighlightBorder': '#E5E7EB',
-        'editor.selectionBackground': '#DBEAFE',
-        'editor.inactiveSelectionBackground': '#EFF6FF',
+        'editor.lineHighlightBackground': '#F189F6',
+        'editor.lineHighlightBorder': '#000',
+        'editor.selectionBackground': '#3aFE',
+        'editor.inactiveSelectionBackground': '#3aeffF',
         'editorCursor.foreground': '#3B82F6',
         'editorLineNumber.foreground': '#9CA3AF',
         'editorLineNumber.activeForeground': '#4B5563',
@@ -770,14 +770,8 @@ function MarkdownEditorComponent({
   ), [showFloatingToolbar, toolbarPosition, handleFormatAction]);
 
   return (
-    <div className={cn('w-full space-y-2 relative isolate', className)}>
-      {label && (
-        <label className="block text-sm font-medium text-foreground mb-1">
-          {label}
-        </label>
-      )}
-      
-      <Tabs 
+    <>
+    <Tabs 
         defaultValue="edit" 
         value={activeTab}
         onValueChange={setActiveTab}
@@ -789,13 +783,7 @@ function MarkdownEditorComponent({
             <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
           
-          {activeTab === 'edit' && isEditorReady && (
-            <EditorToolbar 
-              onFormatAction={handleFormatAction} 
-              onImageUpload={handleImageUpload}
-              onAddLink={handleAddLink}
-            />
-          )}
+          
           
           {activeTab === 'preview' && isDirty && (
             <Button 
@@ -808,7 +796,13 @@ function MarkdownEditorComponent({
             </Button>
           )}
         </div>
-        
+        {activeTab === 'edit' && isEditorReady && (
+            <EditorToolbar 
+              onFormatAction={handleFormatAction} 
+              onImageUpload={handleImageUpload}
+              onAddLink={handleAddLink}
+            />
+          )}
         <TabsContent value="edit" className="mt-0">
           <div 
             className="border rounded-md overflow-hidden"
@@ -823,19 +817,19 @@ function MarkdownEditorComponent({
                 onChange={handleEditorChange}
                 onMount={handleEditorDidMount}
                 options={{
-                  minimap: { enabled: false },
+                  minimap: { enabled: true },
                   scrollBeyondLastLine: false,
                   fontSize: 14,
                   wordWrap: 'on',
                   automaticLayout: true,
                   lineNumbers: 'off',
-                  glyphMargin: false,
+                  glyphMargin: true,
                   folding: false,
                   lineDecorationsWidth: 0,
                   lineNumbersMinChars: 0,
-                  renderLineHighlight: 'none',
+                  renderLineHighlight: 'gutter',
                   scrollbar: {
-                    vertical: 'hidden',
+                    vertical: 'visible',
                     horizontal: 'hidden',
                   },
                 }}
@@ -854,6 +848,14 @@ function MarkdownEditorComponent({
           </div>
         </TabsContent>
       </Tabs>
+    <div className={cn('w-full space-y-2 relative isolate', className)}>
+      {label && (
+        <label className="block text-sm font-medium text-foreground mb-1">
+          {label}
+        </label>
+      )}
+      
+      
       
       {isUploading && (
         <div className="text-sm text-muted-foreground">Uploading image...</div>
@@ -1009,6 +1011,7 @@ function MarkdownEditorComponent({
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
 

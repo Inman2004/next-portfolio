@@ -309,7 +309,7 @@ export default function EditorToolbar({ onFormatAction, onImageUpload, onAddLink
     return (
         <>
             <TooltipProvider>
-                <div className="flex flex-wrap items-center rounded mx-3 gap-1 p-1 border-b bg-muted/50">
+                <div className="flex flex-wrap items-center rounded gap-1 p-1 border-b bg-gray-300 dark:bg-gray-700">
                     {actions.map((action) => {
                         if (action.separator) {
                             return <div key={action.id} className="h-6 w-px bg-border mx-0.5" />;

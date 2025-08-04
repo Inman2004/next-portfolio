@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { getBlogPostById } from '@/lib/blog';
 import { toast } from 'sonner';
-import BlogPostForm from '@/components/BlogPostForm';
+import BlogPostForm from '@/components/blog/BlogPostForm';
 
 function EditPostWithForm({ postId }: { postId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);

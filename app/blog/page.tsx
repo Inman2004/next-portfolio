@@ -74,7 +74,7 @@ import dynamic from 'next/dynamic';
 
 // Dynamically import MarkdownViewer with no SSR to avoid hydration issues
 const MarkdownViewer = dynamic(
-  () => import('@/components/MarkdownViewer'),
+  () => import('@/components/blog/MarkdownViewer'),
   { ssr: false }
 );
 
