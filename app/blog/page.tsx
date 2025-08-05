@@ -47,8 +47,8 @@ const PostTitle = ({
 }: PostTitleProps) => (
   <div className="p-6 flex-1 flex flex-col">
     <p className={cn(
-      "text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2",
-      "group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors",
+      "text-xl font-thin bg-clip-text text-transparent bg-gradient-to-r from-gray-900/50 to-gray-700/50 dark:from-indigo-400/50 dark:to-violet-400/50 mb-3 line-clamp-2",
+      "group-hover:text-white dark:group-hover:text-gray-400 transition-colors",
       className
     )}>
       {children}

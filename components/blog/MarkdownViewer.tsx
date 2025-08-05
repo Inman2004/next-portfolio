@@ -3,6 +3,7 @@
 import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLAttributes, CSSProperties, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
+import { generateHeadingId, resetHeadingCounter } from '@/lib/markdownUtils';
 import { Copy, Check, ArrowUpRight } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import Mermaid from '../Mermaid';
@@ -373,6 +374,8 @@ interface MarkdownViewerProps {
 }
 
 function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
+  // Reset the heading counter before processing content
+  resetHeadingCounter();
   // Process content to handle mermaid code blocks
   const processedContent = useMemo(() => {
     // Convert mermaid code blocks to a format we can handle
@@ -444,12 +447,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           a: CustomLink,
           h1: ({node, ...props}) => {
             const text = String(props.children || '');
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\s-]/g, '')
-              .replace(/\s+/g, '-')
-              .replace(/-+/g, '-')
-              .replace(/^-+|-+$/g, '');
+            const id = generateHeadingId(text);
               
             return (
               <h1 
@@ -468,41 +466,10 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
           h2: ({node, ...props}) => {
             const text = String(props.children || '');
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\s-]/g, '')
-              .replace(/\s+/g, '-')
-              .replace(/-+/g, '-')
-              .replace(/^-+|-+$/g, '');
+            const id = generateHeadingId(text);
               
             return (
               <h2 
-                id={id}
-                className="text-3xl md:text-4xl font-bold mt-12 mb-6 pt-2 relative pl-8 scroll-mt-20"
-                {...props}
-              >
-                <a href={`#${id}`} className="no-underline hover:underline">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-indigo-100 dark:bg-teal-900/50 flex items-center justify-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
-                  </span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-teal-400 dark:to-blue-400">
-                    {props.children}
-                  </span>
-                </a>
-              </h2>
-            );
-          },
-          h3: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = text
-              .toLowerCase()
-              .replace(/[^\w\s-]/g, '')
-              .replace(/\s+/g, '-')
-              .replace(/-+/g, '-')
-              .replace(/^-+|-+$/g, '');
-              
-            return (
-              <h3 
                 id={id}
                 className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-indigo-300 dark:border-teal-700/50 scroll-mt-16"
                 {...props}
@@ -513,6 +480,27 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                     {props.children}
                   </span>
                 </a>
+              </h2>
+            );
+          },
+          h3: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = generateHeadingId(text);
+              
+            return (
+              <h3 
+              id={id}
+              className="text-3xl md:text-2xl font-bold mt-12 mb-6 pt-2 relative pl-8 scroll-mt-20"
+              {...props}
+            >
+              <a href={`#${id}`} className="no-underline hover:underline">
+                <span className="absolute left-0 top-1/2 -translate-y-1/3 w-6 h-6 rounded-full bg-indigo-400/50 dark:bg-teal-900/50 flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
+                </span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-teal-400 dark:to-blue-400/80">
+                  {props.children}
+                </span>
+              </a>
               </h3>
             );
           },
@@ -521,8 +509,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
               className="text-xl md:text-2xl font-semibold mt-8 mb-3 pl-4 relative"
               {...props}
             >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-500 dark:bg-blue-400"></span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-teal-300 dark:to-blue-400">
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 dark:from-gray-100 dark:to-gray-400">
                 {props.children}
               </span>
             </h4>
@@ -617,7 +605,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
 
           blockquote: (props) => (
-            <blockquote className="border-l-4 border-indigo-400 dark:border-indigo-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-r" {...props} />
+            <blockquote className="border-l-4 border-indigo-400 dark:border-teal-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
             <div className="overflow-x-auto my-8 rounded-xl border border-indigo-300 dark:border-teal-700/50 shadow-sm">
