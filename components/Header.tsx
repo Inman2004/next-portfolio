@@ -385,6 +385,13 @@ export default function Header() {
                         size={32}
                         className="w-full h-full"
                         title={displayName || 'User'}
+                        asLink={!!user?.username}
+                        linkHref={user?.username ? `/users/${user.username}` : undefined}
+                        onClick={(e) => {
+                          if (user?.username) {
+                            e.stopPropagation();
+                          }
+                        }}
                       />
                     </div>
                   );

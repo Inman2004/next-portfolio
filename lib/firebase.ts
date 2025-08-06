@@ -30,13 +30,7 @@ const initializeFirebase = () => {
     return; // Already initialized
   }
 
-  // Debug logging in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Initializing Firebase with config:', {
-      ...firebaseConfig,
-      apiKey: firebaseConfig.apiKey ? '***' : 'MISSING',
-    });
-  }
+  // Firebase initialization in development is silent
 
   try {
     firebaseApp = initializeApp(firebaseConfig);

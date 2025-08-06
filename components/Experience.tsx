@@ -25,13 +25,6 @@ type ExperienceCardProps = {
 };
 
 const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
-  console.log('Rendering ExperienceCard with:', {
-    id: exp.id,
-    company: exp.company,
-    status: exp.status,
-    hasStatus: 'status' in exp,
-    exp: JSON.stringify(exp, null, 2)
-  });
   // Format status for display
   const formatStatus = (status: ExperienceStatus): string => {
     return status
@@ -291,6 +284,8 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
   );
 };
 
+
+
 export default function Experience() {
   const [experiences, setExperiences] = useState<ExperienceType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -300,32 +295,25 @@ export default function Experience() {
     const loadExperiences = async () => {
       try {
         setLoading(true);
-        console.log('Fetching experiences...');
         const data = await fetchExperiences();
-        console.log('Fetched experiences:', data);
         
         if (Array.isArray(data) && data.length > 0) {
-          console.log('Setting experiences with data:', data.map(d => ({
-            id: d.id,
-            company: d.company,
-            status: d.status,
-            hasStatus: 'status' in d
-          })));
           setExperiences(data);
         } else {
           throw new Error('No experience data found');
         }
       } catch (err) {
-        console.error('Failed to load experiences:', err);
         setError('Failed to load experiences. Using fallback data.');
         
         // Try to load from local data as fallback
         try {
           const localData = await import('@/data/experiences');
-          console.log('Using local experiences data as fallback');
           setExperiences(localData.experiences);
         } catch (e) {
-          console.error('Failed to load fallback experiences:', e);
+          // Silently handle the error in production
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('Failed to load fallback experiences:', e);
+          }
         }
       } finally {
         setLoading(false);

@@ -122,8 +122,21 @@ const Comments = () => {
     setError('');
     
     try {
+      // Get user data from Firestore to get the username
+      let username = null;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          username = userData.username || null;
+        }
+      } catch (error) {
+        console.error('Error fetching user data for username:', error);
+      }
+      
       const commentData = {
         uid: user.uid,
+        username: username,
         displayName: user.displayName || 'Anonymous',
         photoURL: user.photoURL || null,
         content: content.trim(),

@@ -1,9 +1,11 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Trash2, Pin, Crown } from 'lucide-react';
 import { formatNumber } from '@/lib/formatNumber';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import Link from 'next/link';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { CommentItemProps, ADMIN_EMAIL } from './types';
 import { isValidUrl } from '@/lib/urlUtils';
 
@@ -15,6 +17,37 @@ export const CommentItem = memo(({
   currentUser,
   isAdmin 
 }: CommentItemProps) => {
+  const [resolvedUsername, setResolvedUsername] = useState<string | null>(comment.username || null);
+  const [isLoadingUsername, setIsLoadingUsername] = useState(false);
+
+  // Fetch username if not available
+  useEffect(() => {
+    if (!comment.username && comment.uid && !resolvedUsername) {
+      const fetchUsername = async () => {
+        setIsLoadingUsername(true);
+        try {
+          const userDoc = await getDoc(doc(db, 'users', comment.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData.username) {
+              setResolvedUsername(userData.username);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching username:', error);
+        } finally {
+          setIsLoadingUsername(false);
+        }
+      };
+      
+      fetchUsername();
+    }
+  }, [comment.uid, comment.username, resolvedUsername]);
+
+  // Use resolved username or fallback to uid for navigation
+  const profileLink = resolvedUsername ? `/users/${resolvedUsername}` : comment.uid ? `/users/${comment.uid}` : null;
+  const isClickable = !!profileLink;
+
   const isAdminComment = comment.email === ADMIN_EMAIL;
   const isCurrentUserAdmin = currentUser?.email === ADMIN_EMAIL;
   const isCommentAuthor = currentUser?.uid === comment.uid;
@@ -81,26 +114,44 @@ export const CommentItem = memo(({
                 <Crown className="w-5 h-5 text-yellow-500" />
               </motion.div>
             )}
-            <UserAvatar
-              photoURL={comment.user?.photoURL || comment.photoURL}
-              displayName={comment.user?.displayName || comment.displayName || 'User'}
-              size={40}
-              asLink={!!comment.username}
-              linkHref={comment.username ? `/users/${comment.username}` : undefined}
-              onClick={(e) => {
-                console.log('Avatar clicked for user:', comment.username);
-                e?.stopPropagation();
-              }}
-              className={`group ${comment.username ? 'hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50' : ''}`}
-              title={comment.username ? `View ${comment.user?.displayName || comment.displayName || 'user'}'s profile` : undefined}
-            />
+            <div className="relative">
+              <UserAvatar
+                photoURL={comment.user?.photoURL || comment.photoURL}
+                displayName={comment.user?.displayName || comment.displayName || 'User'}
+                size={40}
+                asLink={isClickable}
+                linkHref={profileLink || undefined}
+                onClick={(e) => {
+                  console.log('Avatar clicked for user:', resolvedUsername || comment.uid);
+                  console.log('Comment data:', {
+                    username: resolvedUsername,
+                    uid: comment.uid,
+                    displayName: comment.user?.displayName || comment.displayName,
+                    profileLink
+                  });
+                  e?.stopPropagation();
+                }}
+                className={`group ${isClickable ? 'hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50 cursor-pointer hover:scale-105 transition-all duration-200' : 'cursor-default opacity-75'}`}
+                title={isClickable ? `View ${comment.user?.displayName || comment.displayName || 'user'}'s profile` : 'User profile not available'}
+              />
+              {!isClickable && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gray-400 rounded-full border border-white dark:border-gray-800" 
+                     title="No profile available">
+                </div>
+              )}
+              {isLoadingUsername && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full border border-white dark:border-gray-800 animate-pulse" 
+                     title="Loading profile...">
+                </div>
+              )}
+            </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
               <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                {comment.username ? (
+                {isClickable ? (
                   <Link 
-                    href={`/users/${comment.username}`}
+                    href={profileLink!}
                     className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-semibold hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >

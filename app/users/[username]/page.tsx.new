@@ -1,0 +1,193 @@
+'use client';
+
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { User } from 'firebase/auth';
+import { format } from 'date-fns';
+import { FiGithub, FiTwitter, FiLinkedin, FiGlobe, FiMapPin, FiCalendar } from 'react-icons/fi';
+import Link from 'next/link';
+import { UserData, getUserByUsername } from '@/lib/userUtils';
+import { BlogPost } from '@/types/blog';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import MarkdownViewer from '@/components/blog/MarkdownViewer';
+
+// Constants
+const POSTS_PER_PAGE = 10;
+
+// Types
+type SocialLink = {
+  platform: string;
+  url: string;
+  icon: JSX.Element;
+};
+
+interface UserProfilePageProps {
+  params: {
+    username: string;
+  };
+}
+
+export default function UserProfilePage({ params }: UserProfilePageProps) {
+  // State management
+  const [user, setUser] = useState<UserData | null>(null);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [activeTab, setActiveTab] = useState<'posts' | 'about'>('posts');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+
+  // Memoize social links
+  const socialLinks = useMemo<SocialLink[]>(() => {
+    if (!user) return [];
+    
+    return [
+      ...(user.website ? [{
+        platform: 'website',
+        url: user.website.startsWith('http') ? user.website : `https://${user.website}`,
+        icon: <FiGlobe className="w-5 h-5" />
+      }] : []),
+      ...(user.github ? [{
+        platform: 'github',
+        url: `https://github.com/${user.github}`,
+        icon: <FiGithub className="w-5 h-5" />
+      }] : []),
+      ...(user.twitter ? [{
+        platform: 'twitter',
+        url: `https://twitter.com/${user.twitter.replace('@', '')}`,
+        icon: <FiTwitter className="w-5 h-5" />
+      }] : []),
+      ...(user.linkedin ? [{
+        platform: 'linkedin',
+        url: `https://linkedin.com/in/${user.linkedin}`,
+        icon: <FiLinkedin className="w-5 h-5" />
+      }] : [])
+    ];
+  }, [user]);
+
+  // Format join date
+  const joinDate = useMemo(() => 
+    user?.createdAt?.toDate
+      ? format(user.createdAt.toDate(), 'MMMM yyyy')
+      : null,
+    [user?.createdAt]
+  );
+
+  // Fetch user data
+  const fetchUserData = useCallback(async (username: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const userData = await getUserByUsername(username);
+      
+      if (!userData) {
+        throw new Error(`User not found with username: ${username}`);
+      }
+      
+      return userData;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
+  }, []);
+
+  // Fetch posts with pagination
+  const fetchPosts = useCallback(async (username: string, pageNum: number) => {
+    try {
+      const apiUrl = `/api/users/${encodeURIComponent(username)}/posts?limit=${POSTS_PER_PAGE}&page=${pageNum}`;
+      
+      // Get the current user's auth token
+      const { getAuth, onAuthStateChanged } = await import('firebase/auth');
+      const auth = getAuth();
+      
+      // Wait for auth state to be determined
+      const currentUser = await new Promise<User | null>((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+      
+      // Prepare headers with auth token if user is signed in
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (currentUser) {
+        try {
+          const token = await currentUser.getIdToken();
+          headers['Authorization'] = `Bearer ${token}`;
+        } catch (tokenError) {
+          console.error('Error getting auth token:', tokenError);
+        }
+      }
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers,
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to fetch posts');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      throw error;
+    }
+  }, []);
+
+  // Load initial data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Reset states
+        setPage(1);
+        setHasMore(true);
+        
+        // Fetch user data
+        const userData = await fetchUserData(params.username);
+        setUser(userData);
+        
+        // Fetch first page of posts
+        const postsData = await fetchPosts(params.username, 1);
+        setPosts(postsData.posts);
+        setHasMore(postsData.hasMore);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [params.username, fetchUserData, fetchPosts]);
+  
+  // Handle tab change
+  const handleTabChange = (tab: 'posts' | 'about') => {
+    setActiveTab(tab);
+  };
+  
+  // Load more posts
+  const loadMorePosts = async () => {
+    if (isLoading || !hasMore) return;
+    
+    try {
+      setIsLoading(true);
+      const nextPage = page + 1;
+      const postsData = await fetchPosts(params.username, nextPage);
+      
+      setPosts(prev => [...prev, ...postsData.posts]);
+      setPage(nextPage);
+      setHasMore(postsData.hasMore);
+    } catch (error) {
+      console.error('Error loading more posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };

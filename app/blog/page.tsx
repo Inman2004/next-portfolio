@@ -71,6 +71,7 @@ import type { BlogPost, EnrichedBlogPost, BlogPostUserData } from '@/types/blog'
 import { getViewCounts } from '@/lib/views';
 import { deleteBlogPost } from '@/app/actions/blog';
 import dynamic from 'next/dynamic';
+import ReactMarkdown from 'react-markdown';
 
 // Dynamically import MarkdownViewer with no SSR to avoid hydration issues
 const MarkdownViewer = dynamic(
@@ -138,20 +139,20 @@ export default function BlogPage() {
   // Get all unique tags from posts with counts
   const allTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
-    
+
     posts.forEach(post => {
       post.tags?.forEach(tag => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
     });
-    
+
     return Object.entries(tagCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
   }, [posts]);
 
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
-  
+
   const toggleTag = (tag: string) => {
     const newTags = new Set(selectedTags);
     if (newTags.has(tag)) {
@@ -161,7 +162,7 @@ export default function BlogPage() {
     }
     setSelectedTags(newTags);
   };
-  
+
   // Clear all selected tags
   const clearTags = () => {
     setSelectedTags(new Set());
@@ -178,7 +179,7 @@ export default function BlogPage() {
   const filteredAndSortedPosts = useMemo(() => {
     // First filter by search query
     let filtered = [...posts];
-    
+
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       filtered = filtered.filter((post) => {
@@ -190,10 +191,10 @@ export default function BlogPage() {
         );
       });
     }
-    
+
     // Then filter by selected tags if any
     if (selectedTags.size > 0) {
-      filtered = filtered.filter(post => 
+      filtered = filtered.filter(post =>
         post.tags?.some(tag => selectedTags.has(tag))
       );
     }
@@ -476,7 +477,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
@@ -500,61 +501,61 @@ export default function BlogPage() {
             </button>
           )}
         </div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
-      {/* Hero Section */}
-      <div className="relative overflow-hidden py-24 md:py-16">
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="relative">
-            <motion.span
-              className="absolute inset-0 mx-auto py-4 flex items-center justify-center w-full blur-xl bg-gradient-to-r from-indigo-900 via-indigo-500 to-blue-500 bg-clip-text text-4xl md:text-6xl font-extrabold text-transparent"
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/20 dark:from-blue-900/20 via-transparent to-transparent"></div>
+        {/* Hero Section */}
+        <div className="relative overflow-hidden py-24 md:py-16">
+          <div className="container mx-auto px-4 relative z-10 text-center">
+            <div className="relative">
+              <motion.span
+                className="absolute inset-0 mx-auto py-4 flex items-center justify-center w-full blur-xl bg-gradient-to-r from-indigo-900 via-indigo-500 to-blue-500 bg-clip-text text-4xl md:text-6xl font-extrabold text-transparent"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                Blogs
+              </motion.span>
+              <motion.h1
+                className="relative z-1 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-600 from-indigo-600 dark:to-purple-500 dark:from-indigo-500 p-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                Blogs
+              </motion.h1>
+            </div>
+            <motion.div
+              className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Blogs
-            </motion.span>
-            <motion.h1
-              className="relative z-1 text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-tr to-purple-600 from-indigo-600 dark:to-purple-500 dark:from-indigo-500 p-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              Blogs
-            </motion.h1>
+              <h1 className="text-xl font-thin tracking-tight text-gray-600 dark:text-gray-400 sm:text-2xl">
+                <span className="block">
+                  Harness the power of social proof to
+
+                  <span className="text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-blue-400">
+                    &nbsp;inspire one another as you create, share, and learn together.
+                  </span>
+                </span>
+              </h1>
+            </motion.div>
           </div>
+        </div>
+
+        {/* Blog Content */}
+        <div className="container mx-auto px-4 py-8 pb-20 max-w-7xl">
+          {/* Header with Create Button */}
           <motion.div
-            className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+            className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <h1 className="text-xl font-thin tracking-tight text-gray-600 dark:text-gray-400 sm:text-2xl">
-              <span className="block">
-                Harness the power of social proof to
-
-                <span className="text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-blue-400">
-                  &nbsp;inspire one another as you create, share, and learn together.
-                </span>
-              </span>
-            </h1>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Blog Content */}
-      <div className="container mx-auto px-4 py-8 pb-20 max-w-7xl">
-        {/* Header with Create Button */}
-        <motion.div
-          className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-              Latest Posts
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+                Latest Posts
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
             </div>
 
             {user && (
@@ -577,44 +578,44 @@ export default function BlogPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
               >
-              <button
-                onClick={() => setSortBy('newest')}
-                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'newest'
+                <button
+                  onClick={() => setSortBy('newest')}
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'newest'
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-600/50 dark:hover:bg-blue-600/50 hover:text-white'
-                  }`}
-              >
-                <Clock className="w-4 h-4 mr-2" />
-                Newest
-              </button>
-              <button
-                onClick={() => setSortBy('oldest')}
-                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'oldest'
+                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-500/40 dark:hover:bg-gray-600/50'
+                    }`}
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  Newest
+                </button>
+                <button
+                  onClick={() => setSortBy('oldest')}
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'oldest'
                     ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20'
-                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-600/50 dark:hover:bg-blue-600/50 hover:text-white'
-                  }`}
-              >
-                <ArrowUpDown className="w-4 h-4 mr-2" />
-                Oldest
-              </button>
-              <button
-                onClick={() => setSortBy('popular')}
-                className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'popular'
+                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-500/40 dark:hover:bg-gray-600/50'
+                    }`}
+                >
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  Oldest
+                </button>
+                <button
+                  onClick={() => setSortBy('popular')}
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${sortBy === 'popular'
                     ? 'bg-blue-600/90 dark:bg-blue-600/90 text-white shadow-lg shadow-blue-500/20'
-                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-600/50 dark:hover:bg-blue-600/50 hover:text-white'
-                  }`}
+                    : 'bg-gray-400/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-gray-500/40 dark:hover:bg-gray-600/50'
+                    }`}
+                >
+                  <Flame className="w-4 h-4 mr-2" />
+                  Most Popular
+                </button>
+              </motion.div>
+
+              <motion.div
+                className="w-full md:w-auto md:flex-1 max-w-md"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
               >
-                <Flame className="w-4 h-4 mr-2" />
-                Most Popular
-              </button>
-            </motion.div>
-            
-            <motion.div
-              className="w-full md:w-auto md:flex-1 max-w-md"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-            >
                 <BlogSearch
                   searchQuery={searchQuery}
                   onSearchChange={(query) => setSearchQuery(query)}
@@ -623,10 +624,10 @@ export default function BlogPage() {
                 />
               </motion.div>
             </div>
-            
+
             {/* Tags Filter */}
             {allTags.length > 0 && (
-              <motion.div 
+              <motion.div
                 className="flex flex-wrap gap-2 py-4 items-center"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -639,11 +640,10 @@ export default function BlogPage() {
                   <button
                     key={name}
                     onClick={() => toggleTag(name)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full transition-all ${
-                      selectedTags.has(name)
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full border border-gray-900/50 dark:border-gray-700/50 transition-all ${selectedTags.has(name)
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                         : 'bg-gray-200/70 dark:bg-gray-700/50 text-gray-800 dark:text-gray-200 hover:bg-gray-300/50 dark:hover:bg-gray-600/50'
-                    }`}
+                      }`}
                   >
                     {name}
                     <span className="text-xs opacity-70">{count}</span>
@@ -704,9 +704,9 @@ export default function BlogPage() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4, delay: index * 0.1 }}
                       whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-                      className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-gray-900/50 dark:hover:shadow-violet-500/30 ${post.isAdmin
-                          ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 hover:!shadow-amber-500/30 dark:hover:!shadow-amber-500/30'
-                          : 'border-gray-00/70 dark:border-gray-700/50 bg-card/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
+                      className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-300 h-full flex flex-col shadow-lg hover:shadow-gray-900/50 dark:hover:shadow-blue-500/30 ${post.isAdmin
+                        ? 'border-amber-300/50 dark:border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-white/80 dark:from-amber-900/10 dark:to-gray-900/50 hover:border-amber-400/70 dark:hover:border-amber-500/80 hover:!shadow-amber-500/30 dark:hover:!shadow-amber-500/30'
+                        : 'border-gray-00/70 dark:border-gray-700/50 bg-card/80 dark:bg-gray-800/30 hover:border-gray-300/80 dark:hover:border-gray-600/80 hover:shadow-md'
                         }`}
                     >
                       <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
@@ -720,8 +720,8 @@ export default function BlogPage() {
                       <Link href={`/blog/${postId}`} className="flex flex-col h-full">
                         {/* Cover Image */}
                         <div className={`h-48 relative overflow-hidden ${post.isAdmin
-                            ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30'
-                            : 'bg-gradient-to-br from-gray-900/30 dark:from-violet-900/30 dark:to-gray-900/30 to-gray-500/30'
+                          ? 'bg-gradient-to-r from-yellow-900/30 to-amber-900/30'
+                          : 'bg-gradient-to-br from-gray-900/30 dark:from-blue-900/30 dark:to-gray-900/30 to-gray-500/30'
                           }`}>
                           {post.coverImage ? (
                             <div className="relative w-full h-full">
@@ -736,35 +736,74 @@ export default function BlogPage() {
                               />
                             </div>
                           ) : (
-                            <>
-                              <AuthorAvatar
-                                src={post.authorPhotoURL}
-                                alt={post.author}
-                                priority={index < 3}
-                                lazy={index > 2}
-                              />
-                              <PostTitle>
-                                {post.title}
-                              </PostTitle>
-                              {/* {post.excerpt ? (
-                                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-                                  {post.excerpt}
-                                </p>
-                              ) : post.content ? (
-                                <p className="text-gray-500 dark:text-gray-500 text-sm line-clamp-2">
-                                  {post.content.replace(/<[^>]*>?/gm, '').substring(0, 150)}...
-                                </p>
-                              ) : (
-                                <p className="text-gray-400 dark:text-gray-600 text-sm italic">
-                                  No content preview available
-                                </p>
-                              )} */}
+                            // <>
+                            //   <AuthorAvatar
+                            //     src={post.authorPhotoURL}
+                            //     alt={post.author}
+                            //     priority={index < 3}
+                            //     lazy={index > 2}
+                            //   />
+                            //   <PostTitle>
+                            //     {post.title}
+                            //   </PostTitle>
+                            //   {post.excerpt ? (
+                            //     <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+                            //       {post.excerpt}
+                            //     </p>
+                            //   ) : post.content ? (
+                            //     <p className="text-gray-500 dark:text-gray-500 text-sm line-clamp-2">
+                            //       {post.content.replace(/<[^>]*>?/gm, '').substring(0, 150)}...
+                            //     </p>
+                            //   ) : (
+                            //     <p className="text-gray-400 dark:text-gray-600 text-sm italic">
+                            //       No content preview available
+                            //     </p>
+                            //   )}
+                            //   {post.tags && post.tags.length > 0 && (
+                            //     <div className="flex flex-wrap gap-1.5 mt-2 mx-2">
+                            //       {post.tags.slice(0, 3).map(tag => (
+                            //         <span 
+                            //           key={tag} 
+                            //           className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700/50 dark:bg-blue-900/30 text-white dark:text-blue-200 border border-gray-900/50 dark:border-blue-800/50 cursor-pointer hover:bg-blue-200/70 dark:hover:bg-blue-800/50 transition-colors"
+                            //           onClick={(e) => {
+                            //             e.preventDefault();
+                            //             e.stopPropagation();
+                            //             toggleTag(tag);
+                            //           }}
+                            //         >
+                            //           {tag}
+                            //         </span>
+                            //       ))}
+                            //       {post.tags.length > 3 && (
+                            //         <span className="text-xs text-gray-500 dark:text-gray-400 self-center">
+                            //           +{post.tags.length - 3} more
+                            //         </span>
+                            //       )}
+                            //     </div>
+                            //   )}
+                            // </>
+                            <div className="prose prose-sm dark:prose-invert max-w-none line-clamp-4 opacity-50 mx-2">
+                              <ReactMarkdown
+                                components={{
+                                  h1: ({ children }) => (
+                                    <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>
+                                  ),
+                                  h2: ({ children }) => (
+                                    <h2 className="text-2xl font-bold mt-6 mb-4">{children}</h2>
+                                  ),
+                                  h3: ({ children }) => (
+                                    <h3 className="text-xl font-bold mt-4 mb-4">{children}</h3>
+                                  )
+                                }}
+                              >
+                                {post.content}
+                              </ReactMarkdown>
                               {post.tags && post.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 mt-2 mx-2">
+                                <div className="flex flex-wrap gap-1.5 mx-2">
                                   {post.tags.slice(0, 3).map(tag => (
-                                    <span 
-                                      key={tag} 
-                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700/50 dark:bg-violet-900/30 text-white dark:text-violet-200 border border-gray-900/50 dark:border-violet-800/50 cursor-pointer hover:bg-blue-200/70 dark:hover:bg-violet-800/50 transition-colors"
+                                    <span
+                                      key={tag}
+                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700/50 dark:bg-blue-900/30 text-white dark:text-blue-200 border border-gray-900/50 dark:border-blue-800/50 cursor-pointer hover:bg-blue-200/70 dark:hover:bg-blue-800/50 transition-colors"
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -781,15 +820,16 @@ export default function BlogPage() {
                                   )}
                                 </div>
                               )}
-                            </>
+                            </div>
+
                           )}
                           <div className={`absolute inset-0 bg-gradient-to-t ${post.isAdmin
-                              ? 'from-amber-900/80 dark:from-amber-900/80'
-                              : 'from-gray-900/50 dark:from-violet-900/70'
+                            ? 'from-amber-900/80 dark:from-amber-900/80'
+                            : 'from-gray-900/50 dark:from-blue-900/70'
                             } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4`}>
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all ${post.isAdmin
-                                ? 'bg-amber-400/90 hover:bg-amber-300 text-amber-900 dark:bg-yellow-500/90 dark:hover:bg-yellow-400/90 dark:text-yellow-900'
-                                : 'bg-gray-600 hover:bg-gray-700 text-white dark:bg-violet-500/90 dark:hover:bg-violet-400/90'
+                              ? 'bg-amber-400/90 hover:bg-amber-300 text-amber-900 dark:bg-yellow-500/90 dark:hover:bg-yellow-400/90 dark:text-yellow-900'
+                              : 'bg-gray-600 hover:bg-gray-700 text-white dark:bg-blue-500/90 dark:hover:bg-blue-400/90'
                               }`}>
                               Read More
                               <ArrowRight className="w-3.5 h-3.5 ml-1.5 -mr-0.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -800,7 +840,7 @@ export default function BlogPage() {
                         {/* Post Content */}
                         <div className="p-6 flex-1 flex flex-col">
                           <div className="flex-1">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-gray-600 dark:group-hover:text-violet-400 transition-colors">
+                            <h2 className="text-xl font-bold mb-3 line-clamp-2 group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-700 group-hover:to-gray-500 dark:group-hover:from-teal-500 dark:group-hover:to-blue-500 transition-colors">
                               {post.title}
                             </h2>
                             {/* {post.excerpt && (
@@ -827,16 +867,19 @@ export default function BlogPage() {
                                     }
                                     size={32}
                                     className="border border-gray-200/50 dark:border-gray-600/50"
+                                    asLink={!!((post.author && typeof post.author === 'object' && 'username' in post.author ? (post.author as any).username : post.username))}
+                                    linkHref={((post.author && typeof post.author === 'object' && 'username' in post.author ? (post.author as any).username : post.username)) ? `/users/${(post.author && typeof post.author === 'object' && 'username' in post.author ? (post.author as any).username : post.username)}` : undefined}
+                                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                   />
                                 </div>
                                 <div>
                                   {(post.author && typeof post.author === 'object' && 'username' in post.author ? (post.author as any).username : post.username) ? (
                                     <Link
                                       href={`/users/${(post.author && typeof post.author === 'object' && 'username' in post.author
-                                          ? (post.author as any).username
-                                          : post.username)
+                                        ? (post.author as any).username
+                                        : post.username)
                                         }`}
-                                      className="text-sm font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-violet-400 transition-colors"
+                                      className="text-sm font-medium text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-blue-400 transition-colors"
                                       onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                     >
                                       {post.author && typeof post.author === 'object' && 'name' in post.author
@@ -873,7 +916,7 @@ export default function BlogPage() {
           {/* Loading indicator for infinite scroll */}
           {loadingMore && (
             <div className="col-span-full flex justify-center py-8">
-              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900 dark:border-violet-500"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900 dark:border-blue-500"></div>
             </div>
           )}
 

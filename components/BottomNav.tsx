@@ -397,6 +397,7 @@ export function BottomNav() {
                   compact
                   className={`h-8 w-8 cursor-pointer transition-all duration-200 ease-in-out`}
                   title={user.displayName || 'User'}
+                  disableLink={true}
                 />
 
                 <div className="flex flex-col text-left">
@@ -412,6 +413,7 @@ export function BottomNav() {
                   compact
                   className={`h-8 w-8 cursor-pointer ${isExpanded ? 'hidden' : 'block'} transition-all duration-200 ease-in-out`}
                   title={user.displayName || 'User'}
+                  disableLink={true}
                 />
               )}
               </button>

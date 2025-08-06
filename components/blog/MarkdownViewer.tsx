@@ -506,7 +506,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
           h4: ({node, ...props}) => (
             <h4 
-              className="text-xl md:text-2xl font-semibold mt-8 mb-3 pl-4 relative"
+              className="text-xl md:text-xl font-semibold mt-8 mb-3 pl-4 relative"
               {...props}
             >
               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>

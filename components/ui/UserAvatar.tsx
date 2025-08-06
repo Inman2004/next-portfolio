@@ -16,6 +16,7 @@ interface UserAvatarProps {
   linkHref?: string;
   onClick?: (e: React.MouseEvent) => void;
   title?: string;
+  disableLink?: boolean;
 }
 
 export function UserAvatar({ 
@@ -27,7 +28,8 @@ export function UserAvatar({
   asLink = false,
   linkHref,
   onClick,
-  title = ''
+  title = '',
+  disableLink = false
 }: UserAvatarProps) {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
@@ -188,7 +190,7 @@ export function UserAvatar({
     </div>
   );
 
-  if (asLink && linkHref) {
+  if (asLink && linkHref && !disableLink) {
     return (
       <Link href={linkHref} className="block" onClick={onClick}>
         {avatarElement}
