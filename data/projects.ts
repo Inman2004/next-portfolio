@@ -9,6 +9,11 @@ export interface Project {
   documentation?: string;
   blogPost?: string; // URL to related blog post
   images: string[];
+  videoPreviews?: {
+    url: string;
+    thumbnail: string;
+    duration?: number;
+  }[];
   startDate: Date; // Start date of the project
   endDate: Date | 'Present'; // End date or 'Present' if ongoing
   status: ProjectStatus; // Current status of the project
@@ -28,6 +33,11 @@ export const projects: Project[] = [
     startDate: new Date('2025-03-01'),
     endDate: new Date('2025-05-30'),
     status: "deployed",
+    videoPreviews: [{
+      url: '/videos/Pneumoscan Demo.mp4',
+      thumbnail: '/images/Pneumoscan Demo-Cover.jpg',
+      // optional duration in seconds
+    }],
     content: `## Project Overview
 PneumoScan is an advanced medical imaging analysis platform that leverages deep learning to detect and classify pneumonia from chest X-ray images. The system was developed to assist radiologists in making faster and more accurate diagnoses, particularly in resource-constrained healthcare settings.
 

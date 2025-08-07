@@ -3,11 +3,14 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight, Flame, Eye } from 'lucide-react';
+import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight, Flame, Eye, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
+import { FaBlog } from 'react-icons/fa6';
+import { projects, type Project, type ProjectStatus } from '@/data/projects';
+import { InteractiveHoverButton } from './magicui/interactive-hover-button';
 
 // Technology to color mapping with better TypeScript support
 interface TechColor {
@@ -84,19 +87,7 @@ const getTechColor = (tech: string): TechColor => {
   };
 };
 
-interface Project {
-  title: string;
-  description: string;
-  technologies: string[];
-  github?: string;
-  live?: string;
-  documentation?: string;
-  blogPost?: string; // URL to related blog post
-  images: string[];
-  startDate: Date;
-  endDate: Date | 'Present';
-  status: ProjectStatus;
-}
+// Project interface is now imported from data/projects
 
 // Format date as 'MMM YYYY' (e.g., 'Jan 2023')
 const formatDate = (date: Date | 'Present'): string => {
@@ -104,10 +95,23 @@ const formatDate = (date: Date | 'Present'): string => {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
 
+// Safely format date that could be string or Date
+const safeFormatDate = (date: string | Date | 'Present'): string => {
+  if (date === 'Present') return 'Present';
+  const dateObj = date instanceof Date ? date : new Date(date);
+  return formatDate(dateObj);
+};
+
+// Safely calculate duration with flexible date types
+const safeCalculateDuration = (start: string | Date, end: string | Date | 'Present'): string => {
+  const startDate = start instanceof Date ? start : new Date(start);
+  return calculateDuration(startDate, end === 'Present' ? 'Present' : (end instanceof Date ? end : new Date(end)));
+};
+
 // Calculate duration in months
 const calculateDuration = (startDate: Date, endDate: Date | 'Present'): string => {
-  const start = new Date(startDate);
-  const end = endDate === 'Present' ? new Date() : new Date(endDate);
+  const start = startDate instanceof Date ? startDate : new Date(startDate);
+  const end = endDate === 'Present' ? new Date() : (endDate instanceof Date ? endDate : new Date(endDate));
   
   const months = (end.getFullYear() - start.getFullYear()) * 12 + 
                 (end.getMonth() - start.getMonth()) + 
@@ -125,43 +129,58 @@ const calculateDuration = (startDate: Date, endDate: Date | 'Present'): string =
   }
 };
 
-import { projects, type ProjectStatus } from '@/data/projects';
-import { InteractiveHoverButton } from './magicui/interactive-hover-button';
-import { Card } from './ui/card';
-import { FaBlog } from 'react-icons/fa6';
+interface ProjectWithVideos extends Omit<Project, 'startDate' | 'endDate'> {
+  videoPreviews?: Array<{
+    url: string;
+    thumbnail: string;
+    duration?: number;
+  }>;
+  startDate: string | Date;
+  endDate: string | Date | 'Present';
+}
 
-const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
+const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  
+  const hasVideoPreviews = project.videoPreviews && project.videoPreviews.length > 0;
+  // Show videos first, then images
+  const allMedia = [
+    ...(project.videoPreviews || []).map(vid => ({
+      type: 'video' as const,
+      src: vid.url,
+      thumbnail: vid.thumbnail
+    })),
+    ...(project.images || []).map(img => ({
+      type: 'image' as const,
+      src: img
+    }))
+  ];
 
-  // Optimize image loading
+  // Optimize media loading
   useEffect(() => {
-    const img = new window.Image();
-    img.src = project.images[0];
-    img.onload = () => setIsImageLoaded(true);
-  }, [project.images]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isAutoPlaying && project.images.length > 1) {
-      interval = setInterval(() => {
-        setCurrentImageIndex((prev) => (prev + 1) % project.images.length);
-      }, 3000);
+    if (project.images.length > 0) {
+      const img = new window.Image();
+      img.src = project.images[0];
+      img.onload = () => setIsImageLoaded(true);
+    } else if (hasVideoPreviews) {
+      setIsImageLoaded(true);
     }
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, project.images.length]);
+  }, [project.images, hasVideoPreviews]);
 
   const handlePrev = () => {
-    setIsAutoPlaying(false);
-    setCurrentImageIndex((prev) => (prev - 1 + project.images.length) % project.images.length);
+    setCurrentMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length);
   };
 
   const handleNext = () => {
-    setIsAutoPlaying(false);
-    setCurrentImageIndex((prev) => (prev + 1) % project.images.length);
+    setCurrentMediaIndex((prev) => (prev + 1) % allMedia.length);
   };
+  
+  const currentMedia = allMedia[currentMediaIndex];
 
   // Only render the card when the image is loaded
   if (!isImageLoaded) {
@@ -183,14 +202,8 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
       }}
       className="h-full relative group"
       style={{ zIndex: 'auto' }}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        setIsAutoPlaying(false);
-      }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setIsAutoPlaying(true);
-      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="h-full">
         {/* Card content */}
@@ -251,99 +264,97 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
         </motion.div>
         
         {/* Image Slideshow */}
-        <div className="relative w-full h-[200px] sm:h-[250px] overflow-hidden bg-gray-100 dark:bg-gray-800">
-          {project.images.map((img, i) => (
-            <motion.div
-              key={`${project.title}-img-${i}`}
-              initial={{ opacity: i === 0 ? 1 : 0 }}
-              animate={{
-                opacity: i === currentImageIndex ? 1 : 0,
-                scale: i === currentImageIndex ? 1 : 0.95,
-              }}
-              transition={{
-                duration: 0.5,
-                ease: [0.4, 0, 0.2, 1],
-              }}
-              className="absolute inset-0 w-full h-full"
-            >
-              <Image
-                src={img}
-                alt={`${project.title} screenshot ${i + 1}`}
-                fill
-                className="object-cover object-top"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                priority={index < 3 && i === 0} // Only load first image of first 3 cards with priority
-                onLoadingComplete={() => {
-                  if (i === 0) setIsImageLoaded(true);
+        <div className="relative h-48 md:h-60 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+          {!isImageLoaded ? (
+            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          ) : currentMedia?.type === 'video' ? (
+            <div className="relative w-full h-full">
+              <video
+                ref={videoRef}
+                src={currentMedia.src}
+                poster={currentMedia.thumbnail}
+                loop
+                muted
+                playsInline
+                onLoadedData={() => {
+                  setIsVideoLoaded(true);
+                  videoRef.current?.play().then(() => {
+                    setIsVideoPlaying(true);
+                  }).catch(console.error);
                 }}
+                onPlay={() => setIsVideoPlaying(true)}
+                onPause={() => setIsVideoPlaying(false)}
+                onEnded={() => {
+                  if (videoRef.current) {
+                    videoRef.current.currentTime = 0;
+                    videoRef.current.play().catch(console.error);
+                  }
+                }}
+                className="w-full h-full object-cover"
               />
-            </motion.div>
-          ))}
-          {/* Navigation Arrows - Only show on hover */}
-          {project.images.length > 1 && (
+              {!isVideoPlaying && isVideoLoaded && (
+                <div 
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer"
+                  onClick={() => videoRef.current?.play()}
+                >
+                  <div className="bg-black/50 p-3 rounded-full">
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Image
+              src={currentMedia.src}
+              alt={`${project.title} screenshot`}
+              fill
+              className="object-cover transition-opacity duration-300"
+              style={{ opacity: isImageLoaded ? 1 : 0 }}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={index < 3}
+            />
+          )}
+          
+          {allMedia.length > 1 && (
             <>
-              <motion.button
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ 
-                  opacity: isHovered ? 1 : 0,
-                  x: isHovered ? 0 : -10
-                }}
-                transition={{ duration: 0.2 }}
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  e.nativeEvent.stopImmediatePropagation();
                   handlePrev();
                 }}
-                onMouseDown={(e) => e.stopPropagation()}
-                onMouseUp={(e) => e.stopPropagation()}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full z-10 transition-all duration-300"
-                aria-label="Previous image"
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                aria-label="Previous media"
               >
                 <ChevronLeft className="w-5 h-5" />
-              </motion.button>
-              <motion.button
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ 
-                  opacity: isHovered ? 1 : 0,
-                  x: isHovered ? 0 : 10
-                }}
-                transition={{ duration: 0.2 }}
+              </button>
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleNext();
                 }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full z-10 transition-all duration-300"
-                aria-label="Next image"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                aria-label="Next media"
               >
                 <ChevronRight className="w-5 h-5" />
-              </motion.button>
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ 
-                  opacity: isHovered ? 1 : 0.7,
-                  y: isHovered ? 0 : 5
-                }}
-                transition={{ duration: 0.2 }}
-                className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 px-2"
-              >
-                {project.images.map((_, i) => (
+              </button>
+              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                {allMedia.map((_, i) => (
                   <button
-                    key={`${project.title}-dot-${i}`}
+                    key={i}
                     onClick={(e) => {
                       e.stopPropagation();
-                      e.nativeEvent.stopImmediatePropagation();
-                      setCurrentImageIndex(i);
-                      setIsAutoPlaying(false);
+                      setCurrentMediaIndex(i);
                     }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onMouseUp={(e) => e.stopPropagation()}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 relative z-20 ${
-                      i === currentImageIndex ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/70'
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === currentMediaIndex 
+                        ? allMedia[i].type === 'video' 
+                          ? 'w-6 bg-blue-400' 
+                          : 'w-6 bg-white'
+                        : 'w-3 bg-white/50 hover:bg-white/75'
                     }`}
-                    aria-label={`View image ${i + 1} of ${project.images.length}`}
+                    aria-label={`Go to ${allMedia[i].type} ${i + 1}`}
                   />
                 ))}
-              </motion.div>
+              </div>
             </>
           )}
         </div>
@@ -366,9 +377,11 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
               </h3>
             </Link>
             <div className="flex items-center text-sm text-gray-400 space-x-4">
-              <span>{formatDate(project.startDate)} - {formatDate(project.endDate)}</span>
+              <span>
+                {safeFormatDate(project.startDate)} - {safeFormatDate(project.endDate)}
+              </span>
               <span className="h-1 w-1 rounded-full bg-gray-600"></span>
-              <span>{calculateDuration(project.startDate, project.endDate)}</span>
+              <span>{safeCalculateDuration(project.startDate, project.endDate)}</span>
             </div>
           </div>
           <p className="text-gray-600 dark:text-gray-300 line-clamp-3 transition-colors duration-300">

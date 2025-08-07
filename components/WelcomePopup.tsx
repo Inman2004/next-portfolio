@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Github, Sparkles, Check, Code, Palette, Zap, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
+import TermsAndConditions from './TermsAndConditions';
 
 export default function WelcomePopup() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const { signInWithGoogle, user } = useAuth();
   
   useEffect(() => {
@@ -157,14 +159,34 @@ export default function WelcomePopup() {
                 </button>
                 <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
                   By continuing, you agree to our{' '}
-                  <a href="/terms" className="text-blue-600 dark:text-blue-400 hover:underline">Terms</a> and{' '}
-                  <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>.
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowTerms(true);
+                    }}
+                    className="text-blue-600 dark:text-blue-400 hover:underline focus:outline-none"
+                  >
+                    Terms and Conditions
+                  </button>
+                  {' '}and{' '}
+                  <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                    Privacy Policy
+                  </a>.
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
       </motion.div>
+      
+      <AnimatePresence>
+        {showTerms && (
+          <TermsAndConditions 
+            isModal={true} 
+            onClose={() => setShowTerms(false)} 
+          />
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   );
 }
