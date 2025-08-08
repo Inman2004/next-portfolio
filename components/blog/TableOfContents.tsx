@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
-import { generateHeadingId } from '@/lib/markdownUtils';
+import { generateHeadingId, resetHeadingCounter } from '@/lib/markdownUtils';
 
 interface HeadingNode {
   id: string;
@@ -64,79 +64,119 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
     return root.children;
   };
 
-  // Extract headings from markdown content, excluding code blocks and inline code
-  useEffect(() => {
-    // First, remove all code blocks (```code```) from the content
-    const contentWithoutCodeBlocks = content.replace(/```[\s\S]*?```/g, '');
-    // Then remove all inline code (`code`) from the content
-    const contentWithoutCode = contentWithoutCodeBlocks.replace(/`[^`]+`/g, '');
-    
-    // This regex matches markdown headings (## Heading) and captures the level and text
-    const regex = /^(#{1,6})\s+(.+)$/gm;
-    const matches = Array.from(contentWithoutCode.matchAll(regex));
-    
-    const flatHeadings = matches
-      .map((match) => {
-        const level = match[1].length; // Number of # characters (1-6)
-        let text = match[2].trim();
-        
-        // Skip if the text is empty after trimming
-        if (!text) return null;
-        
-        // Clean up the text (remove markdown formatting, links, etc.)
-        text = text
-          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove markdown links [text](url) -> text
-          .replace(/<[^>]*>?/gm, '') // Remove HTML tags
-          .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove **bold**
-          .replace(/\*([^*]+)\*/g, '$1') // Remove *italic*
-          .trim();
-        
-        if (!text) return null;
-        
-        // Generate the ID using the same function as in MarkdownViewer
-        const id = generateHeadingId(text);
-        
-        return { id, text, level };
-      })
-      .filter(Boolean) as {id: string, text: string, level: number}[];
-    
-    // Build the hierarchical structure
-    const headingTree = buildHeadingTree(flatHeadings);
-    setHeadings(headingTree);
+  // Memoize the headings extraction to prevent unnecessary recalculations
+  const headingTree = useMemo(() => {
+    try {
+      // Reset heading counter to ensure consistent IDs
+      resetHeadingCounter();
+      
+      // First, remove all code blocks (```code```) from the content
+      const contentWithoutCodeBlocks = content.replace(/```[\s\S]*?```/g, '');
+      // Then remove all inline code (`code`) from the content
+      const contentWithoutCode = contentWithoutCodeBlocks.replace(/`[^`]+`/g, '');
+      
+      // This regex matches markdown headings (## Heading) and captures the level and text
+      const regex = /^(#{1,6})\s+(.+)$/gm;
+      const matches = Array.from(contentWithoutCode.matchAll(regex));
+      
+      const flatHeadings = matches
+        .map((match) => {
+          const level = match[1].length; // Number of # characters (1-6)
+          let text = match[2].trim();
+          
+          // Skip if the text is empty after trimming
+          if (!text) return null;
+          
+          // Clean up the text (remove markdown formatting, links, etc.)
+          text = text
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove markdown links [text](url) -> text
+            .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+            .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove **bold**
+            .replace(/\*([^*]+)\*/g, '$1') // Remove *italic*
+            .trim();
+          
+          if (!text) return null;
+          
+          // Generate the ID using the same function as in MarkdownViewer
+          const id = generateHeadingId(text);
+          
+          return { id, text, level };
+        })
+        .filter(Boolean) as {id: string, text: string, level: number}[];
+      
+      // Build and return the hierarchical structure
+      return buildHeadingTree(flatHeadings);
+    } catch (error) {
+      console.error('Error generating table of contents:', error);
+      return [];
+    }
   }, [content]);
 
-  // Set active heading based on scroll position
+  // Set the headings state once when the component mounts
+  useEffect(() => {
+    setHeadings(headingTree);
+  }, [headingTree]);
+
+  // Set active heading using Intersection Observer
   useEffect(() => {
     if (headings.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '0% 0% -80% 0%', threshold: 0.1 }
-    );
+    const headerHeight = 100; // Adjust based on your header height
+    const observerOptions = {
+      root: null, // viewport
+      rootMargin: `-${headerHeight}px 0px -70% 0px`, // Adjust the bottom margin to control when headings become active
+      threshold: 0.1
+    };
+
+    const headingElements = headings
+      .map(({ id }) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+
+    if (headingElements.length === 0) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      // Find the first entry that's intersecting (visible in the viewport)
+      const visibleEntry = entries.find(entry => entry.isIntersecting);
+      
+      if (visibleEntry) {
+        setActiveId(visibleEntry.target.id);
+      } else if (window.scrollY < 100) {
+        // If we're at the top of the page, set the first heading as active
+        setActiveId(headingElements[0]?.id || '');
+      }
+    }, observerOptions);
 
     // Observe all headings
-    const elements = headings.map(({ id }) => document.getElementById(id));
-    elements.forEach((el) => el && observer.observe(el));
+    headingElements.forEach((element) => observer.observe(element));
 
-    return () => observer.disconnect();
+    // Initial check for headings in view
+    const checkInitialActive = () => {
+      const firstVisible = headingElements.find(el => {
+        const rect = el.getBoundingClientRect();
+        return rect.top >= headerHeight && rect.bottom <= window.innerHeight;
+      });
+      
+      if (firstVisible) {
+        setActiveId(firstVisible.id);
+      } else if (window.scrollY < 100) {
+        setActiveId(headingElements[0]?.id || '');
+      }
+    };
+
+    // Run initial check after a short delay to ensure DOM is ready
+    const timeoutId = setTimeout(checkInitialActive, 100);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeoutId);
+    };
   }, [headings]);
 
-  if (headings.length === 0) return null;
-
-  return (
-    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-900 dark:border-gray-700', className)}>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-        <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
-        Table of Contents
-      </h3>
+  // Memoize the TOC content to prevent unnecessary re-renders
+  const tocContent = useMemo(() => {
+    if (headings.length === 0) return null;
+    
+    return (
       <nav className="border-l-2 border-gray-200 dark:border-gray-700">
         <TocList 
           nodes={headings} 
@@ -145,6 +185,20 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
           className="space-y-1"
         />
       </nav>
+    );
+  }, [headings, activeId]);
+  
+  if (headings.length === 0) return null;
+
+  return (
+    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-900/50 dark:border-gray-700', className)}>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+        <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+        </svg>
+        Table of Contents
+      </h3>
+      {tocContent}
     </div>
   );
 }
@@ -167,12 +221,26 @@ const TocList = ({ nodes, activeId, className = '', level = 0, setActiveId }: To
             onClick={(e) => {
               e.preventDefault();
               const targetId = node.id;
+              
+              // Set active ID immediately for instant feedback
+              setActiveId(targetId);
+              
               // Update the URL hash without scrolling
               window.history.pushState({}, '', `#${targetId}`);
-              // Smooth scroll to the target
-              scrollToElement(targetId);
-              // Set active ID immediately for better UX
-              setActiveId(targetId);
+              
+              // Scroll to the target with smooth behavior
+              const element = document.getElementById(targetId);
+              if (element) {
+                const headerOffset = 100; // Match this with your header height
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                // Immediate scroll to the position
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth'
+                });
+              }
             }}
             className={cn(
               'group flex items-center py-1.5 text-sm transition-all duration-200 w-full text-left',

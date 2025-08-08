@@ -467,7 +467,7 @@ export default function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-100 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-black text-gray-900 dark:text-white transition-all duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-100 to-slate-100 dark:from-gray-900 dark:via-slate-900 dark:to-black text-gray-900 dark:text-white transition-all duration-300">
       {/* Floating Action Bar */}
       <motion.div
         initial={{ y: 100, opacity: 0 }}
@@ -494,8 +494,8 @@ export default function PostPage({ params }: PostPageProps) {
         {AuthorActions}
       </motion.div>
 
-      <div className="pt-10 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12">
+      <div className="pt-10 pb-12 px-4 sm:px-6 lg:px-6">
+        <div className="max-w-8xl lg:ml-12 grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12">
           <div className="lg:pr-1 max-w-5xl">
           {/* Back Button */}
           <motion.div
@@ -505,7 +505,7 @@ export default function PostPage({ params }: PostPageProps) {
           >
             <Link 
               href="/blog" 
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group ml-1"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <span className="font-medium">Back to Blog</span>
@@ -541,7 +541,7 @@ export default function PostPage({ params }: PostPageProps) {
             <div className="p-6 sm:p-8 lg:p-10">
               {/* Title (if no cover image) */}
               {!post.coverImage && (
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-8 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold py-2 mb-8 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-tight">
                   {post.title}
                 </h1>
               )}
@@ -709,14 +709,14 @@ export default function PostPage({ params }: PostPageProps) {
           </div> {/* End of main content column */}
           
           {/* Table of Contents */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block mr-8">
             <TableOfContents content={post.content} />
           </div>
         </div>
 
         {/* Bottom Navigation */}
         <motion.div
-          className="mt-12 ml-12 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50"
+          className="mt-12 ml-12 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl border border-gray-400/50 dark:border-gray-700/50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
