@@ -504,31 +504,57 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
               </h3>
             );
           },
-          h4: ({node, ...props}) => (
-            <h4 
-              className="text-xl md:text-xl font-semibold mt-8 mb-3 pl-4 relative"
-              {...props}
-            >
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 dark:from-gray-100 dark:to-gray-400">
-                {props.children}
-              </span>
-            </h4>
-          ),
-          h5: ({node, ...props}) => (
-            <h5 
-              className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-indigo-600 dark:text-gray-300"
-              {...props}
-            >
-              {props.children}
-            </h5>
-          ),
-          h6: ({node, ...props}) => (
-            <h6 
-              className="text-base font-medium mt-4 mb-2 pl-2 text-indigo-500 dark:text-gray-400"
-              {...props}
-            />
-          ),
+          h4: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = generateHeadingId(text);
+            
+            return (
+              <h4 
+                id={id}
+                className="text-xl md:text-xl font-semibold mt-8 mb-3 pl-4 relative scroll-mt-16"
+                {...props}
+              >
+                <a href={`#${id}`} className="no-underline hover:underline">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 dark:from-gray-100 dark:to-gray-400">
+                    {props.children}
+                  </span>
+                </a>
+              </h4>
+            );
+          },
+          h5: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = generateHeadingId(text);
+            
+            return (
+              <h5 
+                id={id}
+                className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-indigo-600 dark:text-gray-300 scroll-mt-16"
+                {...props}
+              >
+                <a href={`#${id}`} className="no-underline hover:underline">
+                  {props.children}
+                </a>
+              </h5>
+            );
+          },
+          h6: ({node, ...props}) => {
+            const text = String(props.children || '');
+            const id = generateHeadingId(text);
+            
+            return (
+              <h6 
+                id={id}
+                className="text-base font-medium mt-4 mb-2 pl-2 text-indigo-500 dark:text-gray-400 scroll-mt-16"
+                {...props}
+              >
+                <a href={`#${id}`} className="no-underline hover:underline">
+                  {props.children}
+                </a>
+              </h6>
+            );
+          },
           p: (props: any) => {
             const { node, children, ...restProps } = props;
             

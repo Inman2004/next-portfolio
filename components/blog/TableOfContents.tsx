@@ -19,12 +19,23 @@ interface TableOfContentsProps {
 
 // Smooth scroll to element with offset for fixed header
 const scrollToElement = (id: string) => {
-  const element = document.getElementById(id);
+  // First try with the exact ID
+  let element = document.getElementById(id);
+  
+  // If not found, try with the base ID (without -number suffix)
+  if (!element) {
+    const baseId = id.replace(/-\d+$/, '');
+    element = document.getElementById(baseId);
+  }
+  
   if (element) {
     const headerOffset = 100; // Adjust this value based on your header height
     const elementPosition = element.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
+    // Update URL without page reload
+    window.history.pushState({}, '', `#${id}`);
+    
     window.scrollTo({
       top: offsetPosition,
       behavior: 'smooth'
@@ -225,17 +236,22 @@ const TocList = ({ nodes, activeId, className = '', level = 0, setActiveId }: To
               // Set active ID immediately for instant feedback
               setActiveId(targetId);
               
-              // Update the URL hash without scrolling
-              window.history.pushState({}, '', `#${targetId}`);
+              // Find the actual element (try with and without suffix)
+              let element = document.getElementById(targetId);
+              if (!element) {
+                const baseId = targetId.replace(/-\d+$/, '');
+                element = document.getElementById(baseId);
+              }
               
-              // Scroll to the target with smooth behavior
-              const element = document.getElementById(targetId);
               if (element) {
+                // Update the URL hash without scrolling
+                window.history.pushState({}, '', `#${targetId}`);
+                
+                // Scroll to the element with offset
                 const headerOffset = 100; // Match this with your header height
                 const elementPosition = element.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                 
-                // Immediate scroll to the position
                 window.scrollTo({
                   top: offsetPosition,
                   behavior: 'smooth'
