@@ -1,63 +1,55 @@
 /**
- * Generates a URL-friendly ID from a heading text
- * Handles markdown formatting, special characters, and ensures unique ID generation
+ * Pure slugifier that normalizes a heading text into a URL-friendly base ID.
+ * This function is deterministic and has no side effects.
  */
-let headingCounts: Record<string, number> = {};
-
 export function generateHeadingId(text: string): string {
   if (!text) return '';
-  
-  // Create base ID from the text
-  let baseId = String(text)
-    // First remove markdown formatting
-    .replace(/`/g, '')         // Remove backticks
-    .replace(/\*\*/g, '')      // Remove ** for bold
-    .replace(/\*/g, '')        // Remove * for italic
-    .replace(/_{2,}/g, '')     // Remove __ for bold
-    .replace(/_/g, '')         // Remove _ for italic
-    
-    // Convert to lowercase
+
+  return String(text)
+    // Remove common markdown formatting
+    .replace(/`/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/_{2,}/g, '')
+    .replace(/_/g, '')
+    // Lowercase
     .toLowerCase()
-    
-    // Replace common special characters with their text equivalents
+    // Replace special characters with readable words
     .replace(/[&]/g, ' and ')
     .replace(/[+]/g, ' plus ')
     .replace(/[%]/g, ' percent ')
     .replace(/[@]/g, ' at ')
     .replace(/[#]/g, ' hash ')
-    
-    // Remove all remaining special characters except letters, numbers, spaces, and hyphens
+    // Strip remaining non-word characters (keep letters, numbers, spaces, hyphens)
     .replace(/[^\p{L}\p{N}\s-]/gu, '')
-    
-    // Replace any sequence of whitespace or hyphens with a single hyphen
+    // Collapse spaces/hyphens to a single hyphen
     .replace(/[\s-]+/g, '-')
-    
-    // Remove any leading or trailing hyphens
+    // Trim hyphens
     .replace(/^-+|-+$/g, '')
-    
-    // Truncate to a reasonable length (50 chars) to avoid very long IDs
+    // Limit length
     .substring(0, 50)
-    
-    // Remove any trailing hyphen that might have been created by the substring
+    // Remove trailing hyphens again if cut mid-run
     .replace(/-+$/, '');
-
-  // If this is the first time we've seen this ID, initialize the counter
-  if (headingCounts[baseId] === undefined) {
-    headingCounts[baseId] = 0;
-    return baseId;
-  }
-
-  // Otherwise, increment the counter and append it to create a unique ID
-  headingCounts[baseId]++;
-  const uniqueId = `${baseId}-${headingCounts[baseId]}`;
-  
-  // Ensure the final ID isn't too long
-  return uniqueId.substring(0, 60);
 }
 
 /**
- * Resets the heading counter, should be called before processing a new document
+ * Returns a generator function that ensures unique IDs per document render.
+ * The returned function appends an incrementing suffix for duplicate base IDs
+ * (e.g., "intro", "intro-1", "intro-2").
+ */
+export function createHeadingIdGenerator() {
+  const counts = new Map<string, number>();
+  return (text: string): string => {
+    const base = generateHeadingId(text);
+    const seen = counts.get(base) ?? 0;
+    counts.set(base, seen + 1);
+    return seen === 0 ? base : `${base}-${seen}`;
+  };
+}
+
+/**
+ * Deprecated: Kept for backward compatibility; no-op in new implementation.
  */
 export function resetHeadingCounter(): void {
-  headingCounts = {};
+  // no-op
 }

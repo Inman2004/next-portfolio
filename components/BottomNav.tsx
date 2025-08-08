@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -148,11 +148,24 @@ export function BottomNav() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Toggle dock expansion
   const toggleExpand = useCallback(() => {
-    setIsExpanded(!isExpanded);
-  }, [isExpanded]);
+    setIsExpanded(prev => !prev);
+  }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsExpanded(false);
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   // Handle navigation item clicks
   const handleItemClick = useCallback((item: NavItem, e: React.MouseEvent) => {
@@ -172,17 +185,17 @@ export function BottomNav() {
         router.push(item.href);
       }
     }
-    // Collapse after navigation on mobile
-    if (window.innerWidth < 768) {
-      setIsExpanded(false);
-    }
+    // Always collapse after navigation
+    setIsExpanded(false);
   }, [router]);
 
   // Handle click outside to close expanded dock
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (isExpanded && !target.closest('.dock-container')) {
+      if (!isExpanded) return;
+      const target = event.target as Node | null;
+      const container = containerRef.current;
+      if (container && target && !container.contains(target)) {
         setIsExpanded(false);
       }
     };
@@ -281,6 +294,7 @@ export function BottomNav() {
   // Close dropdown when route changes
   useEffect(() => {
     setShowDropdown(false);
+    setIsExpanded(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -303,7 +317,8 @@ export function BottomNav() {
 
   return (
     <div 
-      className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out hidden md:block ${
+      ref={containerRef}
+      className={`dock-container fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out hidden md:block ${
         isExpanded ? 'w-64' : 'w-16'
       }`}
       onMouseEnter={() => setIsHovering(true)}
@@ -322,6 +337,7 @@ export function BottomNav() {
         onClick={toggleExpand}
         className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 mb-4 self-end"
         aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
+        type="button"
       >
         <ChevronLeft 
           className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-0' : 'rotate-180'}`} 
@@ -387,7 +403,6 @@ export function BottomNav() {
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center space-x-2 focus:outline-none"
-                aria-expanded={showDropdown}
                 aria-haspopup="true"
               >                {isExpanded && (
                 <div className="flex items-center gap-2 bg-gray-100/50 dark:bg-gray-800/50 rounded-md p-2">

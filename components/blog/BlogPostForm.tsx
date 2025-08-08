@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Loader2, Image as ImageIcon, X, Plus } from 'lucide-react';
+import { Loader2, Image as ImageIcon, X, Plus, FilePlus2, Library, ChevronDown } from 'lucide-react';
 import { BlogPostFormValues } from '@/lib/schemas/blog';
 import { blogPostSchema } from '@/lib/schemas/blog';
 import { useMarkdownEditor } from './MarkdownEditorContext';
@@ -42,6 +42,8 @@ export default function BlogPostForm({
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isDraftSaving, setIsDraftSaving] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [showDraftsManager, setShowDraftsManager] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   // Initialize form
   const form = useForm<BlogPostFormValues>({
@@ -137,6 +139,51 @@ export default function BlogPostForm({
 
   const content = watch('content');
   const coverImage = watch('coverImage');
+
+  // Minimal templates for quick start
+  const templates = useMemo(() => ([
+    {
+      id: 'tutorial',
+      name: 'Tutorial',
+      content: `# Title\n\n> What the reader will learn.\n\n## Prerequisites\n- Item 1\n- Item 2\n\n## Steps\n1. Step one\n2. Step two\n\n## Conclusion\nKey takeaways.\n`
+    },
+    {
+      id: 'release',
+      name: 'Release Notes',
+      content: `# vX.Y.Z Release Notes\n\n## Highlights\n- Feature A\n- Feature B\n\n## Changes\n- Change 1\n- Change 2\n`
+    },
+    {
+      id: 'deepdive',
+      name: 'Deep Dive',
+      content: `# Deep Dive: Topic\n\n## Background\nContext...\n\n## Architecture\n\n## Trade-offs\n\n## Conclusion\n`
+    }
+  ]), []);
+
+  const applyTemplate = useCallback((tpl: { content: string }, mode: 'replace' | 'append') => {
+    const current = (form.getValues('content') || '') as string;
+    const next = mode === 'replace' ? tpl.content : `${current}\n\n${tpl.content}`;
+    setValue('content', next, { shouldValidate: true });
+    setShowTemplates(false);
+  }, [form, setValue]);
+
+  const handleSaveAsDraft = useCallback(() => {
+    try {
+      const values = form.getValues();
+      const draft: BlogDraft = {
+        ...(values as any),
+        id: draftId || `draft_${Date.now()}`,
+        updatedAt: new Date().toISOString(),
+      };
+      const drafts: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
+      drafts[draft.id] = draft;
+      localStorage.setItem('blogDrafts', JSON.stringify(drafts));
+      setDraftId(draft.id);
+      setLastSaved(new Date());
+      toast.success('Draft saved');
+    } catch (e) {
+      toast.error('Failed to save draft');
+    }
+  }, [form, draftId]);
 
   // Update the editor ref when content changes
   useEffect(() => {
@@ -294,6 +341,48 @@ export default function BlogPostForm({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+      {/* Top actions for upcoming features */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => setShowTemplates(v => !v)}>
+            <FilePlus2 className="w-4 h-4 mr-1" /> Templates
+            <ChevronDown className="w-4 h-4 ml-1" />
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => setShowDraftsManager(true)}>
+            <Library className="w-4 h-4 mr-1" /> Drafts
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="secondary" onClick={handleSaveAsDraft} disabled={isSubmitting}>Save as draft</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isEditing ? 'Updating...' : 'Publishing...'}
+              </>
+            ) : isEditing ? (
+              'Update Post'
+            ) : (
+              'Publish Post'
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {showTemplates && (
+        <div className="rounded-lg border bg-card p-3 grid sm:grid-cols-3 gap-3">
+          {templates.map(tpl => (
+            <div key={tpl.id} className="rounded-md border p-3 space-y-2">
+              <div className="font-medium">{tpl.name}</div>
+              <div className="text-xs text-muted-foreground line-clamp-3 whitespace-pre-wrap">{tpl.content}</div>
+              <div className="flex gap-2 pt-1">
+                <Button type="button" variant="outline" size="sm" onClick={() => applyTemplate(tpl, 'append')}>Append</Button>
+                <Button type="button" size="sm" onClick={() => applyTemplate(tpl, 'replace')}>Use</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor="title">Title</Label>
         <Input
@@ -487,20 +576,61 @@ export default function BlogPostForm({
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {isEditing ? 'Updating...' : 'Publishing...'}
-              </>
-            ) : isEditing ? (
-              'Update Post'
-            ) : (
-              'Publish Post'
-            )}
-          </Button>
         </div>
       </div>
+
+      {/* Drafts Manager Modal (UI only, uses localStorage) */}
+      {showDraftsManager && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background p-6 rounded-lg w-full max-w-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Drafts</h3>
+              <Button variant="ghost" onClick={() => setShowDraftsManager(false)}>Close</Button>
+            </div>
+            <DraftsList onRestore={(draft) => {
+              const { id, updatedAt, ...data } = draft;
+              form.reset(data as any);
+              setDraftId(id);
+              setShowDraftsManager(false);
+              toast.success('Draft restored');
+            }} onDelete={(id) => {
+              const drafts: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
+              delete drafts[id];
+              localStorage.setItem('blogDrafts', JSON.stringify(drafts));
+              toast.success('Draft deleted');
+            }} />
+          </div>
+        </div>
+      )}
     </form>
+  );
+}
+
+function DraftsList({ onRestore, onDelete }: { onRestore: (draft: BlogDraft) => void; onDelete: (id: string) => void }) {
+  const [drafts, setDrafts] = useState<BlogDraft[]>([]);
+
+  useEffect(() => {
+    const saved: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
+    const list = Object.values(saved).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    setDrafts(list);
+  }, []);
+
+  if (!drafts.length) return <div className="text-sm text-muted-foreground">No drafts found.</div>;
+
+  return (
+    <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+      {drafts.map((d) => (
+        <div key={d.id} className="flex items-center justify-between rounded-lg border p-3">
+          <div>
+            <div className="font-medium truncate max-w-[40ch]">{d.title || '(Untitled draft)'}</div>
+            <div className="text-xs text-muted-foreground">Last saved {new Date(d.updatedAt).toLocaleString()}</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => onRestore(d)}>Restore</Button>
+            <Button size="sm" variant="destructive" onClick={() => onDelete(d.id)}>Delete</Button>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

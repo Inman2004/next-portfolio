@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 import {
     Bold,
     Italic,
@@ -18,9 +18,16 @@ import {
     Code2,
     ListTodo,
     Table as TableIcon,
-    Minus as HorizontalRuleIcon
+    Minus as HorizontalRuleIcon,
+    Undo2,
+    Redo2,
+    Heading,
+    WrapText,
+    AlignLeft,
+    Link2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useMarkdownEditor } from './MarkdownEditorContext';
@@ -198,118 +205,74 @@ export default function EditorToolbar({ onFormatAction, onImageUpload, onAddLink
         setIsTableDialogOpen(false);
     };
 
+    const blockActions: MarkdownAction[] = useMemo(() => ([
+        { id: 'heading1', label: 'Heading 1', icon: <Heading1 className="h-4 w-4" /> },
+        { id: 'heading2', label: 'Heading 2', icon: <Heading2 className="h-4 w-4" /> },
+        { id: 'heading3', label: 'Heading 3', icon: <Heading3 className="h-4 w-4" /> },
+        { id: 'heading4', label: 'Heading 4', icon: <Heading4 className="h-4 w-4" /> },
+        { id: 'separator-b1', label: '', icon: null, separator: true },
+        { id: 'ul', label: 'Bullet List', icon: <List className="h-4 w-4" /> },
+        { id: 'ol', label: 'Numbered List', icon: <ListOrdered className="h-4 w-4" /> },
+        { id: 'task', label: 'Task List', icon: <ListTodo className="h-4 w-4" /> },
+        { id: 'separator-b2', label: '', icon: null, separator: true },
+        { id: 'quote', label: 'Quote', icon: <Quote className="h-4 w-4" /> },
+        { id: 'hr', label: 'Horizontal Rule', icon: <HorizontalRuleIcon className="h-4 w-4" /> },
+    ]), []);
+
+    const inlineActions: MarkdownAction[] = useMemo(() => ([
+        { id: 'bold', label: 'Bold', icon: <Bold className="h-4 w-4" />, shortcut: 'Ctrl+B', variant: 'toggle' },
+        { id: 'italic', label: 'Italic', icon: <Italic className="h-4 w-4" />, shortcut: 'Ctrl+I', variant: 'toggle' },
+        { id: 'code', label: 'Inline Code', icon: <Code className="h-4 w-4" /> },
+        { id: 'codeBlock', label: 'Code Block', icon: <Code2 className="h-4 w-4" /> },
+        { id: 'separator-i1', label: '', icon: null, separator: true },
+        { id: 'link', label: 'Link', icon: <Link2 className="h-4 w-4" /> },
+        { id: 'image', label: 'Image', icon: <ImageIcon className="h-4 w-4" /> },
+        { id: 'table', label: 'Table', icon: <TableIcon className="h-4 w-4" /> },
+    ]), []);
+
+    const historyActions: MarkdownAction[] = useMemo(() => ([
+        { id: 'undo', label: 'Undo', icon: <Undo2 className="h-4 w-4" /> },
+        { id: 'redo', label: 'Redo', icon: <Redo2 className="h-4 w-4" /> },
+    ]), []);
+
     const actions: MarkdownAction[] = [
-        // Text formatting
-        {
-            id: 'bold',
-            label: 'Bold',
-            icon: <Bold className="h-4 w-4" />,
-            shortcut: 'Ctrl+B',
-            variant: 'toggle',
-        },
-        {
-            id: 'italic',
-            label: 'Italic',
-            icon: <Italic className="h-4 w-4" />,
-            shortcut: 'Ctrl+I',
-            variant: 'toggle',
-        },
-        {
-            id: 'heading1',
-            label: 'Heading 1',
-            icon: <Heading1 className="h-4 w-4" />,
-        },
-        {
-            id: 'heading2',
-            label: 'Heading 2',
-            icon: <Heading2 className="h-4 w-4" />,
-        },
-        {
-            id: 'heading3',
-            label: 'Heading 3',
-            icon: <Heading3 className="h-4 w-4" />,
-        },
-        {
-            id: 'heading4',
-            label: 'Heading 4',
-            icon: <Heading4 className="h-4 w-4" />,
-        },
-        
-        // First separator
+        ...historyActions,
+        { id: 'separator-0', label: '', icon: null, separator: true },
+        ...inlineActions,
         { id: 'separator-1', label: '', icon: null, separator: true },
-        
-        // Lists
-        {
-            id: 'ul',
-            label: 'Bullet List',
-            icon: <List className="h-4 w-4" />,
-        },
-        {
-            id: 'ol',
-            label: 'Numbered List',
-            icon: <ListOrdered className="h-4 w-4" />,
-        },
-        {
-            id: 'task',
-            label: 'Task List',
-            icon: <ListTodo className="h-4 w-4" />,
-        },
-        
-        // Second separator
-        { id: 'separator-2', label: '', icon: null, separator: true },
-        
-        // Code and quotes
-        {
-            id: 'code',
-            label: 'Inline Code',
-            icon: <Code className="h-4 w-4" />,
-        },
-        {
-            id: 'codeBlock',
-            label: 'Code Block',
-            icon: <Code2 className="h-4 w-4" />,
-        },
-        {
-            id: 'quote',
-            label: 'Quote',
-            icon: <Quote className="h-4 w-4" />,
-        },
-        
-        // Third separator
-        { id: 'separator-3', label: '', icon: null, separator: true },
-        
-        // Media and tables
-        {
-            id: 'link',
-            label: 'Link',
-            icon: <LinkIcon className="h-4 w-4" />,
-        },
-        {
-            id: 'image',
-            label: 'Image',
-            icon: <ImageIcon className="h-4 w-4" />,
-        },
-        {
-            id: 'table',
-            label: 'Table',
-            icon: <TableIcon className="h-4 w-4" />,
-        },
-        
-        // Fourth separator
-        { id: 'separator-4', label: '', icon: null, separator: true },
-        
-        // Horizontal rule
-        {
-            id: 'hr',
-            label: 'Horizontal Rule',
-            icon: <HorizontalRuleIcon className="h-4 w-4" />,
-        }
+        ...blockActions,
+        // Text formatting
     ];
 
     return (
         <>
             <TooltipProvider>
-                <div className="flex flex-wrap items-center rounded gap-1 p-1 border-b bg-gray-300 dark:bg-gray-700">
+                <div className="flex flex-wrap items-center rounded gap-1 p-1 border-b bg-gray-100 dark:bg-gray-800">
+                    {/* Headings dropdown */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline" aria-label="Headings"><Heading className="h-4 w-4" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'heading1', label: 'Heading 1', icon: null })}>Heading 1</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'heading2', label: 'Heading 2', icon: null })}>Heading 2</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'heading3', label: 'Heading 3', icon: null })}>Heading 3</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'heading4', label: 'Heading 4', icon: null })}>Heading 4</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Lists dropdown */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline" aria-label="Lists"><List className="h-4 w-4" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'ul', label: 'Bullet List', icon: null })}>Bullet List</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'ol', label: 'Numbered List', icon: null })}>Numbered List</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction({ id: 'task', label: 'Task List', icon: null })}>Task List</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
                     {actions.map((action) => {
                         if (action.separator) {
                             return <div key={action.id} className="h-6 w-px bg-border mx-0.5" />;
@@ -329,7 +292,7 @@ export default function EditorToolbar({ onFormatAction, onImageUpload, onAddLink
                                     ) : (
                                         <Button
                                             type="button"
-                                            variant="ghost"
+                                            variant="outline"
                                             size="sm"
                                             onClick={() => handleAction(action)}
                                             aria-label={action.label}

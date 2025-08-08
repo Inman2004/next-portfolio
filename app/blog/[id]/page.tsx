@@ -710,7 +710,7 @@ export default function PostPage({ params }: PostPageProps) {
           
           {/* Table of Contents */}
           <div className="hidden lg:block mr-8">
-            <TableOfContents content={post.content} />
+            <TableOfContents content={post.content || ''} />
           </div>
         </div>
 

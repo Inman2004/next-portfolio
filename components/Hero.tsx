@@ -25,15 +25,9 @@ import { SiGmail } from "react-icons/si";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Github, Linkedin, Quote } from "lucide-react";
 import { SkillBadge } from "./skillColors";
-import AvatarCard3D from "./ThreeJS/AvatarCard3d";
 import InteractiveCard3D from "./ThreeJS/HeroID";
 import { getBlogPosts } from "@/lib/blogUtils";
 import Link from "next/link";
-
-interface QuoteType {
-  quote: string;
-  author: string;
-}
 
 export default function Hero() {
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);

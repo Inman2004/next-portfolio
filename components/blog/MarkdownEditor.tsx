@@ -65,7 +65,8 @@ function MarkdownEditorComponent({
         return { localValue: action.value, previewValue: action.value, isDirty: false };
       case 'UPDATE_LOCAL':
         if (prev.localValue === action.value) return prev;
-        return { ...prev, localValue: action.value, isDirty: action.value !== value };
+        // Live preview: keep previewValue in sync with localValue
+        return { ...prev, localValue: action.value, previewValue: action.value, isDirty: action.value !== value };
       case 'UPDATE_PREVIEW':
         if (!prev.isDirty) return prev;
         return { ...prev, previewValue: prev.localValue, isDirty: false };
@@ -106,11 +107,9 @@ function MarkdownEditorComponent({
   
   // Update preview and notify parent
   const handleUpdatePreview = useCallback(() => {
-    if (isDirty) {
-      dispatch({ type: 'UPDATE_PREVIEW' });
-      onChange(localValue);
-    }
-  }, [isDirty, localValue, onChange]);
+    // No-op: live preview updates automatically
+    return;
+  }, []);
   
   // Clean up debounce on unmount
   useEffect(() => {
@@ -370,10 +369,69 @@ function MarkdownEditorComponent({
     
     // Add click outside listener
     document.addEventListener('mousedown', handleClickOutside);
+
+    // Handle paste images into editor (upload to Cloudinary and insert markdown)
+    const handlePaste = async (event: ClipboardEvent) => {
+      try {
+        const items = event.clipboardData?.items || [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) {
+              event.preventDefault();
+              const url = await handleImageUpload(file);
+              // insertText will update local value
+              insertText(`![${file.name}](${url})`);
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    // Handle drag-and-drop images
+    const handleDrop = async (event: DragEvent) => {
+      try {
+        const files = event.dataTransfer?.files;
+        if (!files || files.length === 0) return;
+        const imageFiles: File[] = [];
+        for (let i = 0; i < files.length; i++) {
+          const f = files[i];
+          if (f.type && f.type.startsWith('image/')) imageFiles.push(f);
+        }
+        if (imageFiles.length > 0) {
+          event.preventDefault();
+          for (const file of imageFiles) {
+            const url = await handleImageUpload(file);
+            insertText(`![${file.name}](${url})\n`);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    const domNode = editor.getDomNode();
+    if (domNode) {
+      domNode.addEventListener('paste', handlePaste as any);
+      domNode.addEventListener('drop', handleDrop as any);
+      domNode.addEventListener('dragover', (e: DragEvent) => {
+        if (e.dataTransfer && Array.from(e.dataTransfer.items).some(it => it.type.startsWith('image/'))) {
+          e.preventDefault();
+        }
+      });
+    }
     
     // Cleanup function to remove the listeners
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      if (domNode) {
+        domNode.removeEventListener('paste', handlePaste as any);
+        domNode.removeEventListener('drop', handleDrop as any);
+      }
       keydownListener?.dispose();
       debouncedUpdateToolbar.cancel();
     };
@@ -493,6 +551,38 @@ function MarkdownEditorComponent({
       return;
     }
 
+    // Generic insertText support (from toolbar): action format 'insertText:{"text":"..."}'
+    if (action.startsWith('insertText:')) {
+      try {
+        const payload = JSON.parse(action.replace('insertText:', '')) as { text: string };
+        if (editorRef.current && payload?.text != null) {
+          const editor = editorRef.current;
+          const selection = editor.getSelection();
+          if (!selection) return;
+          const range = {
+            startLineNumber: selection.startLineNumber,
+            startColumn: selection.startColumn,
+            endLineNumber: selection.endLineNumber,
+            endColumn: selection.endColumn,
+          };
+          editor.executeEdits('insert-text-generic', [{ range, text: payload.text, forceMoveMarkers: true }]);
+          const newValue = editor.getValue();
+          dispatch({ type: 'UPDATE_LOCAL', value: newValue });
+        }
+      } catch (_) {
+        // ignore
+      }
+      return;
+    }
+
+    // Undo/redo
+    if (action === 'undo' || action === 'redo') {
+      if (editorRef.current) {
+        editorRef.current.trigger('keyboard', action, null);
+      }
+      return;
+    }
+
     if (!editorRef.current) return;
     const editor = editorRef.current;
     const selection = editor.getSelection();
@@ -523,6 +613,23 @@ function MarkdownEditorComponent({
           forceMoveMarkers: true
         }]);
         break;
+      case 'heading1':
+      case 'heading2':
+      case 'heading3':
+      case 'heading4': {
+        const hashes = action === 'heading1' ? '# ' : action === 'heading2' ? '## ' : action === 'heading3' ? '### ' : '#### ';
+        editor.executeEdits('format-heading', [{
+          range: {
+            startLineNumber: selection.startLineNumber,
+            startColumn: 1,
+            endLineNumber: selection.startLineNumber,
+            endColumn: 1
+          },
+          text: hashes,
+          forceMoveMarkers: true
+        }]);
+        break;
+      }
       case 'heading1':
         editor.executeEdits('format-heading1', [{
           range: {
@@ -583,17 +690,19 @@ function MarkdownEditorComponent({
       case 'ul':
       case 'ol':
       case 'task':
-        const prefix = action === 'ul' ? '- ' : action === 'ol' ? '1. ' : '- [ ] ';
-        editor.executeEdits('format-list', [{
-          range: {
-            startLineNumber: selection.startLineNumber,
-            startColumn: 1,
-            endLineNumber: selection.startLineNumber,
-            endColumn: 1
-          },
-          text: prefix,
-          forceMoveMarkers: true
-        }]);
+        {
+          const prefix = action === 'ul' ? '- ' : action === 'ol' ? '1. ' : '- [ ] ';
+          editor.executeEdits('format-list', [{
+            range: {
+              startLineNumber: selection.startLineNumber,
+              startColumn: 1,
+              endLineNumber: selection.startLineNumber,
+              endColumn: 1
+            },
+            text: prefix,
+            forceMoveMarkers: true
+          }]);
+        }
         break;
     }
   }, []);
@@ -787,19 +896,7 @@ function MarkdownEditorComponent({
             <TabsTrigger value="edit">Edit</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
-          
-          
-          
-          {activeTab === 'preview' && isDirty && (
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={handleUpdatePreview}
-              disabled={!isDirty}
-            >
-              Update Preview
-            </Button>
-          )}
+          {/* Live preview: no update button needed */}
         </div>
         {activeTab === 'edit' && isEditorReady && (
             <EditorToolbar 

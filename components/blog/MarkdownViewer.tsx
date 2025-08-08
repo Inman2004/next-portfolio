@@ -3,7 +3,7 @@
 import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLAttributes, CSSProperties, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
-import { generateHeadingId, resetHeadingCounter } from '@/lib/markdownUtils';
+import { createHeadingIdGenerator } from '@/lib/markdownUtils';
 import { Copy, Check, ArrowUpRight } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import Mermaid from '../Mermaid';
@@ -374,8 +374,37 @@ interface MarkdownViewerProps {
 }
 
 function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
-  // Reset the heading counter before processing content
-  resetHeadingCounter();
+  // Generate unique IDs per render (reset when content changes)
+  const makeId = useMemo(() => createHeadingIdGenerator(), [content]);
+
+  // Extract plain text from ReactMarkdown node/children for stable heading IDs
+  const getPlainText = (node: any, children: any): string => {
+    const parts: string[] = [];
+    const walk = (n: any): void => {
+      if (n == null) return;
+      if (typeof n === 'string' || typeof n === 'number') {
+        parts.push(String(n));
+        return;
+      }
+      if (Array.isArray(n)) {
+        n.forEach(walk);
+        return;
+      }
+      if (typeof n === 'object') {
+        if (typeof n.value === 'string' || typeof n.value === 'number') {
+          parts.push(String(n.value));
+        }
+        if (n.children) {
+          walk(n.children);
+        }
+      }
+    };
+    walk(children);
+    if (parts.length === 0 && node) {
+      walk(node);
+    }
+    return parts.join(' ').replace(/\s+/g, ' ').trim();
+  };
   // Process content to handle mermaid code blocks
   const processedContent = useMemo(() => {
     // Convert mermaid code blocks to a format we can handle
@@ -446,8 +475,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
           a: CustomLink,
           h1: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = generateHeadingId(text);
+            const text = getPlainText(node, props.children);
+            const id = makeId(text);
               
             return (
               <h1 
@@ -465,8 +494,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             );
           },
           h2: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = generateHeadingId(text);
+            const text = getPlainText(node, props.children);
+            const id = makeId(text);
               
             return (
               <h2 
@@ -484,8 +513,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             );
           },
           h3: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = generateHeadingId(text);
+            const text = getPlainText(node, props.children);
+            const id = makeId(text);
               
             return (
               <h3 
@@ -505,8 +534,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             );
           },
           h4: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = generateHeadingId(text);
+            const text = getPlainText(node, props.children);
+            const id = makeId(text);
             
             return (
               <h4 
@@ -524,8 +553,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             );
           },
           h5: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = generateHeadingId(text);
+            const text = getPlainText(node, props.children);
+            const id = makeId(text);
             
             return (
               <h5 
@@ -540,8 +569,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             );
           },
           h6: ({node, ...props}) => {
-            const text = String(props.children || '');
-            const id = generateHeadingId(text);
+            const text = getPlainText(node, props.children);
+            const id = makeId(text);
             
             return (
               <h6 

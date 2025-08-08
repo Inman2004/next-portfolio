@@ -123,8 +123,13 @@ const InteractiveCard3DContent = () => {
       }} />
       <Canvas camera={{ position: [0, 0, 13], fov: 25 }}>
         <ambientLight intensity={Math.PI} />
-        <Physics debug={false} interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
+        {/* Reduce gravity for stability and add floor below */}
+        <Physics debug={false} interpolate gravity={[0, -20, 0]} timeStep={1 / 60}>
           <Band />
+          {/* Hidden floor to catch any falling bodies as a safety net */}
+          <RigidBody type="fixed" position={[0, -10, 0]}>
+            <CuboidCollider args={[50, 0.5, 50]} />
+          </RigidBody>
         </Physics>
         <Environment blur={0.75}>
           <color attach="background" args={['black']} />
@@ -239,6 +244,19 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
   }, [hovered, dragged])
 
   useFrame((state, delta) => {
+    // Mild idle sway (wind) when not dragging
+    if (!dragged && card.current) {
+      const t = state.clock.getElapsedTime()
+      const swayX = Math.sin(t * 0.6) * 0.05
+      const swayY = Math.cos(t * 0.4) * 0.03
+      const base = card.current.translation()
+      // Apply tiny forces to create a gentle floating effect
+      card.current.applyImpulse({ x: swayX * 0.02, y: swayY * 0.02, z: 0 }, true)
+      // Light angular nudge towards neutral
+      const angvel = card.current.angvel()
+      card.current.setAngvel({ x: angvel.x * 0.98, y: angvel.y * 0.98, z: angvel.z * 0.98 })
+    }
+
     if (dragged && card.current) {
       // Handle both mouse and touch inputs
       let pointerX, pointerY
@@ -371,61 +389,61 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
     }
   }, [hovered, isMobile])
 
+  // Offset all rigid bodies explicitly in world space instead of parenting in a transformed group
+  const baseY = 4
+
   return (
     <>
-      <group position={[0, 4, 0]}>
-        {/* Add visual feedback for dragging */}
-        {hovered && (
-          <pointLight 
-            position={[2, 0, 1]} 
-            color="#4f8dff" 
-            intensity={1} 
-            distance={5}
-          />
-        )}
-        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody 
-          position={[2, 0, 0]} 
-          ref={card} 
-          {...segmentProps} 
-          type={dragged ? 'kinematicPosition' : 'dynamic'}
+      {/* Add visual feedback for dragging */}
+      {hovered && (
+        <pointLight 
+          position={[2, baseY, 1]} 
+          color="#4f8dff" 
+          intensity={1} 
+          distance={5}
+        />
+      )}
+      <RigidBody ref={fixed} {...segmentProps} type="fixed" position={[0, baseY, 0]} />
+      <RigidBody position={[0.5, baseY, 0]} ref={j1} {...segmentProps}>
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody position={[1, baseY, 0]} ref={j2} {...segmentProps}>
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody position={[1.5, baseY, 0]} ref={j3} {...segmentProps}>
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody 
+        position={[2, baseY, 0]} 
+        ref={card} 
+        {...segmentProps} 
+        type={dragged ? 'kinematicPosition' : 'dynamic'}
+      >
+        <CuboidCollider args={[0.8, 1.125, 0.01]} />
+        <group
+          scale={2.25}
+          position={[0, -1.2, -0.05]}
+          onPointerOver={() => hover(true)}
+          onPointerOut={() => hover(false)}
+          onPointerUp={handlePointerUp}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
         >
-          <CuboidCollider args={[0.8, 1.125, 0.01]} />
-          <group
-            scale={2.25}
-            position={[0, -1.2, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-            onPointerUp={handlePointerUp}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            // Use pointer events for touch interactions as well
-            // They handle both mouse and touch events
-          >
-            <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial 
-                map={materials.base.map} 
-                map-anisotropy={16} 
-                clearcoat={1} 
-                clearcoatRoughness={0.15} 
-                roughness={0.3} 
-                metalness={0.5} 
-              />
-            </mesh>
-            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
-            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
-          </group>
-        </RigidBody>
-      </group>
+          <mesh geometry={nodes.card.geometry}>
+            <meshPhysicalMaterial 
+              map={materials.base.map} 
+              map-anisotropy={16} 
+              clearcoat={1} 
+              clearcoatRoughness={0.15} 
+              roughness={0.3} 
+              metalness={0.5} 
+            />
+          </mesh>
+          <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
+          <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+        </group>
+      </RigidBody>
+      {/* Band visual */}
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial 
