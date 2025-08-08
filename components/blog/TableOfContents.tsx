@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
-import { generateHeadingId, resetHeadingCounter } from '@/lib/markdownUtils';
+import { generateHeadingId } from '@/lib/markdownUtils';
 
 interface HeadingNode {
   id: string;
@@ -17,6 +17,21 @@ interface TableOfContentsProps {
   className?: string;
 }
 
+// Smooth scroll to element with offset for fixed header
+const scrollToElement = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    const headerOffset = 100; // Adjust this value based on your header height
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+};
+
 export function TableOfContents({ content, className }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<HeadingNode[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -28,7 +43,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
     
     for (const heading of headings) {
       const node: HeadingNode = {
-        id: heading.id,
+        id: generateHeadingId(heading.text), // Use the same ID generation as in MarkdownViewer
         text: heading.text,
         level: heading.level,
         children: []
@@ -51,32 +66,39 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
 
   // Extract headings from markdown content, excluding code blocks and inline code
   useEffect(() => {
-    // Reset the heading counter before processing a new document
-    resetHeadingCounter();
-    
     // First, remove all code blocks (```code```) from the content
     const contentWithoutCodeBlocks = content.replace(/```[\s\S]*?```/g, '');
     // Then remove all inline code (`code`) from the content
     const contentWithoutCode = contentWithoutCodeBlocks.replace(/`[^`]+`/g, '');
     
-    const regex = /^(#{1,6})\s+(.+)$/gm; // Support up to h6
+    // This regex matches markdown headings (## Heading) and captures the level and text
+    const regex = /^(#{1,6})\s+(.+)$/gm;
     const matches = Array.from(contentWithoutCode.matchAll(regex));
     
     const flatHeadings = matches
       .map((match) => {
-        const level = match[1].length; // Number of # characters
+        const level = match[1].length; // Number of # characters (1-6)
         let text = match[2].trim();
         
         // Skip if the text is empty after trimming
-        text = text.trim();
         if (!text) return null;
         
-        // Use the shared utility function to generate consistent IDs
+        // Clean up the text (remove markdown formatting, links, etc.)
+        text = text
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove markdown links [text](url) -> text
+          .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+          .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove **bold**
+          .replace(/\*([^*]+)\*/g, '$1') // Remove *italic*
+          .trim();
+        
+        if (!text) return null;
+        
+        // Generate the ID using the same function as in MarkdownViewer
         const id = generateHeadingId(text);
-          
+        
         return { id, text, level };
       })
-      .filter(Boolean) as {id: string, text: string, level: number}[]; // Filter out any null entries
+      .filter(Boolean) as {id: string, text: string, level: number}[];
     
     // Build the hierarchical structure
     const headingTree = buildHeadingTree(flatHeadings);
@@ -108,14 +130,18 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto pr-4', className)}>
-      <div className="mb-4 text-sm font-semibold text-foreground uppercase tracking-wider">
+    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-900 dark:border-gray-700', className)}>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+        <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+        </svg>
         Table of Contents
-      </div>
-      <nav className="border-l-2 border-primary/20">
+      </h3>
+      <nav className="border-l-2 border-gray-200 dark:border-gray-700">
         <TocList 
           nodes={headings} 
-          activeId={activeId} 
+          activeId={activeId}
+          setActiveId={setActiveId}
           className="space-y-1"
         />
       </nav>
@@ -130,19 +156,28 @@ interface TocListProps {
   level?: number;
 }
 
-const TocList = ({ nodes, activeId, className = '', level = 0 }: TocListProps) => {
+const TocList = ({ nodes, activeId, className = '', level = 0, setActiveId }: TocListProps & { setActiveId: (id: string) => void }) => {
   if (!nodes.length) return null;
   
   return (
     <ul className={cn('space-y-1', className)}>
       {nodes.map((node) => (
         <li key={node.id} className="">
-          <a
-            href={`#${node.id}`}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              const targetId = node.id;
+              // Update the URL hash without scrolling
+              window.history.pushState({}, '', `#${targetId}`);
+              // Smooth scroll to the target
+              scrollToElement(targetId);
+              // Set active ID immediately for better UX
+              setActiveId(targetId);
+            }}
             className={cn(
-              'group flex items-center py-1.5 text-sm transition-all duration-200',
-              'relative rounded-lg dark:hover:bg-accent/10 hover:bg-gray-900/10 px-3 -ml-2',
-              'border-l-2',
+              'group flex items-center py-1.5 text-sm transition-all duration-200 w-full text-left',
+              'relative rounded dark:hover:bg-accent/10 hover:bg-gray-900/10 px-3 -ml-2',
+              'border-l-2 cursor-pointer',
               {
                 // Base styles for all levels
                 'pl-4': level === 0,
@@ -175,11 +210,12 @@ const TocList = ({ nodes, activeId, className = '', level = 0 }: TocListProps) =
               )}
             />
             <span className="truncate">{node.text}</span>
-          </a>
+          </button>
           {node.children.length > 0 && (
             <TocList 
               nodes={node.children} 
-              activeId={activeId} 
+              activeId={activeId}
+              setActiveId={setActiveId}
               level={level + 1}
               className="mt-1"
             />

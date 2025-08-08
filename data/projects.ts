@@ -34,8 +34,8 @@ export const projects: Project[] = [
     endDate: new Date('2025-05-30'),
     status: "deployed",
     videoPreviews: [{
-      url: '/videos/Pneumoscan Demo.mp4',
-      thumbnail: '/images/Pneumoscan Demo-Cover.jpg',
+      url: '/videos/Pneumoscan-Demo.mp4',
+      thumbnail: '/images/Pneumoscan-thumbnail.jpg',
       // optional duration in seconds
     }],
     content: `## Project Overview

@@ -554,7 +554,7 @@ export default function PostPage({ params }: PostPageProps) {
                     displayName={typeof post.author.name === 'string' ? post.author.name : 
                                (post.author as any)?.displayName || '?'}
                     size={56}
-                    className="hover:ring-4 hover:ring-blue-500/30 transition-all duration-200 flex-shrink-0"
+                    className="hover:ring-4 hover:ring-blue-500/30 transition-all duration-200 flex-shrink-0 cursor-pointer"
                     asLink={!!post.author.username}
                     linkHref={post.author.username ? `/users/${post.author.username}` : undefined}
                     title={typeof post.author.name === 'string' ? post.author.name : 
