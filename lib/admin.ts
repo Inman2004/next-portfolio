@@ -1,8 +1,9 @@
 import { User } from 'firebase/auth';
+import { ADMIN_EMAIL } from '@/types/blog';
 
 export async function isAdmin(user: User | null) {
   if (!user || !user.email) return false;
-  return user.email === 'rvimman@gmail.com';
+  return user.email === ADMIN_EMAIL;
 }
 
 export function getAuthToken() {

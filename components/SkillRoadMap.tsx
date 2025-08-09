@@ -254,13 +254,17 @@ export default function RoadmapTimeline() {
         animate={isInView ? 'show' : 'hidden'}
         className="relative"
       >
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid Layout (md+) and Horizontal Snap Carousel (mobile) */}
+        <div className="
+          flex gap-4 overflow-x-auto snap-x snap-mandatory px-2 -mx-2
+          md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:mx-0
+          lg:grid-cols-3
+        ">
           {steps.map((step, index) => (
             <motion.div
               key={step.id}
               variants={item}
-              className="group relative"
+              className="group relative min-w-[85%] snap-start shrink-0 md:min-w-0"
             >
               <div className={`
                 p-4 rounded-xl border-2 transition-all duration-300 h-full flex flex-col
@@ -320,8 +324,8 @@ export default function RoadmapTimeline() {
           ))}
         </div>
 
-        {/* Legend */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-300">
+        {/* Legend (hidden on mobile to reduce height) */}
+        <div className="mt-8 hidden md:flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-300">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-500" />
             <span>Completed</span>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,50 +17,53 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal } from 'lucide-react';
-
-// Mock user data - replace with real data from your API
-const users = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@example.com',
-    role: 'Admin',
-    joined: '2023-01-15',
-    status: 'Active',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    role: 'Editor',
-    joined: '2023-02-20',
-    status: 'Active',
-  },
-  {
-    id: 3,
-    name: 'Bob Johnson',
-    email: 'bob@example.com',
-    role: 'Author',
-    joined: '2023-03-10',
-    status: 'Inactive',
-  },
-];
+import { MoreHorizontal, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { getAllUsers, UserData } from '@/lib/userUtils';
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [users, setUsers] = useState<UserData[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const list = await getAllUsers();
+        if (!mounted) return;
+        setUsers(list);
+      } catch (e) {
+        console.error(e);
+        if (mounted) setError('Failed to load users');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    const list = users || [];
+    const q = searchQuery.toLowerCase();
+    return list.filter((u) =>
+      (u.displayName || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.username || '').toLowerCase().includes(q)
+    );
+  }, [users, searchQuery]);
 
   return (
     <div className="my-12">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Users</h1>
-        <Button>Add New User</Button>
+        <Button asChild>
+          <Link href="/admin/users/new">
+            <Plus className="mr-2 h-4 w-4" />
+            Add New User
+          </Link>
+        </Button>
       </div>
 
       <div className="flex items-center py-4">
@@ -78,34 +81,34 @@ export default function UsersPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
               <TableHead>Joined</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
+            {loading && (
+              <TableRow>
+                <TableCell colSpan={4}>Loading...</TableCell>
+              </TableRow>
+            )}
+            {error && !loading && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-red-600">{error}</TableCell>
+              </TableRow>
+            )}
+            {!loading && !error && filteredUsers.map((user) => (
+              <TableRow key={user.uid}>
+                <TableCell className="font-medium">
+                  <Link href={`/admin/users/${user.uid}`} className="hover:underline">
+                    {user.displayName || user.username || 'Unnamed'}
+                  </Link>
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell>{user.joined}</TableCell>
-                <TableCell>
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      user.status === 'Active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {user.status}
-                  </span>
-                </TableCell>
+                <TableCell>{(() => {
+                  const d: any = user.createdAt;
+                  const date = typeof d?.toDate === 'function' ? d.toDate() : (d instanceof Date ? d : null);
+                  return date ? date.toISOString().slice(0,10) : '';
+                })()}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -115,10 +118,11 @@ export default function UsersPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        Delete
+                      <DropdownMenuItem asChild>
+                        <Link href={`/admin/users/${user.uid}`}>View/Edit</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-muted-foreground" disabled>
+                        Delete (wire action)
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -131,7 +135,7 @@ export default function UsersPage() {
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-sm text-muted-foreground">
-          Page 1 of 1
+          {loading ? 'Loading...' : `Showing ${filteredUsers.length} of ${(users || []).length} users`}
         </div>
         <Button variant="outline" size="sm" disabled>
           Previous

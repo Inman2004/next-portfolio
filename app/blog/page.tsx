@@ -72,6 +72,7 @@ import { getViewCounts } from '@/lib/views';
 import { deleteBlogPost } from '@/app/actions/blog';
 import dynamic from 'next/dynamic';
 import ReactMarkdown from 'react-markdown';
+import Fuse from 'fuse.js';
 
 // Dynamically import MarkdownViewer with no SSR to avoid hydration issues
 const MarkdownViewer = dynamic(
@@ -98,6 +99,24 @@ export default function BlogPage() {
   const router = useRouter();
   const auth = getAuth(app);
   const postsPerPage = 9; // Number of posts to load per page
+
+  // Fuzzy search index (rebuild when posts change)
+  const fuse = useMemo(() => {
+    if (!posts?.length) return null;
+    return new Fuse(posts, {
+      includeScore: true,
+      threshold: 0.38, // typo tolerance
+      ignoreLocation: true,
+      keys: [
+        { name: 'title', weight: 0.3 },
+        { name: 'excerpt', weight: 0.25 },
+        { name: 'content', weight: 0.2 },
+        { name: 'tags', weight: 0.15 },
+        { name: 'authorName', weight: 0.07 },
+        { name: 'author.name', weight: 0.03 },
+      ],
+    });
+  }, [posts]);
 
   // Track current posts for cleanup
   const currentPostsRef = useRef<EnrichedBlogPost[]>([]);
@@ -177,19 +196,22 @@ export default function BlogPage() {
 
   // Filter and sort posts
   const filteredAndSortedPosts = useMemo(() => {
-    // First filter by search query
+    // First filter by search query (fuzzy when available)
     let filtered = [...posts];
 
-    if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      filtered = filtered.filter((post) => {
-        return (
+    if (searchQuery?.trim()) {
+      if (fuse) {
+        const results = fuse.search(searchQuery.trim());
+        filtered = results.map(r => r.item);
+      } else {
+        const searchLower = searchQuery.toLowerCase();
+        filtered = filtered.filter((post) => (
           post.title?.toLowerCase().includes(searchLower) ||
           post.excerpt?.toLowerCase().includes(searchLower) ||
           post.content?.toLowerCase().includes(searchLower) ||
           post.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-        );
-      });
+        ));
+      }
     }
 
     // Then filter by selected tags if any

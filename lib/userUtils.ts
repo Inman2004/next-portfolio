@@ -161,6 +161,30 @@ export async function getUserByUsername(username: string): Promise<UserData | nu
   }
 }
 
+export async function getAllUsers(): Promise<UserData[]> {
+  try {
+    const usersRef = collection(db, 'users');
+    const snap = await getDocs(usersRef);
+    const list: UserData[] = [];
+    snap.forEach((d) => {
+      const data = d.data() as Partial<UserData>;
+      list.push({
+        uid: d.id,
+        displayName: data.displayName ?? null,
+        email: data.email ?? null,
+        photoURL: data.photoURL ?? null,
+        username: data.username ?? '',
+        createdAt: data.createdAt ?? null,
+        ...data,
+      } as UserData);
+    });
+    return list;
+  } catch (e) {
+    console.error('Error fetching users:', e);
+    return [];
+  }
+}
+
 export async function getUserData(userId: string, subscribe: boolean = false): Promise<UserData | null> {
   // Check in-memory cache first
   if (userCache.has(userId) && !subscribe) {

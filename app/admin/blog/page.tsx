@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,45 +19,46 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
-
-// Mock blog posts data - replace with real data from your API
-const blogPosts = [
-  {
-    id: 1,
-    title: 'Getting Started with Next.js',
-    slug: 'getting-started-with-nextjs',
-    author: 'John Doe',
-    date: '2023-05-15',
-    status: 'Published',
-    views: 1245,
-  },
-  {
-    id: 2,
-    title: 'Advanced React Patterns',
-    slug: 'advanced-react-patterns',
-    author: 'Jane Smith',
-    date: '2023-04-22',
-    status: 'Draft',
-    views: 0,
-  },
-  {
-    id: 3,
-    title: 'Building Scalable APIs with Node.js',
-    slug: 'building-scalable-apis-nodejs',
-    author: 'Bob Johnson',
-    date: '2023-03-10',
-    status: 'Published',
-    views: 892,
-  },
-];
+import { getBlogPosts } from '@/lib/blog';
+import type { BlogPost } from '@/types/blog';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function BlogPostsPage() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [posts, setPosts] = useState<BlogPost[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredPosts = blogPosts.filter((post) =>
-    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.author.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await getBlogPosts();
+        if (!mounted) return;
+        setPosts(data);
+      } catch (e) {
+        console.error(e);
+        if (mounted) setError('Failed to load posts');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const filteredPosts = useMemo(() => {
+    const list = posts || [];
+    const q = searchQuery.toLowerCase();
+    return list.filter((p) => {
+      const title = (p.title || '').toLowerCase();
+      const authorName = (p.authorName || (p.author && typeof p.author === 'string' ? p.author : (p.author as any)?.name) || '').toLowerCase();
+      const username = (p.authorUsername || p.username || '').toLowerCase();
+      return title.includes(q) || authorName.includes(q) || username.includes(q);
+    });
+  }, [posts, searchQuery]);
 
   return (
     <div className="my-12">
@@ -97,27 +98,39 @@ export default function BlogPostsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredPosts.map((post) => (
+            {loading && (
+              <TableRow>
+                <TableCell colSpan={6}>Loading...</TableCell>
+              </TableRow>
+            )}
+            {error && !loading && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-red-600">{error}</TableCell>
+              </TableRow>
+            )}
+            {!loading && !error && filteredPosts.map((post) => (
               <TableRow key={post.id}>
                 <TableCell className="font-medium">
-                  <Link href={`/admin/blog/edit/${post.id}`} className="hover:underline">
-                    {post.title}
-                  </Link>
+                  <Link href={`/admin/blog/edit/${post.id}`} className="hover:underline">{post.title}</Link>
                 </TableCell>
-                <TableCell>{post.author}</TableCell>
-                <TableCell>{post.date}</TableCell>
+                <TableCell>{post.authorName || (post.author && typeof post.author === 'string' ? post.author : (post.author as any)?.name) || 'Unknown'}</TableCell>
+                <TableCell>{(() => {
+                  const d = post.createdAt as any;
+                  const date = typeof d?.toDate === 'function' ? d.toDate() : (d instanceof Date ? d : null);
+                  return date ? date.toISOString().slice(0,10) : '';
+                })()}</TableCell>
                 <TableCell>
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${
-                      post.status === 'Published'
+                      post.published
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}
                   >
-                    {post.status}
+                    {post.published ? 'Published' : 'Draft'}
                   </span>
                 </TableCell>
-                <TableCell>{post.views.toLocaleString()}</TableCell>
+                <TableCell>{(post.viewCount || 0).toLocaleString()}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -130,9 +143,11 @@ export default function BlogPostsPage() {
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/blog/edit/${post.id}`}>Edit</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>View Live</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        Delete
+                      <DropdownMenuItem asChild>
+                        <Link href={`/blog/${post.slug || post.id}`}>View Live</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-muted-foreground" disabled>
+                        Delete (wire server action)
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -145,7 +160,7 @@ export default function BlogPostsPage() {
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-sm text-muted-foreground">
-          Showing {filteredPosts.length} of {blogPosts.length} posts
+          {loading ? 'Loading...' : `Showing ${filteredPosts.length} of ${(posts || []).length} posts`}
         </div>
       </div>
     </div>

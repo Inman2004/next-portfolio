@@ -8,6 +8,7 @@ import { Plus, Users, FileText, Eye, MessageSquare, ArrowRight, Loader2 } from '
 import { DashboardStats } from '@/components/admin/DashboardStats';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { ADMIN_EMAIL } from '@/types/blog';
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth();
@@ -17,7 +18,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!loading && !user) {
       router.push('/signin?callbackUrl=/admin');
-    } else if (!loading && user && user.email !== 'rvimman@gmail.com') {
+    } else if (!loading && user && user.email !== ADMIN_EMAIL) {
       // Redirect to unauthorized if not the admin
       router.push('/unauthorized');
     }
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
   }
 
   // Show unauthorized message if not admin
-  if (user.email !== 'rvimman@gmail.com') {
+  if (user.email !== ADMIN_EMAIL) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
@@ -113,7 +114,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-6 my-12">
+    <div className="space-y-6 ml-12">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <Button asChild className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white dark:text-black">

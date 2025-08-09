@@ -49,6 +49,21 @@ export default function BlogCard({ post, className = '' }: BlogCardProps) {
             <p className="text-gray-600 dark:text-gray-300 line-clamp-3 mb-4">
               {post.excerpt || post.content?.substring(0, 160) + '...'}
             </p>
+            {post.tags?.length ? (
+              <div className="mb-2 flex flex-wrap gap-2">
+                {post.tags.slice(0, 6).map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800/60"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                {post.tags.length > 6 && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">+{post.tags.length - 6} more</span>
+                )}
+              </div>
+            ) : null}
           </div>
           
           <div className="flex items-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">

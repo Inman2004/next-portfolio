@@ -1,57 +1,58 @@
 import { notFound } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { UserProfile } from '@/components/admin/UserProfile';
+import { getUserProfile, updateUserProfile } from '@/lib/user';
 
-// Mock function to fetch user by ID
-async function getUserById(id: string) {
-  // In a real app, you would fetch this from your API
-  if (id === 'new') {
-    return undefined; // New user
-  }
-  
-  // Simulate not found
-  if (id === 'not-found') {
-    return undefined;
-  }
-  
+type UserRole = 'ADMIN' | 'EDITOR' | 'AUTHOR' | 'USER';
+
+function mapToUserProfileProps(uid: string, data: any | null) {
+  if (!data) return undefined;
   return {
-    id,
-    name: 'John Doe',
-    email: 'john@example.com',
-    role: 'ADMIN' as const,
-    bio: 'Full-stack developer with a passion for building amazing web applications.',
-    image: 'https://github.com/shadcn.png',
-    isActive: true,
-    createdAt: '2023-01-15T00:00:00.000Z',
-  };
-}
-
-async function handleSave(userData: any) {
-  'use server';
-  // In a real app, you would save the user data to your database
-  console.log('Saving user:', userData);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { success: true };
-}
-
-async function handleDelete(userId: string) {
-  'use server';
-  // In a real app, you would delete the user from your database
-  console.log('Deleting user:', userId);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { success: true };
+    id: uid,
+    name: data.displayName || data.username || 'Unnamed',
+    email: data.email || '',
+    role: (data.role as UserRole) || 'USER',
+    bio: data.bio || '',
+    image: data.photoURL || '',
+    isActive: data.isActive ?? true,
+    createdAt: typeof data.createdAt?.toDate === 'function'
+      ? data.createdAt.toDate().toISOString()
+      : (data.createdAt || new Date().toISOString()),
+  } as const;
 }
 
 export default async function UserDetailPage({ params }: { params: { id: string } }) {
   const userId = params.id;
   const isNewUser = userId === 'new';
-  
-  const user = isNewUser ? undefined : await getUserById(userId);
-  
-  // If user doesn't exist and it's not a new user, show 404
+
+  const appUser = isNewUser ? null : await getUserProfile(userId);
+  const user = isNewUser ? undefined : mapToUserProfileProps(userId, appUser);
+
   if (!user && !isNewUser) {
     notFound();
+  }
+
+  async function handleSave(userData: any) {
+    'use server';
+    const uid = userId;
+    const payload: any = {
+      displayName: userData.name,
+      email: userData.email,
+      photoURL: userData.image,
+      bio: userData.bio,
+      // Persist role if you add it to Firestore schema later
+      role: userData.role,
+    };
+    await updateUserProfile(uid, payload);
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${uid}`);
+    return { success: true };
+  }
+
+  async function handleDelete(_userId: string) {
+    'use server';
+    // Deleting users typically requires Firebase Admin SDK; keep disabled for now
+    return { success: false };
   }
 
   return (
@@ -63,10 +64,10 @@ export default async function UserDetailPage({ params }: { params: { id: string 
       </div>
       
       <UserProfile 
-        user={user} 
+        user={user}
         onSave={handleSave}
         onDelete={isNewUser ? undefined : handleDelete}
-        isNew={isNewUser} 
+        isNew={isNewUser}
       />
     </div>
   );
