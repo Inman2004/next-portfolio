@@ -149,6 +149,7 @@ export default function RootLayout({
       <head>
       <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6373066383987878"
      crossOrigin="anonymous"></script>
+     <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
