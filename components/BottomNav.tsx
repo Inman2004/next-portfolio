@@ -117,9 +117,14 @@ const DATA: { navbar: NavItem[]; contact: { email: string; social: NavItem[] } }
 
 const DashboardLinks = [
   { 
-    href: '/profile', 
+    href: '/profile', // This will redirect to /users/[username]
     label: 'Profile', 
     icon: (props: IconProps) => <User {...props} className="w-4 h-4 mr-2" />
+  },
+  { 
+    href: '/blog/new', 
+    label: 'New Post', 
+    icon: (props: IconProps) => <FileText {...props} className="w-4 h-4 mr-2" />
   },
   { 
     href: '/blog', 
@@ -131,11 +136,6 @@ const DashboardLinks = [
     label: 'Admin', 
     icon: (props: IconProps) => <Settings {...props} className="w-4 h-4 mr-2" />,
     adminOnly: true
-  },
-  { 
-    href: '/blog/new', 
-    label: 'New Post', 
-    icon: (props: IconProps) => <FileText {...props} className="w-4 h-4 mr-2" />
   }
 ];
 
@@ -261,6 +261,16 @@ export function BottomNav() {
         className: 'text-gray-500 hover:text-orange-600 dark:text-gray-400 dark:hover:text-orange-400 transition-colors'
       }
     ];
+
+    // Add Profile button for authenticated users
+    if (user) {
+      items.push({
+        href: '/profile',
+        label: 'Profile',
+        icon: (props: IconProps) => <User {...props} className="w-5 h-5" />,
+        className: 'text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors'
+      });
+    }
 
     // Add New Post button on blog pages for authenticated users
     if (isBlogPage && user) {

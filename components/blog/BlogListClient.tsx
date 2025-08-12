@@ -9,6 +9,7 @@ import { BlogSearch } from '@/components/blog/BlogSearch';
 import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import Markdown from 'react-markdown';
 
 type Post = {
   id: string;
@@ -146,7 +147,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {filteredAndSorted.map((post) => (
-            <article key={post.id} className="group bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition-all overflow-hidden border border-gray-200 dark:border-gray-700">
+            <article key={post.id} className="group bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition-all overflow-hidden border border-gray-200 hover:border-gray-700 dark:border-gray-700">
               {post.coverImage && (
                 <div className="relative h-48 overflow-hidden">
                   <Image src={post.coverImage} alt={post.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
@@ -173,7 +174,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                   </div>
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{post.title}</h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{post.excerpt || (post.content ? `${post.content.substring(0, 150)}...` : '')}</p>
+                <div className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     {post.author?.photoURL ? (

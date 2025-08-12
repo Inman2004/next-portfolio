@@ -108,14 +108,15 @@ export default async function BlogPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/80 via-teal-600 to-purple-600/80">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="relative overflow-hidden">
+        
+        <div className="absolute inset-0 bg-[url('/images/ui/blog-hero.png')] bg-cover bg-center"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700 py-4 mb-6">
               Blog & Insights
               </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-900 max-w-3xl mx-auto">
               Explore my thoughts on technology, development, and the latest trends in the digital world.
             </p>
           </div>

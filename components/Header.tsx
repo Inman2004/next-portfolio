@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench } from 'lucide-react';
+import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -20,19 +20,31 @@ interface NavLink {
   className?: string;
 }
 
-const navigationLinks: NavLink[] = [
-  { href: '#home', label: 'Intro', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
-  { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
-  { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
-  { href: '#skills', label: 'Skills', icon: <Wrench className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
-  { href: '#contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
-  {
-    href: '/blog',
-    label: 'Blog',
-    icon: <FaBlog className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
-    className: 'group/blog',
-  },
-];
+// Main navigation links with better responsive support
+const getNavigationLinks = (isHome: boolean): NavLink[] => {
+  const homeLinks: NavLink[] = [
+    { href: '#home', label: 'Intro', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+    { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
+    { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
+    { href: '#skills', label: 'Skills', icon: <Wrench className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
+    { href: '#contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
+  ];
+
+  const globalLinks: NavLink[] = [
+    { href: '/', label: 'Home', icon: <Home className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+    { href: '/about', label: 'About', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+    { href: '/projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
+    { href: '/contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
+    {
+      href: '/blog',
+      label: 'Blog',
+      icon: <FaBlog className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
+      className: 'group/blog',
+    },
+  ];
+
+  return isHome ? homeLinks.concat([globalLinks[globalLinks.length - 1]]) : globalLinks;
+};
 
 interface DashboardLink extends NavLink {
   adminOnly?: boolean;
@@ -40,15 +52,20 @@ interface DashboardLink extends NavLink {
 
 const dashboardLinks: DashboardLink[] = [
   { 
-    href: '/admin', 
-    label: 'Admin', 
-    icon: <Settings className="w-4 h-4 mr-2" />,
-    adminOnly: true 
+    href: '/blog/new', 
+    label: 'New Post', 
+    icon: <Plus className="w-4 h-4 mr-2" /> 
   },
   { 
     href: '/profile', 
     label: 'Profile', 
     icon: <User className="w-4 h-4 mr-2" /> 
+  },
+  { 
+    href: '/admin', 
+    label: 'Admin', 
+    icon: <Settings className="w-4 h-4 mr-2" />,
+    adminOnly: true 
   },
 ];
 
@@ -259,16 +276,15 @@ export default function Header() {
     }
   };
 
-  // Filter navigation links based on current page
-  const filteredNavLinks = isHome
-    ? navigationLinks
-    : navigationLinks.filter(link => !link.href.startsWith('#') && link.href !== '/blog');
+  // Get navigation links based on current page
+  const navigationLinks = getNavigationLinks(isHome);
 
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 lg:hidden xl:hidden',
+        'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300',
         'backdrop-blur-md border-b shadow-sm',
+        'lg:hidden', // Hide on desktop devices
         scrolled
           ? 'bg-background/95 border-border/10 shadow-sm'
           : 'bg-background/80 border-transparent',
@@ -327,221 +343,152 @@ export default function Header() {
           </Link>
         </motion.div>
 
-        {/* Desktop Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="hidden md:flex items-center gap-2"
-        >
-          {/* <ul className="flex items-center space-x-1">
-            {filteredNavLinks.map((link, index) => (
-              <React.Fragment key={link.href}>
-                {index === filteredNavLinks.length - 1 && (
-                  <li className="hidden md:block h-6 w-0.5 bg-blue-500/50 dark:bg-blue-500/50 mx-1" />
-                )}
-                <NavItem href={link.href}>
-                  {link.icon}
-                  <span>{link.label}</span>
-                </NavItem>
-              </React.Fragment>
-            ))}
-          </ul> */}
 
-          {/* Theme Toggle */}
-          {/* <div className="ml-2">
-            <ThemeSwitcher />
-          </div> */}
 
-          {/* User Menu */}
-          {user ? (
-            <div className="relative ml-2">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/30 hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                aria-haspopup="true"
-                aria-expanded={showDropdown}
-              >
-                {(() => {
-                  const displayName = user.displayName || 'User';
-                  const initials = displayName
-                    .split(' ')
-                    .map(n => n[0])
-                    .join('')
-                    .toUpperCase()
-                    .substring(0, 2);
-
-                  // Use UserAvatar component for consistent avatar display
-                  // Ensure photoURL is in the correct format for UserAvatar
-                  const formattedPhotoURL = user.photoURL?.startsWith('user://') 
-                    ? `user_${user.uid}` 
-                    : user.photoURL;
-                    
-                  return (
-                    <div className="w-8 h-8">
-                      <UserAvatar 
-                        photoURL={formattedPhotoURL || ''} 
-                        displayName={displayName} 
-                        size={32}
-                        className="w-full h-full"
-                        title={displayName || 'User'}
-                        asLink={!!user?.username}
-                        linkHref={user?.username ? `/users/${user.username}` : undefined}
-                        onClick={(e) => {
-                          if (user?.username) {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </div>
-                  );
-                })()}
-              </button>
-
-              <AnimatePresence>
-                {showDropdown && (
+        {/* Mobile & Tablet Menu Button */}
+        <div className="flex items-center gap-2">
+          <ThemeSwitcher />
+          <div className="relative">
+            <motion.button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={cn(
+                "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-300",
+                "hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                "active:scale-95",
+                menuOpen ? "bg-accent/30" : "bg-transparent"
+              )}
+              aria-expanded={menuOpen ? "true" : "false"}
+              aria-label="Toggle menu"
+              whileTap={{ scale: 0.95 }}
+            >
+              <AnimatePresence mode="wait">
+                {menuOpen ? (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
+                    key="close"
+                    initial={{ opacity: 0, rotate: -90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: 90 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-4 backdrop-blur-sm w-56 rounded-md shadow-lg bg-popover border border-border overflow-hidden z-50 bg-white/80 dark:bg-gray-800/80"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="user-menu"
                   >
-                    <div className="py-1" role="none">
-                      {dashboardLinks
-                        .filter(link => !link.adminOnly || (user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL))
-                        .map((link) => (
-                          <Link
-                            key={link.href}
-                            href={link.href}
-                            className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
-                            role="menuitem"
-                            onClick={() => setShowDropdown(false)}
-                          >
-                            {link.icon}
-                            {link.label}
-                          </Link>
-                      ))}
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
-                        role="menuitem"
-                      >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Sign out
-                      </button>
-                    </div>
+                    <X className="w-5 h-5" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ opacity: 0, rotate: 90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: -90 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="w-5 h-5" />
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2 ml-2">
-              <Link
-                href="/signup"
-                className="px-4 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent/50 transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign up
-              </Link>
-              <Link
-                href="/signin"
-                className="px-4 py-2 rounded-md text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign in
-              </Link>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center">
-          <ThemeSwitcher />
-          <div className="relative ml-2">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-accent/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              aria-expanded={menuOpen}
-              aria-label="Toggle menu"
-            >
-              {menuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
+            </motion.button>
 
             {/* Mobile Dropdown Menu */}
             <AnimatePresence>
               {menuOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-popover border border-border bg-gray-50/95 dark:bg-gray-800/95 overflow-hidden z-50"
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute right-0 mt-3 w-64 rounded-2xl shadow-xl bg-background/95 backdrop-blur-xl border border-border overflow-hidden z-50"
                 >
-                  <div className="py-1">
-                    {filteredNavLinks.map((link) => (
-                      <Link
+                  <div className="py-3">
+                    {navigationLinks.map((link, index) => (
+                      <motion.div
                         key={link.href}
-                        href={link.href}
-                        className="flex items-center px-4 py-3 text-sm text-foreground hover:bg-accent/50 transition-colors"
-                        onClick={(e) => handleMobileLinkClick(e, link.href)}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
                       >
-                        {React.cloneElement(link.icon as React.ReactElement, {
-                          className: 'w-4 h-4 mr-3 flex-shrink-0'
-                        })}
-                        {link.label}
-                      </Link>
+                        <Link
+                          href={link.href}
+                          className={cn(
+                            "flex items-center px-4 py-3 mx-2 rounded-xl text-sm font-medium transition-all duration-200",
+                            "text-foreground/80 hover:text-foreground hover:bg-accent/50",
+                            "active:scale-95 active:bg-accent/70",
+                            (pathname === link.href || 
+                             (link.href.startsWith('#') && isHome && window.location.hash === link.href)) && 
+                            "text-primary bg-accent/30"
+                          )}
+                          onClick={(e) => handleMobileLinkClick(e, link.href)}
+                        >
+                          {React.cloneElement(link.icon as React.ReactElement, {
+                            className: 'w-5 h-5 mr-3 flex-shrink-0'
+                          })}
+                          <span className="flex-1">{link.label}</span>
+                          {(pathname === link.href || 
+                            (link.href.startsWith('#') && isHome && window.location.hash === link.href)) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-2 h-2 rounded-full bg-primary"
+                            />
+                          )}
+                        </Link>
+                      </motion.div>
                     ))}
                     
                     {user ? (
                       <>
-                        <div className="border-t border-border/50 my-1"></div>
-                        {dashboardLinks.map((link) => (
-                          <Link
+                        <div className="border-t border-border/30 my-2 mx-2"></div>
+                        {dashboardLinks
+                          .filter(link => !link.adminOnly || (user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL))
+                          .map((link, index) => (
+                          <motion.div
                             key={link.href}
-                            href={link.href}
-                            className="flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
-                            onClick={(e) => handleMobileLinkClick(e, link.href)}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: (navigationLinks.length + index) * 0.05 }}
                           >
-                            {link.icon}
-                            {link.label}
-                          </Link>
+                            <Link
+                              href={link.href}
+                              className="flex items-center px-4 py-3 mx-2 rounded-xl text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent/50 transition-all duration-200 active:scale-95"
+                              onClick={(e) => handleMobileLinkClick(e, link.href)}
+                            >
+                              {link.icon}
+                              <span className="flex-1">{link.label}</span>
+                            </Link>
+                          </motion.div>
                         ))}
-                        <button
-                          onClick={() => {
-                            handleLogout();
-                            setMenuOpen(false);
-                            setMenuOpen(false);
-                          }}
-                          className="w-full text-left flex items-center px-4 py-2 text-sm text-foreground hover:bg-accent/50 transition-colors"
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: (navigationLinks.length + dashboardLinks.length) * 0.05 }}
                         >
-                          <LogOut className="w-4 h-4 mr-3" />
-                          Sign out
-                        </button>
+                          <button
+                            onClick={() => {
+                              handleLogout();
+                              setMenuOpen(false);
+                            }}
+                            className="w-full flex items-center px-4 py-3 mx-2 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-200 active:scale-95"
+                          >
+                            <LogOut className="w-5 h-5 mr-3" />
+                            <span className="flex-1 text-left">Sign out</span>
+                          </button>
+                        </motion.div>
                       </>
                     ) : (
-                      <div className="p-2 border-t border-border/50">
-                        <Link
-                          href="/signin"
-                          className="block w-full text-center px-4 py-2 text-sm font-medium rounded-md text-foreground bg-primary/10 hover:bg-primary/20 transition-colors mb-2"
-                          onClick={(e) => handleMobileLinkClick(e, '/signin')}
-                        >
-                          Sign in
-                        </Link>
-                        <Link
-                          href="/signup"
-                          className="block w-full text-center px-4 py-2 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors"
-                          onClick={(e) => handleMobileLinkClick(e, '/signup')}
-                        >
-                          Create account
-                        </Link>
+                      <div className="px-2 pb-2 pt-2 border-t border-border/30 mt-2">
+                        <div className="space-y-2">
+                          <Link
+                            href="/signin"
+                            className="block w-full text-center px-4 py-3 text-sm font-medium rounded-xl text-foreground bg-accent/30 hover:bg-accent/50 transition-all duration-200 active:scale-95"
+                            onClick={(e) => handleMobileLinkClick(e, '/signin')}
+                          >
+                            Sign in
+                          </Link>
+                          <Link
+                            href="/signup"
+                            className="block w-full text-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-primary hover:bg-primary/90 transition-all duration-200 active:scale-95"
+                            onClick={(e) => handleMobileLinkClick(e, '/signup')}
+                          >
+                            Create account
+                          </Link>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -553,12 +500,18 @@ export default function Header() {
       </nav>
 
       {/* Click outside handler for mobile dropdown */}
-      {menuOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
-          onClick={() => setMenuOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+            onClick={() => setMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </header>
   );
 }

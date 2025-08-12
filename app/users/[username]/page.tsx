@@ -4,11 +4,17 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { User } from 'firebase/auth';
 import { format } from 'date-fns';
-import { FiGithub, FiTwitter, FiLinkedin, FiGlobe, FiMapPin, FiCalendar, FiMail, FiUser, FiClock } from 'react-icons/fi';
+import { FiGithub, FiTwitter, FiLinkedin, FiGlobe, FiMapPin, FiCalendar, FiMail, FiUser, FiClock, FiSettings, FiEdit3 } from 'react-icons/fi';
 import Link from 'next/link';
 import { UserData, getUserByUsername, getUserData } from '@/lib/userUtils';
 import { BlogPost } from '@/types/blog';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ProfileSettings from '@/components/ui/ProfileSettings';
+import { SocialLinksForm } from '@/components/profile/SocialLinksForm';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Constants
 const POSTS_PER_PAGE = 10;
@@ -31,6 +37,7 @@ export default function UserProfilePage() {
   const routeParams = useParams<{ username: string }>();
   const username = routeParams?.username || '';
   const identifier = username; // This can be username or UID
+  const { user: currentUser } = useAuth(); // Get current authenticated user
   
   if (!username) {
     // Handle the case where username is not available
@@ -48,6 +55,13 @@ export default function UserProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  
+  // Check if this is the current user's own profile
+  const isOwnProfile = useMemo(() => {
+    if (!currentUser || !user) return false;
+    return currentUser.uid === user.uid || 
+           (currentUser.username && currentUser.username === user.username);
+  }, [currentUser, user]);
 
   // Memoize social links
   const socialLinks = useMemo<SocialLink[]>(() => {
@@ -218,8 +232,8 @@ export default function UserProfilePage() {
   }, [identifier, fetchUserData, fetchPosts]);
   
   // Handle tab change
-  const handleTabChange = (tab: 'posts' | 'about') => {
-    setActiveTab(tab);
+  const handleTabChange = (tab: 'posts' | 'about' | 'settings') => {
+    setActiveTab(tab as 'posts' | 'about');
   };
   
   // Load more posts
@@ -352,36 +366,45 @@ export default function UserProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => handleTabChange('posts')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'posts'
-                ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'
-            }`}
-          >
-            Posts
-          </button>
-          <button
-            onClick={() => handleTabChange('about')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'about'
-                ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'
-            }`}
-          >
-            About
-          </button>
-        </nav>
-      </div>
+      <div className="mb-6">
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList className={`grid w-full ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'} max-w-md mb-6`}>
+            <TabsTrigger 
+              value="posts" 
+              onClick={() => handleTabChange('posts')}
+            >
+              Posts
+            </TabsTrigger>
+            <TabsTrigger 
+              value="about" 
+              onClick={() => handleTabChange('about')}
+            >
+              About
+            </TabsTrigger>
+            {isOwnProfile && (
+              <TabsTrigger 
+                value="settings" 
+                onClick={() => handleTabChange('settings')}
+              >
+                <FiSettings className="w-4 h-4 mr-1" />
+                Settings
+              </TabsTrigger>
+            )}
+          </TabsList>
 
-      {/* Tab Content */}
-      <div className="space-y-6">
-        {activeTab === 'about' ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">About</h2>
+          {/* Tab Content */}
+          <TabsContent value="about" className="space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About</h2>
+                {isOwnProfile && (
+                  <Button variant="outline" size="sm">
+                    <FiEdit3 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                )}
+              </div>
+
             
             {user.bio ? (
               <div className="mb-6">
@@ -477,8 +500,9 @@ export default function UserProfilePage() {
               </div>
             </div>
           </div>
-        ) : activeTab === 'posts' ? (
-          <>
+          </TabsContent>
+
+          <TabsContent value="posts" className="space-y-6">
             {posts.length > 0 ? (
               <div className="space-y-6">
                 {posts.map((post) => (
@@ -541,17 +565,75 @@ export default function UserProfilePage() {
                 )}
               </div>
             )}
-          </>
-        ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">About {user.displayName || 'User'}</h3>
-            {user.bio ? (
-              <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>
-            ) : (
-              <p className="text-gray-500 dark:text-gray-400">No bio available.</p>
-            )}
-          </div>
-        )}
+          </TabsContent>
+
+          {isOwnProfile && (
+            <TabsContent value="settings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Settings</CardTitle>
+                  <CardDescription>
+                    Update your profile information and preferences
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProfileSettings />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Social Links</CardTitle>
+                  <CardDescription>
+                    Manage your social media links
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <SocialLinksForm 
+                    initialData={currentUser?.socials || {}}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account Settings</CardTitle>
+                  <CardDescription>
+                    Manage your account settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Email</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {currentUser?.email}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Account Created</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {currentUser?.metadata?.creationTime ? 
+                        new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'N/A'
+                      }
+                    </p>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                    <Button variant="destructive">Delete Account</Button>
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      Permanently delete your account and all associated data
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
+        </Tabs>
       </div>
     </div>
   );
