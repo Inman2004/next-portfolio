@@ -2,17 +2,16 @@ import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
+// We'll fetch data through API routes to avoid Firebase on the server
+const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 import { formatNumber } from '@/lib/formatNumber';
-import dynamic from 'next/dynamic';
-import MarkdownServer from '@/components/blog/MarkdownServer';
+import MarkdownViewer from '@/components/blog/MarkdownViewer';
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { Eye, Calendar, User as UserIcon, Clock } from 'lucide-react';
 import BlogPostActions from '@/components/blog/BlogPostActions';
 import BlogFloatingBar from '@/components/blog/BlogFloatingBar';
 import { TableOfContents } from '@/components/blog/TableOfContents';
-import { getBlogPost } from '@/lib/blogUtils';
-import { getViewCount } from '@/lib/views';
 import { SocialLinks } from '@/components/blog/SocialLinks';
 import BlogMobileBar from '@/components/blog/BlogMobileBar';
 
@@ -27,23 +26,21 @@ interface PostPageProps {
 
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
-  // Fetch blog post directly server-side to avoid network in production SSR
-  const post = await getBlogPost(id);
-  if (!post) {
+  
+  // Fetch blog post data through API route
+  const postRes = await fetch(`${API_BASE_URL}/api/blog/${id}`, {
+    next: { revalidate: 60 }
+  });
+  
+  if (!postRes.ok) {
     notFound();
   }
-  // Get view count; do not increment on SSR
-  let views = 0;
-  try {
-    views = await getViewCount(id);
-  } catch {
-    views = 0;
-  }
+  
+  const { post, views } = await postRes.json();
   
   // Format dates (post.createdAt is now an ISO string from the API)
-  const createdAtDate = post.createdAt?.toDate ? post.createdAt.toDate() : new Date(post.createdAt);
-  const formattedDate = createdAtDate instanceof Date && !isNaN(createdAtDate.getTime())
-    ? format(createdAtDate, 'MMMM d, yyyy')
+  const formattedDate = post.createdAt 
+    ? format(new Date(post.createdAt), 'MMMM d, yyyy')
     : 'Unknown date';
     
   const readTime = post.readingTime || '5 min read';
@@ -59,36 +56,6 @@ export default async function PostPage({ params }: PostPageProps) {
   // Render the blog post content
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* JSON-LD Article schema for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: post.title,
-            datePublished: post.createdAt || formattedDate,
-            dateModified: post.updatedAt || post.createdAt || formattedDate,
-            author: post.author?.name ? { '@type': 'Person', name: post.author.name } : undefined,
-            image: post.coverImage ? [post.coverImage] : undefined,
-            mainEntityOfPage: {
-              '@type': 'WebPage',
-              '@id': `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/blog/${id}`,
-            },
-            publisher: {
-              '@type': 'Organization',
-              name: 'Immanuvel',
-              logo: {
-                '@type': 'ImageObject',
-                url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/icon.png`,
-              },
-            },
-            description: post.excerpt || undefined,
-            articleSection: Array.isArray(post.tags) && post.tags.length ? post.tags[0] : undefined,
-            keywords: Array.isArray(post.tags) ? post.tags.join(', ') : undefined,
-          }),
-        }}
-      />
       {/* Mobile bottom bar */}
       <BlogMobileBar
         postId={id}
@@ -149,8 +116,7 @@ export default async function PostPage({ params }: PostPageProps) {
         
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-10">
           <div className="prose max-w-none min-w-0 prose-img:rounded-xl prose-headings:scroll-mt-28">
-            {/* Server-rendered markdown for SEO-first content */}
-            <MarkdownServer content={post.content} />
+            <MarkdownViewer content={post.content} />
           </div>
           <div className="hidden lg:block w-[320px] min-w-0">
             <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
