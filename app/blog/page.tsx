@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils';
 import BlogListClient from '@/components/blog/BlogListClient';
+import { getBlogPosts } from '@/lib/blogUtils';
+import { getViewCounts } from '@/lib/views';
  
 
 // Revalidate the page every 60 seconds
@@ -61,16 +63,16 @@ const PostTitle = ({
 );
 
 export default async function BlogPage() {
-  // Fetch blog posts on the server side
-  const postsRes = await fetch(`${API_BASE_URL}/api/blog`, {
-    next: { revalidate: 60 }
-  });
-  
-  if (!postsRes.ok) {
-    notFound();
+  // Get posts without network calls during prerender
+  let posts = await getBlogPosts({ publishedOnly: true });
+  // Attach view counts, but don't fail build if unavailable
+  try {
+    const ids = posts.map((p: any) => p.id).filter(Boolean);
+    const counts = await getViewCounts(ids);
+    posts = posts.map((p: any) => ({ ...p, views: counts[p.id] || 0 }));
+  } catch {
+    // ignore view count errors at build time
   }
-  
-  const { posts } = await postsRes.json();
   
   // Normalize shape for client list
   const normalizedPosts = posts.map((p: any) => ({
