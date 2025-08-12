@@ -12,7 +12,6 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import Header from '@/components/Header';
 import { Mail, Calendar, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getBlogPost } from '@/lib/blogUtils';
 
 // This is a Client Component
 export default function ProfilePage() {

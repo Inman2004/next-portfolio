@@ -1,3 +1,4 @@
+import 'server-only';
 import { 
   doc, 
   getFirestore, 
@@ -12,10 +13,9 @@ import {
   DocumentData,
   QueryDocumentSnapshot
 } from 'firebase/firestore';
-import { getFirebase } from './firebase';
+import { db } from './firebase-server';
 
-// Initialize Firebase and get Firestore instance
-const { db } = getFirebase();
+// Use server-side Firestore instance
 const VIEWS_COLLECTION = 'post_views';
 
 // Increment view count for a post

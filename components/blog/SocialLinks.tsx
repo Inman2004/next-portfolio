@@ -18,8 +18,8 @@ export function SocialLinks({ socials, authorName, className = 'flex justify-cen
   return (
     <div className={`${className}`}>
       {authorName && (
-        <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 mx-2">
-          Follow Author
+        <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+          Follow {authorName}
         </h4>
       )}
       <div className="flex flex-wrap gap-3">

@@ -15,6 +15,129 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
   const [error, setError] = useState('');
   const { resolvedTheme } = useTheme();
 
+  // Unified palette for light/dark themes
+  const getThemeVariables = (isDark: boolean) => {
+    // Cohesive indigo/blue/teal palette, tuned for contrast and harmony
+    if (isDark) {
+      return {
+        // backgrounds
+        background: 'hsl(222, 47%, 11%)',
+        mainBkg: 'hsl(222, 45%, 14%)',
+        secondBkg: 'hsl(222, 35%, 18%)',
+
+        // text
+        textColor: 'hsl(210, 20%, 92%)',
+        titleColor: 'hsl(210, 20%, 95%)',
+
+        // borders and lines
+        border1: 'hsl(200, 30%, 45%)',
+        border2: 'hsl(200, 25%, 38%)',
+        lineColor: 'hsl(199, 89%, 48%)', // sky-500
+        nodeBorder: 'hsl(200, 30%, 45%)',
+        clusterBorder: 'hsl(200, 25%, 38%)',
+        edgeLabelBackground: 'rgba(15,23,42,0.7)',
+
+        // nodes
+        primaryColor: 'hsl(219, 27%, 18%)', // slate-800
+        primaryTextColor: 'hsl(210, 20%, 92%)',
+        primaryBorderColor: 'hsl(200, 30%, 45%)',
+
+        secondaryColor: 'hsl(221, 39%, 23%)', // slate-700
+        secondaryTextColor: 'hsl(210, 20%, 92%)',
+        secondaryBorderColor: 'hsl(199, 60%, 45%)',
+
+        tertiaryColor: 'hsl(217, 33%, 17%)', // slate-800ish
+        tertiaryTextColor: 'hsl(210, 20%, 92%)',
+        tertiaryBorderColor: 'hsl(200, 25%, 38%)',
+
+        // sequence/actors
+        actorBkg: 'hsl(222, 40%, 16%)',
+        actorBorder: 'hsl(199, 70%, 45%)',
+        actorTextColor: 'hsl(210, 20%, 92%)',
+        actorLineColor: 'hsl(199, 70%, 45%)',
+
+        // notes
+        noteBkgColor: 'rgba(14, 116, 144, 0.15)', // teal tint
+        noteTextColor: 'hsl(210, 20%, 92%)',
+        noteBorderColor: 'hsl(200, 30%, 45%)',
+
+        // arrows
+        arrowheadColor: 'hsl(199, 89%, 60%)',
+        arrowMarkerColor: 'hsl(199, 89%, 60%)',
+
+        // cScales for pies / class colors
+        cScale0: 'hsl(199, 89%, 48%)',   // sky-500
+        cScale1: 'hsl(217, 91%, 60%)',   // blue-500
+        cScale2: 'hsl(174, 72%, 56%)',   // teal-400
+        cScale3: 'hsl(262, 83%, 58%)',   // violet-500
+        cScale4: 'hsl(142, 70%, 45%)',   // green-500
+        cScale5: 'hsl(24, 95%, 64%)',    // orange-500
+        cScale6: 'hsl(334, 73%, 52%)',   // pink-500
+        cScale7: 'hsl(271, 91%, 65%)',   // purple-500
+        cScale8: 'hsl(0, 84%, 60%)',     // red-500
+        cScale9: 'hsl(45, 93%, 47%)',    // amber-500
+      } as const;
+    }
+    return {
+      // backgrounds
+      background: 'hsl(220, 40%, 99%)',
+      mainBkg: 'hsl(220, 45%, 98%)',
+      secondBkg: 'hsl(220, 35%, 96%)',
+
+      // text
+      textColor: 'hsl(222, 47%, 23%)', // slate-800
+      titleColor: 'hsl(222, 47%, 18%)',
+
+      // borders and lines
+      border1: 'hsl(220, 14%, 80%)',
+      border2: 'hsl(220, 16%, 85%)',
+      lineColor: 'hsl(217, 91%, 60%)', // blue-500
+      nodeBorder: 'hsl(220, 14%, 75%)',
+      clusterBorder: 'hsl(220, 16%, 80%)',
+      edgeLabelBackground: 'rgba(255,255,255,0.85)',
+
+      // nodes
+      primaryColor: 'hsl(210, 100%, 97%)', // light blue tint
+      primaryTextColor: 'hsl(222, 47%, 23%)',
+      primaryBorderColor: 'hsl(217, 91%, 60%)',
+
+      secondaryColor: 'hsl(192, 95%, 95%)', // light sky
+      secondaryTextColor: 'hsl(222, 47%, 23%)',
+      secondaryBorderColor: 'hsl(199, 89%, 48%)',
+
+      tertiaryColor: 'hsl(168, 76%, 95%)', // light teal
+      tertiaryTextColor: 'hsl(222, 47%, 23%)',
+      tertiaryBorderColor: 'hsl(174, 72%, 56%)',
+
+      // sequence/actors
+      actorBkg: 'hsl(220, 35%, 96%)',
+      actorBorder: 'hsl(217, 91%, 60%)',
+      actorTextColor: 'hsl(222, 47%, 23%)',
+      actorLineColor: 'hsl(217, 91%, 60%)',
+
+      // notes
+      noteBkgColor: 'rgba(199, 210, 254, 0.35)', // indigo-200 tint
+      noteTextColor: 'hsl(222, 47%, 23%)',
+      noteBorderColor: 'hsl(220, 14%, 80%)',
+
+      // arrows
+      arrowheadColor: 'hsl(217, 91%, 60%)',
+      arrowMarkerColor: 'hsl(217, 91%, 60%)',
+
+      // cScales for pies / class colors
+      cScale0: 'hsl(217, 91%, 60%)',
+      cScale1: 'hsl(199, 89%, 48%)',
+      cScale2: 'hsl(174, 72%, 56%)',
+      cScale3: 'hsl(262, 83%, 58%)',
+      cScale4: 'hsl(142, 70%, 45%)',
+      cScale5: 'hsl(24, 95%, 64%)',
+      cScale6: 'hsl(334, 73%, 52%)',
+      cScale7: 'hsl(271, 91%, 65%)',
+      cScale8: 'hsl(0, 84%, 60%)',
+      cScale9: 'hsl(45, 93%, 47%)',
+    } as const;
+  };
+
   useEffect(() => {
     // Only run on client-side
     if (typeof window === 'undefined') return;
@@ -33,57 +156,9 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
           fontFamily: 'inherit',
           themeVariables: {
             darkMode: resolvedTheme === 'dark',
-            // Background colors - Using a deep teal base for dark, soft purple for light
-            background: resolvedTheme === 'dark' ? 'hsl(192, 70%, 8%)' : 'hsl(260, 60%, 98%)',
-            mainBkg: resolvedTheme === 'dark' ? 'hsl(192, 70%, 12%)' : 'hsl(260, 50%, 96%)',
-            secondBkg: resolvedTheme === 'dark' ? 'hsl(192, 70%, 16%)' : 'hsl(230, 40%, 84%)',
-            
-            // Text colors - High contrast for readability
-            textColor: resolvedTheme === 'dark' ? 'hsl(180, 30%, 90%)' : 'hsl(260, 70%, 20%)',
-            
-            // Border and line colors - Distinct but not harsh
-            border1: resolvedTheme === 'dark' ? 'hsl(180, 50%, 30%)' : 'hsl(260, 50%, 80%)',
-            border2: resolvedTheme === 'dark' ? 'hsl(180, 40%, 35%)' : 'hsl(260, 40%, 85%)',
-            lineColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 50%)' : 'hsl(260, 60%, 70%)',
-            
-            // Sequence diagram specific
-            actorBkg: resolvedTheme === 'dark' ? 'hsl(192, 70%, 15%)' : 'hsl(260, 40%, 92%)',
-            actorBorder: resolvedTheme === 'dark' ? 'hsl(180, 50%, 40%)' : 'hsl(260, 50%, 75%)',
-            actorTextColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 90%)' : 'hsl(260, 70%, 25%)',
-            actorLineColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 50%)' : 'hsl(260, 50%, 75%)',
-            
-            // Node colors - Primary elements
-            primaryColor: resolvedTheme === 'dark' ? 'hsl(192, 70%, 20%)' : 'hsl(260, 60%, 90%)',
-            primaryTextColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 90%)' : 'hsl(260, 70%, 25%)',
-            primaryBorderColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 40%)' : 'hsl(260, 60%, 70%)',
-            
-            // Secondary colors - Supporting elements
-            secondaryColor: resolvedTheme === 'dark' ? 'hsl(192, 50%, 18%)' : 'hsl(260, 30%, 95%)',
-            secondaryTextColor: resolvedTheme === 'dark' ? 'hsl(180, 30%, 85%)' : 'hsl(260, 50%, 30%)',
-            secondaryBorderColor: resolvedTheme === 'dark' ? 'hsl(180, 40%, 35%)' : 'hsl(260, 40%, 80%)',
-            
-            // Tertiary colors - Background elements
-            tertiaryColor: resolvedTheme === 'dark' ? 'hsl(192, 70%, 10%)' : 'hsl(260, 20%, 97%)',
-            tertiaryTextColor: resolvedTheme === 'dark' ? 'hsl(180, 40%, 80%)' : 'hsl(260, 40%, 40%)',
-            tertiaryBorderColor: resolvedTheme === 'dark' ? 'hsl(180, 40%, 30%)' : 'hsl(260, 30%, 85%)',
-            
-            // Note boxes and highlights
-            noteBkgColor: resolvedTheme === 'dark' ? 'hsla(180, 50%, 15%, 0.3)' : 'hsla(45, 60%, 70%, 0.7)',
-            noteTextColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 90%)' : 'hsl(260, 70%, 25%)',
-            noteBorderColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 30%)' : 'hsl(260, 50%, 80%)',
-            
-            // Font settings
+            ...getThemeVariables(resolvedTheme === 'dark'),
             fontSize: '14px',
             fontFamily: 'inherit',
-            
-            // Additional sequence diagram styling
-            labelBoxBorderColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 40%)' : 'hsl(260, 50%, 80%)',
-            labelBoxBkgColor: resolvedTheme === 'dark' ? 'hsl(192, 70%, 12%)' : 'hsl(260, 40%, 96%)',
-            labelTextColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 90%)' : 'hsl(260, 70%, 25%)',
-            
-            // Arrow colors
-            arrowheadColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 70%)' : 'hsl(260, 70%, 60%)',
-            arrowMarkerColor: resolvedTheme === 'dark' ? 'hsl(180, 50%, 70%)' : 'hsl(260, 70%, 60%)',
           },
         };
         
@@ -134,6 +209,7 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
         theme: (resolvedTheme === 'dark' ? 'dark' : 'default') as 'dark' | 'default',
         themeVariables: {
           ...(currentConfig.themeVariables || {}),
+          ...getThemeVariables(resolvedTheme === 'dark'),
           fontSize: window.innerWidth < 768 ? '12px' : '14px',
         },
       };

@@ -1,4 +1,5 @@
-import { db } from './firebase';
+import 'server-only';
+import { db } from './firebase-server';
 import { 
   doc, 
   getDoc, 

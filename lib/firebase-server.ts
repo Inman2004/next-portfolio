@@ -1,8 +1,8 @@
+import 'server-only';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
 import { getStorage, FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
-import { logToFile, logError } from './apiLogger';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -26,33 +26,33 @@ const initializeFirebase = () => {
   
   // Return existing instances if already initialized
   if (firebaseApp) {
-    logToFile(`${logContext} Using existing Firebase instance`);
+    console.log(`${logContext} Using existing Firebase instance`);
     return { firebaseApp, auth, db, storage };
   }
 
   try {
-    logToFile(`${logContext} Initializing Firebase`);
+    console.log(`${logContext} Initializing Firebase`);
     
     // Initialize Firebase
     firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     
     // Initialize services
-    logToFile(`${logContext} Initializing Auth service`);
+    console.log(`${logContext} Initializing Auth service`);
     auth = getAuth(firebaseApp);
     
-    logToFile(`${logContext} Initializing Firestore`);
+    console.log(`${logContext} Initializing Firestore`);
     db = getFirestore(firebaseApp);
     
-    logToFile(`${logContext} Initializing Storage`);
+    console.log(`${logContext} Initializing Storage`);
     storage = getStorage(firebaseApp);
 
     // Configure emulators in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
       try {
         // Only connect to emulators if not already connected
         const emulatorConnected = (global as any)._emulatorConnected;
         if (!emulatorConnected) {
-          logToFile(`${logContext} Connecting to emulators`);
+          console.log(`${logContext} Connecting to emulators`);
           
           // Connect to Firestore emulator
           connectFirestoreEmulator(db, 'localhost', 8080);
@@ -64,21 +64,20 @@ const initializeFirebase = () => {
           connectStorageEmulator(storage, 'localhost', 9199);
           
           (global as any)._emulatorConnected = true;
-          logToFile(`${logContext} Connected to all emulators`);
+          console.log(`${logContext} Connected to all emulators`);
         }
       } catch (emulatorError) {
-        logError(emulatorError instanceof Error ? emulatorError : new Error(String(emulatorError)), 
-               `${logContext} Error connecting to emulators`);
+        console.error(`${logContext} Error connecting to emulators:`, emulatorError);
         // Don't throw, continue without emulators
       }
     }
 
-    logToFile(`${logContext} Firebase initialized successfully`);
+    console.log(`${logContext} Firebase initialized successfully`);
     return { firebaseApp, auth, db, storage };
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logError(new Error(`Firebase initialization failed: ${errorMessage}`), logContext);
+    console.error(`${logContext} Firebase initialization failed:`, error);
     
     // Log the full error for debugging
     console.error('Firebase initialization error details:', {
@@ -96,3 +95,6 @@ const initializeFirebase = () => {
 
 // Export initialized services
 export { auth, db, storage, firebaseApp as app, initializeFirebase };
+
+// Initialize Firebase automatically when this module is imported
+initializeFirebase();

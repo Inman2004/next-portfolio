@@ -209,7 +209,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-900/50 dark:border-gray-700', className)}>
+    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-900/50 dark:border-gray-700 w-full', className)}>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
         <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />

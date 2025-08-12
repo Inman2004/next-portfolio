@@ -16,7 +16,7 @@ const initialAssistantMsg =
 
 export default function ChatWidget() {
   const pathname = usePathname();
-  if (pathname !== "/") return null;
+  const isVisible = pathname === "/";
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -225,6 +225,8 @@ export default function ChatWidget() {
     document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [open]);
+
+  if (!isVisible) return null;
 
   return (
     <>

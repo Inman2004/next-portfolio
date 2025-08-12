@@ -1,4 +1,6 @@
 import { MetadataRoute } from 'next';
+import { db } from '@/lib/firebase-server';
+import { collection, getDocs } from 'firebase/firestore';
 
 // Base URL from environment variable or fallback
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.app';
@@ -6,8 +8,8 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.
 // Common last modified date
 const lastModified = new Date();
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const urls: MetadataRoute.Sitemap = [
     // Main pages
     {
       url: baseUrl,
@@ -74,4 +76,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.2,
     },
   ];
+
+  // Add blog posts (published only)
+  try {
+    const snap = await getDocs(collection(db, 'blogPosts'));
+    snap.forEach((doc) => {
+      const d = doc.data() as any;
+      if (d?.published === false) return; // skip private
+      const createdAt = d?.createdAt?.toDate ? d.createdAt.toDate() : (d?.createdAt ? new Date(d.createdAt) : lastModified);
+      urls.push({
+        url: `${baseUrl}/blog/${doc.id}`,
+        lastModified: createdAt,
+        changeFrequency: 'weekly',
+        priority: 0.6,
+      });
+    });
+  } catch (e) {
+    // ignore errors; keep static urls
+  }
+
+  return urls;
 }

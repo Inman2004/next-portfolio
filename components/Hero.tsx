@@ -26,7 +26,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Github, Linkedin, Quote } from "lucide-react";
 import { SkillBadge } from "./skillColors";
 import InteractiveCard3D from "./ThreeJS/HeroID";
-import { getBlogPosts } from "@/lib/blogUtils";
 import Link from "next/link";
 
 export default function Hero() {
@@ -57,14 +56,22 @@ export default function Hero() {
         }
       }
 
-      // If no valid cache, fetch fresh data
-      const posts = await getBlogPosts({
-        limit: 1,
-        publishedOnly: true
-      });
+      // If no valid cache, fetch fresh data via API
+      const res = await fetch('/api/blog');
+      const json = await res.json();
+      const posts = Array.isArray(json?.posts) ? json.posts : [];
       
       if (posts.length > 0) {
-        const postData = posts[0];
+        // Pick newest by createdAt
+        posts.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const first = posts[0];
+        // Normalize createdAt to match existing consumption
+        const postData = {
+          ...first,
+          createdAt: first?.createdAt
+            ? { toDate: () => new Date(first.createdAt as string) }
+            : undefined,
+        } as any;
         setLatestPost(postData);
         
         // Cache the result
@@ -136,10 +143,10 @@ export default function Hero() {
             <div className="text-sm sm:text-base md:text-lg text-indigo-700 dark:text-indigo-300 mb-2 min-h-[120px] flex items-center justify-center lg:justify-start">
               <MorphingText
                 texts={[
-                  "UI/UX Designer",
                   "Full Stack Developer",
-                  "Graphic Designer",
-                  "3D Artist",
+                  "AI/ML Engineer",
+                  "AI Integration Specialist",
+                  "LLM Specialist",
                 ]}
                 className="text-center lg:text-left !h-[160px] text-indigo-800/90 dark:text-indigo-300"
               />
@@ -148,13 +155,13 @@ export default function Hero() {
               {/* Stats */}
               <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
                 <div className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                  <span className="font-medium text-blue-600 dark:text-blue-400">2+</span> years experience
+                  <span className="font-medium text-green-600 dark:text-green-400">2+</span> years experience
                 </div>
                 <div className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                  <span className="font-medium text-blue-600 dark:text-blue-400">15+</span> projects
+                  <span className="font-medium text-green-600 dark:text-green-400">15+</span> projects
                 </div>
                 <div className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                  <span className="font-medium text-blue-600 dark:text-blue-400">High Activity+</span> in GitHub
+                  <span className="font-medium text-green-600 dark:text-green-400">High Activity</span> in GitHub
                 </div>
               </div>
 

@@ -4,11 +4,12 @@ import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLA
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { createHeadingIdGenerator } from '@/lib/markdownUtils';
-import { Copy, Check, ArrowUpRight } from 'lucide-react';
+import { Copy, Check, ArrowUpRight, ZoomIn, ZoomOut, Maximize2, RefreshCcw } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import Mermaid from '../Mermaid';
 // Import the Prism component type from react-syntax-highlighter
 import type { PrismLight } from 'react-syntax-highlighter';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 // Lazy load heavy components
 const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: true });
@@ -228,7 +229,258 @@ const CustomCode: React.FC<CustomCodeProps> = ({
   // Check if this is a mermaid diagram
   if (className === 'language-mermaid' || className === 'mermaid') {
     const code = String(children).trim();
-    return <Mermaid chart={code} />;
+    const [zoom, setZoom] = useState(1);
+    const [open, setOpen] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const innerRef = useRef<HTMLDivElement | null>(null);
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const dialogScrollRef = useRef<HTMLDivElement | null>(null);
+    const initialZoomRef = useRef<number>(1);
+    const hasInitialRef = useRef<boolean>(false);
+
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) {
+          setVisible(true);
+          io.disconnect();
+        }
+      }, { rootMargin: '200px 0px' });
+      io.observe(el);
+      return () => io.disconnect();
+    }, []);
+
+    const fitToWidth = () => {
+      try {
+        const container = containerRef.current;
+        const svg = innerRef.current?.querySelector('svg');
+        if (!container || !svg) return setZoom(1);
+        const containerWidth = container.clientWidth - 24; // padding
+        const svgWidth = (svg as SVGGraphicsElement).getBBox?.().width || (svg as any).clientWidth || 0;
+        if (svgWidth > 0) {
+          const next = Math.max(0.4, Math.min(2.5, containerWidth / svgWidth));
+          setZoom(next);
+          if (!hasInitialRef.current) {
+            initialZoomRef.current = next;
+            hasInitialRef.current = true;
+          }
+        } else {
+          setZoom(1);
+          if (!hasInitialRef.current) {
+            initialZoomRef.current = 1;
+            hasInitialRef.current = true;
+          }
+        }
+      } catch {
+        setZoom(1);
+        if (!hasInitialRef.current) {
+          initialZoomRef.current = 1;
+          hasInitialRef.current = true;
+        }
+      }
+    };
+
+    useEffect(() => {
+      // Try to fit after first render
+      const t = setTimeout(fitToWidth, 50);
+      return () => clearTimeout(t);
+    }, [visible, open]);
+
+    // Pan/Zoom interactions (wheel zoom + drag pan + touch pinch)
+    useEffect(() => {
+      const attach = (scrollEl: HTMLDivElement | null) => {
+        if (!scrollEl) return () => {};
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+        let touchMode: 'none' | 'drag' | 'pinch' = 'none';
+        let lastDist = 0;
+        let startZoom = 1;
+
+        const onWheel = (e: WheelEvent) => {
+          // Zoom when ctrl/cmd key held to avoid hijacking normal scroll
+          if (!(e.ctrlKey || e.metaKey)) return;
+          e.preventDefault();
+          const rect = scrollEl.getBoundingClientRect();
+          const inner = innerRef.current;
+          if (!inner) return;
+          const mouseX = e.clientX - rect.left + scrollEl.scrollLeft;
+          const mouseY = e.clientY - rect.top + scrollEl.scrollTop;
+          const contentX = mouseX / zoom;
+          const contentY = mouseY / zoom;
+          const delta = -e.deltaY; // up zooms in
+          const factor = delta > 0 ? 1.1 : 0.9;
+          const next = Math.min(3, Math.max(0.3, +(zoom * factor).toFixed(3)));
+          setZoom(next);
+          // keep cursor point stable
+          const newScrollLeft = contentX * next - (e.clientX - rect.left);
+          const newScrollTop = contentY * next - (e.clientY - rect.top);
+          scrollEl.scrollLeft = Math.max(0, newScrollLeft);
+          scrollEl.scrollTop = Math.max(0, newScrollTop);
+        };
+
+        const onMouseDown = (e: MouseEvent) => {
+          if (e.button !== 0) return; // left only
+          isDragging = true;
+          lastX = e.clientX;
+          lastY = e.clientY;
+          scrollEl.style.cursor = 'grabbing';
+        };
+        const onMouseMove = (e: MouseEvent) => {
+          if (!isDragging) return;
+          const dx = e.clientX - lastX;
+          const dy = e.clientY - lastY;
+          lastX = e.clientX;
+          lastY = e.clientY;
+          scrollEl.scrollLeft -= dx;
+          scrollEl.scrollTop -= dy;
+        };
+        const onMouseUp = () => {
+          isDragging = false;
+          scrollEl.style.cursor = '';
+        };
+
+        const dist = (t1: Touch, t2: Touch) => {
+          const dx = t1.clientX - t2.clientX;
+          const dy = t1.clientY - t2.clientY;
+          return Math.hypot(dx, dy);
+        };
+
+        const center = (t1: Touch, t2: Touch) => ({
+          x: (t1.clientX + t2.clientX) / 2,
+          y: (t1.clientY + t2.clientY) / 2,
+        });
+
+        const onTouchStart = (e: TouchEvent) => {
+          if (e.touches.length === 1) {
+            touchMode = 'drag';
+            lastX = e.touches[0].clientX;
+            lastY = e.touches[0].clientY;
+          } else if (e.touches.length >= 2) {
+            touchMode = 'pinch';
+            lastDist = dist(e.touches[0], e.touches[1]);
+            startZoom = zoom;
+          }
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+          if (touchMode === 'drag' && e.touches.length === 1) {
+            e.preventDefault();
+            const tx = e.touches[0].clientX;
+            const ty = e.touches[0].clientY;
+            scrollEl.scrollLeft -= (tx - lastX);
+            scrollEl.scrollTop -= (ty - lastY);
+            lastX = tx;
+            lastY = ty;
+          } else if (touchMode === 'pinch' && e.touches.length >= 2) {
+            e.preventDefault();
+            const d = dist(e.touches[0], e.touches[1]);
+            if (lastDist === 0) return;
+            const factor = d / lastDist;
+            const rect = scrollEl.getBoundingClientRect();
+            const c = center(e.touches[0], e.touches[1]);
+            const focusX = c.x - rect.left + scrollEl.scrollLeft;
+            const focusY = c.y - rect.top + scrollEl.scrollTop;
+            const contentX = focusX / zoom;
+            const contentY = focusY / zoom;
+            const next = Math.min(3, Math.max(0.3, +(startZoom * factor).toFixed(3)));
+            setZoom(next);
+            scrollEl.scrollLeft = contentX * next - (c.x - rect.left);
+            scrollEl.scrollTop = contentY * next - (c.y - rect.top);
+          }
+        };
+        const onTouchEnd = () => {
+          touchMode = 'none';
+          lastDist = 0;
+        };
+
+        scrollEl.addEventListener('wheel', onWheel, { passive: false });
+        scrollEl.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        scrollEl.addEventListener('touchstart', onTouchStart, { passive: false });
+        scrollEl.addEventListener('touchmove', onTouchMove, { passive: false });
+        scrollEl.addEventListener('touchend', onTouchEnd);
+        scrollEl.addEventListener('touchcancel', onTouchEnd);
+
+        return () => {
+          scrollEl.removeEventListener('wheel', onWheel);
+          scrollEl.removeEventListener('mousedown', onMouseDown);
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          scrollEl.removeEventListener('touchstart', onTouchStart);
+          scrollEl.removeEventListener('touchmove', onTouchMove);
+          scrollEl.removeEventListener('touchend', onTouchEnd);
+          scrollEl.removeEventListener('touchcancel', onTouchEnd);
+        };
+      };
+
+      const detachMain = attach(scrollRef.current);
+      const detachDialog = attach(dialogScrollRef.current);
+      return () => {
+        detachMain?.();
+        detachDialog?.();
+      };
+    }, [zoom, visible, open]);
+
+    const Toolbar = (
+      <div className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-gray-200 dark:border-gray-700 p-1 shadow">
+        <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.min(2.5, +(z + 0.1).toFixed(2)))} aria-label="Zoom in">
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.max(0.4, +(z - 0.1).toFixed(2)))} aria-label="Zoom out">
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        <button className="p-1 hover:text-blue-600" onClick={() => setZoom(initialZoomRef.current)} aria-label="Reset zoom">
+          <RefreshCcw className="w-4 h-4" />
+        </button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <button className="p-1 hover:text-blue-600" aria-label="Full screen">
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[min(1000px,95vw)] p-3 md:p-4">
+            <DialogHeader>
+              <DialogTitle>Diagram</DialogTitle>
+            </DialogHeader>
+            <div className="relative">
+              <div className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-gray-200 dark:border-gray-700 p-1 shadow">
+                <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.min(3, +(z + 0.1).toFixed(2)))} aria-label="Zoom in">
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.max(0.3, +(z - 0.1).toFixed(2)))} aria-label="Zoom out">
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:text-blue-600" onClick={() => setZoom(1)} aria-label="Reset zoom">
+                  <RefreshCcw className="w-4 h-4" />
+                </button>
+              </div>
+              <div ref={dialogScrollRef} className="overflow-auto max-h-[80vh] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-3">
+                  {visible || open ? <Mermaid chart={code} /> : null}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+
+    return (
+      <div ref={containerRef} className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        {Toolbar}
+        <div ref={scrollRef} className="overflow-auto max-h-80 md:max-h-96 touch-pan-y touch-pan-x">
+          <div ref={innerRef} style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-3">
+            {visible ? <Mermaid chart={code} /> : (
+              <div className="h-40 flex items-center justify-center text-gray-400 text-sm">Loading diagram…</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   }
   // Determine the language and filename from the className
   const match = /language-(\w+)(?::(.+))?/.exec(className || '');
