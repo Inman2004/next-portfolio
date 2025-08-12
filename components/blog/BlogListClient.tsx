@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useLoadingState } from '@/hooks/useLoadingState';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Eye, Clock, Calendar, Crown, ArrowRight } from 'lucide-react';
@@ -34,6 +35,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const { startLoading, stopLoading } = useLoadingState();
 
   const allTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
@@ -48,12 +50,25 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
   }, [posts]);
 
   const toggleTag = (tag: string) => {
+    startLoading();
     const next = new Set(selectedTags);
     if (next.has(tag)) next.delete(tag); else next.add(tag);
     setSelectedTags(next);
+    setTimeout(() => stopLoading(), 300); // Short delay to show loading effect
   };
 
-  const clearTags = () => setSelectedTags(new Set());
+  const clearTags = () => {
+    startLoading();
+    setSelectedTags(new Set());
+    setTimeout(() => stopLoading(), 300); // Short delay to show loading effect
+  };
+
+  // Show loading state when filters change
+  useEffect(() => {
+    startLoading();
+    const timer = setTimeout(() => stopLoading(), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, sortBy, selectedTags, startLoading, stopLoading]);
 
   const filteredAndSorted = useMemo(() => {
     let list = posts ?? [];
@@ -87,14 +102,23 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
           <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
         </div>
         <div className="w-full md:w-auto md:flex-1 max-w-md">
-          <BlogSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} placeholder="Search blog posts..." className="w-full" />
+          <BlogSearch 
+            searchQuery={searchQuery} 
+            onSearchChange={(query) => {
+              startLoading();
+              setSearchQuery(query);
+              setTimeout(() => stopLoading(), 300);
+            }} 
+            placeholder="Search blog posts..." 
+            className="w-full" 
+          />
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => setSortBy('newest')} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
-        <button onClick={() => setSortBy('oldest')} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
-        <button onClick={() => setSortBy('popular')} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
+        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
+        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
+        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
       </div>
 
       {allTags.length > 0 && (

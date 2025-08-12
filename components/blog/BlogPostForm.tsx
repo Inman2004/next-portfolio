@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useLoadingState } from '@/hooks/useLoadingState';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +35,7 @@ export default function BlogPostForm({
   isEditing = false,
 }: BlogPostFormProps) {
   const router = useRouter();
+  const { startLoading, stopLoading } = useLoadingState();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
@@ -225,6 +227,7 @@ export default function BlogPostForm({
   
     setIsUploading(true);
     setUploadError(null);
+    startLoading();
   
     try {
       // Create form data
@@ -256,6 +259,7 @@ export default function BlogPostForm({
       toast.error('Failed to upload image');
     } finally {
       setIsUploading(false);
+      stopLoading();
     }
   };
 
@@ -303,6 +307,7 @@ export default function BlogPostForm({
 
   const handleFormSubmit = async (formData: BlogPostFormValues) => {
     console.log('=== Form submission started ===');
+    startLoading();
 
     try {
       // Validate required fields
@@ -336,6 +341,8 @@ export default function BlogPostForm({
     } catch (error) {
       console.error('Error in form submission:', error);
       toast.error(`Failed to save post: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      stopLoading();
     }
   };
 

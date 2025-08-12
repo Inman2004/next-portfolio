@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import emailjs from '@emailjs/browser';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { BlogCacheProvider } from '@/contexts/BlogCacheContext';
+import { LoadingProvider } from '@/hooks/useLoadingState';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -47,10 +48,12 @@ export default function Providers({
   if (!mounted) {
     return (
       <AuthProvider>
-        <Header />
-        <main>
-          {children}
-        </main>
+        <LoadingProvider>
+          <Header />
+          <main>
+            {children}
+          </main>
+        </LoadingProvider>
       </AuthProvider>
     );
   }
@@ -66,11 +69,13 @@ export default function Providers({
           themes={['light', 'dark', 'system']}
         >
           <ThemeProvider>
-            <ThemeWrapper>
-              <main className="min-h-screen bg-background text-foreground transition-colors duration-200">
-                {children}
-              </main>
-            </ThemeWrapper>
+            <LoadingProvider>
+              <ThemeWrapper>
+                <main className="min-h-screen bg-background text-foreground transition-colors duration-200">
+                  {children}
+                </main>
+              </ThemeWrapper>
+            </LoadingProvider>
           </ThemeProvider>
         </NextThemesProvider>
       </BlogCacheProvider>

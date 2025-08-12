@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { PageLoadingProvider } from "@/components/providers/page-loading-provider";
+import { NavigationLoading } from "@/components/ui/navigation-loading";
 import Header from "@/components/Header";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { elegantScript, pacifico } from './fonts';
@@ -205,6 +206,7 @@ export default function RootLayout({
         <PageLoadingProvider>
           <Providers>
             <ErrorBoundary>
+              <NavigationLoading />
               <div className="flex flex-col min-h-screen">
                 <Header />
                 <main className="flex-grow" id="main-content">

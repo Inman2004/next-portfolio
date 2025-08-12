@@ -14,6 +14,7 @@ import { getBlogPost } from '@/lib/blogUtils';
 import { getViewCount } from '@/lib/views';
 import { SocialLinks } from '@/components/blog/SocialLinks';
 import BlogMobileBar from '@/components/blog/BlogMobileBar';
+import BlogLoadingHandler from '@/components/blog/BlogLoadingHandler';
 
 // Revalidate the page every 60 seconds
 export const revalidate = 60;
@@ -48,16 +49,18 @@ export default async function PostPage({ params }: PostPageProps) {
   const readTime = post.readingTime || '5 min read';
   
   // Ensure author is properly typed
-  const author = typeof post.author === 'object' ? post.author : { 
+  const author = typeof post.author === 'object' && post.author ? post.author : { 
     name: 'Anonymous',
     photoURL: undefined,
     bio: undefined,
-    email: undefined
+    email: undefined,
+    socials: undefined
   };
 
   // Render the blog post content
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <BlogLoadingHandler />
       {/* JSON-LD Article schema for SEO */}
       <script
         type="application/ld+json"
@@ -68,7 +71,7 @@ export default async function PostPage({ params }: PostPageProps) {
             headline: post.title,
             datePublished: post.createdAt || formattedDate,
             dateModified: post.updatedAt || post.createdAt || formattedDate,
-            author: post.author?.name ? { '@type': 'Person', name: post.author.name } : undefined,
+            author: author?.name ? { '@type': 'Person', name: author.name } : undefined,
             image: post.coverImage ? [post.coverImage] : undefined,
             mainEntityOfPage: {
               '@type': 'WebPage',

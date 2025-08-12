@@ -12,16 +12,26 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import Header from '@/components/Header';
 import { Mail, Calendar, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLoadingState } from '@/hooks/useLoadingState';
+import ProfileLoadingHandler from '@/components/profile/ProfileLoadingHandler';
 
 // This is a Client Component
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const { startLoading, stopLoading } = useLoadingState();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Show loading indicator when tabs change
+  const handleTabChange = (tab: string) => {
+    startLoading();
+    setActiveTab(tab);
+    setTimeout(() => stopLoading(), 300);
+  };
 
   if (!isClient || loading) {
     return (
@@ -90,6 +100,7 @@ export default function ProfilePage() {
 
   return (
     <>
+    <ProfileLoadingHandler />
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black p-4 md:p-8 ml-10">
       <div className="max-w-8xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8">
@@ -169,13 +180,13 @@ export default function ProfilePage() {
           <div className="w-full md:w-3/4">
             <Tabs defaultValue="profile" className="w-full">
               <TabsList className="grid w-full grid-cols-3 max-w-xs mb-6">
-                <TabsTrigger value="profile" onClick={() => setActiveTab('profile')}>
+                <TabsTrigger value="profile" onClick={() => handleTabChange('profile')}>
                   Profile
                 </TabsTrigger>
-                <TabsTrigger value="posts" onClick={() => setActiveTab('posts')}>
+                <TabsTrigger value="posts" onClick={() => handleTabChange('posts')}>
                   Posts
                 </TabsTrigger>
-                <TabsTrigger value="settings" onClick={() => setActiveTab('settings')}>
+                <TabsTrigger value="settings" onClick={() => handleTabChange('settings')}>
                   Settings
                 </TabsTrigger>
               </TabsList>

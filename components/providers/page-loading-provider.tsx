@@ -2,15 +2,17 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
-import { PageLoading } from '../ui/page-loading';
+import { LoadingController } from '../ui/loading-controller';
+import { useLoadingState } from '@/hooks/useLoadingState';
 
 // Client-side only component that uses useSearchParams
 function LoadingContent({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [prevPath, setPrevPath] = useState(pathname);
   const [isClient, setIsClient] = useState(false);
+  const { startLoading, stopLoading } = useLoadingState();
 
   // Set client-side flag on mount
   useEffect(() => {
@@ -19,47 +21,66 @@ function LoadingContent({ children }: { children: React.ReactNode }) {
 
   // Handle route changes
   useEffect(() => {
-    // Don't show loading spinner for blog page
-    if (pathname && pathname.startsWith('/blog')) {
-      setIsLoading(false);
-      return;
-    }
-    
     if (pathname && pathname !== prevPath) {
-      setIsLoading(true);
+      console.log('Route change detected:', prevPath, '->', pathname);
+      setIsPageLoading(true);
+      startLoading();
       setPrevPath(pathname);
+      
+      // Stop loading after a delay to allow content to load
+      const timer = setTimeout(() => {
+        setIsPageLoading(false);
+        stopLoading();
+      }, 800);
+      
+      return () => clearTimeout(timer);
     }
-  }, [pathname, prevPath]);
+  }, [pathname, prevPath, startLoading, stopLoading]);
+
+  // Handle search param changes
+  useEffect(() => {
+    if (isClient && searchParams) {
+      startLoading();
+      const timer = setTimeout(() => {
+        stopLoading();
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, isClient, startLoading, stopLoading]);
 
   // Handle page load completion
   useEffect(() => {
     if (!isClient) return;
 
     const handleLoad = () => {
-      setIsLoading(false);
+      setIsPageLoading(false);
+      stopLoading();
     };
 
     // If the page is already loaded when this component mounts
     if (document.readyState === 'complete') {
-      setIsLoading(false);
+      setIsPageLoading(false);
+      stopLoading();
     } else {
       window.addEventListener('load', handleLoad);
     }
 
-    // Also set a timeout as a fallback in case the load event doesn't fire
+    // Also set a timeout as a fallback
     const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+      setIsPageLoading(false);
+      stopLoading();
+    }, 1500);
 
     return () => {
       window.removeEventListener('load', handleLoad);
       clearTimeout(timer);
     };
-  }, [isClient, pathname, searchParams]);
+  }, [isClient, pathname, stopLoading]);
 
   return (
     <>
-      <PageLoading isLoading={isLoading} />
+      <LoadingController isLoading={isPageLoading} />
       {children}
     </>
   );
@@ -85,9 +106,8 @@ export function PageLoadingProvider({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
-
   return (
-    <Suspense fallback={<PageLoading isLoading={true} />}>
+    <Suspense fallback={<LoadingController isLoading={true} />}>
       <LoadingContent>
         {children}
       </LoadingContent>
