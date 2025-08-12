@@ -74,10 +74,35 @@ export default async function BlogPage() {
     // ignore view count errors at build time
   }
   
-  // Normalize shape for client list
+  // Normalize dates safely for client list
+  const toIsoStringSafe = (value: any): string => {
+    try {
+      if (!value) return new Date().toISOString();
+      if (typeof value?.toDate === 'function') {
+        const d = value.toDate();
+        return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+      }
+      if (value instanceof Date) {
+        return isNaN(value.getTime()) ? new Date().toISOString() : value.toISOString();
+      }
+      if (typeof value === 'string') {
+        const t = Date.parse(value);
+        return isNaN(t) ? new Date().toISOString() : new Date(t).toISOString();
+      }
+      if (typeof value === 'number') {
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+      }
+      return new Date().toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
+
   const normalizedPosts = posts.map((p: any) => ({
     ...p,
-    createdAt: typeof p.createdAt === 'string' ? p.createdAt : new Date(p.createdAt).toISOString(),
+    createdAt: toIsoStringSafe(p.createdAt),
+    updatedAt: toIsoStringSafe(p.updatedAt ?? p.createdAt),
   }));
 
   return (
