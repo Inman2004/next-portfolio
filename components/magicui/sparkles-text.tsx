@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
-import { CSSProperties, ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { CSSProperties, ReactElement } from "react";
 
 import { cn } from "@/lib/utils";
 

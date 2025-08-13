@@ -1,2 +1,2 @@
-import { domMax } from "motion/react"
+import { domMax } from "framer-motion"
 export default domMax

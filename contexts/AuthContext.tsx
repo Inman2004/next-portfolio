@@ -77,6 +77,7 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
 }
 
+// Use the new React 19 context API
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export { AuthContext };
