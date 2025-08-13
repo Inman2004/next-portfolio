@@ -117,9 +117,9 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
-        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
-        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
+        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
+        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
+        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
       </div>
 
       {allTags.length > 0 && (
@@ -173,7 +173,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                     <span>{formatNumber(post.views || 0)}</span>
                   </div>
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{post.title}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-lime-500 dark:group-hover:text-lime-400 transition-colors">{post.title}</h2>
                 <div className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -187,7 +187,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                       )}
                     </div>
                   </div>
-                  <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm transition-colors">
+                  <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 hover:text-lime-700 dark:text-blue-400 dark:hover:text-lime-300 font-medium text-sm transition-colors">
                     Read More <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                 </div>
