@@ -15,6 +15,10 @@ import { getViewCount } from '@/lib/views';
 import { SocialLinks } from '@/components/blog/SocialLinks';
 import BlogMobileBar from '@/components/blog/BlogMobileBar';
 import BlogLoadingHandler from '@/components/blog/BlogLoadingHandler';
+import { canAccessMemberContent, getCreatorProfile } from '@/lib/membership';
+import MemberOnlyContent from '@/components/membership/MemberOnlyContent';
+import BlogSubscription from '@/components/membership/BlogSubscription';
+import { auth } from '@/lib/auth';
 
 // Revalidate the page every 60 seconds
 export const revalidate = 60;
@@ -56,6 +60,25 @@ export default async function PostPage({ params }: PostPageProps) {
     email: undefined,
     socials: undefined
   };
+
+  // Check if user can access member-only content
+  let canAccess = false;
+  let creatorProfile = null;
+  
+  if (post.isMembersOnly) {
+    try {
+      // Get current user session
+      const { user } = await auth();
+      if (user) {
+        canAccess = await canAccessMemberContent(user.uid, post.authorId);
+      }
+      
+      // Get creator profile for membership tiers
+      creatorProfile = await getCreatorProfile(post.authorId);
+    } catch (error) {
+      console.error('Error checking member access:', error);
+    }
+  }
 
   // Render the blog post content
   return (
@@ -112,7 +135,7 @@ export default async function PostPage({ params }: PostPageProps) {
         />
       </div>
       <div className="mb-6 sm:mb-8">
-        <Link href="/blog" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
+        <Link href="/blog" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
           <span className="mr-2">←</span> Back to Blog
         </Link>
         
@@ -151,10 +174,26 @@ export default async function PostPage({ params }: PostPageProps) {
         
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-10">
           <div className="prose max-w-none min-w-0 prose-img:rounded-xl prose-headings:scroll-mt-28">
-            <MarkdownViewer content={post.content} />
+            {/* Use MemberOnlyContent component for conditional rendering */}
+            <MemberOnlyContent
+              isMembersOnly={post.isMembersOnly || false}
+              membershipTier={post.membershipTier}
+              previewContent={post.previewContent}
+              fullContent={post.content}
+              creatorId={post.authorId}
+              creatorName={author.name}
+              membershipTiers={creatorProfile?.membershipTiers || []}
+              canAccess={canAccess}
+            />
           </div>
-          <div className="hidden lg:block w-[320px] min-w-0">
-            <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
+          <div className="hidden lg:block w-[320px] min-w-0 space-y-4">
+            {/* Blog Subscription */}
+            <BlogSubscription
+              blogId={id}
+              creatorName={author.name}
+            />
+            
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
               {/* Social links (if available on author) */}
               {/* @ts-ignore */}
               {author?.socials ? (

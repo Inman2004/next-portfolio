@@ -99,15 +99,62 @@ service cloud.firestore {
       
       // Allow users to delete their own comments
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
-      // Allow admin to pin/unpin comments
-      allow update: if isAdmin() 
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPinned'])
-        && request.resource.data.isPinned is bool;
+    }
+
+    // New membership and subscription collections
+    
+    // Creator profiles collection
+    match /creatorProfiles/{creatorId} {
+      // Allow public read access to creator profiles
+      allow read: if true;
       
-      // Allow delete if user is admin or comment author
+      // Only allow creators to create/update their own profile
+      allow create, update: if request.auth != null && request.auth.uid == creatorId;
+      
+      // Only allow creators to delete their own profile or admin can delete any
       allow delete: if request.auth != null && (
-        isAdmin() || resource.data.uid == request.auth.uid
+        request.auth.uid == creatorId || isAdmin()
       );
+    }
+    
+    // User subscriptions collection
+    match /userSubscriptions/{subscriptionId} {
+      // Users can read their own subscriptions
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || 
+        resource.data.creatorId == request.auth.uid ||
+        isAdmin()
+      );
+      
+      // Users can create subscriptions to creators
+      allow create: if request.auth != null 
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userId != request.resource.data.creatorId;
+      
+      // Users can update their own subscriptions
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Users can delete their own subscriptions
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Blog subscriptions collection
+    match /blogSubscriptions/{subscriptionId} {
+      // Users can read their own blog subscriptions
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || 
+        isAdmin()
+      );
+      
+      // Users can create blog subscriptions
+      allow create: if request.auth != null 
+        && request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own blog subscriptions
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Users can delete their own blog subscriptions
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
   }
 }

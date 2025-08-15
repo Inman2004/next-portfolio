@@ -32,6 +32,10 @@ export interface BaseBlogPost {
   tags?: string[];
   readingTime?: string;
   viewCount?: number;
+  // Membership fields
+  isMembersOnly?: boolean;
+  membershipTier?: 'free' | 'basic' | 'premium';
+  previewContent?: string; // Content shown to non-members
 }
 
 // Interface for user data that comes from the users collection
@@ -63,4 +67,46 @@ export interface EnrichedBlogPost extends Omit<BlogPost, 'user'> {
   user: BlogPostUserData;
   username?: string;
   _userUnsubscribe?: () => void;
+}
+
+// New interfaces for membership and subscriptions
+export interface MembershipTier {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  features: string[];
+  description: string;
+}
+
+export interface UserSubscription {
+  userId: string;
+  creatorId: string;
+  tier: string;
+  status: 'active' | 'cancelled' | 'expired';
+  startDate: Timestamp | Date;
+  endDate?: Timestamp | Date;
+  createdAt: Timestamp | Date;
+}
+
+export interface BlogSubscription {
+  userId: string;
+  blogId: string;
+  email: string;
+  isActive: boolean;
+  createdAt: Timestamp | Date;
+  lastNotificationSent?: Timestamp | Date;
+}
+
+export interface CreatorProfile {
+  userId: string;
+  displayName: string;
+  bio?: string;
+  photoURL?: string;
+  isCreator: boolean;
+  membershipEnabled: boolean;
+  membershipTiers: MembershipTier[];
+  subscriptionCount: number;
+  createdAt: Timestamp | Date;
+  updatedAt: Timestamp | Date;
 }

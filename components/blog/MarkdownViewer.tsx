@@ -117,7 +117,7 @@ const CustomLink = memo(({ node, children, ...props }: CustomLinkProps) => {
   return (
     <a 
       {...props} 
-      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-4 transition-colors inline-flex items-center gap-1"
+      className="text-teal-600 hover:text-teal-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-4 transition-colors inline-flex items-center gap-1"
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
     >
@@ -737,11 +737,11 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline group-hover:underline">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-700 dark:from-teal-400 dark:to-blue-400">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-lime-500 to-sky-700 dark:from-teal-400 dark:to-blue-400">
                     {props.children}
                   </span>
                 </a>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-500 to-lime-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </h1>
             );
           },
@@ -752,12 +752,12 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             return (
               <h2 
                 id={id}
-                className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-indigo-300 dark:border-teal-700/50 scroll-mt-16"
+                className="text-2xl md:text-3xl font-semibold mt-10 mb-4 pb-2 relative pl-6 border-b border-teal-300 dark:border-teal-700/50 scroll-mt-16"
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
-                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-teal-300 dark:to-blue-300">
+                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-teal-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-lime-500 dark:from-teal-300 dark:to-blue-300">
                     {props.children}
                   </span>
                 </a>
@@ -775,10 +775,10 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
               {...props}
             >
               <a href={`#${id}`} className="no-underline hover:underline">
-                <span className="absolute left-0 top-1/2 -translate-y-1/3 w-6 h-6 rounded-full bg-indigo-400/50 dark:bg-teal-900/50 flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-teal-400"></span>
+                <span className="absolute left-0 top-1/2 -translate-y-1/3 w-6 h-6 rounded-full bg-teal-400/50 dark:bg-teal-900/50 flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-teal-400"></span>
                 </span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-teal-400 dark:to-blue-400/80">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-lime-500 dark:from-teal-400 dark:to-blue-400/80">
                   {props.children}
                 </span>
               </a>
@@ -811,7 +811,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             return (
               <h5 
                 id={id}
-                className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-indigo-600 dark:text-gray-300 scroll-mt-16"
+                className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-teal-600 dark:text-gray-300 scroll-mt-16"
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
@@ -827,7 +827,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             return (
               <h6 
                 id={id}
-                className="text-base font-medium mt-4 mb-2 pl-2 text-indigo-500 dark:text-gray-400 scroll-mt-16"
+                className="text-base font-medium mt-4 mb-2 pl-2 text-teal-500 dark:text-gray-400 scroll-mt-16"
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
@@ -894,7 +894,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
           ol: (olProps: React.OlHTMLAttributes<HTMLOListElement>) => (
             <ol 
-              className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-indigo-400 [&>li]:marker:dark:text-indigo-300" 
+              className="list-decimal pl-6 my-4 space-y-2 [&>li]:relative [&>li]:pl-2 [&>li]:marker:font-semibold [&>li]:marker:text-teal-400 [&>li]:marker:dark:text-teal-300" 
               {...olProps} 
             />
           ),
@@ -912,22 +912,22 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
 
           blockquote: (props) => (
-            <blockquote className="border-l-4 border-indigo-400 dark:border-teal-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
+            <blockquote className="border-l-4 border-lime-400 dark:border-teal-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-teal-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
-            <div className="overflow-x-auto my-8 rounded-xl border border-indigo-300 dark:border-teal-700/50 shadow-sm">
+            <div className="overflow-x-auto my-8 rounded-xl border border-teal-300 dark:border-teal-700/50 shadow-sm">
               <table className="min-w-full divide-y divide-gray-400 dark:divide-gray-700" {...props} />
             </div>
           ),
           thead: (props) => (
-            <thead className="bg-indigo-50 dark:bg-indigo-900/20 border-b border-gray-200 dark:border-gray-700" {...props} />
+            <thead className="bg-teal-50 dark:bg-teal-900/20 border-b border-gray-200 dark:border-gray-700" {...props} />
           ),
           tbody: (props) => (
             <tbody className="divide-y divide-gray-400/50 dark:divide-gray-700/50" {...props} />
           ),
           th: (props) => (
             <th 
-              className="px-6 py-4 text-left text-xs font-medium text-indigo-700 dark:text-teal-300  border-b border-indigo-300 dark:border-teal-700 uppercase tracking-wider"
+              className="px-6 py-4 text-left text-xs font-medium text-lime-700 dark:text-teal-300  border-b border-teal-300 dark:border-teal-700 uppercase tracking-wider"
               style={{ whiteSpace: 'nowrap' }}
               {...props}
             />
@@ -940,7 +940,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           ),
           tr: (props) => (
             <tr 
-              className="hover:bg-indigo-400/40 dark:hover:bg-gray-800/30 transition-colors duration-150"
+              className="hover:bg-teal-400/10 dark:hover:bg-gray-800/30 transition-colors duration-150"
               {...props}
             />
           ),
