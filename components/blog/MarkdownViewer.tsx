@@ -537,7 +537,7 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           </span>
           <button
             onClick={handleCopy}
-            className="p-1.5 sm:p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="p-1.5 sm:p-1.5 rounded-md hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             title="Copy to clipboard"
             aria-label="Copy code"
           >
@@ -696,15 +696,15 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                     // @ts-ignore - CSS custom properties
                     '--bg-color': 'rgba(243, 244, 246, 0.5)',
                     // @ts-ignore - CSS custom properties
-                    '--text-color': 'rgba(13, 148, 136, 0.9)',
+                    '--text-color': 'rgba(13, 78, 136, 0.9)',
                     // @ts-ignore - CSS custom properties
-                    '--border-color': 'rgba(209, 213, 219, 0.5)',
+                    '--border-color': 'rgba(209, 213, 219, 0.3)',
                     // @ts-ignore - CSS custom properties
                     '--dark-bg-color': 'rgba(31, 41, 55, 0.5)',
                     // @ts-ignore - CSS custom properties
                     '--dark-text-color': 'rgba(94, 234, 212, 0.9)',
                     // @ts-ignore - CSS custom properties
-                    '--dark-border-color': 'rgba(55, 65, 81, 0.5)',
+                    '--dark-border-color': 'rgba(55, 65, 81, 0.3)',
                     
                     backgroundColor: 'var(--bg-color)',
                     color: 'var(--text-color)',
@@ -912,7 +912,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
 
           blockquote: (props) => (
-            <blockquote className="border-l-4 border-sky-400 dark:border-teal-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-teal-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
+            <blockquote className="border-l-4 border-sky-400 dark:border-teal-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-sky-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
             <div className="overflow-x-auto my-8 rounded-xl border border-slate-300 dark:border-teal-700/50 shadow-sm">
