@@ -1,17 +1,20 @@
 import 'server-only';
-import { db } from './firebase-server';
 import { 
-  doc, 
-  getDoc, 
   collection, 
   query, 
   where, 
   getDocs, 
+  getDoc,
+  doc,
   orderBy, 
   limit, 
+  startAfter,
+  QueryDocumentSnapshot,
   DocumentData,
   Timestamp
 } from 'firebase/firestore';
+import { db } from './firebase-server';
+import { batchQueryAsMap } from './firebase-utils';
 import { 
   getUserData, 
   enrichWithUserData, 
@@ -40,11 +43,15 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
   if (!posts.length) return [];
   
   try {
-    // Get unique user IDs
-    const userIds = [...new Set(posts.map(post => post.authorId).filter(Boolean))];
+    // Get unique user IDs and filter out invalid ones
+    const userIds = [...new Set(
+      posts
+        .map(post => post.authorId)
+        .filter(id => id && typeof id === 'string' && id.trim() !== '')
+    )];
     
     if (!userIds.length) {
-      console.warn('No valid user IDs found in posts');
+      console.warn('No valid user IDs found in posts, returning posts with fallback data');
       return posts.map(post => ({
         ...post,
         author: post.author || 'Anonymous',
@@ -56,30 +63,19 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
       })) as Array<T & EnrichedBlogPost>;
     }
     
-    // Always fetch fresh user data to ensure we have the latest
-    const usersCollection = collection(db, 'users');
-    const usersQuery = query(usersCollection, where('__name__', 'in', userIds));
-    const usersSnapshot = await getDocs(usersQuery);
+    console.log(`Enriching ${posts.length} posts with data for ${userIds.length} unique users`);
     
-    interface UserData {
+    // Use the batch query utility to handle arrays larger than 30
+    const userDataMap = await batchQueryAsMap<{
       displayName?: string;
       photoURL?: string;
       socials?: Record<string, string>;
-    }
+    }>('users', '__name__', userIds);
     
-    const userDataMap = new Map<string, UserData>();
-    
-    usersSnapshot.forEach(doc => {
-      const data = doc.data();
-      userDataMap.set(doc.id, {
-        displayName: data.displayName,
-        photoURL: data.photoURL,
-        socials: data.socials || {}
-      });
-    });
+    console.log(`Retrieved user data for ${userDataMap.size} users`);
     
     // Enrich each post with the latest user data
-    return posts.map(post => {
+    const enrichedPosts = posts.map(post => {
       const userData = userDataMap.get(post.authorId) || {};
       
       // Handle case where post.author might be a string or an object
@@ -122,8 +118,14 @@ export const enrichBlogPosts = async <T extends BaseBlogPost>(
       
       return enrichedPost as unknown as T & EnrichedBlogPost;
     });
+    
+    console.log(`Successfully enriched ${enrichedPosts.length} posts`);
+    return enrichedPosts;
+    
   } catch (error) {
     console.error('Error enriching blog posts:', error);
+    console.log('Falling back to original data with basic author information');
+    
     // Fallback to original data if there's an error
     return posts.map(post => ({
       ...post,
@@ -183,8 +185,31 @@ export const getBlogPosts = async (options: {
     const querySnapshot = await getDocs(q);
     const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'rvimman@gmail.com';
     
+    // Extract all unique author IDs for efficient batch querying
+    const authorIds = [...new Set(
+      querySnapshot.docs
+        .map(doc => doc.data().authorId)
+        .filter(id => id && typeof id === 'string' && id.trim() !== '')
+    )];
+    
+    // Batch fetch all author data at once
+    const authorDataMap = new Map<string, { email?: string }>();
+    if (authorIds.length > 0) {
+      try {
+        console.log(`Fetching author data for ${authorIds.length} unique authors for admin check`);
+        const authorData = await batchQueryAsMap<{ email?: string }>('users', '__name__', authorIds);
+        authorData.forEach((data, id) => {
+          authorDataMap.set(id, data);
+        });
+        console.log(`Retrieved author data for ${authorDataMap.size} authors`);
+      } catch (error) {
+        console.error('Error fetching author data for admin check:', error);
+      }
+    }
+    
     // Process each post to check if the author is admin
     let posts: Array<BlogPost & { user?: any }> = [];
+    let adminPostCount = 0;
     
     for (const postDoc of querySnapshot.docs) {
       const data = postDoc.data();
@@ -196,13 +221,18 @@ export const getBlogPosts = async (options: {
           // Direct check for known admin user ID
           if (data.authorId === 'ksHyBhNWEdUUIizl2qs42KwoR3D2') {
             isAdminPost = true;
+            console.log(`Post ${postDoc.id} identified as admin post by user ID`);
           } else {
-            // Fallback to email check
-            const authorDoc = await getDoc(doc(db, 'users', data.authorId));
-            if (authorDoc.exists()) {
-              const authorData = authorDoc.data() as { email?: string };
-              isAdminPost = authorData?.email === adminEmail;
+            // Use the batched author data
+            const authorData = authorDataMap.get(data.authorId);
+            if (authorData?.email === adminEmail) {
+              isAdminPost = true;
+              console.log(`Post ${postDoc.id} identified as admin post by email: ${authorData.email}`);
             }
+          }
+          
+          if (isAdminPost) {
+            adminPostCount++;
           }
         } catch (error) {
           console.error('Error checking admin status:', error);
@@ -217,6 +247,9 @@ export const getBlogPosts = async (options: {
       
       posts.push(post);
     }
+    
+    console.log(`Processed ${posts.length} posts, identified ${adminPostCount} as admin posts`);
+    console.log(`Admin email being checked against: ${adminEmail}`);
     
     // Apply published filter in memory if needed
     if (options.publishedOnly) {

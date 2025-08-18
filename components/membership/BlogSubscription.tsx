@@ -94,7 +94,7 @@ export default function BlogSubscription({
           Stay Updated
         </CardTitle>
         <CardDescription>
-          Subscribe to get notified when {creatorName} publishes new blog posts
+          Subscribe to get notified when <b className="text-slate-900 dark:text-slate-200">{creatorName}</b> publishes new blog posts
         </CardDescription>
       </CardHeader>
       <CardContent>

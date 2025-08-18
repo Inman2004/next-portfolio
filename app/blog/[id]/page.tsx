@@ -15,6 +15,7 @@ import { getViewCount } from '@/lib/views';
 import { SocialLinks } from '@/components/blog/SocialLinks';
 import BlogMobileBar from '@/components/blog/BlogMobileBar';
 import BlogLoadingHandler from '@/components/blog/BlogLoadingHandler';
+import ViewCountHandler from '@/components/blog/ViewCountHandler';
 import { canAccessMemberContent, getCreatorProfile } from '@/lib/membership';
 import MemberOnlyContent from '@/components/membership/MemberOnlyContent';
 import BlogSubscription from '@/components/membership/BlogSubscription';
@@ -84,6 +85,7 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <BlogLoadingHandler />
+      <ViewCountHandler postId={id} />
       {/* JSON-LD Article schema for SEO */}
       <script
         type="application/ld+json"
@@ -139,10 +141,10 @@ export default async function PostPage({ params }: PostPageProps) {
           <span className="mr-2">←</span> Back to Blog
         </Link>
         
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 leading-tight">{post.title}</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-slate-950 dark:from-gray-50 dark:to-gray-400 font-bold mb-3 sm:mb-4 leading-tight">{post.title}</h1>
         
         <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-5 sm:mb-6">
-          <div className="flex items-center mr-4">
+          <div className="flex items-center text-slate-900 dark:text-slate-400 mr-4">
             <UserIcon className="h-4 w-4 mr-1" />
             <span>{author.name}</span>
           </div>

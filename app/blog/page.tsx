@@ -62,7 +62,11 @@ const PostTitle = ({
   </div>
 );
 
-export default async function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; perPage?: string };
+}) {
   // Get posts without network calls during prerender
   let posts = await getBlogPosts({ publishedOnly: true });
   // Attach view counts, but don't fail build if unavailable
@@ -73,6 +77,10 @@ export default async function BlogPage() {
   } catch {
     // ignore view count errors at build time
   }
+  
+  // Parse pagination parameters from URL
+  const currentPage = parseInt(searchParams.page || '1', 10);
+  const postsPerPage = parseInt(searchParams.perPage || '9', 10);
   
   // Normalize dates safely for client list
   const toIsoStringSafe = (value: any): string => {
@@ -125,7 +133,11 @@ export default async function BlogPage() {
 
       {/* Blog Posts controls and grid (client) */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-10 sm:py-16">
-        <BlogListClient posts={normalizedPosts} />
+        <BlogListClient 
+          posts={normalizedPosts} 
+          initialPage={currentPage}
+          initialPostsPerPage={postsPerPage}
+        />
         </div>
     </div>
   );

@@ -2,13 +2,16 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { useLoadingState } from '@/hooks/useLoadingState';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Eye, Clock, Calendar, Crown, ArrowRight } from 'lucide-react';
+import { Eye, Clock, Calendar, Crown, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BlogSearch } from '@/components/blog/BlogSearch';
 import { formatNumber } from '@/lib/formatNumber';
 import { cn } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Markdown from 'react-markdown';
 
 type Post = {
@@ -30,13 +33,19 @@ type SortOption = 'newest' | 'oldest' | 'popular';
 
 interface BlogListClientProps {
   posts: Post[];
+  initialPage?: number;
+  initialPostsPerPage?: number;
 }
 
-export default function BlogListClient({ posts }: BlogListClientProps) {
+export default function BlogListClient({ posts, initialPage = 1, initialPostsPerPage = 9 }: BlogListClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [postsPerPage, setPostsPerPage] = useState(initialPostsPerPage); // 3x3 grid
   const { startLoading, stopLoading } = useLoadingState();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const allTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
@@ -55,12 +64,14 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     const next = new Set(selectedTags);
     if (next.has(tag)) next.delete(tag); else next.add(tag);
     setSelectedTags(next);
+    setCurrentPage(1); // Reset to first page when filters change
     setTimeout(() => stopLoading(), 300); // Short delay to show loading effect
   };
 
   const clearTags = () => {
     startLoading();
     setSelectedTags(new Set());
+    setCurrentPage(1); // Reset to first page when filters change
     setTimeout(() => stopLoading(), 300); // Short delay to show loading effect
   };
 
@@ -70,6 +81,29 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     const timer = setTimeout(() => stopLoading(), 300);
     return () => clearTimeout(timer);
   }, [searchQuery, sortBy, selectedTags, startLoading, stopLoading]);
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Sync URL with pagination state
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (currentPage > 1) {
+      params.set('page', currentPage.toString());
+    } else {
+      params.delete('page');
+    }
+    if (postsPerPage !== 9) {
+      params.set('perPage', postsPerPage.toString());
+    } else {
+      params.delete('perPage');
+    }
+    
+    const newUrl = params.toString() ? `?${params.toString()}` : '';
+    router.replace(newUrl, { scroll: false });
+  }, [currentPage, postsPerPage, router, searchParams]);
 
   const filteredAndSorted = useMemo(() => {
     let list = posts ?? [];
@@ -95,12 +129,75 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     return copy;
   }, [posts, searchQuery, sortBy, selectedTags]);
 
+  // Pagination logic
+  const totalPosts = filteredAndSorted.length;
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const currentPosts = filteredAndSorted.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const goToNextPage = () => goToPage(currentPage + 1);
+  const goToPreviousPage = () => goToPage(currentPage - 1);
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      let start = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let end = Math.min(totalPages, start + maxVisiblePages - 1);
+      
+      // Adjust if we're near the end
+      if (end - start + 1 < maxVisiblePages) {
+        start = Math.max(1, end - maxVisiblePages + 1);
+      }
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Latest Posts</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Discover the latest articles and tutorials</p>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Blog Posts ({totalPosts})
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400">Show:</span>
+            <Select value={postsPerPage.toString()} onValueChange={(value) => {
+              setPostsPerPage(Number(value));
+              setCurrentPage(1); // Reset to first page
+            }}>
+              <SelectTrigger className="w-20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="6">6</SelectItem>
+                <SelectItem value="9">9</SelectItem>
+                <SelectItem value="12">12</SelectItem>
+                <SelectItem value="18">18</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div className="w-full md:w-auto md:flex-1 max-w-md">
           <BlogSearch 
@@ -130,7 +227,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
               key={name}
               onClick={() => toggleTag(name)}
               className={`px-3 py-1.5 rounded-full text-xs border ${selectedTags.has(name) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700'}`}
-              aria-pressed={selectedTags.has(name)}
+              aria-pressed={selectedTags.has(name) ? 'true' : 'false'}
             >
               {name}
               <span className="ml-1 opacity-70">{count}</span>
@@ -145,56 +242,105 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
       {filteredAndSorted.length === 0 ? (
         <div className="text-center text-gray-500 dark:text-gray-400 py-16">No blog posts found.</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filteredAndSorted.map((post) => (
-            <article key={post.id} className="group bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition-all overflow-hidden border border-gray-200 hover:border-gray-700 dark:border-gray-700">
-              {post.coverImage && (
-                <div className="relative h-48 overflow-hidden">
-                  <Image src={post.coverImage} alt={post.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                  {post.isAdmin && (
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
-                      <Crown className="w-3 h-3 mr-1" /> Admin
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {currentPosts.map((post) => (
+              <article key={post.id} className="group bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition-all overflow-hidden border border-gray-200 hover:border-gray-700 dark:border-gray-700">
+                {post.coverImage && (
+                  <div className="relative h-48 overflow-hidden">
+                    <Image src={post.coverImage} alt={post.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    {post.isAdmin && (
+                      <div className="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                        <Crown className="w-3 h-3 mr-1" /> Admin
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="p-6">
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    <div className="flex items-center mr-4">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                     </div>
-                  )}
-                </div>
-              )}
-              <div className="p-6">
-                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-                  <div className="flex items-center mr-4">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center mr-4">
-                    <Clock className="w-4 h-4 mr-1" />
-                    <span>{post.readingTime || '5 min read'}</span>
-                  </div>
-                  <div className="flex items-center ml-auto">
-                    <Eye className="w-4 h-4 mr-1" />
-                    <span>{formatNumber(post.views || 0)}</span>
-                  </div>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-lime-500 dark:group-hover:text-lime-400 transition-colors">{post.title}</h2>
-                <div className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    {post.author?.photoURL ? (
-                      <UserAvatar photoURL={post.author.photoURL} displayName={post.author.name || 'Anonymous'} size={32} className="h-8 w-8 mr-3" />
-                    ) : null}
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{post.author?.name || 'Anonymous'}</p>
-                      {post.author?.bio && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{post.author.bio}</p>
-                      )}
+                    <div className="flex items-center mr-4">
+                      <Clock className="w-4 h-4 mr-1" />
+                      <span>{post.readingTime || '5 min read'}</span>
+                    </div>
+                    <div className="flex items-center ml-auto">
+                      <Eye className="w-4 h-4 mr-1" />
+                      <span>{formatNumber(post.views || 0)}</span>
                     </div>
                   </div>
-                  <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 hover:text-lime-700 dark:text-blue-400 dark:hover:text-lime-300 font-medium text-sm transition-colors">
-                    Read More <ArrowRight className="w-4 h-4 ml-1" />
-                  </Link>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">{post.title}</h2>
+                  <div className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      {post.author?.photoURL ? (
+                        <UserAvatar photoURL={post.author.photoURL} displayName={post.author.name || 'Anonymous'} size={32} className="h-8 w-8 mr-3" />
+                      ) : null}
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{post.author?.name || 'Anonymous'}</p>
+                        {post.author?.bio && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{post.author.bio}</p>
+                        )}
+                      </div>
+                    </div>
+                    <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 hover:text-sky-700 dark:text-blue-400 dark:hover:text-sky-300 font-medium text-sm transition-colors">
+                      Read More <ArrowRight className="w-4 h-4 ml-1" />
+                    </Link>
+                  </div>
                 </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Showing {startIndex + 1}-{Math.min(endIndex, totalPosts)} of {totalPosts} posts
               </div>
-            </article>
-          ))}
-        </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {getPageNumbers().map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => goToPage(page)}
+                      className="w-10 h-10 p-0"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-2"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

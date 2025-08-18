@@ -260,7 +260,7 @@ const TocList = ({ nodes, activeId, className = '', level = 0, setActiveId }: To
                 'border-l-indigo-500 text-indigo-700/80 dark:text-indigo-200/80 font-bold hover:text-indigo-700 dark:hover:text-indigo-200': level === 0,
                 'border-l-blue-500 text-blue-700/70 dark:text-blue-200/60 hover:text-blue-700 dark:hover:text-blue-200': level === 1,
                 'border-l-teal-500 text-teal-950/60 dark:text-teal-700 hover:text-teal-700 dark:hover:text-teal-200': level === 2,
-                'border-l-purple-500 text-purple-600/50 dark:text-purple-300/50 hover:text-purple-700 dark:hover:text-purple-200': level >= 3,
+                'border-l-sky-500 text-sky-600/50 dark:text-sky-300/50 hover:text-sky-700 dark:hover:text-sky-200': level >= 3,
                 // Active state colors
                 '!text-indigo-700 dark:!text-indigo-200 !border-l-indigo-700 dark:!border-l-indigo-300': activeId === node.id && level === 0,
                 '!text-blue-700 dark:!text-blue-200 !border-l-blue-700 dark:!border-l-blue-300': activeId === node.id && level === 1,
