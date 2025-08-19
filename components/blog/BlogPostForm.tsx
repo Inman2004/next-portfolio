@@ -5,7 +5,6 @@ import { useLoadingState } from '@/hooks/useLoadingState';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { debounce } from 'lodash';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -61,72 +60,14 @@ export default function BlogPostForm({
     },
   });
 
-  // Generate a unique ID for this draft
-  useEffect(() => {
-    if (!draftId) {
-      setDraftId(`draft_${Date.now()}`);
-    }
-  }, [draftId]);
+  // Draft auto-ID disabled
 
-  // Load draft from localStorage on initial render
-  useEffect(() => {
-    if (initialData?.title) return; // Skip if editing existing post
-    
-    const savedDrafts: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
-    const mostRecentDraft = Object.entries(savedDrafts)
-      .sort(([_, a], [__, b]) => 
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      )[0]?.[1];
+  // Draft restore disabled
 
-    if (mostRecentDraft) {
-      // Only include fields that exist in BlogPostFormValues
-      const { id, updatedAt, ...draftData } = mostRecentDraft;
-      form.reset(draftData);
-      setLastSaved(new Date(updatedAt));
-      setDraftId(id);
-      
-      // Ask user if they want to restore the draft
-      if (confirm('Found an unsaved draft. Would you like to restore it?')) {
-        toast.success('Draft restored');
-      }
-    }
-  }, [form, initialData]);
+  // Autosave disabled
+  const saveDraft = useCallback(async (_data: BlogPostFormValues) => {}, []);
 
-  // Save draft to localStorage with debounce
-  const saveDraft = useCallback(
-    debounce(async (data: BlogPostFormValues) => {
-      if (!draftId) return;
-      
-      setIsDraftSaving(true);
-      
-      try {
-        const draft: BlogDraft = {
-          ...data,
-          id: draftId,
-          updatedAt: new Date().toISOString(),
-        };
-        
-        const savedDrafts: Record<string, BlogDraft> = JSON.parse(localStorage.getItem('blogDrafts') || '{}');
-        savedDrafts[draftId] = draft;
-        localStorage.setItem('blogDrafts', JSON.stringify(savedDrafts));
-        
-        setLastSaved(new Date());
-      } catch (error) {
-        console.error('Error saving draft:', error);
-      } finally {
-        setIsDraftSaving(false);
-      }
-    }, 1000), // Debounce for 1 second
-    [draftId]
-  );
-
-  // Watch for form changes to trigger autosave
-  const watchedFields = form.watch();
-  useEffect(() => {
-    if (form.formState.isDirty && draftId) {
-      saveDraft(watchedFields);
-    }
-  }, [watchedFields, form.formState.isDirty, saveDraft, draftId]);
+  // Autosave watcher disabled
 
   const { 
     register, 
@@ -355,12 +296,10 @@ export default function BlogPostForm({
             <FilePlus2 className="w-4 h-4 mr-1" /> Templates
             <ChevronDown className="w-4 h-4 ml-1" />
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => setShowDraftsManager(true)}>
-            <Library className="w-4 h-4 mr-1" /> Drafts
-          </Button>
+          {/* Drafts disabled */}
         </div>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="secondary" onClick={handleSaveAsDraft} disabled={isSubmitting}>Save as draft</Button>
+          {/* Save as draft disabled */}
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
