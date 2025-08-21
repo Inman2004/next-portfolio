@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench, Plus } from 'lucide-react';
+import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench, Plus, Handshake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -41,6 +41,11 @@ const getNavigationLinks = (isHome: boolean): NavLink[] => {
       icon: <FaBlog className="w-4 h-4 group-hover:scale-110 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-all duration-300" />,
       className: 'group/blog',
     },
+    {
+      href: "/contact",
+      label: "Connect",
+      icon: <Handshake className="w-4 h-4 group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors" /> 
+    }
   ];
 
   return isHome ? homeLinks.concat([globalLinks[globalLinks.length - 1]]) : globalLinks;

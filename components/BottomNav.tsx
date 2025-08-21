@@ -92,6 +92,11 @@ const DATA: { navbar: NavItem[]; contact: { email: string; social: NavItem[] } }
         <FaBlog {...props} className="w-4 h-4 group-hover:text-orange-600 hover:fill-orange-600 dark:hover:text-orange-400 dark:hover:fill-orange-400 hover:scale-110 transition-colors" />
       )
     },
+    {
+      href: "/contact",
+      label: "Connect",
+      icon: (props: IconProps) => <Handshake {...props} className="w-4 h-4 group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors" /> 
+    }
   ],
   contact: {
     email: "rvimman@gmail.com",

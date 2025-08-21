@@ -1,1133 +1,1124 @@
 'use client';
 
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect, useMemo, useReducer } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useTheme } from 'next-themes';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import dynamic from 'next/dynamic';
+import EditorToolbar from './EditorToolbar';
+import debounce from 'lodash/debounce';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Label } from '../ui/label';
-import { 
-  Bold, 
-  Italic, 
-  Strikethrough, 
-  Heading1, 
-  Heading2, 
-  Heading3, 
-  Heading4, 
-  Heading5, 
-  List, 
-  ListOrdered, 
-  Quote, 
-  Code, 
-  Link, 
-  Image, 
-  Table, 
-  Undo, 
-  Redo, 
-  Maximize2, 
-  Minimize2, 
-  Download,
-  Type,
-  Minus,
-  X,
-  CheckSquare,
-  Square
-} from 'lucide-react';
-import TurndownService from 'turndown';
-import DOMPurify from 'dompurify';
-import { marked } from 'marked';
+import { LoadingSpinner } from '../ui/loading-spinner';
 
-// Configure turndown for HTML to Markdown conversion
-const turndownService = new TurndownService({
-  headingStyle: 'atx',
-  codeBlockStyle: 'fenced',
-  emDelimiter: '*',
-  bulletListMarker: '-',
-  strongDelimiter: '**',
-  hr: '---',
-  listIndentation: 'one',
-  fence: '```',
-  linkStyle: 'inlined',
-  linkReferenceStyle: 'full'
-});
+// Lazy load the Monaco Editor
+const MonacoEditor = dynamic(
+  () => import('@monaco-editor/react').then(mod => mod.default),
+  { ssr: false, loading: () => <div className="p-4 flex items-center justify-center">
+    <LoadingSpinner />
+  </div> }
+);
 
-// Configure marked for MD -> HTML formatting
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-  smartypants: true
-});
-
-// Convert task list items (checkboxes) to Markdown
-// - <li class="task-list-item"><input type="checkbox" checked/> Label</li>
-// -> "- [x] Label" (or "- [ ] Label")
-turndownService.addRule('taskListItem', {
-  filter: (node) => {
-    try {
-      const el = node as any;
-      if (!el || el.nodeName !== 'LI') return false;
-      if (el.classList && el.classList.contains('task-list-item')) return true;
-      return !!(el.querySelector && el.querySelector('input[type="checkbox"]'));
-    } catch {
-      return false;
-    }
-  },
-  replacement: (content, node) => {
-    try {
-      const el = node as any;
-      const checkbox: HTMLInputElement | null = el.querySelector?.('input[type="checkbox"]') ?? null;
-      const checked = checkbox?.checked ?? false;
-      const text = String(content || '')
-        .replace(/\n+/g, ' ')
-        .replace(/^\s+|\s+$/g, '');
-      return `${checked ? '- [x] ' : '- [ ] '}${text}\n`;
-    } catch {
-      return `- [ ] ${content}\n`;
-    }
-  }
+// Lazy load the MarkdownViewer to reduce initial bundle size
+const LazyMarkdownViewer = dynamic(() => import('./MarkdownViewer'), {
+  ssr: false,
+  loading: () => <div className="p-4 flex items-center justify-center">
+    <LoadingSpinner />
+  </div>
 });
 
 interface MarkdownEditorProps {
-  initialMarkdown?: string;
-  height?: number | string;
-  onChange?: (markdown: string) => void;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
   className?: string;
+  minHeight?: number;
+  label?: string;
+  error?: string;
 }
 
-interface HistoryState {
-  html: string;
-  selection: { start: number; end: number } | null;
-}
-
-/**
- * Markdown Editor Component
- * 
- * This component provides a contentEditable-based editor that directly maintains
- * HTML content and converts to Markdown only when needed for output.
- */
-const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
-  initialMarkdown = '',
-  height = 600,
+// Memoize the editor to prevent unnecessary re-renders
+function MarkdownEditorComponent({
+  value,
   onChange,
-  className
-}) => {
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showLinkDialog, setShowLinkDialog] = useState(false);
-  const [showImageDialog, setShowImageDialog] = useState(false);
-  const [showTableDialog, setShowTableDialog] = useState(false);
+  placeholder = 'Write your content here...',
+  className = '',
+  minHeight = 500,
+  label,
+  error,
+}: MarkdownEditorProps) {
+  const editorRef = useRef<any>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState('edit');
+  const [isEditorReady, setIsEditorReady] = useState(false);
+  const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  
+  // Optimized reducer to prevent unnecessary state updates
+  const [state, dispatch] = useReducer((prev: any, action: any) => {
+    switch (action.type) {
+      case 'SET_VALUES':
+        if (prev.localValue === action.value && !prev.isDirty) return prev;
+        return { localValue: action.value, previewValue: action.value, isDirty: false };
+      case 'UPDATE_LOCAL':
+        if (prev.localValue === action.value) return prev;
+        // Live preview: keep previewValue in sync with localValue
+        return { ...prev, localValue: action.value, previewValue: action.value, isDirty: action.value !== value };
+      case 'UPDATE_PREVIEW':
+        if (!prev.isDirty) return prev;
+        return { ...prev, previewValue: prev.localValue, isDirty: false };
+      default:
+        return prev;
+    }
+  }, { localValue: value, previewValue: value, isDirty: false });
+
+  const { localValue, previewValue, isDirty } = state;
+  
+  // Update local value when the prop changes (e.g., when resetting the form)
+  const prevValueRef = useRef(value);
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      dispatch({ type: 'SET_VALUES', value });
+      prevValueRef.current = value;
+    }
+  }, [value]);
+  
+  // Debounced update to parent
+  const debouncedOnChange = useMemo(
+    () => debounce((val: string) => {
+      onChange(val);
+    }, 500), // 500ms debounce delay
+    [onChange]
+  );
+
+  // Handle editor changes with debounce
+  const handleEditorChange = useCallback((newValue: string | undefined) => {
+    if (newValue === undefined) return;
+    
+    // Update local state immediately for responsive UI
+    dispatch({ type: 'UPDATE_LOCAL', value: newValue });
+    
+    // Debounce the parent update
+    debouncedOnChange(newValue);
+  }, [debouncedOnChange]);
+  
+  // Update preview and notify parent
+  const handleUpdatePreview = useCallback(() => {
+    // No-op: live preview updates automatically
+    return;
+  }, []);
+  
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedOnChange.cancel();
+    };
+  }, [debouncedOnChange]);
+  
+  // Handle editor mount
+  const handleEditorKeyDown = useCallback((e: any, editor: any = editorRef.current) => {
+    if (e.keyCode === 9) { // Tab key
+      e.preventDefault();
+      
+      if (editor) {
+        const selection = editor.getSelection();
+        if (!selection) return;
+        
+        // Handle multi-line selection
+        if (selection.startLineNumber !== selection.endLineNumber) {
+          const model = editor.getModel();
+          if (!model) return;
+          
+          const startLine = selection.startLineNumber;
+          const endLine = selection.endLineNumber;
+          const edits: any[] = [];
+          
+          // Add two spaces at the start of each selected line
+          for (let i = startLine; i <= endLine; i++) {
+            edits.push({
+              range: {
+                startLineNumber: i,
+                startColumn: 1,
+                endLineNumber: i,
+                endColumn: 1
+              },
+              text: '  ',
+              forceMoveMarkers: false
+            });
+          }
+          
+          editor.executeEdits('indent-lines', edits);
+          
+          // Update local value
+          const newValue = editor.getValue();
+          dispatch({ type: 'UPDATE_LOCAL', value: newValue });
+        } else {
+          // Insert two spaces at cursor position
+          editor.executeEdits('insert-tab', [{
+            range: selection,
+            text: '  ',
+            forceMoveMarkers: true
+          }]);
+          
+          // Update local value
+          const newValue = editor.getValue();
+          dispatch({ type: 'UPDATE_LOCAL', value: newValue });
+        }
+      }
+    } else if (e.keyCode === 13 && !e.shiftKey) { // Enter key without shift
+      e.preventDefault();
+      
+      if (editor) {
+        const selection = editor.getSelection();
+        if (!selection) return;
+        
+        const model = editor.getModel();
+        if (!model) return;
+        
+        // Get current line's leading whitespace
+        const lineContent = model.getLineContent(selection.startLineNumber);
+        const leadingSpaces = lineContent.match(/^\s*/)?.[0] || '';
+        
+        // Insert new line with the same indentation
+        editor.executeEdits('new-line', [{
+          range: selection,
+          text: `\n${leadingSpaces}`,
+          forceMoveMarkers: true
+        }]);
+        
+        // Update local value
+        const newValue = editor.getValue();
+        dispatch({ type: 'UPDATE_LOCAL', value: newValue });
+      }
+    }
+  }, []);
+
+  // Update toolbar position based on selection
+  const updateToolbarPosition = useCallback((editor: any) => {
+    if (!editor || !toolbarRef.current) return;
+    
+    const selection = editor.getSelection();
+    if (!selection || selection.isEmpty()) {
+      setShowFloatingToolbar(false);
+      return;
+    }
+    
+    // Get the editor's DOM node and its position
+    const editorElement = editor.getDomNode();
+    const editorRect = editorElement.getBoundingClientRect();
+    
+    // Get the pixel position of the end of the selection
+    const position = {
+      lineNumber: selection.endLineNumber,
+      column: selection.endColumn
+    };
+    
+    // Get the top position of the line in the editor's coordinate system
+    const topInEditor = editor.getTopForPosition(position.lineNumber, position.column);
+    const leftInEditor = editor.getOffsetForColumn(position.lineNumber, position.column);
+    
+    // Convert to viewport coordinates
+    const viewportPosition = {
+      top: editorRect.top + topInEditor - 60, // Position 50px above the line (increased from 40px)
+      left: editorRect.left + leftInEditor
+    };
+    
+    // Ensure the toolbar stays within the viewport
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const toolbarHeight = 40; // Approximate height of the toolbar
+    const toolbarWidth = 280; // Approximate width of the toolbar
+    
+    // Calculate final position with boundary checks
+    setToolbarPosition({
+      top: Math.max(10, viewportPosition.top), // Don't go above the viewport
+      left: Math.max(
+        10, // Minimum left margin
+        Math.min(
+          viewportPosition.left - (toolbarWidth / 2), // Center the toolbar on cursor
+          viewportWidth - toolbarWidth - 10 // Don't go off the right edge
+        )
+      )
+    });
+    
+    setShowFloatingToolbar(true);
+  }, []);
+  
+  // Debounce the toolbar position updates
+  const debouncedUpdateToolbar = useMemo(
+    () => debounce(updateToolbarPosition, 100),
+    [updateToolbarPosition]
+  );
+
+    const { theme, resolvedTheme } = useTheme();
+  
+  // Update Monaco theme when system/theme changes
+  useEffect(() => {
+    if (editorRef.current) {
+      const currentTheme = resolvedTheme || 'light';
+      editorRef.current.updateOptions({
+        theme: currentTheme === 'dark' ? 'custom-dark' : 'custom-light'
+      });
+    }
+  }, [resolvedTheme]);
+
+  const handleEditorDidMount = useCallback((editor: any, monaco: any) => {
+    editorRef.current = editor;
+    setIsEditorReady(true);
+    
+    // Listen for cursor position changes
+    editor.onDidChangeCursorPosition(() => {
+      debouncedUpdateToolbar(editor);
+    });
+    
+    // Listen for selection changes
+    editor.onDidChangeCursorSelection(() => {
+      const selection = editor.getSelection();
+      if (selection && !selection.isEmpty()) {
+        debouncedUpdateToolbar(editor);
+      } else {
+        setShowFloatingToolbar(false);
+      }
+    });
+    
+      // Define a custom dark theme that matches the application
+    monaco.editor.defineTheme('custom-dark', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: '', foreground: 'D4D4D4', background: '0F172A' },
+        { token: 'comment', foreground: '6B7280' },
+        { token: 'string', foreground: 'A5D6A7' },
+        { token: 'keyword', foreground: 'C792EA' },
+        { token: 'number', foreground: 'F78C6C' },
+        { token: 'delimiter.bracket', foreground: 'D4D4D4' },
+        { token: 'delimiter', foreground: 'D4D4D4' },
+        { token: 'identifier', foreground: 'D4D4D4' },
+        { token: 'type', foreground: '82AAFF' },
+        { token: 'tag', foreground: 'F78C6C' },
+        { token: 'attribute.name', foreground: 'C792EA' },
+        { token: 'attribute.value', foreground: 'A5D6A7' },
+      ],
+      colors: {
+        'editor.background': '#1A202C',
+        'editor.foreground': '#D4D4D4',
+        'editor.lineHighlightBackground': '#f4b5',
+        'editor.lineHighlightBorder': '#fff',
+        'editor.selectionBackground': '#f4b5',
+        'editor.inactiveSelectionBackground': '#1E293B',
+        'editorCursor.foreground': '#f4b',
+        'editorLineNumber.foreground': '#4B5563',
+        'editorLineNumber.activeForeground': '#9CA3AF',
+        'editor.selectionHighlightBorder': '#334155',
+      },
+    });
+
+    // Define a custom light theme
+    monaco.editor.defineTheme('custom-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: '', foreground: '1F2937', background: 'F9FAFB' },
+        { token: 'comment', foreground: '6B7280' },
+        { token: 'string', foreground: '059669' }, // green-600
+        { token: 'keyword', foreground: '7C3AED' }, // violet-600
+        { token: 'number', foreground: 'D97706' }, // amber-600
+        { token: 'delimiter.bracket', foreground: '1F2937' },
+        { token: 'delimiter', foreground: '1F2937' },
+        { token: 'identifier', foreground: '1F2937' },
+        { token: 'type', foreground: '2563EB' }, // blue-600
+        { token: 'tag', foreground: 'D97706' }, // amber-600
+        { token: 'attribute.name', foreground: '7C3AED' }, // violet-600
+        { token: 'attribute.value', foreground: '059669' }, // green-600
+      ],
+      colors: {
+        'editor.background': '#E5E7EB',
+        'editor.foreground': '#1F2937',
+        'editor.lineHighlightBackground': '#F189F6',
+        'editor.lineHighlightBorder': '#000',
+        'editor.selectionBackground': '#3aFE',
+        'editor.inactiveSelectionBackground': '#3aeffF',
+        'editorCursor.foreground': '#3B82F6',
+        'editorLineNumber.foreground': '#9CA3AF',
+        'editorLineNumber.activeForeground': '#4B5563',
+        'editor.selectionHighlightBorder': '#BFDBFE',
+      },
+    });
+    
+    // Get the current theme
+    const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    // Apply the appropriate theme
+    monaco.editor.setTheme(theme === 'dark' ? 'custom-dark' : 'custom-light');
+    
+    // Add keydown listener to the editor
+    const keydownListener = editor.onKeyDown((e: any) => {
+      handleEditorKeyDown(e, editor);
+    });
+    
+    // Hide toolbar when clicking outside the editor
+    const handleClickOutside = (event: MouseEvent) => {
+      const editorElement = editor.getDomNode();
+      if (editorElement && !editorElement.contains(event.target as Node) && 
+          toolbarRef.current && !toolbarRef.current.contains(event.target as Node)) {
+        setShowFloatingToolbar(false);
+      }
+    };
+    
+    // Add click outside listener
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Handle paste images into editor (upload to Cloudinary and insert markdown)
+    const handlePaste = async (event: ClipboardEvent) => {
+      try {
+        const items = event.clipboardData?.items || [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) {
+              event.preventDefault();
+              const url = await handleImageUpload(file);
+              // insertText will update local value
+              insertText(`![${file.name}](${url})`);
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    // Handle drag-and-drop images
+    const handleDrop = async (event: DragEvent) => {
+      try {
+        const files = event.dataTransfer?.files;
+        if (!files || files.length === 0) return;
+        const imageFiles: File[] = [];
+        for (let i = 0; i < files.length; i++) {
+          const f = files[i];
+          if (f.type && f.type.startsWith('image/')) imageFiles.push(f);
+        }
+        if (imageFiles.length > 0) {
+          event.preventDefault();
+          for (const file of imageFiles) {
+            const url = await handleImageUpload(file);
+            insertText(`![${file.name}](${url})\n`);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    const domNode = editor.getDomNode();
+    if (domNode) {
+      domNode.addEventListener('paste', handlePaste as any);
+      domNode.addEventListener('drop', handleDrop as any);
+      domNode.addEventListener('dragover', (e: DragEvent) => {
+        if (e.dataTransfer && Array.from(e.dataTransfer.items).some(it => it.type.startsWith('image/'))) {
+          e.preventDefault();
+        }
+      });
+    }
+    
+    // Cleanup function to remove the listeners
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (domNode) {
+        domNode.removeEventListener('paste', handlePaste as any);
+        domNode.removeEventListener('drop', handleDrop as any);
+      }
+      keydownListener?.dispose();
+      debouncedUpdateToolbar.cancel();
+    };
+  }, [handleEditorKeyDown]);
+  
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageAlt, setImageAlt] = useState('');
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [isTableDialogOpen, setIsTableDialogOpen] = useState(false);
   const [tableRows, setTableRows] = useState(3);
   const [tableColumns, setTableColumns] = useState(3);
-  
-  // History management for undo/redo
-  const [history, setHistory] = useState<HistoryState[]>([{ html: '', selection: null }]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const [isUndoRedo, setIsUndoRedo] = useState(false);
 
-  // Convert markdown to HTML for display
-  const convertMarkdownToHtml = useCallback((markdown: string): string => {
-    try {
-      const rawHtml = marked.parse(markdown);
-      const cleanHtml = DOMPurify.sanitize(String(rawHtml), {
-        ALLOWED_TAGS: [
-          'h1','h2','h3','h4','h5','h6',
-          'p','br','strong','b','em','i','s','del',
-          'ul','ol','li','blockquote','code','pre',
-          'a','img','table','thead','tbody','tr','th','td',
-          'hr','div','span','input'
-        ],
-        ALLOWED_ATTR: ['href','src','alt','title','class','type','checked','disabled']
-      });
-      return cleanHtml;
-    } catch (error) {
-      console.error('Error converting markdown to HTML:', error);
-      return markdown;
-    }
-  }, []);
-
-  // Initialize editor with initial content
-  useEffect(() => {
-    if (editorRef.current && initialMarkdown) {
-      // Convert initial markdown to HTML and set it
-      try {
-        const html = convertMarkdownToHtml(initialMarkdown);
-        editorRef.current.innerHTML = html;
-        
-                // Set initial history
-        setHistory([{ html, selection: null }]);
-        setHistoryIndex(0);
-        
-        // Move cursor to end
-        setTimeout(() => {
-          if (editorRef.current) {
-            const selection = window.getSelection();
-            if (selection) {
-              const range = document.createRange();
-              range.selectNodeContents(editorRef.current);
-              range.collapse(false);
-              selection.removeAllRanges();
-              selection.addRange(range);
-              editorRef.current.focus();
-            }
-          }
-        }, 0);
-      } catch (error) {
-        console.error('Error initializing editor:', error);
-        // Fallback to plain text
-        editorRef.current.textContent = initialMarkdown;
-      }
-    }
-  }, [initialMarkdown, convertMarkdownToHtml]);
-
-  // Convert current HTML content to markdown
-  const convertHtmlToMarkdown = useCallback((): string => {
-    if (!editorRef.current) return '';
-    
-    try {
-      const html = editorRef.current.innerHTML;
-      const cleanHtml = DOMPurify.sanitize(html, {
-        ALLOWED_TAGS: [
-          'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-          'p', 'br', 'strong', 'b', 'em', 'i', 's', 'del',
-          'ul', 'ol', 'li', 'blockquote', 'code', 'pre',
-          'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
-          'hr', 'div', 'span', 'input'
-        ],
-        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'type', 'checked', 'disabled']
-      });
-      
-      return turndownService.turndown(cleanHtml);
-    } catch (error) {
-      console.error('Error converting HTML to markdown:', error);
-      return editorRef.current.textContent || '';
-    }
-  }, []);
-  
-  // Save current selection
-  const saveSelection = useCallback((): { start: number; end: number } | null => {
-    const selection = window.getSelection();
-    if (!selection || !editorRef.current) return null;
-    
-    const range = selection.getRangeAt(0);
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(editorRef.current);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-    
-    return {
-      start: preCaretRange.toString().length,
-      end: preCaretRange.toString().length
-    };
-  }, []);
-
-  // Restore selection
-  const restoreSelection = useCallback((selection: { start: number; end: number }) => {
+  const insertText = useCallback((text: string) => {
     if (!editorRef.current) return;
     
-    const range = document.createRange();
-    const sel = window.getSelection();
-    if (!sel) return;
+    const editor = editorRef.current;
+    const selection = editor.getSelection();
     
-    let charIndex = 0;
-    let foundStart = false;
-    let foundEnd = false;
-    
-    function traverse(node: Node) {
-      if (foundStart && foundEnd) return;
+    if (selection) {
+      const range = {
+        startLineNumber: selection.startLineNumber,
+        startColumn: selection.startColumn,
+        endLineNumber: selection.endLineNumber,
+        endColumn: selection.endColumn
+      };
       
-      if (node.nodeType === Node.TEXT_NODE) {
-        const nextCharIndex = charIndex + node.textContent!.length;
-        
-        if (!foundStart && selection.start >= charIndex && selection.start <= nextCharIndex) {
-          range.setStart(node, Math.min(selection.start - charIndex, node.textContent!.length));
-          foundStart = true;
+      // Get the current line content
+      const currentLine = editor.getModel().getLineContent(selection.startLineNumber);
+      const beforeCursor = currentLine.substring(0, selection.startColumn - 1);
+      const afterCursor = currentLine.substring(selection.endColumn - 1);
+      
+      // Insert the text at the cursor position
+      editor.executeEdits('insert-text', [
+        {
+          range,
+          text,
+          forceMoveMarkers: true
         }
-        
-        if (!foundEnd && selection.end >= charIndex && selection.end <= nextCharIndex) {
-          range.setEnd(node, Math.min(selection.end - charIndex, node.textContent!.length));
-          foundEnd = true;
-        }
-        
-        charIndex = nextCharIndex;
-        } else {
-        for (const child of Array.from(node.childNodes)) {
-          traverse(child);
-        }
-      }
+      ]);
+      
+      // Focus the editor
+      editor.focus();
+      
+      // Update local value
+      const newValue = editor.getValue();
+      dispatch({ type: 'UPDATE_LOCAL', value: newValue });
     }
+  }, [editorRef]);
+
+  const handleImageUpload = useCallback(async (file: File) => {
+    setIsUploading(true);
+    setUploadError(null);
     
-    traverse(editorRef.current);
-    
-    if (foundStart && foundEnd) {
-      sel.removeAllRanges();
-      sel.addRange(range);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
+      formData.append('folder', 'blog-images');
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      const markdown = `![${file.name}](${data.secure_url})`;
+      insertText(markdown);
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setUploadError('Failed to upload image. Please try again.');
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
+  }, [insertText]);
+
+  const handleAddLink = useCallback(() => {
+    if (editorRef.current) {
       editorRef.current.focus();
     }
+    setShowLinkDialog(true);
   }, []);
 
-  // Add to history
-  const addToHistory = useCallback((html: string, selection: { start: number; end: number } | null) => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push({ html, selection });
-    
-    // Limit history to 50 entries
-    if (newHistory.length > 50) {
-      newHistory.shift();
-    }
-    
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-    
-    // Notify parent component
-    if (onChange) {
-      const markdown = convertHtmlToMarkdown();
-      onChange(markdown);
-    }
-  }, [history, historyIndex, onChange, convertHtmlToMarkdown]);
-
-  // Handle content changes
-  const handleContentChange = useCallback(() => {
-    if (!editorRef.current || isUndoRedo) return;
-    
-    const html = editorRef.current.innerHTML;
-    const selection = saveSelection();
-    
-    // Add to history
-    addToHistory(html, selection);
-  }, [isUndoRedo, saveSelection, addToHistory]);
-
-  // Undo
-  const undo = useCallback(() => {
-    if (historyIndex > 0) {
-      setIsUndoRedo(true);
-      const newIndex = historyIndex - 1;
-      const prevState = history[newIndex];
-      
-      if (editorRef.current && prevState) {
-        editorRef.current.innerHTML = prevState.html;
-        setHistoryIndex(newIndex);
-        
-        if (prevState.selection) {
-          setTimeout(() => {
-            restoreSelection(prevState.selection!);
-            setIsUndoRedo(false);
-          }, 0);
-        } else {
-          setIsUndoRedo(false);
-        }
-      }
-    }
-  }, [history, historyIndex, restoreSelection]);
-
-  // Redo
-  const redo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-      setIsUndoRedo(true);
-      const newIndex = historyIndex + 1;
-      const nextState = history[newIndex];
-      
-      if (editorRef.current && nextState) {
-        editorRef.current.innerHTML = nextState.html;
-        setHistoryIndex(newIndex);
-        
-        if (nextState.selection) {
-          setTimeout(() => {
-            restoreSelection(nextState.selection!);
-            setIsUndoRedo(false);
-          }, 0);
-      } else {
-          setIsUndoRedo(false);
-        }
-      }
-    }
-  }, [history, historyIndex, restoreSelection]);
-
-  // Handle paste events
-  const handlePaste = useCallback((e: React.ClipboardEvent) => {
-    e.preventDefault();
-    
-    const text = e.clipboardData.getData('text/plain');
-    const html = e.clipboardData.getData('text/html');
-    
-    if (html) {
-      // Clean HTML and insert (preserve checkboxes)
-      const cleanHtml = DOMPurify.sanitize(html, {
-        ALLOWED_TAGS: [
-          'h1','h2','h3','h4','h5','h6',
-          'p','br','strong','b','em','i','s','del',
-          'ul','ol','li','blockquote','code','pre',
-          'a','img','table','thead','tbody','tr','th','td',
-          'hr','div','span','input'
-        ],
-        ALLOWED_ATTR: ['href','src','alt','title','class','type','checked','disabled']
-      });
-      document.execCommand('insertHTML', false, cleanHtml);
-    } else if (text) {
-      // Check if it's markdown and format it
-      if (text.includes('**') || text.includes('*') || text.includes('#') || 
-          text.includes('- ') || text.includes('1. ') || text.includes('> ') ||
-          text.includes('`') || text.includes('[') || text.includes('![') ||
-          text.includes('|') || text.includes('---') || text.includes('~~')) {
-        
-        // Convert markdown to HTML and insert
-        const formattedHtml = convertMarkdownToHtml(text);
-        document.execCommand('insertHTML', false, formattedHtml);
-      } else {
-        // Plain text
-        document.execCommand('insertText', false, text);
-      }
-    }
-    
-    // Trigger content change
-    setTimeout(handleContentChange, 0);
-  }, [convertMarkdownToHtml, handleContentChange]);
-
-  // Handle keyboard shortcuts
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Prevent Backspace navigating away when editor is empty
-    if (e.key === 'Backspace') {
-      const editor = editorRef.current;
-      if (editor) {
-        const text = editor.textContent || '';
-        if (text.length === 0) {
-          e.preventDefault();
-          return;
-        }
-      }
-    }
-
-    // Prevent browser history navigation via Alt+Arrow while editing
-    if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-      e.preventDefault();
-      return;
-    }
-
-    // Undo/Redo shortcuts
-    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-      e.preventDefault();
-      undo();
-      return;
-    }
-    
-    if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
-      e.preventDefault();
-      redo();
-      return;
-    }
-    
-    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
-      e.preventDefault();
-      redo();
-      return;
-    }
-    
-    // Bold/Italic shortcuts
-    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-      e.preventDefault();
-      document.execCommand('bold', false);
-      return;
-    }
-    
-    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
-      e.preventDefault();
-      document.execCommand('italic', false);
-      return;
-    }
-    
-    // Auto-formatting on space/enter (reduced)
-    if (e.key === ' ' || e.key === 'Enter') {
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const textNode = range.startContainer;
-        
-        if (textNode.nodeType === Node.TEXT_NODE) {
-          const text = textNode.textContent || '';
-          const cursorPos = range.startOffset;
-          
-          if (e.key === ' ' && cursorPos > 0) {
-            const beforeCursor = text.substring(0, cursorPos);
-            // Only trigger at plain markers at start-of-line
-            if (!/^\s*([#]{1,5}|[-*>])$/.test(beforeCursor)) {
-              return;
-            }
-            
-            // Headings (#..##### + space)
-            if (beforeCursor.match(/^#{1,6}$/)) {
-              e.preventDefault();
-              const level = beforeCursor.length;
-              if (level <= 5) {
-                document.execCommand('formatBlock', false, `<h${level}>`);
-                document.execCommand('insertText', false, ' ');
-                return;
-              }
-            }
-          }
-          
-          if (e.key === 'Enter') {
-            const beforeCursor = text.substring(0, cursorPos);
-            // Lists only if line is just the marker
-            if (beforeCursor.match(/^[-*]\s*$/)) {
-              e.preventDefault();
-              document.execCommand('insertUnorderedList', false);
-              return;
-            }
-            
-            if (beforeCursor.match(/^\d+\.\s*$/)) {
-              e.preventDefault();
-              document.execCommand('insertOrderedList', false);
-              return;
-            }
-            
-            // Checkbox
-            if (beforeCursor.match(/^- \[ \]\s*$/)) {
-              e.preventDefault();
-              const checkboxHtml = '<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" /> ';
-              document.execCommand('insertHTML', false, checkboxHtml);
-              return;
-            }
-            
-            // Blockquote
-            if (beforeCursor.match(/^>\s*$/)) {
-              e.preventDefault();
-              document.execCommand('formatBlock', false, '<blockquote>');
-              document.execCommand('insertText', false, ' ');
-              return;
-            }
-          }
-        }
-      }
-    }
-  }, [undo, redo]);
-
-  // Download markdown file
-  const downloadMarkdown = useCallback(() => {
-    const markdown = convertHtmlToMarkdown();
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'document.md';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [convertHtmlToMarkdown]);
-
-  // Toggle fullscreen
-  const toggleFullscreen = useCallback(() => {
-    setIsFullscreen(!isFullscreen);
-  }, [isFullscreen]);
-
-  // Toolbar action handlers
-  const handleToolbarAction = useCallback((action: string) => {
-    if (!editorRef.current) return;
-    
-    editorRef.current.focus();
-
-    const getCurrentBlockTag = (): string | null => {
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return null;
-      let node: Node | null = sel.getRangeAt(0).startContainer;
-      if (!node) return null;
-      if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
-      while (node && node instanceof HTMLElement && node !== editorRef.current) {
-        const tag = (node as HTMLElement).tagName;
-        if (/^(H1|H2|H3|H4|H5|H6|P|BLOCKQUOTE|LI|DIV)$/.test(tag)) return tag;
-        node = (node as HTMLElement).parentElement;
-      }
-      return null;
-    };
-
-    switch (action) {
-      case 'bold':
-        document.execCommand('bold', false);
-        break;
-      case 'italic':
-        document.execCommand('italic', false);
-        break;
-      case 'strikethrough':
-        document.execCommand('strikethrough', false);
-        break;
-      case 'heading1': {
-        const current = getCurrentBlockTag();
-        document.execCommand('formatBlock', false, current === 'H1' ? 'P' : 'H1');
-        break;
-      }
-      case 'heading2': {
-        const current = getCurrentBlockTag();
-        document.execCommand('formatBlock', false, current === 'H2' ? 'P' : 'H2');
-        break;
-      }
-      case 'heading3': {
-        const current = getCurrentBlockTag();
-        document.execCommand('formatBlock', false, current === 'H3' ? 'P' : 'H3');
-        break;
-      }
-      case 'heading4': {
-        const current = getCurrentBlockTag();
-        document.execCommand('formatBlock', false, current === 'H4' ? 'P' : 'H4');
-        break;
-      }
-      case 'heading5': {
-        const current = getCurrentBlockTag();
-        document.execCommand('formatBlock', false, current === 'H5' ? 'P' : 'H5');
-        break;
-      }
-      case 'unorderedList':
-        document.execCommand('insertUnorderedList', false);
-        break;
-      case 'orderedList':
-        document.execCommand('insertOrderedList', false);
-        break;
-      case 'checkbox': {
-        const checkboxHtml = '<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" /> ';
-        document.execCommand('insertHTML', false, checkboxHtml);
-        break;
-      }
-      case 'quote':
-        document.execCommand('formatBlock', false, 'BLOCKQUOTE');
-        break;
-      case 'code':
-        document.execCommand('insertText', false, '`code`');
-        break;
-      case 'paragraph':
-        document.execCommand('formatBlock', false, 'P');
-        break;
-      case 'hr': {
-        const hrElement = document.createElement('hr');
-        hrElement.className = 'border-t border-border my-6';
-        
-        const hrSelection = window.getSelection();
-        if (hrSelection && hrSelection.rangeCount > 0) {
-          const hrRange = hrSelection.getRangeAt(0);
-          hrRange.deleteContents();
-          hrRange.insertNode(hrElement);
-          const br = document.createElement('br');
-          hrRange.setStartAfter(hrElement);
-          hrRange.insertNode(br);
-          hrRange.setStartAfter(br);
-          hrRange.collapse(true);
-          hrSelection.removeAllRanges();
-          hrSelection.addRange(hrRange);
-        }
-        break;
-      }
-      case 'link':
-        setShowLinkDialog(true);
-        return;
-      case 'image':
-        setShowImageDialog(true);
-        return;
-      case 'table':
-        setShowTableDialog(true);
-        return;
-      case 'undo':
-        undo();
-        return;
-      case 'redo':
-        redo();
-        return;
-      case 'download':
-        downloadMarkdown();
-        return;
-      case 'fullscreen':
-        toggleFullscreen();
-        return;
-    }
-
-    // Push change into history after action
-    setTimeout(() => {
-      try { handleContentChange(); } catch {}
-    }, 0);
-  }, [undo, redo, downloadMarkdown, toggleFullscreen, handleContentChange]);
-
-  // Insert link
-  const insertLink = useCallback(() => {
-    if (!linkUrl) return;
-    
-    const linkMarkdown = `[${linkText || linkUrl}](${linkUrl})`;
-    const linkHtml = convertMarkdownToHtml(linkMarkdown);
-    document.execCommand('insertHTML', false, linkHtml);
-    
+  const handleInsertLink = useCallback((url: string, text?: string) => {
+    const markdownLink = `[${text || 'link'}](${url})`;
+    insertText(markdownLink);
     setLinkUrl('');
     setLinkText('');
     setShowLinkDialog(false);
-    
-    setTimeout(handleContentChange, 0);
-  }, [linkUrl, linkText, convertMarkdownToHtml, handleContentChange]);
+  }, [insertText]);
 
-  // Insert image
-  const insertImage = useCallback(() => {
-    if (!imageUrl) return;
-    
-    const imageMarkdown = `![${imageAlt || 'image'}](${imageUrl})`;
-    const imageHtml = convertMarkdownToHtml(imageMarkdown);
-    document.execCommand('insertHTML', false, imageHtml);
-    
-    setImageUrl('');
-    setImageAlt('');
-    setShowImageDialog(false);
-    
-    setTimeout(handleContentChange, 0);
-  }, [imageUrl, imageAlt, convertMarkdownToHtml, handleContentChange]);
-
-  // Insert table
-  const insertTable = useCallback(() => {
-    let table = '\n';
-    
-    // Header row
-    table += '| ' + Array(tableColumns).fill('Header').join(' | ') + ' |\n';
-    
-    // Divider row
-    table += '|' + Array(tableColumns).fill('---').join('|') + '|\n';
-    
-    // Data rows
-    for (let i = 0; i < tableRows; i++) {
-      table += '| ' + Array(tableColumns).fill('Data').join(' | ') + ' |\n';
+  const handleFormatAction = useCallback((action: string) => {
+    if (action === 'table') {
+      setIsTableDialogOpen(true);
+      return;
     }
     
-    const tableHtml = convertMarkdownToHtml(table);
-    document.execCommand('insertHTML', false, tableHtml);
-    
-    setShowTableDialog(false);
-    setTimeout(handleContentChange, 0);
-  }, [tableRows, tableColumns, convertMarkdownToHtml, handleContentChange]);
-
-  // Handle content changes
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    
-    const handleInput = () => {
-      setTimeout(handleContentChange, 100);
-    };
-    
-    const handleBlur = () => handleContentChange();
-    
-    // Handle checkbox clicks
-    const handleClick = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target.classList.contains('task-list-item-checkbox')) {
-        e.preventDefault();
-        const checkbox = target as HTMLInputElement;
-        checkbox.checked = !checkbox.checked;
-        // Trigger content change after checkbox toggle
-        setTimeout(handleContentChange, 0);
+    if (action === 'link') {
+      if (editorRef.current) {
+        const selection = editorRef.current.getSelection();
+        const text = selection ? editorRef.current.getModel()?.getValueInRange(selection) : '';
+        setLinkText(text || '');
+        setLinkUrl('');
       }
-    };
-    
-    editor.addEventListener('input', handleInput);
-    editor.addEventListener('blur', handleBlur);
-    editor.addEventListener('click', handleClick);
-    
-    return () => {
-      editor.removeEventListener('input', handleInput);
-      editor.removeEventListener('blur', handleBlur);
-      editor.removeEventListener('click', handleClick);
-    };
-  }, [handleContentChange]);
+      setShowLinkDialog(true);
+      return;
+    }
 
-  // Toolbar button component
-  const ToolbarButton = ({ 
+    // Generic insertText support (from toolbar): action format 'insertText:{"text":"..."}'
+    if (action.startsWith('insertText:')) {
+      try {
+        const payload = JSON.parse(action.replace('insertText:', '')) as { text: string };
+        if (editorRef.current && payload?.text != null) {
+          const editor = editorRef.current;
+          const selection = editor.getSelection();
+          if (!selection) return;
+          const range = {
+            startLineNumber: selection.startLineNumber,
+            startColumn: selection.startColumn,
+            endLineNumber: selection.endLineNumber,
+            endColumn: selection.endColumn,
+          };
+          editor.executeEdits('insert-text-generic', [{ range, text: payload.text, forceMoveMarkers: true }]);
+          const newValue = editor.getValue();
+          dispatch({ type: 'UPDATE_LOCAL', value: newValue });
+        }
+      } catch (_) {
+        // ignore
+      }
+      return;
+    }
+
+    // Undo/redo
+    if (action === 'undo' || action === 'redo') {
+      if (editorRef.current) {
+        editorRef.current.trigger('keyboard', action, null);
+      }
+      return;
+    }
+
+    if (!editorRef.current) return;
+    const editor = editorRef.current;
+    const selection = editor.getSelection();
+    
+    if (!selection) return;
+
+    const range = {
+      startLineNumber: selection.startLineNumber,
+      startColumn: selection.startColumn,
+      endLineNumber: selection.endLineNumber,
+      endColumn: selection.endColumn,
+    };
+
+    const text = editor.getModel()?.getValueInRange(range) || '';
+
+    switch (action) {
+      case 'bold':
+        editor.executeEdits('format-bold', [{
+          range,
+          text: text ? `**${text}**` : '****',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'italic':
+        editor.executeEdits('format-italic', [{
+          range,
+          text: text ? `*${text}*` : '**',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'heading1':
+      case 'heading2':
+      case 'heading3':
+      case 'heading4': {
+        const hashes = action === 'heading1' ? '# ' : action === 'heading2' ? '## ' : action === 'heading3' ? '### ' : '#### ';
+        editor.executeEdits('format-heading', [{
+          range: {
+            startLineNumber: selection.startLineNumber,
+            startColumn: 1,
+            endLineNumber: selection.startLineNumber,
+            endColumn: 1
+          },
+          text: hashes,
+          forceMoveMarkers: true
+        }]);
+        break;
+      }
+      case 'heading1':
+        editor.executeEdits('format-heading1', [{
+          range: {
+            startLineNumber: selection.startLineNumber,
+            startColumn: 1,
+            endLineNumber: selection.startLineNumber,
+            endColumn: 1
+          },
+          text: '# ',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'heading2':
+        editor.executeEdits('format-heading2', [{
+          range: {
+            startLineNumber: selection.startLineNumber,
+            startColumn: 1,
+            endLineNumber: selection.startLineNumber,
+            endColumn: 1
+          },
+          text: '## ',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'code':
+        editor.executeEdits('format-code', [{
+          range,
+          text: text ? `\`${text}\`` : '``',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'codeBlock':
+        editor.executeEdits('format-code-block', [{
+          range,
+          text: text ? `\`\`\`\n${text}\n\`\`\`` : '```\n\n```',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'quote':
+        editor.executeEdits('format-quote', [{
+          range: {
+            startLineNumber: selection.startLineNumber,
+            startColumn: 1,
+            endLineNumber: selection.startLineNumber,
+            endColumn: 1
+          },
+          text: '> ',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'hr':
+        editor.executeEdits('format-hr', [{
+          range,
+          text: '\n---\n',
+          forceMoveMarkers: true
+        }]);
+        break;
+      case 'ul':
+      case 'ol':
+      case 'task':
+        {
+          const prefix = action === 'ul' ? '- ' : action === 'ol' ? '1. ' : '- [ ] ';
+          editor.executeEdits('format-list', [{
+            range: {
+              startLineNumber: selection.startLineNumber,
+              startColumn: 1,
+              endLineNumber: selection.startLineNumber,
+              endColumn: 1
+            },
+            text: prefix,
+            forceMoveMarkers: true
+          }]);
+        }
+        break;
+    }
+  }, []);
+
+  // Floating toolbar component
+  // Format button component for consistency
+  const FormatButton = ({ 
     action, 
-    icon: Icon, 
+    icon, 
     title, 
     shortcut = '',
-    disabled = false 
+    type = 'button' 
   }: { 
     action: string; 
-    icon: React.ComponentType<{ size?: number }>; 
+    icon: React.ReactNode; 
     title: string; 
     shortcut?: string;
-    disabled?: boolean;
+    type?: 'button' | 'submit' | 'reset';
   }) => (
-    <Button
-      variant="ghost"
-      size="sm"
-      onMouseDown={(e) => e.preventDefault()}
-      onClick={() => handleToolbarAction(action)}
-      disabled={disabled}
-      className="h-8 w-8 p-0 hover:bg-accent"
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleFormatAction(action);
+      }}
+      onMouseDown={(e) => {
+        // Prevent focus from being taken away from the editor
+        e.preventDefault();
+      }}
+      className="p-1.5 rounded hover:bg-accent text-foreground/80 hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
       title={`${title}${shortcut ? ` (${shortcut})` : ''}`}
     >
-      <Icon size={16} />
-    </Button>
+      {icon}
+    </button>
   );
+
+  // SVG Icons for better consistency
+  const Icons = {
+    Bold: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+        <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
+      </svg>
+    ),
+    Italic: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="19" y1="4" x2="10" y2="4"></line>
+        <line x1="14" y1="20" x2="5" y2="20"></line>
+        <line x1="15" y1="4" x2="9" y2="20"></line>
+      </svg>
+    ),
+    Heading1: () => <span className="font-bold text-sm">H1</span>,
+    Heading2: () => <span className="font-bold text-xs">H2</span>,
+    Heading3: () => <span className="font-bold text-xs opacity-80">H3</span>,
+    Heading4: () => <span className="font-bold text-xs opacity-60">H4</span>,
+    Code: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="16 18 22 12 16 6"></polyline>
+        <polyline points="8 6 2 12 8 18"></polyline>
+      </svg>
+    ),
+    Link: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+    ),
+    Image: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+      </svg>
+    ),
+    List: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+      </svg>
+    ),
+    ListOrdered: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="10" y1="6" x2="21" y2="6"></line>
+        <line x1="10" y1="12" x2="21" y2="12"></line>
+        <line x1="10" y1="18" x2="21" y2="18"></line>
+        <path d="M4 6h1v4"></path>
+        <path d="M4 10h2"></path>
+        <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path>
+      </svg>
+    ),
+    Quote: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+    ),
+    HorizontalRule: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    ),
+    Task: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="9 11 12 14 22 4"></polyline>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+      </svg>
+    ),
+    Table: () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="3" y1="9" x2="21" y2="9"></line>
+        <line x1="3" y1="15" x2="21" y2="15"></line>
+        <line x1="12" y1="3" x2="12" y2="21"></line>
+      </svg>
+    )
+  };
+
+  const FloatingToolbar = useMemo(() => (
+    <div 
+      ref={toolbarRef}
+      className={`fixed z-[9999] bg-background/95 border border-border/50 rounded-md shadow-lg p-1.5 flex items-center space-x-1.5 transition-all duration-200 ${
+        showFloatingToolbar ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+      }`}
+      style={{
+        top: `${toolbarPosition.top}px`,
+        left: `${toolbarPosition.left}px`,
+        transform: 'translateZ(0) translateY(0)',
+        willChange: 'transform, opacity',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        // Prevent focus from being taken away from the editor
+        e.preventDefault();
+      }}
+    >
+      {/* Text Formatting */}
+      <FormatButton type="button" action="bold" icon={<Icons.Bold />} title="Bold" shortcut="Ctrl+B" />
+      <FormatButton type="button" action="italic" icon={<Icons.Italic />} title="Italic" shortcut="Ctrl+I" />
+      
+      <div className="h-5 w-px bg-border/50 mx-0.5"></div>
+      
+      {/* Headings */}
+      <FormatButton type="button" action="heading1" icon={<Icons.Heading1 />} title="Heading 1" />
+      <FormatButton type="button" action="heading2" icon={<Icons.Heading2 />} title="Heading 2" />
+      <FormatButton type="button" action="heading3" icon={<Icons.Heading3 />} title="Heading 3" />
+      <FormatButton type="button" action="heading4" icon={<Icons.Heading4 />} title="Heading 4" />
+      
+      <div className="h-5 w-px bg-border/50 mx-0.5"></div>
+      
+      {/* Lists */}
+      <FormatButton type="button" action="ul" icon={<Icons.List />} title="Bullet List" />
+      <FormatButton type="button" action="ol" icon={<Icons.ListOrdered />} title="Numbered List" />
+      <FormatButton type="button" action="task" icon={<Icons.Task />} title="Task List" />
+      
+      <div className="h-5 w-px bg-border/50 mx-0.5"></div>
+      
+      {/* Code & Blocks */}
+      <FormatButton type="button" action="code" icon={<Icons.Code />} title="Inline Code" shortcut="`" />
+      <FormatButton type="button" action="codeBlock" icon={<Icons.Code />} title="Code Block" shortcut="```" />
+      <FormatButton type="button" action="quote" icon={<Icons.Quote />} title="Blockquote" shortcut=">" />
+      <FormatButton type="button" action="hr" icon={<Icons.HorizontalRule />} title="Horizontal Rule" />
+      
+      <div className="h-5 w-px bg-border/50 mx-0.5"></div>
+      
+      {/* Media & Tables */}
+      <FormatButton type="button" action="link" icon={<Icons.Link />} title="Insert Link" shortcut="Ctrl+K" />
+      <FormatButton type="button" action="image" icon={<Icons.Image />} title="Insert Image" />
+      <FormatButton type="button" action="table" icon={<Icons.Table />} title="Insert Table" />
+    </div>
+  ), [showFloatingToolbar, toolbarPosition, handleFormatAction]);
 
   return (
     <>
-      {/* Custom CSS for MarkdownViewer-style formatting */}
-      <style jsx>{`
-        .prose h1 {
-          background: linear-gradient(to right, #0369a1, #0ea5e9, #475569);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .prose h1::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(to right, #14b8a6, #84cc16);
-          transition: width 0.3s ease;
-        }
-        .prose h1:hover::after {
-          width: 100%;
-        }
-        .prose h2::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 4px;
-          background: #0ea5e9;
-          border-radius: 9999px;
-        }
-        .prose h2 {
-          background: linear-gradient(to right, #0369a1, #475569);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .prose h3::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-33%);
-          width: 24px;
-          height: 24px;
-          border-radius: 9999px;
-          background: rgba(56, 189, 248, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .prose h3::after {
-          content: '';
-          position: absolute;
-          left: 6px;
-          top: 50%;
-          transform: translateY(-33%);
-          width: 6px;
-          height: 6px;
-          border-radius: 9999px;
-          background: #2563eb;
-        }
-        .prose h3 {
-          background: linear-gradient(to right, #0369a1, #475569);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .prose h4::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 8px;
-          height: 8px;
-          border-radius: 9999px;
-          background: #6b7280;
-        }
-        .prose h4 {
-          background: linear-gradient(to right, #374151, #4b5563);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .prose h5 {
-          background: linear-gradient(to right, #0369a1, #475569);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .prose .task-list-item-checkbox {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E") no-repeat center;
-        }
-        .prose .task-list-item-checkbox:checked {
-          background-color: #4f46e5;
-          border-color: #4f46e5;
-        }
-        .prose .task-list-item-checkbox:not(:checked) {
-          background-color: #ffffff;
-          border-color: #d1d5db;
-        }
-        .dark .prose .task-list-item-checkbox:not(:checked) {
-          background-color: #1f2937;
-          border-color: #4b5563;
-        }
-      `}</style>
-      <div className={cn(
-        'border rounded-lg shadow-sm bg-background',
-        isFullscreen ? 'fixed inset-0 z-50 m-4' : '',
-        className
-      )}>
-      {/* Toolbar */}
-      <div className="flex items-center justify-between p-2 border-b bg-muted/30">
-        <div className="flex items-center space-x-1">
-      {/* Text Formatting */}
-          <ToolbarButton action="bold" icon={Bold} title="Bold" shortcut="Ctrl+B" />
-          <ToolbarButton action="italic" icon={Italic} title="Italic" shortcut="Ctrl+I" />
-          <ToolbarButton action="strikethrough" icon={Strikethrough} title="Strikethrough" />
-      
-          <div className="w-px h-6 bg-border mx-2" />
-      
-      {/* Headings */}
-          <ToolbarButton action="heading1" icon={Heading1} title="Heading 1" />
-          <ToolbarButton action="heading2" icon={Heading2} title="Heading 2" />
-          <ToolbarButton action="heading3" icon={Heading3} title="Heading 3" />
-          <ToolbarButton action="heading4" icon={Heading4} title="Heading 4" />
-          <ToolbarButton action="heading5" icon={Heading5} title="Heading 5" />
-          
-          <div className="w-px h-6 bg-border mx-2" />
-      
-      {/* Lists */}
-          <ToolbarButton action="unorderedList" icon={List} title="Bullet List" />
-          <ToolbarButton action="orderedList" icon={ListOrdered} title="Numbered List" />
-          <ToolbarButton action="checkbox" icon={CheckSquare} title="Checkbox" />
-          
-          <div className="w-px h-6 bg-border mx-2" />
-          
-          {/* Blocks */}
-          <ToolbarButton action="quote" icon={Quote} title="Blockquote" />
-          <ToolbarButton action="code" icon={Code} title="Inline Code" />
-          <ToolbarButton action="paragraph" icon={Type} title="Paragraph" />
-          <ToolbarButton action="hr" icon={Minus} title="Horizontal Rule" />
-          
-          <div className="w-px h-6 bg-border mx-2" />
-      
-      {/* Media & Tables */}
-          <ToolbarButton action="link" icon={Link} title="Insert Link" />
-          <ToolbarButton action="image" icon={Image} title="Insert Image" />
-          <ToolbarButton action="table" icon={Table} title="Insert Table" />
-    </div>
-        
-        <div className="flex items-center space-x-1">
-          {/* History */}
-          <ToolbarButton 
-            action="undo" 
-            icon={Undo} 
-            title="Undo" 
-            shortcut="Ctrl+Z"
-            disabled={historyIndex <= 0}
-          />
-          <ToolbarButton 
-            action="redo" 
-            icon={Redo} 
-            title="Redo" 
-            shortcut="Ctrl+Y"
-            disabled={historyIndex >= history.length - 1}
-          />
-          
-          <div className="w-px h-6 bg-border mx-2" />
-          
-          {/* Actions */}
-          <ToolbarButton action="download" icon={Download} title="Download Markdown" />
-          <ToolbarButton action="fullscreen" icon={isFullscreen ? Minimize2 : Maximize2} title="Toggle Fullscreen" />
+    <Tabs 
+        defaultValue="edit" 
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <div className="flex justify-between items-center mb-2">
+          <TabsList>
+            <TabsTrigger value="edit">Edit</TabsTrigger>
+            <TabsTrigger value="preview">Preview</TabsTrigger>
+          </TabsList>
+          {/* Live preview: no update button needed */}
+        </div>
+        {activeTab === 'edit' && isEditorReady && (
+            <EditorToolbar 
+              onFormatAction={handleFormatAction} 
+              onImageUpload={handleImageUpload}
+              onAddLink={handleAddLink}
+            />
+          )}
+        <TabsContent value="edit" className="mt-0">
+          <div 
+            className="border rounded-md overflow-hidden"
+            style={{ minHeight: `${minHeight}px` }}
+          >
+            <div className="relative">
+              <MonacoEditor
+                height={`${minHeight}px`}
+                language="markdown"
+                theme="custom-dark"
+                value={localValue}
+                onChange={handleEditorChange}
+                onMount={handleEditorDidMount}
+                options={{
+                  minimap: { enabled: true },
+                  scrollBeyondLastLine: false,
+                  fontSize: 14,
+                  wordWrap: 'on',
+                  automaticLayout: true,
+                  lineNumbers: 'off',
+                  glyphMargin: true,
+                  folding: false,
+                  lineDecorationsWidth: 0,
+                  lineNumbersMinChars: 0,
+                  renderLineHighlight: 'gutter',
+                  scrollbar: {
+                    vertical: 'visible',
+                    horizontal: 'hidden',
+                  },
+                }}
+              />
+              {FloatingToolbar}
             </div>
           </div>
-
-      {/* Editor */}
-      <div 
-        ref={editorRef}
-        contentEditable
-        suppressContentEditableWarning
-        onPaste={handlePaste}
-        onKeyDown={handleKeyDown}
-        data-placeholder="Start typing your content here... Use the toolbar above to format your text."
-        className={cn(
-          'prose dark:prose-invert max-w-none p-4 outline-none min-h-[200px] relative',
-          'focus:ring-2 focus:ring-ring focus:ring-offset-2',
-          'prose-headings:mt-6 prose-headings:mb-4',
-          'prose-p:my-2 prose-p:leading-relaxed',
-          'prose-ul:my-2 prose-ol:my-2',
-          'prose-li:my-1',
-          'prose-blockquote:my-4 prose-blockquote:pl-4 prose-blockquote:border-l-4 prose-blockquote:border-primary',
-          'prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm',
-          'prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto',
-          'prose-table:my-4 prose-table:w-full prose-table:border-collapse',
-          'prose-th:border prose-th:border-border prose-th:p-2 prose-th:text-left',
-          'prose-td:border prose-td:border-border prose-td:p-2',
-          'prose-img:my-4 prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto',
-          'prose-a:text-primary prose-a:underline prose-a:decoration-primary/50 hover:prose-a:decoration-primary',
-          // Additional styles for better editing experience
-          'prose-strong:font-bold prose-strong:text-foreground',
-          'prose-em:italic prose-em:text-foreground',
-          'prose-del:line-through prose-del:text-muted-foreground',
-          'prose-code:font-mono prose-code:text-sm prose-code:bg-muted/50',
-          'prose-pre:font-mono prose-code:text-sm prose-pre:bg-muted/50',
-          'prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:bg-muted/20 prose-blockquote:pl-4 prose-blockquote:py-2 prose-blockquote:rounded-r',
-          // Enhanced editing styles with MarkdownViewer formatting
-          'prose-h1:text-4xl prose-h1:md:text-5xl prose-h1:font-extrabold prose-h1:tracking-tight prose-h1:mt-12 prose-h1:mb-8 prose-h1:relative prose-h1:group prose-h1:scroll-mt-24',
-          'prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:font-semibold prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:relative prose-h2:pl-6 prose-h2:border-b prose-h2:border-teal-300 prose-h2:dark:border-teal-700/50 prose-h2:scroll-mt-16',
-          'prose-h3:text-3xl prose-h3:md:text-2xl prose-h3:font-bold prose-h3:mt-12 prose-h3:mb-6 prose-h3:pt-2 prose-h3:relative prose-h3:pl-8 prose-h3:scroll-mt-20',
-          'prose-h4:text-xl prose-h4:md:text-xl prose-h4:font-semibold prose-h4:mt-8 prose-h4:mb-3 prose-h4:pl-4 prose-h4:relative prose-h4:scroll-mt-16',
-          'prose-h5:text-lg prose-h5:md:text-xl prose-h5:font-medium prose-h5:mt-6 prose-h5:mb-2 prose-h5:pl-2 prose-h5:relative prose-h5:text-sky-600 prose-h5:dark:text-gray-300 prose-h5:scroll-mt-16',
-          'prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2',
-          'prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2 prose-ol:[&>li]:relative prose-ol:[&>li]:pl-2 prose-ol:[&>li]:marker:font-semibold prose-ol:[&>li]:marker:text-sky-400 prose-ol:[&>li]:marker:dark:text-teal-300',
-          'prose-li:relative prose-li:pl-2 prose-li:my-1 prose-li:text-gray-700 prose-li:dark:text-gray-300',
-          'prose-hr:border-t prose-hr:border-border prose-hr:my-6',
-          // Task list styling
-          'prose-li.task-list-item:flex prose-li.task-list-item:items-start',
-          'prose-input.task-list-item-checkbox:h-4 prose-input.task-list-item-checkbox:w-4 prose-input.task-list-item-checkbox:rounded prose-input.task-list-item-checkbox:border prose-input.task-list-item-checkbox:mr-2 prose-input.task-list-item-checkbox:mt-0.5 prose-input.task-list-item-checkbox:cursor-pointer prose-input.task-list-item-checkbox:transition-colors',
-          // Custom HR styling
-          'hr:border-t hr:border-border hr:my-6 hr:border-2'
-        )}
-        style={{ 
-          height: typeof height === 'number' ? `${height}px` : height,
-          overflowY: 'auto'
-        }}
-      />
-
-      {/* Placeholder */}
-      {!editorRef.current?.textContent && (
-        <div className="absolute top-16 left-4 text-muted-foreground pointer-events-none">
-          Start typing your content here... Use the toolbar above to format your text.
-        </div>
+        </TabsContent>
+        
+        <TabsContent value="preview" className="mt-0">
+          <div 
+            className="prose dark:prose-invert max-w-none p-4 border rounded-md min-h-[200px]"
+            style={{ minHeight: `${minHeight}px` }}
+          >
+            <LazyMarkdownViewer content={previewValue} />
+          </div>
+        </TabsContent>
+      </Tabs>
+    <div className={cn('w-full space-y-2 relative isolate', className)}>
+      {label && (
+        <label className="block text-sm font-medium text-foreground mb-1">
+          {label}
+        </label>
+      )}
+      
+      
+      
+      {isUploading && (
+        <div className="text-sm text-muted-foreground">Uploading image...</div>
+      )}
+      
+      {uploadError && (
+        <div className="text-sm text-destructive">{uploadError}</div>
+      )}
+      
+      {error && (
+        <p className="text-sm text-destructive">{error}</p>
       )}
       
       {/* Link Dialog */}
-      <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Insert Link</DialogTitle>
-            <DialogDescription>
-              Enter the URL and optional text for your link.
-            </DialogDescription>
-          </DialogHeader>
+      {showLinkDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h3 className="text-lg font-medium mb-4">Insert Link</h3>
             <div className="space-y-4">
               <div>
-              <Label htmlFor="linkUrl">URL</Label>
+                <label htmlFor="link-url" className="block text-sm font-medium mb-1">
+                  URL
+                </label>
                 <Input
-                id="linkUrl"
+                  id="link-url"
+                  placeholder="https://example.com"
                   value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://example.com"
-                onKeyDown={(e) => e.key === 'Enter' && insertLink()}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLinkUrl(e.target.value)}
+                  className="w-full"
                 />
               </div>
               <div>
-              <Label htmlFor="linkText">Text (optional)</Label>
+                <label htmlFor="link-text" className="block text-sm font-medium mb-1">
+                  Link Text (optional)
+                </label>
                 <Input
-                id="linkText"
+                  id="link-text"
+                  placeholder="Click here"
                   value={linkText}
-                onChange={(e) => setLinkText(e.target.value)}
-                placeholder="Link text"
-                onKeyDown={(e) => e.key === 'Enter' && insertLink()}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLinkText(e.target.value)}
+                  className="w-full"
                 />
               </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+              <div className="flex justify-end space-x-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    setShowLinkDialog(false);
+                  }}
+                >
                   Cancel
                 </Button>
-              <Button onClick={insertLink}>
+                <Button
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    handleInsertLink(linkUrl, linkText || undefined);
+                  }}
+                  disabled={!linkUrl}
+                >
                   Insert Link
                 </Button>
               </div>
             </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Image Dialog */}
-      <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Insert Image</DialogTitle>
-            <DialogDescription>
-              Enter the URL and alt text for your image.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="imageUrl">Image URL</Label>
-              <Input
-                id="imageUrl"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                onKeyDown={(e) => e.key === 'Enter' && insertImage()}
-              />
           </div>
-            <div>
-              <Label htmlFor="imageAlt">Alt Text (optional)</Label>
-              <Input
-                id="imageAlt"
-                value={imageAlt}
-                onChange={(e) => setImageAlt(e.target.value)}
-                placeholder="Image description"
-                onKeyDown={(e) => e.key === 'Enter' && insertImage()}
-              />
         </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowImageDialog(false)}>
-                Cancel
-              </Button>
-              <Button onClick={insertImage}>
-                Insert Image
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      )}
       
       {/* Table Dialog */}
-      <Dialog open={showTableDialog} onOpenChange={setShowTableDialog}>
-        <DialogContent>
+      <Dialog open={isTableDialogOpen} onOpenChange={setIsTableDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Insert Table</DialogTitle>
             <DialogDescription>
-              Choose the size of your table.
+              Configure your table dimensions
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="tableRows">Rows</Label>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rows" className="text-right">
+                Rows
+              </Label>
               <Input
-                  id="tableRows"
+                id="rows"
                 type="number"
                 min="1"
-                  max="10"
+                max="20"
                 value={tableRows}
-                  onChange={(e) => setTableRows(parseInt(e.target.value) || 3)}
+                onChange={(e) => setTableRows(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))}
+                className="col-span-1"
               />
             </div>
-              <div>
-                <Label htmlFor="tableColumns">Columns</Label>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="columns" className="text-right">
+                Columns
+              </Label>
               <Input
-                  id="tableColumns"
+                id="columns"
                 type="number"
                 min="1"
                 max="10"
                 value={tableColumns}
-                  onChange={(e) => setTableColumns(parseInt(e.target.value) || 3)}
+                onChange={(e) => setTableColumns(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                className="col-span-1"
               />
             </div>
           </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowTableDialog(false)}>
+          <div className="flex justify-end gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsTableDialogOpen(false)}
+            >
               Cancel
             </Button>
-              <Button onClick={insertTable}>
+            <Button 
+              onClick={() => {
+                if (!editorRef.current) return;
+                
+                let table = '\n';
+                
+                // Header row
+                table += '| ' + Array(tableColumns).fill('Header').join(' | ') + ' |\n';
+                
+                // Divider row
+                table += '|' + Array(tableColumns).fill('---').join('|') + '|\n';
+                
+                // Data rows
+                for (let i = 0; i < tableRows; i++) {
+                  table += '| ' + Array(tableColumns).fill('Data').join(' | ') + ' |\n';
+                }
+                
+                const editor = editorRef.current;
+                const selection = editor.getSelection();
+                const range = {
+                  startLineNumber: selection?.startLineNumber || 1,
+                  startColumn: selection?.startColumn || 1,
+                  endLineNumber: selection?.endLineNumber || selection?.startLineNumber || 1,
+                  endColumn: selection?.endColumn || selection?.startColumn || 1
+                };
+                
+                editor.executeEdits('insert-table', [{
+                  range,
+                  text: table,
+                  forceMoveMarkers: true
+                }]);
+                
+                setIsTableDialogOpen(false);
+              }}
+            >
               Insert Table
             </Button>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
     </div>
     </>
   );
-};
+}
+
+// Memoize the component to prevent unnecessary re-renders
+const MarkdownEditor = React.memo(MarkdownEditorComponent);
+MarkdownEditor.displayName = 'MarkdownEditor';
 
 export default MarkdownEditor;
