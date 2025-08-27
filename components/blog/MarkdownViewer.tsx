@@ -741,7 +741,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                     {props.children}
                   </span>
                 </a>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-500 to-lime-600 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-600 to-slate-700 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </h1>
             );
           },
@@ -985,3 +985,4 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
 }
 
 export default MarkdownViewer;
+
