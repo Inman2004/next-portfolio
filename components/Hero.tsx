@@ -144,9 +144,8 @@ export default function Hero() {
               <MorphingText
                 texts={[
                   "Full Stack Developer",
-                  "AI/ML Engineer",
-                  "AI Integration Specialist",
-                  "LLM Specialist",
+                  "Front-end Specialist",
+                  "React / Native developer"
                 ]}
                 className="text-center lg:text-left !h-[160px] text-indigo-800/90 dark:text-indigo-300"
               />
