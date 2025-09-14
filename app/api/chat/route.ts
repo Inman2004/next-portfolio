@@ -5,8 +5,48 @@ import { resume } from "@/data/resume";
 import { faq } from "@/data/faq";
 import { intentSynonyms } from "@/data/intentSynonyms";
 import { getRelevantContext, generateRAGPrompt, getDataFreshnessInfo } from "@/lib/rag";
+import { HfInference } from "@huggingface/inference";
 
 export const runtime = "nodejs";
+
+const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
+
+async function generateHuggingFaceResponse(prompt: string): Promise<string> {
+  try {
+    const model = "google/gemma-2-2b-it";
+    const response = await hf.chatCompletion({
+      model,
+      messages: [{ role: "user", content: prompt }],
+      parameters: {
+        max_new_tokens: 512,
+        temperature: 0.7,
+        top_p: 0.95,
+        repetition_penalty: 1.2,
+      },
+    });
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Hugging Face API error:", error);
+    // Try a smaller model as a fallback
+    try {
+      const model = "HuggingFaceH4/zephyr-7b-beta";
+      const response = await hf.chatCompletion({
+        model,
+        messages: [{ role: "user", content: prompt }],
+        parameters: {
+          max_new_tokens: 512,
+          temperature: 0.7,
+          top_p: 0.95,
+          repetition_penalty: 1.2,
+        },
+      });
+      return response.choices[0].message.content;
+    } catch (fallbackError) {
+      console.error("Hugging Face fallback API. This is likely due to a problem with the Hugging Face API, or the API key.", fallbackError);
+      return ""; // Return empty string to trigger the rule-based fallback
+    }
+  }
+}
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 
@@ -82,7 +122,12 @@ async function generateRAGReply(query: string): Promise<string> {
     const prompt = generateRAGPrompt(query, context);
     
     // Generate response
-    const response = generateContextualResponse(query, context);
+    let response = await generateHuggingFaceResponse(prompt);
+
+    // If Hugging Face fails, fall back to the rule-based system
+    if (!response) {
+      response = generateContextualResponse(query, context);
+    }
     
     // Cache the response
     cacheResponse(query, response);
@@ -786,24 +831,17 @@ export async function POST(req: NextRequest) {
 
     // RAG-based reply system for all queries
     if (query.trim()) {
-      const cached = getCachedResponse(query);
-      if (cached) {
-        return respond(cached, "rag-cached", true);
-      }
-      
       const ragReply = await generateRAGReply(query);
-      if (ragReply && !ragReply.includes("Based on my background")) {
+      if (ragReply) {
         return respond(ragReply, "rag-system", false);
       }
     }
 
-    // Score intents early to decide precedence vs. low-confidence FAQ
+    // Fallback to original intent-based system if RAG fails
     const intent = intentFrom(query);
     const intentScores = scoreIntents(query);
     const topIntentScore = intentScores.length ? intentScores[0].score : 0;
 
-    // Try FAQ first (weighted), but only let low-confidence FAQ suggestions win
-    // when there is no clear intent detected.
     const best = faqBestMatch(query);
     if (best.idx >= 0) {
       if (best.score >= 4) {
@@ -814,14 +852,6 @@ export async function POST(req: NextRequest) {
           headers: { "Content-Type": "application/json" },
         });
       } else if (best.score >= 1 && topIntentScore === 0) {
-        // Low confidence: use RAG system
-        const ragReply = await generateRAGReply(query);
-        if (ragReply) {
-          return new Response(JSON.stringify({ reply: ragReply }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
         const reply = `${didYouMean(query, 5)}\n\nIf none of these fit, ask me about **skills**, **projects**, **education**, or **contact**.`;
         return new Response(JSON.stringify({ reply }), {
           status: 200,
@@ -829,7 +859,7 @@ export async function POST(req: NextRequest) {
         });
       }
     }
-    // Compose multi-intent response when the query mentions 2 topics
+
     const multi = composeMultiIntent(query);
     if (multi) {
       const final = `${multi}`;
@@ -839,7 +869,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // If no intent is detected at all, return a polite fallback
     if (topIntentScore === 0 && query.trim()) {
       const reply = answerNoData();
       return new Response(JSON.stringify({ reply }), {
@@ -847,10 +876,6 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
       });
     }
-
-    // For all other intents, use the RAG system
-    const ragIntent = await generateRAGReply(query);
-    if (ragIntent) return respond(ragIntent, "rag-intent");
 
     let reply = "";
     switch (intent) {
@@ -890,7 +915,6 @@ export async function POST(req: NextRequest) {
         break;
     }
 
-    // Keep concise; add a follow-up prompt
     const final = `${reply}\n\nNeed details on skills, experience, projects, or contact?`;
     return new Response(JSON.stringify({ reply: final }), {
       status: 200,
