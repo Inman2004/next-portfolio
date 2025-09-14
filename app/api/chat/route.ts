@@ -109,12 +109,6 @@ function respond(reply: string, source?: string, cacheHit?: boolean) {
 // RAG-based response system
 async function generateRAGReply(query: string): Promise<string> {
   try {
-    // Check cache first
-    const cached = getCachedResponse(query);
-    if (cached) {
-      return cached;
-    }
-    
     // Get relevant context from vector database
     const context = getRelevantContext(query, 3);
     
@@ -128,9 +122,6 @@ async function generateRAGReply(query: string): Promise<string> {
     if (!response) {
       response = generateContextualResponse(query, context);
     }
-    
-    // Cache the response
-    cacheResponse(query, response);
     
     return response;
   } catch (error) {
@@ -829,10 +820,17 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Check cache first
+    const cached = getCachedResponse(query);
+    if (cached) {
+      return respond(cached, "rag-cached", true);
+    }
+
     // RAG-based reply system for all queries
     if (query.trim()) {
       const ragReply = await generateRAGReply(query);
       if (ragReply) {
+        cacheResponse(query, ragReply);
         return respond(ragReply, "rag-system", false);
       }
     }
