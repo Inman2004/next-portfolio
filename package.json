@@ -55,6 +55,7 @@
     "firebase-admin": "^13.4.0",
     "framer-motion": "^11.0.0",
     "fuse.js": "^7.1.0",
+    "gpt-tokenizer": "^3.0.1",
     "highlight.js": "^11.9.0",
     "katex": "^0.16.22",
     "leva": "^0.10.0",

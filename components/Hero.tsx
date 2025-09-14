@@ -143,9 +143,11 @@ export default function Hero() {
             <div className="text-sm sm:text-base md:text-lg text-indigo-700 dark:text-indigo-300 mb-2 min-h-[120px] flex items-center justify-center lg:justify-start">
               <MorphingText
                 texts={[
-                  "Full Stack Developer",
-                  "Front-end Specialist",
-                  "React / Native developer"
+                  "Junior Full-Stack Developer",
+                  "Front-end expert",
+                  "AI/ML enthusiast",
+                  "Tech Blogger",
+                  "Open Source Contributor",
                 ]}
                 className="text-center lg:text-left !h-[160px] text-indigo-800/90 dark:text-indigo-300"
               />
@@ -154,7 +156,7 @@ export default function Hero() {
               {/* Stats */}
               <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
                 <div className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                  <span className="font-medium text-green-600 dark:text-green-400">2+</span> years experience
+                  <span className="font-medium text-green-600 dark:text-green-400">Hands-on</span> experience
                 </div>
                 <div className="flex items-center gap-1 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
                   <span className="font-medium text-green-600 dark:text-green-400">15+</span> projects
@@ -172,7 +174,7 @@ export default function Hero() {
                 <div className="flex flex-wrap gap-2 mb-1 ml-2">
                   <SkillBadge skill="Next.js" proficiency="Advanced" />
                   <SkillBadge skill="React" proficiency="Advanced" />
-                  <SkillBadge skill="TypeScript" proficiency="Advanced" />
+                  <SkillBadge skill="JavaScript" proficiency="Advanced" />
                   <SkillBadge skill="Python" proficiency="Expert" />
                   <SkillBadge skill="MongoDB" proficiency="Intermediate" />
                   <SkillBadge skill="Tailwind CSS" proficiency="Advanced" />
@@ -226,6 +228,15 @@ export default function Hero() {
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-base sm:text-lg font-medium hover:opacity-90 transition-all duration-300 shadow-lg shadow-blue-500/25 text-white text-center w-full sm:w-auto"
               >
                 View My Work
+              </motion.a>
+              <motion.a
+                href="https://rvimman-two.vercel.app"
+                target='_blank'
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-3 sm:px-4 py-1 sm:py-2 border border-blue-500 dark:border-blue-500/30 dark:hover:border-blue-500 rounded-lg text-base sm:text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white w-full sm:w-auto"
+              >
+                Resume
               </motion.a>
               <motion.a
                 href="/personal"
