@@ -24,7 +24,7 @@ async function generateHuggingFaceResponse(prompt: string): Promise<string> {
         repetition_penalty: 1.2,
       },
     });
-    return response.choices[0].message.content;
+    return response.choices[0].message.content ?? '';
   } catch (error) {
     console.error("Hugging Face API error:", error);
     // Try a smaller model as a fallback
@@ -40,10 +40,14 @@ async function generateHuggingFaceResponse(prompt: string): Promise<string> {
           repetition_penalty: 1.2,
         },
       });
-      return response.choices[0].message.content;
+      return response.choices[0].message.content ?? '';
     } catch (fallbackError) {
       console.error("Hugging Face fallback API. This is likely due to a problem with the Hugging Face API, or the API key.", fallbackError);
-      return ""; // Return empty string to trigger the rule-based fallback
+      if (process.env.NODE_ENV === 'production') {
+        return "AI capabilities are temporarily unavailable due to a configuration issue. Please notify the administrator.";
+      } else {
+        return "Hugging Face API call failed. This is likely due to a missing or invalid HUGGINGFACE_API_KEY environment variable. Please check your .env file.";
+      }
     }
   }
 }
@@ -539,7 +543,7 @@ function naturalJoin(items: string[], conj = 'and') {
 
 function isGreeting(text: string) {
   const t = (text || '').toLowerCase().trim();
-  return /^(hi|hello|hey|greetings|hi there|hello there|yo|sup|good\s+(?:morning|afternoon|evening)|who\s+are\s+you|introduce\s+yourself|tell\s+me\s+about\s+yourself)/i.test(t);
+  return /^(hi|hello|hey|greetings|hi there|hello there|yo|sup|good\s+(?:morning|afternoon|evening)|who\s+are\s+you|introduce\s+yourself|tell\s+me\s+about\s+yourself)$/i.test(t);
 }
 
 function intentFrom(text: string) {
