@@ -24,7 +24,7 @@
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
-  
+
   @keyframes float {
     0%, 100% {
       transform: translateY(0);
@@ -206,7 +206,7 @@
     color: var(--dark-text-color) !important;
     border-color: var(--dark-border-color) !important;
   }
-  
+
   /* Smooth transition for dark mode */
   .inline-code {
     transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
@@ -473,7 +473,7 @@
 @layer base {
   * {
     @apply border-border;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-raleway), sans-serif;
   }
 
   body {
@@ -611,4 +611,9 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+::view-transition-old(root), ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }

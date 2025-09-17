@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import { ThemeSwitcher } from "./ui/ThemeSwitcher";
+import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
 import Image from "next/image";
 import { FaBlog } from "react-icons/fa6";
 
@@ -412,7 +412,7 @@ export function BottomNav() {
       {/* Bottom Section - Theme Toggle and User Menu */}
       <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
         <div className="flex flex-col justify-between items-center gap-4 p-4">
-          <ThemeSwitcher />
+          <AnimatedThemeToggler />
           {user && (
             <div className="relative">
               <button

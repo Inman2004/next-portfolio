@@ -8,6 +8,7 @@ module.exports = {
   darkMode: 'class',
   theme: {
     fontFamily: {
+      sans: ['var(--font-raleway)', 'sans-serif'],
       pacifico: ['var(--font-pacifico)', 'cursive'],
     },
     container: {

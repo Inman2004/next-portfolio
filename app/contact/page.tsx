@@ -38,7 +38,7 @@ const contactMethods = [
     title: 'Location',
     description: 'Based in Chennai, India',
     value: 'Chennai, Tamil Nadu',
-    href: '#',
+    href: 'https://maps.app.goo.gl/5DVwK9b859Kk9GCK6',
     color: 'text-purple-500',
   },
   {
@@ -168,7 +168,7 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
               >
-                <Card className="text-center hover:shadow-lg transition-shadow">
+                <Card className="text-center border border-slate-700/80 bg-gradient-to-br from-slate-50 to-slate-100 transition-all dark:from-slate-900 dark:to-slate-800 shadow-none">
                   <CardContent className="pt-6">
                     <method.icon className={`w-8 h-8 mx-auto mb-4 ${method.color}`} />
                     <h3 className="font-semibold mb-2">{method.title}</h3>

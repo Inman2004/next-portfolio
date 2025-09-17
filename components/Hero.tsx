@@ -230,15 +230,6 @@ export default function Hero() {
                 View My Work
               </motion.a>
               <motion.a
-                href="https://rvimman-two.vercel.app"
-                target='_blank'
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-3 sm:px-4 py-1 sm:py-2 border border-blue-500 dark:border-blue-500/30 dark:hover:border-blue-500 rounded-lg text-base sm:text-lg font-medium hover:bg-blue-500/10 dark:hover:bg-blue-500/10 transition-all duration-300 text-center text-blue-700 dark:text-blue-200 hover:text-blue-800 dark:hover:text-white w-full sm:w-auto"
-              >
-                Resume
-              </motion.a>
-              <motion.a
                 href="/personal"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -285,6 +276,16 @@ export default function Hero() {
                 className="text-[rgb(217,48,37)] dark:text-[#cf594e] hover:bg-red-500 dark:hover:bg-red-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
               >
                 <SiGmail className="w-6 h-6" />
+              </motion.a>
+              <motion.a
+                href="https://rvimman-two.vercel.app"
+                target='_blank'
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                title='online resume'
+                className="text-emerald-500 dark:text-emerald-500 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+              >
+                <img src="/images/favicon.png" className="w-6 h-6" />
               </motion.a>
             </div>
             </div>
