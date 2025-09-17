@@ -539,7 +539,7 @@ function naturalJoin(items: string[], conj = 'and') {
 
 function isGreeting(text: string) {
   const t = (text || '').toLowerCase().trim();
-  return /^(hi|hello|hey|greetings|hi there|hello there|yo|sup|good\s+(?:morning|afternoon|evening)|who\s+are\s+you|introduce\s+yourself|tell\s+me\s+about\s+yourself)/i.test(t);
+  return /^(hi|hello|hey|greetings|hi there|hello there|yo|sup|good\s+(?:morning|afternoon|evening)|who\s+are\s+you)/i.test(t);
 }
 
 function intentFrom(text: string) {
