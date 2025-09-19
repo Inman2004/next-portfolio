@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import SocialShare from '@/components/SocialShare';
+import { ArrowUp } from 'lucide-react';
 import BlogPostActions from '@/components/blog/BlogPostActions';
 
 interface BlogFloatingBarProps {
@@ -36,9 +36,13 @@ export default function BlogFloatingBar({
         isScrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
       }`}
     >
-      <div className="hidden md:block">
-        <SocialShare url={shareUrl} title={shareTitle} description={shareDescription} isCompact />
-      </div>
+      <button 
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="hidden md:flex items-center justify-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        aria-label="Scroll to top"
+      >
+        <ArrowUp className="h-4 w-4" />
+      </button>
       <BlogPostActions postId={postId} authorId={authorId} initialPublished={initialPublished} />
     </div>
   );

@@ -6,6 +6,7 @@ import { formatDate } from '@/lib/utils';
 import BlogListClient from '@/components/blog/BlogListClient';
 import { getBlogPosts } from '@/lib/blogUtils';
 import { getViewCounts } from '@/lib/views';
+import FeaturedPosts from '@/components/blog/FeaturedPosts';
  
 
 // Revalidate the page every 60 seconds
@@ -133,6 +134,9 @@ export default async function BlogPage({
 
       {/* Blog Posts controls and grid (client) */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-10 sm:py-16">
+        <div className="mb-6">
+        <FeaturedPosts posts={normalizedPosts} />
+        </div>
         <BlogListClient 
           posts={normalizedPosts} 
           initialPage={currentPage}

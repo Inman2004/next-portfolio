@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { ThemeSwitcher } from './ui/ThemeSwitcher';
 import { FaBlog } from 'react-icons/fa6';
+import { AnimatedThemeToggler } from './ui/animated-theme-toggler';
 
 interface NavLink {
   href: string;
@@ -352,7 +353,7 @@ export default function Header() {
 
         {/* Mobile & Tablet Menu Button */}
         <div className="flex items-center gap-2">
-          <ThemeSwitcher />
+          <AnimatedThemeToggler />
           <div className="relative">
             <motion.button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -412,21 +413,24 @@ export default function Header() {
                         <Link
                           href={link.href}
                           className={cn(
-                            "flex items-center px-4 py-3 mx-2 rounded-xl text-sm font-medium transition-all duration-200",
+                            "flex items-center px-4 py-3 mx-2 rounded-xl text-sm font-medium transition-all duration-200 group",
                             "text-foreground/80 hover:text-foreground hover:bg-accent/50",
                             "active:scale-95 active:bg-accent/70",
+                            link.className,
                             (pathname === link.href || 
-                             (link.href.startsWith('#') && isHome && window.location.hash === link.href)) && 
+                             (link.href.startsWith('#') && isHome && window.location.hash === link.href) ||
+                             (link.href === '/blog' && pathname.startsWith('/blog'))) && 
                             "text-primary bg-accent/30"
                           )}
                           onClick={(e) => handleMobileLinkClick(e, link.href)}
                         >
                           {React.cloneElement(link.icon as React.ReactElement, {
-                            className: 'w-5 h-5 mr-3 flex-shrink-0'
+                            className: 'w-5 h-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform duration-200'
                           })}
                           <span className="flex-1">{link.label}</span>
                           {(pathname === link.href || 
-                            (link.href.startsWith('#') && isHome && window.location.hash === link.href)) && (
+                            (link.href.startsWith('#') && isHome && window.location.hash === link.href) ||
+                            (link.href === '/blog' && pathname.startsWith('/blog'))) && (
                             <motion.div
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}

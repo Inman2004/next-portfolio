@@ -1,6 +1,7 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { getServerBlogPost, getServerUserData } from '@/lib/server-blog-utils';
 import { SITE_CONFIG } from '@/config/site';
+import { ScrollProgress } from '@/components/ui/scroll-progress';
 
 type Props = {
   params: { id: string };
@@ -355,5 +356,5 @@ export default function BlogPostLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <>{children}<ScrollProgress /></>;
 }

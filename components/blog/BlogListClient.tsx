@@ -179,7 +179,7 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Blog Posts ({totalPosts})
+            All Posts ({totalPosts})
           </h2>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">Show:</span>
