@@ -306,11 +306,11 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 right-5 z-40 flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-zinc-100/60 shadow-2xl dark:border-gray-800 dark:bg-gray-900/60 backdrop-blur-lg"
+            className="fixed bottom-20 right-5 z-40 flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white/80 shadow-2xl dark:border-gray-800 dark:bg-gray-900/80 backdrop-blur-lg"
             role="dialog"
             aria-label="Chat assistant"
           >
-            <div className="flex items-center justify-between border-b border-gray-200 p-3 dark:border-gray-800">
+            <div className="flex items-center justify-between border-b border-gray-200 p-3 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
               <div className="text-sm font-semibold">Mimir</div>
               <button
                 onClick={() => setOpen(false)}

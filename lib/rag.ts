@@ -1295,6 +1295,12 @@ ${relevantExp}
 }
 
 function generateFresherContext(): string {
+  const softSkills = resume.skills
+    .find(skill => skill.name.toLowerCase().includes('soft'))
+    ?.items || [];
+
+  const strengths = softSkills.slice(0, 4).map(skill => `• ${skill.charAt(0).toUpperCase() + skill.slice(1)}`).join('\n');
+
   return `## Professional Profile
 • Motivated fresher with strong foundation in modern web technologies
 • Completed multiple real-world projects demonstrating practical skills
@@ -1302,26 +1308,23 @@ function generateFresherContext(): string {
 • Strong problem-solving skills and attention to detail
 
 ## Key Strengths
-• Passionate about creating efficient, user-friendly applications
-• Up-to-date with latest industry trends and best practices
-• Excellent time management and ability to meet deadlines
-• Eager to contribute and grow within a collaborative team environment`;
+${strengths || '• Excellent communication and collaboration abilities\n• Quick learner with adaptability to new technologies\n• Passionate about creating efficient applications\n• Eager to contribute and grow within a team'}`;
 }
 
 function generateContactContext(): string {
   return `## Contact Information
 
-Email: **${resume.links.email}**
-Phone: **${resume.links.phone}**
-LinkedIn: **${resume.links.linkedin}**
-GitHub: **${resume.links.github}**
-Portfolio: **${resume.links.portfolio}**
+- Email: **${resume.links.email}**
+- Phone: **${resume.links.phone}**
+- LinkedIn: **${resume.links.linkedin}**
+- GitHub: **${resume.links.github}**
+- Portfolio: **${resume.links.portfolio}**
 
 ## Preferred Communication
-• Email for formal inquiries and detailed discussions
-• Phone for urgent matters or quick clarifications
-• LinkedIn for professional networking
-• GitHub to explore code samples and projects`;
+- Email for formal inquiries and detailed discussions
+- Phone for urgent matters or quick clarifications
+- LinkedIn for professional networking
+- GitHub to explore code samples and projects`;
 }
 
 function generateAchievementContext(): string {
@@ -1335,20 +1338,43 @@ function generateAchievementContext(): string {
 ${achievements}
 
 ## Achievement Approach
-• Focus on measurable impact and value creation
-• Continuous improvement and learning from each project
-• Documentation of learnings and best practices
-• Sharing knowledge with the community`;
+- Focus on measurable impact and value creation
+- Continuous improvement and learning from each project
+- Documentation of learnings and best practices
+- Sharing knowledge with the community`;
 }
 
 function generateFallbackContext(query: string): string {
+  const availableInfo = [
+    'Technical skills and expertise',
+    'Projects and practical experience',
+    'Educational background and certifications',
+    'Contact information and availability',
+    'Location preferences and work arrangements',
+    'Career goals and aspirations'
+  ];
+
+  // Add specific info based on query content
+  const queryLower = query.toLowerCase();
+  const specificInfo = [];
+
+  if (queryLower.includes('skill') || queryLower.includes('tech')) {
+    specificInfo.push('Technical skills: React, Next.js, TypeScript, Python, AI/ML');
+  }
+  if (queryLower.includes('project')) {
+    specificInfo.push('Key projects: Pneumoscan (Medical AI), HR Interview Platform, MoviesDB');
+  }
+  if (queryLower.includes('contact')) {
+    specificInfo.push('Contact: Email, LinkedIn, GitHub available');
+  }
+  if (queryLower.includes('location')) {
+    specificInfo.push('Location: Tirunelveli, TN, India - Open to remote opportunities');
+  }
+
+  const allInfo = [...specificInfo, ...availableInfo];
+
   return `I can help you with information about:
-• Technical skills and expertise
-• Projects and practical experience
-• Educational background and certifications
-• Contact information and availability
-• Location preferences and work arrangements
-• Career goals and aspirations
+${allInfo.map(item => `- ${item}`).join('\n')}
 
 Please feel free to ask specific questions about any of these areas.`;
 }
@@ -1459,6 +1485,52 @@ function extractKeyInformation(doc: Document, intent: QueryIntent): string {
   return `• ${content.split('.')[0]}.`;
 }
 
+function generateProfileContextForPrompt(): string {
+  return `About Immanuvel:
+- Full Name: ${resume.name}
+- Role: ${resume.headline}
+- Location: ${resume.location}
+- Email: ${resume.links.email}
+- Phone: ${resume.links.phone}
+- LinkedIn: ${resume.links.linkedin}
+- GitHub: ${resume.links.github}
+- Portfolio: ${resume.links.portfolio}
+- Availability: ${resume.availability}
+- Languages: ${resume.languages.join(', ')}`;
+}
+
+function generateSkillsContextForPrompt(): string {
+  const skills = resume.skills.map(skill => {
+    return `- ${skill.name}: ${skill.items.join(', ')}`;
+  }).join('\n');
+
+  return `Key Skills:
+${skills}`;
+}
+
+function generateProjectsContextForPrompt(): string {
+  const topProjects = projects.slice(0, 3).map((project, index) => {
+    return `${index + 1}. ${project.title} - ${project.description}
+   - Tech: ${project.technologies.slice(0, 4).join(', ')}${project.technologies.length > 4 ? ` (+${project.technologies.length - 4} more)` : ''}
+   - GitHub: ${project.github || '[Link to be added]'}`;
+  }).join('\n\n');
+
+  return `Projects:
+${topProjects}`;
+}
+
+function generateEducationContextForPrompt(): string {
+  const education = resume.education.map(edu => {
+    const yearRange = edu.endDate === 'Present'
+      ? `${edu.startDate} - Present`
+      : `${edu.startDate} - ${edu.endDate}`;
+    return `- ${edu.program} from ${edu.institution} (${yearRange})`;
+  }).join('\n');
+
+  return `Education:
+${education}`;
+}
+
 export function generateRAGPrompt(query: string, context: string): string {
   const currentDate = new Date().toISOString().split('T')[0];
   
@@ -1466,41 +1538,13 @@ export function generateRAGPrompt(query: string, context: string): string {
   
 Current Date: ${currentDate}
 
-About Immanuvel:
-- Full Name: Immanuvel B
-- Role: Junior Software Engineer (React/Next.js)
-- Location: Tirunelveli, TN, India
-- Email: rvimman@gmail.com
-- Phone: +91 638-292-4427
-- LinkedIn: https://www.linkedin.com/in/immanuvel-b-3a8b61234/
-- GitHub: https://github.com/Immanuvel2004
+${generateProfileContextForPrompt()}
 
-Key Skills:
-- Frontend: React, Next.js, TypeScript, Tailwind CSS, Redux, React Query
-- Backend: Python, Flask, RESTful APIs
-- AI/ML: TensorFlow, Keras, CNN, Computer Vision
-- Tools: Git, GitHub, VS Code
-- Languages: English (Professional), Tamil (Native)
+${generateSkillsContextForPrompt()}
 
-Projects:
-1. Pneumoscan - Medical diagnostic tool (92% accuracy)
-   - Tech: Python, TensorFlow, Keras, Flask, CNN
-   - Role: Full-stack Developer & ML Engineer
-   - GitHub: [Link to be added]
-   
-2. HR AI Interview Platform
-   - Tech: React, TypeScript, Tailwind CSS, TMDB API
-   - Features: Automated interview process
-   - GitHub: [Link to be added]
-   
-3. MoviesDB - Movie Discovery Platform
-   - Tech: React, Next.js, Redux, React Query, TMDB API
-   - Features: Movie search, filtering, and details
-   - GitHub: [Link to be added]
+${generateProjectsContextForPrompt()}
 
-Education:
-- [Degree] in [Field] from [University/Institution]
-- Graduation Year: [Year]
+${generateEducationContextForPrompt()}
 
 Response Guidelines:
 1. Always refer to Immanuvel in the third person (e.g., "He has experience with...")
