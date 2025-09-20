@@ -25,7 +25,7 @@ export const WelcomeEmail = ({ name, email }: WelcomeEmailProps) => {
       <Preview>Welcome to My Portfolio!</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Text style={logo}>👋 Welcome, {firstName}!</Text>
+          <Text style={logo}>Welcome, {firstName}!</Text>
           <Text style={paragraph}>
             Thank you for signing up for my portfolio website. I'm thrilled to have you here!
           </Text>
@@ -33,10 +33,10 @@ export const WelcomeEmail = ({ name, email }: WelcomeEmailProps) => {
           <Section style={section}>
             <Text style={heading}>Here's what you can do now:</Text>
             <ul style={list}>
-              <li>📝 Read and comment on my blog posts</li>
-              <li>📂 Explore my projects and case studies</li>
-              <li>💡 Get notified about new content and updates</li>
-              <li>📧 Stay in touch with me directly through the contact form</li>
+              <li>Read and comment on my blog posts</li>
+              <li>Explore my projects and case studies</li>
+              <li>Get notified about new content and updates</li>
+              <li>Stay in touch with me directly through the contact form</li>
             </ul>
           </Section>
 

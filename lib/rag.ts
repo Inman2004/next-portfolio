@@ -1147,10 +1147,10 @@ function generateLocationContext(): string {
     doc.metadata.semanticCategory === SEMANTIC_CATEGORIES.PERSONAL_INFO
   );
   
-  return `Location & Availability:
-• Currently based in ${resume.location}
-• Open to: ${resume.openTo.join(', ')}
-• Availability: ${resume.availability}
+  return `## Location & Availability
+• Currently based in **${resume.location}**
+• Open to: **${resume.openTo.join(', ')}**
+• Availability: **${resume.availability}**
 • Willing to relocate for the right opportunity
 • Comfortable with remote collaboration across time zones`;
 }
@@ -1166,20 +1166,20 @@ function generateEducationContext(): string {
     .map(ach => `• ${ach.title}: ${ach.details}`)
     .join('\n');
   
-  return `Educational Background:
+  return `## Educational Background
 ${education}
 
-Professional Development:
+## Professional Development
 ${certifications || '• Continuous self-learning through online platforms and documentation'}
 
-Learning Approach:
+## Learning Approach
 • Strong focus on practical, project-based learning
 • Regular participation in coding challenges and hackathons
 • Active contribution to open-source projects for real-world experience`;
 }
 
 function generateCompensationContext(): string {
-  return `Compensation Expectations:
+  return `## Compensation Expectations
 • As a fresher, I'm focused on learning and growth opportunities
 • Open to discussing compensation based on:
   - Role responsibilities and growth potential
@@ -1200,13 +1200,13 @@ function generateProjectContext(query: string): string {
     const techMatch = content.match(/Technologies: ([^.]+)/);
     const tech = techMatch ? techMatch[1] : '';
     return `• ${proj.metadata.title}: ${content.split(':')[1].split('.')[0]}
-  Tech Stack: ${tech}`;
+  **Tech Stack:** ${tech}`;
   }).join('\n\n');
   
-  return `Key Projects:
+  return `## Key Projects
 ${relevantProjects}
 
-Project Approach:
+## Project Approach
 • Focus on clean, maintainable code with proper documentation
 • Emphasis on user experience and performance optimization
 • Integration of modern best practices and design patterns
@@ -1224,28 +1224,49 @@ function generateTechnologyContext(query: string): string {
   );
   
   if (relevantSkills.length === 0) {
-    // Return general tech stack
-    return `Technical Expertise:
-${allSkills.slice(0, 3).map(skill => 
-  `• ${skill.name}: ${skill.items.slice(0, 5).join(', ')}`
-).join('\n')}
+    // Return general tech stack with rich formatting
+    return `## Technical Expertise
 
-Technical Approach:
-• Strong foundation in computer science fundamentals
-• Quick learner with ability to adapt to new technologies
-• Focus on writing clean, efficient, and scalable code
-• Emphasis on testing and code quality`;
+### Frontend Development
+• **React.js** and **Next.js** for building responsive web applications  
+• **TypeScript** for type-safe development  
+• **Tailwind CSS** for efficient styling  
+• State management with **Redux** and **React Query**
+
+### Backend & Full-Stack
+• **Python** with **Flask** for backend development  
+• Building **RESTful APIs**  
+• Full-stack application development
+
+### AI/ML & Data
+• **TensorFlow** and **Keras** for deep learning  
+• **Computer Vision (CNN)**  
+• Data handling and processing
+
+### Development Tools
+• **Git** & **GitHub** for version control  
+• **VS Code** as primary code editor  
+• Modern development workflows
+
+## Key Strengths
+• **Problem-solving** abilities  
+• Quick **learning** and **adaptation**  
+• Strong **communication** and **collaboration**  
+• **Analytical** thinking and attention to detail`;
   }
   
-  return `Relevant Technical Skills:
+  return `## Relevant Technical Skills
 ${relevantSkills.map(skill => 
-  `• ${skill.name}: ${skill.items.join(', ')}`
-).join('\n')}
+  `### ${skill.name}
+  • ${skill.items.map(item => `**${item}**`).join(' • ')}`
+).join('\n\n')}
 
-Practical Experience:
-• Applied these technologies in real-world projects
-• Continuous learning through documentation and community resources
-• Focus on best practices and industry standards`;
+## Practical Application
+• Successfully implemented these technologies in projects like **Pneumoscan** and **HR AI Interview Platform**  
+• Built **scalable** and **maintainable** applications following best practices  
+• **Continuous learning** through documentation, courses, and community resources  
+• Strong focus on writing **clean**, **efficient**, and **well-tested** code  
+• Experience with both **individual** and **team-based** development workflows`;
 }
 
 function generateExperienceContext(query: string): string {
@@ -1263,10 +1284,10 @@ function generateExperienceContext(query: string): string {
   ${parts.slice(1, 3).join('.')}`;
   }).join('\n\n');
   
-  return `Professional Experience:
+  return `## Professional Experience
 ${relevantExp}
 
-Key Strengths:
+## Key Strengths
 • Strong problem-solving and analytical skills
 • Excellent collaboration and communication abilities
 • Quick learner with adaptability to new technologies
@@ -1274,13 +1295,13 @@ Key Strengths:
 }
 
 function generateFresherContext(): string {
-  return `Professional Profile:
+  return `## Professional Profile
 • Motivated fresher with strong foundation in modern web technologies
 • Completed multiple real-world projects demonstrating practical skills
 • Self-taught developer with proven ability to learn quickly
 • Strong problem-solving skills and attention to detail
 
-Key Strengths:
+## Key Strengths
 • Passionate about creating efficient, user-friendly applications
 • Up-to-date with latest industry trends and best practices
 • Excellent time management and ability to meet deadlines
@@ -1288,15 +1309,15 @@ Key Strengths:
 }
 
 function generateContactContext(): string {
-  return `Contact Information:
+  return `## Contact Information
 
-📧 Email: ${resume.links.email}
-📱 Phone: ${resume.links.phone}
-💼 LinkedIn: ${resume.links.linkedin}
-🐙 GitHub: ${resume.links.github}
-🌐 Portfolio: ${resume.links.portfolio}
+Email: **${resume.links.email}**
+Phone: **${resume.links.phone}**
+LinkedIn: **${resume.links.linkedin}**
+GitHub: **${resume.links.github}**
+Portfolio: **${resume.links.portfolio}**
 
-Preferred Communication:
+## Preferred Communication
 • Email for formal inquiries and detailed discussions
 • Phone for urgent matters or quick clarifications
 • LinkedIn for professional networking
@@ -1310,10 +1331,10 @@ function generateAchievementContext(): string {
     .map(ach => `• ${ach.title}: ${ach.details}${ach.impact ? ` (Impact: ${ach.impact})` : ''}`)
     .join('\n\n');
   
-  return `Key Achievements:
+  return `## Key Achievements
 ${achievements}
 
-Achievement Approach:
+## Achievement Approach
 • Focus on measurable impact and value creation
 • Continuous improvement and learning from each project
 • Documentation of learnings and best practices
@@ -1434,73 +1455,80 @@ function extractKeyInformation(doc: Document, intent: QueryIntent): string {
     return `• ${content}`;
   }
   
-  // Default extraction
-  const keyParts = content.split('.').slice(0, 3).join('.');
-  return `• ${keyParts}`;
+  // Default return for other cases
+  return `• ${content.split('.')[0]}.`;
 }
 
-// Enhanced RAG prompt generation with context awareness
 export function generateRAGPrompt(query: string, context: string): string {
-  const queryIntent = vectorDB.analyzeQueryIntent(query);
-  const insights = vectorDB.getQueryInsights();
+  const currentDate = new Date().toISOString().split('T')[0];
   
-  // Base template with common elements
-  let promptTemplate = `You are Immanuvel B, a software engineer. Your name is Immanuvel B. You are not an AI assistant. Answer the following question from the first-person perspective of Immanuvel B.`;
-  promptTemplate += `\n\n**IMPORTANT: Your answer MUST be based exclusively on the following context. Do not use any external knowledge or make up information.**\n\n`;
+  return `You are a helpful AI assistant for Immanuvel, a Junior Software Engineer specializing in React/Next.js development. 
   
-  // Add context section
-  promptTemplate += `Context:\n---\n${context}\n---\n\n`;
-  
-  // Add user's question
-  promptTemplate += `User Question: ${query}\n\n`;
-  
-  // Add response guidelines based on intent
-  promptTemplate += `Response Guidelines:\n`;
-  promptTemplate += `- Answer in a professional, yet conversational and natural-sounding tone. Avoid robotic or overly formal language.\n`;
-  
-  // Format guidelines
-  if (queryIntent.preferredFormat === 'list') {
-    promptTemplate += `- Format the answer as a numbered or bulleted list.\n`;
-  } else if (queryIntent.preferredFormat === 'table') {
-    promptTemplate += `- Present the information in a structured table format if possible.\n`;
-  } else if (queryIntent.preferredFormat === 'bullet') {
-    promptTemplate += `- Use bullet points for clarity.\n`;
-  }
-  
-  // Verbosity guidelines
-  if (queryIntent.verbosity === 'brief') {
-    promptTemplate += `- Keep the response concise (1-2 sentences).\n`;
-  } else if (queryIntent.verbosity === 'detailed') {
-    promptTemplate += `- Provide a thorough response with examples (4-5 sentences).\n`;
-  } else {
-    promptTemplate += `- Provide a balanced response (2-3 sentences).\n`;
-  }
-  
-  // Content guidelines based on intent
-  if (queryIntent.primaryIntent === 'experience') {
-    promptTemplate += `- Focus on relevant work experiences and roles.\n`;
-    promptTemplate += `- Include company names, roles, and key responsibilities.\n`;
-  } else if (queryIntent.primaryIntent === 'skills') {
-    promptTemplate += `- List and describe your relevant skills and technologies based on the context.\n`;
-  } else if (queryIntent.primaryIntent === 'projects') {
-    promptTemplate += `- Describe your projects with clear objectives and measurable outcomes.\n`;
-    promptTemplate += `- Mention technologies used, challenges faced, and how you overcame them.\n`;
-    promptTemplate += `- Highlight your specific contributions and their impact.\n`;
-  } else if (queryIntent.primaryIntent === 'education') {
-    promptTemplate += `- Provide details about your degrees, certifications, and relevant coursework.\n`;
-  }
-  
-  promptTemplate += `\nAnswer as Immanuvel B:`;
-  
-  return promptTemplate;
+Current Date: ${currentDate}
+
+About Immanuvel:
+- Full Name: Immanuvel B
+- Role: Junior Software Engineer (React/Next.js)
+- Location: Tirunelveli, TN, India
+- Email: rvimman@gmail.com
+- Phone: +91 638-292-4427
+- LinkedIn: https://www.linkedin.com/in/immanuvel-b-3a8b61234/
+- GitHub: https://github.com/Immanuvel2004
+
+Key Skills:
+- Frontend: React, Next.js, TypeScript, Tailwind CSS, Redux, React Query
+- Backend: Python, Flask, RESTful APIs
+- AI/ML: TensorFlow, Keras, CNN, Computer Vision
+- Tools: Git, GitHub, VS Code
+- Languages: English (Professional), Tamil (Native)
+
+Projects:
+1. Pneumoscan - Medical diagnostic tool (92% accuracy)
+   - Tech: Python, TensorFlow, Keras, Flask, CNN
+   - Role: Full-stack Developer & ML Engineer
+   - GitHub: [Link to be added]
+   
+2. HR AI Interview Platform
+   - Tech: React, TypeScript, Tailwind CSS, TMDB API
+   - Features: Automated interview process
+   - GitHub: [Link to be added]
+   
+3. MoviesDB - Movie Discovery Platform
+   - Tech: React, Next.js, Redux, React Query, TMDB API
+   - Features: Movie search, filtering, and details
+   - GitHub: [Link to be added]
+
+Education:
+- [Degree] in [Field] from [University/Institution]
+- Graduation Year: [Year]
+
+Response Guidelines:
+1. Always refer to Immanuvel in the third person (e.g., "He has experience with...")
+2. Be professional, concise, and accurate
+3. Only provide information that can be verified from the context
+4. If you don't know something, say so
+5. For technical questions, focus on React, Next.js, and related technologies
+6. For personal questions, only share information that's publicly available
+7. Never make up information or claim expertise in areas not listed
+8. For language questions, note that Immanuvel is a native Tamil speaker and fluent in English
+9. For project details, only mention what's in the context
+10. For work experience, only mention verified roles and responsibilities
+
+Current Query: "${query}"
+
+Context from Immanuvel's profile:
+${context}
+
+Please provide a helpful and accurate response based on the information above.`;
 }
 
 // Export enhanced interfaces and types for external use
-export type { QueryIntent };
 export { SEMANTIC_CATEGORIES };
 
 // Re-export document types with proper naming
 export type { Document as RAGDocument, SearchResult as RAGSearchResult };
+
+// QueryIntent type is defined at the top of the file
 
 // Export the vector database instance for advanced operations
 export const getVectorDB = (): EnhancedVectorDB => vectorDB;

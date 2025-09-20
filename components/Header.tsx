@@ -94,6 +94,7 @@ function NavItem({
   const isAnchor = href.startsWith('#');
   const pathname = usePathname();
   const isActive = pathname === href || (isAnchor && pathname === '/' + href.substring(1));
+  const labelText = React.Children.toArray(children).find(c => typeof c === 'string') as string | undefined;
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (isAnchor) {
@@ -175,9 +176,7 @@ function NavItem({
             'group-hover/label:after:w-full group-hover/label:after:opacity-70',
             isActive ? 'after:opacity-100 after:w-full' : ''
           )}>
-            {React.Children.map(children, child =>
-              typeof child === 'string' ? child : null
-            )}
+            {labelText}
           </span>
         </span>
 
@@ -194,7 +193,7 @@ function NavItem({
           'px-1.5 py-0.5 rounded',
           isActive ? 'text-primary' : ''
         )}>
-          {navigationLinks.find(l => l.href === href)?.label}
+          {labelText}
         </span>
       </Link>
     </li>

@@ -93,7 +93,7 @@ const Personel = () => {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-indigo-500/20">
                 <Image 
-                  src="/images/avatar1.png" 
+                  src="/images/crop.png" 
                   alt="Profile" 
                   fill 
                   className="object-cover"
@@ -124,7 +124,7 @@ const Personel = () => {
                   { icon: <Mail size={18} className="text-indigo-500" />, label: 'Email', value: 'rvimman@gmail.com' },
                   { icon: <BookOpen size={18} className="text-blue-500" />, label: 'Education', value: 'B.E in Computer Science' },
                   { icon: <Music size={18} className="text-amber-500" />, label: 'Interests', value: 'Tech, Music, Games, Phycology' },
-                  { icon: <HeartCrack size={18} className="text-pink-500" />, label: 'Marital Status', value: 'Unmarried' },
+                  { icon: <Briefcase size={18} className="text-lime-500" />, label: 'Work Status', value: 'Unemployed' },
                   { icon: <Languages size={18} className="text-teal-500" />, label: 'Languages', value: 'English, Tamil' },
                 ].map((item, index) => (
                   <div key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
@@ -412,7 +412,7 @@ const Personel = () => {
                         fill 
                         className="object-cover" 
                         sizes="(max-width: 768px) 100vw, 33vw" 
-                        src="/images/avatar.png" 
+                        src="/images/crop.png" 
                         alt="Profile" 
                     />
                   </div>

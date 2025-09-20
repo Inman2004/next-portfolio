@@ -184,9 +184,9 @@ function generateSmartReply(query: string, context: string): string {
 // Helper function to format project info with better structure and clickable links
 function formatProjectInfo(info: string): string {
   return info
-    .replace(/Technologies: /g, '\n\n**🛠️ Technologies:** ')
-    .replace(/GitHub: /g, '\n\n**📁 GitHub:** ')
-    .replace(/Live: /g, '\n\n**🌐 Live Demo:** ')
+    .replace(/Technologies: /g, '\n\n**Technologies:** ')
+    .replace(/GitHub: /g, '\n\n**GitHub:** ')
+    .replace(/Live: /g, '\n\n**Live Demo:** ')
     .replace(/\. /g, '.\n\n')
     .replace(/(https?:\/\/[^\s]+)/g, '[$1]($1)'); // Make URLs clickable
 }
@@ -218,22 +218,22 @@ function generateContextualResponse(query: string, context: string): string {
   // Generate formatted response based on query type
   if (/(location|where|based|city|country|india|tirunelveli|remote|hybrid|onsite|work location|preferred location)/i.test(q)) {
     // For location questions, give a direct, clear answer
-    return `**📍 Location & Work Preferences:**\n\nI'm based in **${resume.location}** and I'm open to:\n\n• **🌍 Remote** opportunities\n• **🏢 Hybrid** arrangements\n• **✈️ Relocation** for the right role\n\nI'm flexible with work arrangements and can work effectively in any of these modes.`;
+    return `## Location & Work Preferences\n\nI'm based in **${resume.location}** and I'm open to:\n\n• Remote opportunities\n• Hybrid arrangements\n• Relocation for the right role\n\nI'm flexible with work arrangements and can work effectively in any of these modes.`;
   }
   
   if (/(course|courses|education|degree|college|university|diploma|certification|cert|udemy|learning|study)/i.test(q)) {
     // For education questions, give a structured answer
     if (cleanedInfo.length === 1) {
-      return `**🎓 Education:**\n\n${cleanedInfo[0]}`;
+      return `## Education\n\n${cleanedInfo[0]}`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${info}`).join('\n\n');
-      return `**🎓 Educational Background:**\n\n${formatted}`;
+      return `## Educational Background\n\n${formatted}`;
     }
   }
   
   if (/(salary|ctc|compensation|pay|package|expected|negotiable|benefits)/i.test(q)) {
     // For salary questions, give a clear, professional answer
-    return `**💰 Salary Expectations:**\n\nI'm a fresher and don't have a current CTC. I'm open to discussing fair compensation aligned with the role, responsibilities, and location. For fresher roles, I expect compensation in line with industry standards for my skill set.`;
+    return `## Salary Expectations\n\nI'm a fresher and don't have a current CTC. I'm open to discussing fair compensation aligned with the role, responsibilities, and location. For fresher roles, I expect compensation in line with industry standards for my skill set.`;
   }
   
   if (/(project|built|developed|created|grc|document|ai|assistant|automation)/i.test(q)) {
@@ -241,39 +241,39 @@ function generateContextualResponse(query: string, context: string): string {
     if (/(e.?commerce|shop|store|retail)/i.test(q)) {
       // For e-commerce specific questions
       if (cleanedInfo.length === 1) {
-        return `**🛒 E-commerce Project:**\n\n${formatProjectInfo(cleanedInfo[0])}`;
+        return `## E-commerce Project\n\n${formatProjectInfo(cleanedInfo[0])}`;
       } else {
         const formatted = cleanedInfo.map(info => `• ${formatProjectInfo(info)}`).join('\n\n');
-        return `**🛒 E-commerce Projects:**\n\n${formatted}`;
+        return `## E-commerce Projects\n\n${formatted}`;
       }
     }
     
     if (/(ai|ml|machine.?learning|deep.?learning|neural|gpt|llm)/i.test(q)) {
       // For AI-specific questions
       if (cleanedInfo.length === 1) {
-        return `**🤖 AI Project:**\n\n${formatProjectInfo(cleanedInfo[0])}`;
+        return `## AI Project\n\n${formatProjectInfo(cleanedInfo[0])}`;
       } else {
         const formatted = cleanedInfo.map(info => `• ${formatProjectInfo(info)}`).join('\n\n');
-        return `**🤖 AI Projects:**\n\n${formatted}`;
+        return `## AI Projects\n\n${formatted}`;
       }
     }
     
     // For general project questions
     if (cleanedInfo.length === 1) {
-      return `**🚀 Project:**\n\n${formatProjectInfo(cleanedInfo[0])}`;
+      return `## Project\n\n${formatProjectInfo(cleanedInfo[0])}`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${formatProjectInfo(info)}`).join('\n\n');
-      return `**🚀 Key Projects:**\n\n${formatted}`;
+      return `## Key Projects\n\n${formatted}`;
     }
   }
   
   if (/(tech|technology|stack|framework|library|tool|skill)/i.test(q)) {
     // For technology questions, give prioritized, structured answers
     if (cleanedInfo.length === 1) {
-      return `**⚡ Technology:**\n\n${cleanedInfo[0]}`;
+      return `## Technology\n\n${cleanedInfo[0]}`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${info}`).join('\n\n');
-      return `**⚡ Technology Stack:**\n\n${formatted}`;
+      return `## Technology Stack\n\n${formatted}`;
     }
   }
   
@@ -290,17 +290,17 @@ function generateContextualResponse(query: string, context: string): string {
         proj.technologies.some(tech => tech.toLowerCase().includes(specificTech))
       );
       
-      let response = `**⚡ ${specificTech.charAt(0).toUpperCase() + specificTech.slice(1)} Experience:**\n\n`;
+      let response = `## ${specificTech.charAt(0).toUpperCase() + specificTech.slice(1)} Experience\n\n`;
       
       if (relevantSkills.length > 0) {
         const skillItems = relevantSkills.flatMap(skill => 
           skill.items.filter(item => item.toLowerCase().includes(specificTech))
         );
-        response += `**🛠️ Skills:** ${skillItems.join(', ')}\n\n`;
+        response += `**Skills:** ${skillItems.join(', ')}\n\n`;
       }
       
       if (relevantProjects.length > 0) {
-        response += `**🚀 Projects using ${specificTech}:**\n`;
+        response += `**Projects using ${specificTech}:**\n`;
         relevantProjects.forEach(proj => {
           const techList = proj.technologies.filter(tech => 
             tech.toLowerCase().includes(specificTech)
@@ -317,44 +317,44 @@ function generateContextualResponse(query: string, context: string): string {
   if (/(name|who|identity|yourself)/i.test(q)) {
     // For name/identity questions, give concise personal info
     if (cleanedInfo.length === 1) {
-      return `**👋 ${cleanedInfo[0]}**`;
+      return `**${cleanedInfo[0]}**`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${info}`).join('\n\n');
-      return `**👋 About Me:**\n\n${formatted}`;
+      return `## About Me\n\n${formatted}`;
     }
   }
   
   // For contact information questions
   if (/(contact|email|phone|linkedin|github|portfolio|reach|get in touch)/i.test(q)) {
-    return `**📞 Contact Information:**\n\n**📧 Email:** ${resume.links.email}\n**📱 Phone:** ${resume.links.phone}\n**💼 LinkedIn:** ${resume.links.linkedin}\n**🐙 GitHub:** ${resume.links.github}\n**🌐 Portfolio:** ${resume.links.portfolio}`;
+    return `## Contact Information\n\n**Email:** ${resume.links.email}\n**Phone:** ${resume.links.phone}\n**LinkedIn:** ${resume.links.linkedin}\n**GitHub:** ${resume.links.github}\n**Portfolio:** ${resume.links.portfolio}`;
   }
   
   if (/(latest|recent|new|last|current)/i.test(q) && /(project|work|built|developed)/i.test(q)) {
     // For latest project questions, give focused project info
     if (cleanedInfo.length === 1) {
-      return `**🆕 Latest Project:**\n\n${formatProjectInfo(cleanedInfo[0])}`;
+      return `## Latest Project\n\n${formatProjectInfo(cleanedInfo[0])}`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${formatProjectInfo(info)}`).join('\n\n');
-      return `**🆕 Recent Projects:**\n\n${formatted}`;
+      return `## Recent Projects\n\n${formatted}`;
     }
   }
   
   if (/(e.?commerce|shop|store|retail|shopping|buy|sell)/i.test(q)) {
     // For e-commerce specific questions
     if (cleanedInfo.length === 1) {
-      return `**🛒 ${formatProjectInfo(cleanedInfo[0])}**`;
+      return `## ${formatProjectInfo(cleanedInfo[0])}`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${formatProjectInfo(info)}`).join('\n\n');
-      return `**🛒 E-commerce Project:**\n\n${formatted}`;
+      return `## E-commerce Project\n\n${formatted}`;
     }
   }
   
   if (/(experience|work|job|role|company)/i.test(q)) {
     if (cleanedInfo.length === 1) {
-      return `**💼 Experience:**\n\n${cleanedInfo[0]}`;
+      return `## Experience\n\n${cleanedInfo[0]}`;
     } else {
       const formatted = cleanedInfo.map(info => `• ${info}`).join('\n\n');
-      return `**💼 Work Experience:**\n\n${formatted}`;
+      return `## Work Experience\n\n${formatted}`;
     }
   }
   
@@ -363,7 +363,7 @@ function generateContextualResponse(query: string, context: string): string {
       /ai|ml|machine learning|artificial intelligence|tensorflow|langchain/i.test(info)
     );
     if (aiInfo) {
-      return `**🤖 AI Experience:**\n\n${aiInfo}`;
+      return `## AI Experience\n\n${aiInfo}`;
     }
   }
   
@@ -372,7 +372,7 @@ function generateContextualResponse(query: string, context: string): string {
       /react|next|node|typescript|python|ai|ml/i.test(info)
     );
     if (skillInfo) {
-      return `**⚡ My Key Strengths:**\n\n• ${skillInfo}`;
+      return `## My Key Strengths\n\n• ${skillInfo}`;
     }
   }
   
@@ -381,16 +381,16 @@ function generateContextualResponse(query: string, context: string): string {
       /project|built|developed|created|application/i.test(info)
     );
     if (projectInfo) {
-      return `**🚀 Project:**\n\n${formatProjectInfo(projectInfo)}`;
+      return `## Project\n\n${formatProjectInfo(projectInfo)}`;
     }
   }
   
   // Default: format multiple pieces of info clearly
   if (cleanedInfo.length === 1) {
-    return `**📋 Information:**\n\n${cleanedInfo[0]}`;
+    return `## Information\n\n${cleanedInfo[0]}`;
   } else {
     const formatted = cleanedInfo.map(info => `• ${info}`).join('\n\n');
-    return `**📋 Here's what I can tell you:**\n\n${formatted}`;
+    return `## Here's what I can tell you\n\n${formatted}`;
   }
 }
 
@@ -818,6 +818,15 @@ export async function POST(req: NextRequest) {
     // Quick commands that should bypass AI
     if (normalize(query) === "list faq" || /^(show|list)\s+faq/.test(normalize(query))) {
       const reply = listFAQ(12);
+      return new Response(JSON.stringify({ reply }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Ultra-simple queries: return concise answers and skip RAG
+    if (/^(?:name|your\s+name|what(?:'| i)s\s+your\s+name|who\s+are\s+you\??)$/i.test(rawLower)) {
+      const reply = answerName();
       return new Response(JSON.stringify({ reply }), {
         status: 200,
         headers: { "Content-Type": "application/json" },

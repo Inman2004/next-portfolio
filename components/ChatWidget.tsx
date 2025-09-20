@@ -12,7 +12,7 @@ type ChatMessage = {
 };
 
 const initialAssistantMsg =
-  `Hi! I'm Immanuvel's assistant Mimir. Ask me anything about projects, skills, experience, education, or any quick answers.`;
+  `Hi! I'm Mimir. Ask about skills, projects, experience, education, or contact.`;
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -23,6 +23,44 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: initialAssistantMsg },
   ]);
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+
+  // Compact assistant responses by default to avoid unnecessary long text
+  const compactForDisplay = useCallback((text: string) => {
+    if (!text) return text;
+    let t = text
+      // Remove filler/CTA lines that don't add info
+      .split(/\r?\n/)
+      .filter((line) => !/^(let me know|feel free to|i'd love to|ask me|do you want)/i.test(line.trim()))
+      .join('\n');
+    // Collapse extra blank lines
+    t = t.replace(/\n{3,}/g, '\n\n');
+    // Limit number of lines in collapsed view
+    const lines = t.split(/\r?\n/);
+    const maxLines = 18;
+    if (lines.length > maxLines) {
+      return lines.slice(0, maxLines).join('\n').trim();
+    }
+    // Also guard by characters as a fallback
+    const maxChars = 1400;
+    if (t.length > maxChars) {
+      return t.slice(0, maxChars).replace(/\s+\S*$/, '').trim();
+    }
+    return t;
+  }, []);
+
+  // Subtle animation variants for assistant text
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.02, ease: [0.16, 1, 0.3, 1] }
+    }
+  } as const;
+  const itemVariants = {
+    hidden: { opacity: 0, y: 2 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.2 } }
+  } as const;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const listEndRef = useRef<HTMLDivElement>(null);
@@ -141,6 +179,8 @@ export default function ChatWidget() {
     const lines = md.split(/\r?\n/);
     const blocks: React.ReactNode[] = [];
     let listBuf: string[] = [];
+    let currentSection = '';
+    let inSkillsSection = false;
 
     function renderSkillBadges(skillsCsv: string) {
       const items = skillsCsv
@@ -172,23 +212,23 @@ export default function ChatWidget() {
     function flushList() {
       if (listBuf.length) {
         blocks.push(
-          <ul key={`ul-${blocks.length}`} className="list-disc ml-5 space-y-1">
+          <motion.ul key={`ul-${blocks.length}`} className="list-disc ml-4 space-y-0.5" variants={containerVariants} initial="hidden" animate="show">
             {listBuf.map((li, i) => {
               // If line is like "Category: a, b, c" (common in Skills), render badges for RHS
               const m = li.match(/^([^:]+):\s*(.+)$/);
-              if (m) {
+              if (m && inSkillsSection) {
                 const label = m[1];
                 const rest = m[2];
                 return (
-                  <li key={`li-${i}`}>
+                  <motion.li key={`li-${i}`} variants={itemVariants}>
                     <span className="font-medium">{renderInline(label + ":", `li-l-${i}`)}</span>
                     {renderSkillBadges(rest)}
-                  </li>
+                  </motion.li>
                 );
               }
-              return <li key={`li-${i}`}>{renderInline(li, `li-${i}`)}</li>;
+              return <motion.li key={`li-${i}`} variants={itemVariants}>{renderInline(li, `li-${i}`)}</motion.li>;
             })}
-          </ul>
+          </motion.ul>
         );
         listBuf = [];
       }
@@ -196,9 +236,26 @@ export default function ChatWidget() {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      const liMatch = line.match(/^\s*[-*]\s+(.*)$/);
+      // ATX headings (# .. ######)
+      const hMatch = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/);
+      if (hMatch) {
+        flushList();
+        const level = Math.min(6, hMatch[1].length);
+        const content = hMatch[2];
+        currentSection = content.trim();
+        inSkillsSection = /skill|technical\s+expertise/i.test(currentSection);
+        const HeadingTag = (`h${level}` as keyof JSX.IntrinsicElements);
+        const MotionHeading: any = motion[HeadingTag as unknown as keyof typeof motion] || motion.h3;
+        blocks.push(
+          <MotionHeading key={`h-${blocks.length}`} className="font-semibold text-foreground" variants={itemVariants} initial="hidden" animate="show">{renderInline(content, `h-${i}`)}</MotionHeading>
+        );
+        continue;
+      }
+
+      // Bulleted lists: -, *, •
+      const liMatch = line.match(/^\s*([-*•])\s+(.*)$/);
       if (liMatch) {
-        listBuf.push(liMatch[1]);
+        listBuf.push(liMatch[2]);
         continue;
       }
       if (line.trim() === "") {
@@ -207,11 +264,11 @@ export default function ChatWidget() {
       }
       flushList();
       blocks.push(
-        <p key={`p-${blocks.length}`} className="leading-relaxed">{renderInline(line, `p-${i}`)}</p>
+        <motion.p key={`p-${blocks.length}`} className="leading-snug text-[13px]" variants={itemVariants} initial="hidden" animate="show">{renderInline(line, `p-${i}`)}</motion.p>
       );
     }
     flushList();
-    return <div className="space-y-2">{blocks}</div>;
+    return <motion.div className="space-y-2" variants={containerVariants} initial="hidden" animate="show">{blocks}</motion.div>;
   }
 
   // Close when clicking outside
@@ -249,12 +306,12 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-20 right-5 z-40 flex h-[60vh] w-[min(92vw,360px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-900"
+            className="fixed bottom-20 right-5 z-40 flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-zinc-100/60 shadow-2xl dark:border-gray-800 dark:bg-gray-900/60 backdrop-blur-lg"
             role="dialog"
             aria-label="Chat assistant"
           >
             <div className="flex items-center justify-between border-b border-gray-200 p-3 dark:border-gray-800">
-              <div className="text-sm font-semibold">Mimir Assistant</div>
+              <div className="text-sm font-semibold">Mimir</div>
               <button
                 onClick={() => setOpen(false)}
                 className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
@@ -266,19 +323,44 @@ export default function ChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 space-y-3 overflow-y-auto p-3">
-              {messages.map((m, i) => (
-                <div key={i} className="flex">
-                  <div
-                    className={
-                      m.role === "user"
-                        ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"
-                        : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-                    }
-                  >
-                    {m.role === "assistant" ? renderMarkdown(m.content) : m.content}
+              {messages.map((m, i) => {
+                const isAssistant = m.role === "assistant";
+                const isLong = isAssistant && (m.content?.length || 0) > 600;
+                const isExpanded = !!expanded[i];
+                return (
+                  <div key={i} className="flex">
+                    <div
+                      className={
+                        m.role === "user"
+                          ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"
+                          : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-gray-100 px-3 py-1.5 text-sm text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                      }
+                    >
+                      <div className={(!isExpanded && isLong) ? "relative max-h-56 overflow-hidden" : undefined}>
+                        {isAssistant ? (
+                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                            {renderMarkdown(isExpanded ? m.content : compactForDisplay(m.content))}
+                          </motion.div>
+                        ) : m.content}
+                        {(!isExpanded && isLong) && (
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-gray-100 to-transparent dark:from-gray-800" />
+                        )}
+                      </div>
+                      {isLong && (
+                        <div className="mt-1 flex justify-end">
+                          <button
+                            type="button"
+                            className="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                            onClick={() => setExpanded(prev => ({ ...prev, [i]: !prev[i] }))}
+                          >
+                            {isExpanded ? "Show less" : "Show more"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {loading && (
                 <div className="flex">
                   <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200">
@@ -302,7 +384,7 @@ export default function ChatWidget() {
                     }
                   }}
                   placeholder="Type your message..."
-                  className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-500"
+                  className="flex-1 rounded-md border border-gray-300 bg-white/90 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-900/90 dark:text-gray-100 dark:focus:border-blue-500 backdrop-blur-xl"
                 />
                 <button
                   type="submit"

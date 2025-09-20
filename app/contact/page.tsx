@@ -29,8 +29,8 @@ const contactMethods = [
     icon: Phone,
     title: 'Phone',
     description: 'Call me for urgent matters',
-    value: '+91 98765 43210',
-    href: 'tel:+919876543210',
+    value: '+91 6382924427',
+    href: 'tel:+916382924427',
     color: 'text-green-500',
   },
   {
