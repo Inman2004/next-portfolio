@@ -33,7 +33,7 @@ const FeaturedPosts = ({ posts, className }: FeaturedPostsProps) => {
   return (
     <section className={cn('w-full mb-12', className)}>
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-whited mb-6 text-foreground/90">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-foreground/90">
           Featured Posts
           <span className="block w-12 h-1 bg-gradient-to-r from-foreground to-bg/60 mt-2 rounded-full" />
         </h2>

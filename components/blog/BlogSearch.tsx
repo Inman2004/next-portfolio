@@ -25,9 +25,9 @@ export function BlogSearch({
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         className={cn(
-          'flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-4 py-2',
+          'flex h-10 w-full rounded-md border border-input bg-background/30 pl-10 pr-4 py-2 backdrop:blur-sm',
           'text-sm ring-offset-background placeholder:text-muted-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/20',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'transition-shadow duration-200',
           className

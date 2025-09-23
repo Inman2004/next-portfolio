@@ -214,9 +214,9 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
-        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
-        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
+        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
+        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
+        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
       </div>
 
       {allTags.length > 0 && (
@@ -271,7 +271,12 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
                       <span>{formatNumber(post.views || 0)}</span>
                     </div>
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">{post.title}</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white group">
+                    <span className="relative inline-block">
+                      <span className="line-clamp-2">{post.title}</span>
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-current transition-all duration-300 group-hover:w-full"></span>
+                    </span>
+                  </h2>
                   <div className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">

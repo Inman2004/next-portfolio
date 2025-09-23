@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLAttributes, CSSProperties, useEffect } from 'react';
+import { useMemo, useState, useRef, memo, ReactNode, AnchorHTMLAttributes, HTMLAttributes, CSSProperties, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { createHeadingIdGenerator } from '@/lib/markdownUtils';
@@ -232,12 +232,14 @@ const CustomCode: React.FC<CustomCodeProps> = ({
     const [zoom, setZoom] = useState(1);
     const [open, setOpen] = useState(false);
     const [visible, setVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const innerRef = useRef<HTMLDivElement | null>(null);
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const dialogScrollRef = useRef<HTMLDivElement | null>(null);
     const initialZoomRef = useRef<number>(1);
     const hasInitialRef = useRef<boolean>(false);
+    const [diagramError, setDiagramError] = useState<string | null>(null);
 
     useEffect(() => {
       const el = containerRef.current;
@@ -252,43 +254,62 @@ const CustomCode: React.FC<CustomCodeProps> = ({
       return () => io.disconnect();
     }, []);
 
-    const fitToWidth = () => {
+    const calculateOptimalZoom = useCallback(() => {
       try {
         const container = containerRef.current;
         const svg = innerRef.current?.querySelector('svg');
-        if (!container || !svg) return setZoom(1);
-        const containerWidth = container.clientWidth - 24; // padding
-        const svgWidth = (svg as SVGGraphicsElement).getBBox?.().width || (svg as any).clientWidth || 0;
-        if (svgWidth > 0) {
-          const next = Math.max(0.4, Math.min(2.5, containerWidth / svgWidth));
-          setZoom(next);
-          if (!hasInitialRef.current) {
-            initialZoomRef.current = next;
-            hasInitialRef.current = true;
-          }
-        } else {
-          setZoom(1);
-          if (!hasInitialRef.current) {
-            initialZoomRef.current = 1;
-            hasInitialRef.current = true;
-          }
-        }
-      } catch {
-        setZoom(1);
-        if (!hasInitialRef.current) {
-          initialZoomRef.current = 1;
-          hasInitialRef.current = true;
-        }
-      }
-    };
+        if (!container || !svg) return 1;
 
-    useEffect(() => {
-      // Try to fit after first render
-      const t = setTimeout(fitToWidth, 50);
-      return () => clearTimeout(t);
+        const containerWidth = container.clientWidth - 32; // padding
+        const containerHeight = container.clientHeight - 32;
+        const svgElement = svg as SVGGraphicsElement;
+
+        const svgWidth = svgElement.getBBox?.().width || svgElement.clientWidth || 0;
+        const svgHeight = svgElement.getBBox?.().height || svgElement.clientHeight || 0;
+
+        if (svgWidth > 0 && svgHeight > 0) {
+          const widthRatio = containerWidth / svgWidth;
+          const heightRatio = containerHeight / svgHeight;
+          const optimalRatio = Math.min(widthRatio, heightRatio, 2); // Cap at 2x zoom
+
+          // For mobile, be more conservative
+          const isMobile = window.innerWidth < 768;
+          const minZoom = isMobile ? 0.6 : 0.8;
+          const maxZoom = isMobile ? 1.5 : 2;
+
+          const finalRatio = Math.max(minZoom, Math.min(maxZoom, optimalRatio));
+
+          if (!hasInitialRef.current) {
+            initialZoomRef.current = finalRatio;
+            hasInitialRef.current = true;
+          }
+
+          return finalRatio;
+        }
+        return 1;
+      } catch {
+        return 1;
+      }
     }, [visible, open]);
 
-    // Pan/Zoom interactions (wheel zoom + drag pan + touch pinch)
+    const fitToWidth = useCallback(() => {
+      const optimalZoom = calculateOptimalZoom();
+      setZoom(optimalZoom);
+      setIsLoading(false);
+    }, [calculateOptimalZoom]);
+
+    useEffect(() => {
+      if (!visible && !open) return;
+
+      // Try to fit after first render with a small delay
+      const timer = setTimeout(() => {
+        fitToWidth();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }, [visible, open, fitToWidth]);
+
+    // Enhanced pan/zoom interactions with better mobile support
     useEffect(() => {
       const attach = (scrollEl: HTMLDivElement | null) => {
         if (!scrollEl) return () => {};
@@ -298,6 +319,8 @@ const CustomCode: React.FC<CustomCodeProps> = ({
         let touchMode: 'none' | 'drag' | 'pinch' = 'none';
         let lastDist = 0;
         let startZoom = 1;
+        let initialScrollLeft = 0;
+        let initialScrollTop = 0;
 
         const onWheel = (e: WheelEvent) => {
           // Zoom when ctrl/cmd key held to avoid hijacking normal scroll
@@ -310,9 +333,12 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           const mouseY = e.clientY - rect.top + scrollEl.scrollTop;
           const contentX = mouseX / zoom;
           const contentY = mouseY / zoom;
-          const delta = -e.deltaY; // up zooms in
-          const factor = delta > 0 ? 1.1 : 0.9;
-          const next = Math.min(3, Math.max(0.3, +(zoom * factor).toFixed(3)));
+          const delta = -e.deltaY;
+          const factor = delta > 0 ? 1.15 : 0.85;
+          const isMobile = window.innerWidth < 768;
+          const minZoom = isMobile ? 0.5 : 0.6;
+          const maxZoom = isMobile ? 2 : 3;
+          const next = Math.min(maxZoom, Math.max(minZoom, +(zoom * factor).toFixed(3)));
           setZoom(next);
           // keep cursor point stable
           const newScrollLeft = contentX * next - (e.clientX - rect.left);
@@ -326,20 +352,25 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           isDragging = true;
           lastX = e.clientX;
           lastY = e.clientY;
+          initialScrollLeft = scrollEl.scrollLeft;
+          initialScrollTop = scrollEl.scrollTop;
           scrollEl.style.cursor = 'grabbing';
+          scrollEl.style.userSelect = 'none';
         };
         const onMouseMove = (e: MouseEvent) => {
           if (!isDragging) return;
+          e.preventDefault();
           const dx = e.clientX - lastX;
           const dy = e.clientY - lastY;
           lastX = e.clientX;
           lastY = e.clientY;
-          scrollEl.scrollLeft -= dx;
-          scrollEl.scrollTop -= dy;
+          scrollEl.scrollLeft = initialScrollLeft - dx;
+          scrollEl.scrollTop = initialScrollTop - dy;
         };
         const onMouseUp = () => {
           isDragging = false;
           scrollEl.style.cursor = '';
+          scrollEl.style.userSelect = '';
         };
 
         const dist = (t1: Touch, t2: Touch) => {
@@ -358,6 +389,8 @@ const CustomCode: React.FC<CustomCodeProps> = ({
             touchMode = 'drag';
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
+            initialScrollLeft = scrollEl.scrollLeft;
+            initialScrollTop = scrollEl.scrollTop;
           } else if (e.touches.length >= 2) {
             touchMode = 'pinch';
             lastDist = dist(e.touches[0], e.touches[1]);
@@ -370,8 +403,8 @@ const CustomCode: React.FC<CustomCodeProps> = ({
             e.preventDefault();
             const tx = e.touches[0].clientX;
             const ty = e.touches[0].clientY;
-            scrollEl.scrollLeft -= (tx - lastX);
-            scrollEl.scrollTop -= (ty - lastY);
+            scrollEl.scrollLeft = initialScrollLeft - (tx - lastX);
+            scrollEl.scrollTop = initialScrollTop - (ty - lastY);
             lastX = tx;
             lastY = ty;
           } else if (touchMode === 'pinch' && e.touches.length >= 2) {
@@ -385,7 +418,10 @@ const CustomCode: React.FC<CustomCodeProps> = ({
             const focusY = c.y - rect.top + scrollEl.scrollTop;
             const contentX = focusX / zoom;
             const contentY = focusY / zoom;
-            const next = Math.min(3, Math.max(0.3, +(startZoom * factor).toFixed(3)));
+            const isMobile = window.innerWidth < 768;
+            const minZoom = isMobile ? 0.5 : 0.6;
+            const maxZoom = isMobile ? 2 : 3;
+            const next = Math.min(maxZoom, Math.max(minZoom, +(startZoom * factor).toFixed(3)));
             setZoom(next);
             scrollEl.scrollLeft = contentX * next - (c.x - rect.left);
             scrollEl.scrollTop = contentY * next - (c.y - rect.top);
@@ -425,41 +461,104 @@ const CustomCode: React.FC<CustomCodeProps> = ({
       };
     }, [zoom, visible, open]);
 
-    const Toolbar = (
-      <div className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-gray-200 dark:border-gray-700 p-1 shadow">
-        <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.min(2.5, +(z + 0.1).toFixed(2)))} aria-label="Zoom in">
-          <ZoomIn className="w-4 h-4" />
+    // Enhanced zoom controls with better UX
+    const handleZoomIn = useCallback(() => {
+      const isMobile = window.innerWidth < 768;
+      const maxZoom = isMobile ? 2 : 3;
+      setZoom(z => Math.min(maxZoom, +(z + 0.2).toFixed(2)));
+    }, []);
+
+    const handleZoomOut = useCallback(() => {
+      const isMobile = window.innerWidth < 768;
+      const minZoom = isMobile ? 0.5 : 0.6;
+      setZoom(z => Math.max(minZoom, +(z - 0.2).toFixed(2)));
+    }, []);
+
+    const handleResetZoom = useCallback(() => {
+      setZoom(initialZoomRef.current);
+    }, []);
+
+    const handleFitToWidth = useCallback(() => {
+      fitToWidth();
+    }, [fitToWidth]);
+
+    // Enhanced toolbar component
+    const Toolbar = useMemo(() => (
+      <div className="absolute top-3 right-3 z-20 flex items-center gap-1 p-1.5 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-600/50 shadow-lg transition-all duration-200 hover:bg-white/95 dark:hover:bg-gray-800/95">
+        <div className="flex items-center gap-1">
+          <button
+            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleZoomOut}
+            disabled={zoom <= (window.innerWidth < 768 ? 0.5 : 0.6)}
+            aria-label="Zoom out"
+            title="Zoom out (Ctrl + Scroll wheel)"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+          <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded text-gray-700 dark:text-gray-300 min-w-[3rem] text-center">
+            {Math.round(zoom * 100)}%
+          </span>
+          <button
+            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleZoomIn}
+            disabled={zoom >= (window.innerWidth < 768 ? 2 : 3)}
+            aria-label="Zoom in"
+            title="Zoom in (Ctrl + Scroll wheel)"
+          >
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <button
+          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+          onClick={handleResetZoom}
+          aria-label="Reset zoom"
+          title="Reset to fit"
+        >
+          <RefreshCcw className="w-3.5 h-3.5" />
         </button>
-        <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.max(0.4, +(z - 0.1).toFixed(2)))} aria-label="Zoom out">
-          <ZoomOut className="w-4 h-4" />
-        </button>
-        <button className="p-1 hover:text-blue-600" onClick={() => setZoom(initialZoomRef.current)} aria-label="Reset zoom">
-          <RefreshCcw className="w-4 h-4" />
+        <button
+          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+          onClick={handleFitToWidth}
+          aria-label="Fit to width"
+          title="Fit to width"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
         </button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <button className="p-1 hover:text-blue-600" aria-label="Full screen">
-              <Maximize2 className="w-4 h-4" />
+            <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" aria-label="Full screen" title="Full screen">
+              <Maximize2 className="w-3.5 h-3.5" />
             </button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[min(1000px,95vw)] p-3 md:p-4">
-            <DialogHeader>
-              <DialogTitle>Diagram</DialogTitle>
+          <DialogContent className="sm:max-w-[95vw] max-h-[95vh] p-0 overflow-hidden">
+            <DialogHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <DialogTitle className="flex items-center gap-2 text-lg">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Diagram
+              </DialogTitle>
             </DialogHeader>
-            <div className="relative">
-              <div className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-md bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-gray-200 dark:border-gray-700 p-1 shadow">
-                <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.min(3, +(z + 0.1).toFixed(2)))} aria-label="Zoom in">
-                  <ZoomIn className="w-4 h-4" />
+            <div className="relative flex-1 overflow-hidden">
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-1 p-1.5 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-600/50 shadow-lg">
+                <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" onClick={handleZoomOut} aria-label="Zoom out">
+                  <ZoomOut className="w-3.5 h-3.5" />
                 </button>
-                <button className="p-1 hover:text-blue-600" onClick={() => setZoom(z => Math.max(0.3, +(z - 0.1).toFixed(2)))} aria-label="Zoom out">
-                  <ZoomOut className="w-4 h-4" />
+                <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded text-gray-700 dark:text-gray-300 min-w-[3rem] text-center">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" onClick={handleZoomIn} aria-label="Zoom in">
+                  <ZoomIn className="w-3.5 h-3.5" />
                 </button>
-                <button className="p-1 hover:text-blue-600" onClick={() => setZoom(1)} aria-label="Reset zoom">
-                  <RefreshCcw className="w-4 h-4" />
+                <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" onClick={handleResetZoom} aria-label="Reset zoom">
+                  <RefreshCcw className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <div ref={dialogScrollRef} className="overflow-auto max-h-[80vh] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-                <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-3">
+              <div ref={dialogScrollRef} className="overflow-auto h-full max-h-[calc(95vh-80px)] rounded-lg bg-white dark:bg-gray-900">
+                <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-4 origin-top-left">
                   {visible || open ? <Mermaid chart={code} /> : null}
                 </div>
               </div>
@@ -467,15 +566,42 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           </DialogContent>
         </Dialog>
       </div>
-    );
+    ), [zoom, open, handleZoomIn, handleZoomOut, handleResetZoom, handleFitToWidth, visible, code]);
+
+    if (diagramError) {
+      return (
+        <div className="relative rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 my-4">
+          <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="font-medium">Diagram Error</span>
+          </div>
+          <p className="text-sm text-red-600 dark:text-red-400 mt-1">{diagramError}</p>
+        </div>
+      );
+    }
 
     return (
-      <div ref={containerRef} className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <div ref={containerRef} className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        {isLoading && (
+          <div className="absolute inset-0 bg-gray-50 dark:bg-gray-800 flex items-center justify-center z-10">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm">Loading diagram...</span>
+            </div>
+          </div>
+        )}
         {Toolbar}
-        <div ref={scrollRef} className="overflow-auto max-h-80 md:max-h-96 touch-pan-y touch-pan-x">
-          <div ref={innerRef} style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-3">
+        <div ref={scrollRef} className="overflow-auto max-h-80 md:max-h-96 touch-pan-y touch-pan-x bg-gray-50 dark:bg-gray-800/50">
+          <div ref={innerRef} style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-3 origin-top-left">
             {visible ? <Mermaid chart={code} /> : (
-              <div className="h-40 flex items-center justify-center text-gray-400 text-sm">Loading diagram…</div>
+              <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  Loading diagram...
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -533,7 +659,7 @@ const CustomCode: React.FC<CustomCodeProps> = ({
         </div>
         <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
           <span className="text-xs text-gray-800 dark:text-gray-300 hidden sm:inline">
-            {match[1]} • {codeString.split('\n').length} lines
+            {languageFromMatch || 'text'} • {codeString.split('\n').length} lines
           </span>
           <button
             onClick={handleCopy}
