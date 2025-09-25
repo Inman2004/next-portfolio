@@ -26,7 +26,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as m } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { buttonVariants } from "@/components/ui/button";
@@ -257,13 +257,13 @@ export function BottomNav() {
         href: '/',
         label: 'Home',
         icon: (props: IconProps) => <HomeIcon {...props} className="w-5 h-5" />,
-        className: 'text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors'
+        className: 'text-zinc-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 transition-colors'
       },
       {
         href: '/blog',
         label: 'Blog',
         icon: (props: IconProps) => <FaBlog {...props} className="w-5 h-5" />,
-        className: 'text-gray-500 hover:text-orange-600 dark:text-gray-400 dark:hover:text-orange-400 transition-colors'
+        className: 'text-zinc-500 hover:text-orange-600 dark:text-zinc-400 dark:hover:text-orange-400 transition-colors'
       }
     ];
 
@@ -273,7 +273,7 @@ export function BottomNav() {
         href: '/profile',
         label: 'Profile',
         icon: (props: IconProps) => <User {...props} className="w-5 h-5" />,
-        className: 'text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors'
+        className: 'text-zinc-500 hover:text-purple-600 dark:text-zinc-400 dark:hover:text-purple-400 transition-colors'
       });
     }
 
@@ -283,7 +283,7 @@ export function BottomNav() {
         href: '/blog/new',
         label: 'New Post',
         icon: (props: IconProps) => <PencilIcon {...props} className="w-5 h-5" />,
-        className: 'text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 transition-colors'
+        className: 'text-zinc-500 hover:text-green-600 dark:text-zinc-400 dark:hover:text-green-400 transition-colors'
       });
     }
 
@@ -339,8 +339,8 @@ export function BottomNav() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <motion.div 
-        className={`h-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-r-2xl shadow-xl border-r border-gray-200 dark:border-gray-800 flex flex-col p-2 transition-all ${isHovering ? 'shadow-2xl' : ''}`}
+      <m.div 
+        className={`h-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg rounded-r-2xl shadow-xl border-r border-zinc-200 dark:border-zinc-800 flex flex-col p-2 transition-all ${isHovering ? 'shadow-2xl' : ''}`}
         initial={false}
         animate={{ width: isExpanded ? '16rem' : '4rem' }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
@@ -350,7 +350,7 @@ export function BottomNav() {
       {/* Expand/Collapse Button */}
       <button
         onClick={toggleExpand}
-        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 mb-4 self-end"
+        className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 mb-4 self-end"
         aria-label={isExpanded ? 'Collapse menu' : 'Expand menu'}
         type="button"
       >
@@ -369,12 +369,12 @@ export function BottomNav() {
           return (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <motion.button
+                <m.button
                   onClick={(e) => handleItemClick(item, e)}
                   className={cn(
                     'flex items-center p-3 rounded-xl transition-all duration-200 w-full',
-                    'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
-                    'hover:bg-gray-100 dark:hover:bg-gray-800',
+                    'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white',
+                    'hover:bg-zinc-100 dark:hover:bg-zinc-800',
                     isActive && 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
                     item.className
                   )}
@@ -384,7 +384,7 @@ export function BottomNav() {
                 >
                   <div className="flex items-center">
                     {item.icon({ className: 'w-5 h-5 flex-shrink-0' })}
-                    <motion.span 
+                    <m.span 
                       className="ml-3 whitespace-nowrap"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ 
@@ -395,12 +395,12 @@ export function BottomNav() {
                       transition={{ duration: 0.2 }}
                     >
                       {item.label}
-                    </motion.span>
+                    </m.span>
                   </div>
-                </motion.button>
+                </m.button>
               </TooltipTrigger>
               {!isExpanded && (
-                <TooltipContent side="right" className="bg-gray-900 text-white text-xs ml-2">
+                <TooltipContent side="right" className="bg-zinc-900 text-white text-xs ml-2">
                   {item.label}
                 </TooltipContent>
               )}
@@ -410,7 +410,7 @@ export function BottomNav() {
       </nav>
 
       {/* Bottom Section - Theme Toggle and User Menu */}
-      <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+      <div className="mt-auto pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
         <div className="flex flex-col justify-between items-center gap-4 p-4">
           <AnimatedThemeToggler />
           {user && (
@@ -420,7 +420,7 @@ export function BottomNav() {
                 className="flex items-center space-x-2 focus:outline-none"
                 aria-haspopup="true"
               >                {isExpanded && (
-                <div className="flex items-center gap-2 bg-gray-100/50 dark:bg-gray-800/50 rounded-md p-2">
+                <div className="flex items-center gap-2 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-md p-2">
                 <UserAvatar
                   photoURL={user.photoURL?.startsWith('user://') ? `user_${user.uid}` : user.photoURL || undefined}
                   displayName={user.displayName || 'User'}
@@ -450,16 +450,16 @@ export function BottomNav() {
 
               <AnimatePresence>
                 {showDropdown && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 5 }}
                     transition={{ duration: 0.15, ease: 'easeInOut' }}
-                    className="absolute right-0 left-0 bottom-full mb-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                    className="absolute right-0 left-0 bottom-full mb-2 w-48 rounded-md shadow-lg bg-white dark:bg-zinc-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                   >
                     <div className="py-1">
                       {DashboardLinks.map((link, index) => (
-                        <motion.div
+                        <m.div
                           key={index}
                           initial={false}
                           animate={{ opacity: 1 }}
@@ -467,12 +467,12 @@ export function BottomNav() {
                         >
                           <Link
                             href={link.href}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="flex items-center px-4 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                           >
                             {link.icon({ className: 'w-4 h-4 mr-2' })}
                             {link.label}
                           </Link>
-                        </motion.div>
+                        </m.div>
                       ))}
                       <button
                         onClick={() => {
@@ -485,7 +485,7 @@ export function BottomNav() {
                         Sign out
                       </button>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -517,7 +517,7 @@ export function BottomNav() {
           </div>
         )}
       </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

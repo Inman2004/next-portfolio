@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Mail, Bell, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { auth } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface BlogSubscriptionProps {
   blogId: string;
@@ -23,11 +23,12 @@ export default function BlogSubscription({
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [localSubscriptionStatus, setLocalSubscriptionStatus] = useState(isSubscribed);
+  const { user } = useAuth();
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!auth.currentUser) {
+    if (!user) {
       toast.error('Please sign in to subscribe to notifications');
       return;
     }
@@ -94,7 +95,7 @@ export default function BlogSubscription({
           Stay Updated
         </CardTitle>
         <CardDescription>
-          Subscribe to get notified when <b className="text-slate-900 dark:text-slate-200">{creatorName}</b> publishes new blog posts
+          Subscribe to get notified when <b className="text-zinc-900 dark:text-zinc-200">{creatorName}</b> publishes new blog posts
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -132,7 +133,7 @@ export default function BlogSubscription({
             )}
           </Button>
           
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-zinc-500 text-center">
             We'll send you an email when new content is published. 
             You can unsubscribe at any time.
           </p>

@@ -247,7 +247,7 @@ export default function EditorToolbar({ onFormatAction, onImageUpload, onAddLink
     return (
         <>
             <TooltipProvider>
-                <div className="flex flex-wrap items-center rounded gap-1 p-1 border-b bg-gray-100 dark:bg-gray-800">
+                <div className="flex flex-wrap items-center rounded gap-1 p-1 border-b bg-zinc-100 dark:bg-zinc-800">
                     {/* Headings dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

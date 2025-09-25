@@ -36,7 +36,7 @@ export default function BlogMobileBar({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
       <div className="mx-auto max-w-6xl px-3 pb-[env(safe-area-inset-bottom)]">
-        <div className="mb-3 rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur dark:border-gray-700 dark:bg-gray-900/90">
+        <div className="mb-3 rounded-2xl border border-zinc-200 bg-white/95 shadow-lg backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/90">
           <div className="flex items-center justify-between p-2">
             <Button variant="ghost" size="sm" className="gap-2" onClick={() => setOpenShare((v) => !v)}>
               <Share2 className="h-4 w-4" /> Share

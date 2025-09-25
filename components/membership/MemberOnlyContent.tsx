@@ -64,8 +64,8 @@ export default function MemberOnlyContent({
       {/* Preview Content */}
       {previewContent && (
         <div className="prose max-w-none">
-          <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border-l-4 border-blue-500">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border-l-4 border-blue-500">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
               <strong>Preview:</strong> Here's a glimpse of what members get to see:
             </p>
             <div dangerouslySetInnerHTML={{ __html: previewContent }} />
@@ -90,7 +90,7 @@ export default function MemberOnlyContent({
             {membershipTiers.map((tier) => (
               <div
                 key={tier.id}
-                className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-zinc-800 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700"
               >
                 <div className="flex items-center gap-2 mb-2">
                   {tier.name === 'premium' && <Crown className="h-4 w-4 text-yellow-500" />}
@@ -99,9 +99,9 @@ export default function MemberOnlyContent({
                 </div>
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   ${tier.price}
-                  <span className="text-sm font-normal text-gray-500">/month</span>
+                  <span className="text-sm font-normal text-zinc-500">/month</span>
                 </div>
-                <ul className="text-sm text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                <ul className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 space-y-1">
                   {tier.features.slice(0, 3).map((feature, index) => (
                     <li key={index} className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 bg-blue-500 rounded-full" />
@@ -121,7 +121,7 @@ export default function MemberOnlyContent({
               </Link>
             </Button>
             
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               Already a member? <Link href="/signin" className="text-blue-600 dark:text-blue-400 hover:underline">Sign in</Link>
             </p>
           </div>
@@ -129,7 +129,7 @@ export default function MemberOnlyContent({
       </Card>
 
       {/* Stats */}
-      <div className="text-center text-sm text-gray-500">
+      <div className="text-center text-sm text-zinc-500">
         <div className="flex items-center justify-center gap-4">
           <div className="flex items-center gap-1">
             <Users className="h-4 w-4" />

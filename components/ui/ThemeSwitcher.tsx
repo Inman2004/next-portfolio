@@ -85,7 +85,7 @@ export function ThemeSwitcher({
           className={cn(
             'absolute inset-0 flex items-center justify-center',
             'transform transition-transform duration-500 ease-in-out',
-            isDark ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0',
+            isDark ? 'tranzinc-y-0 opacity-100' : '-tranzinc-y-10 opacity-0',
             isHovered && 'scale-110',
             isPressed && 'scale-95'
           )}
@@ -97,7 +97,7 @@ export function ThemeSwitcher({
           className={cn(
             'absolute inset-0 flex items-center justify-center',
             'transform transition-transform duration-500 ease-in-out',
-            !isDark ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0',
+            !isDark ? 'tranzinc-y-0 opacity-100' : 'tranzinc-y-10 opacity-0',
             isHovered && 'scale-110',
             isPressed && 'scale-95'
           )}

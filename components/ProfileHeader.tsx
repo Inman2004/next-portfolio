@@ -23,9 +23,9 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
     : null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+    <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 mb-8">
       <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-100 dark:border-gray-700">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-100 dark:border-zinc-700">
           {user.photoURL ? (
             <Image
               src={user.photoURL}
@@ -47,7 +47,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
               </span>
             </div>
           )}
-          <div className="absolute inset-0 w-full h-full bg-gray-200 dark:bg-gray-700 hidden items-center justify-center user-fallback">
+          <div className="absolute inset-0 w-full h-full bg-zinc-200 dark:bg-zinc-700 hidden items-center justify-center user-fallback">
             <span className="text-4xl font-bold text-white">
               {user.displayName?.[0]?.toUpperCase() || 'U'}
             </span>
@@ -55,23 +55,23 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
         </div>
         
         <div className="flex-1 text-center md:text-left">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
             {user.displayName || 'Anonymous User'}
           </h1>
           
           {user.username && (
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-zinc-600 dark:text-zinc-300">
               @{user.username}
             </p>
           )}
           
           {user.bio && (
-            <p className="mt-3 text-gray-700 dark:text-gray-300">
+            <p className="mt-3 text-zinc-700 dark:text-zinc-300">
               {user.bio}
             </p>
           )}
           
-          <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4 text-sm text-zinc-500 dark:text-zinc-400">
             {user.location && (
               <div className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

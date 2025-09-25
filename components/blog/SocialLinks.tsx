@@ -18,8 +18,8 @@ export function SocialLinks({ socials, authorName, className = 'flex justify-cen
   return (
     <div className={`${className}`}>
       {authorName && (
-        <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-          Follow <b className="text-gray-900 dark:text-white">{authorName}</b>
+        <h4 className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-2">
+          Follow <b className="text-zinc-900 dark:text-white">{authorName}</b>
         </h4>
       )}
       <div className="flex flex-wrap gap-3">
@@ -44,7 +44,7 @@ export function SocialLinks({ socials, authorName, className = 'flex justify-cen
                 clipRule="evenodd"
               />
             }
-            hoverClass="hover:text-gray-900 dark:hover:text-white"
+            hoverClass="hover:text-zinc-900 dark:hover:text-white"
           />
         )}
         {socials.linkedin && (
@@ -133,7 +133,7 @@ function SocialLink({ href, label, icon, hoverClass, isStroke = false }: SocialL
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`text-gray-600 dark:text-gray-400 transition-colors ${hoverClass}`}
+      className={`text-zinc-600 dark:text-zinc-400 transition-colors ${hoverClass}`}
       aria-label={label}
     >
       <svg

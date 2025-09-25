@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface FeaturedPost {
   id: string;
@@ -33,14 +33,14 @@ const FeaturedPosts = ({ posts, className }: FeaturedPostsProps) => {
   return (
     <section className={cn('w-full mb-12', className)}>
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-foreground/90">
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-6 text-foreground/90">
           Featured Posts
           <span className="block w-12 h-1 bg-gradient-to-r from-foreground to-bg/60 mt-2 rounded-full" />
         </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredPosts.map((post, index) => (
-            <motion.article
+            <m.article
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -133,19 +133,18 @@ const FeaturedPosts = ({ posts, className }: FeaturedPostsProps) => {
                         </div>
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
-                          <span className="text-xs">👤</span>
                         </div>
                       )}
                       <span>{post.authorName || 'Anonymous'}</span>
                     </div>
                     <div className="text-xs">
-                      {formatDate(post.createdAt)}
+                      {formatDate(typeof post.createdAt === 'string' ? new Date(post.createdAt) : post.createdAt)}
                       {post.readingTime && ` • ${post.readingTime}`}
                     </div>
                   </div>
                 </div>
               </Link>
-            </motion.article>
+            </m.article>
           ))}
         </div>
       </div>

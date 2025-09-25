@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { Loader2, ChevronDown, Clock, Flame, Check, Pin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
@@ -185,12 +185,12 @@ const Comments = () => {
   
   // Define common classes
   const containerClasses = 'max-w-5xl mx-auto px-4 py-8';
-  const sectionTitleClasses = 'text-2xl font-bold text-gray-900 dark:text-white';
-  const sortButtonClasses = 'flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800/50 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 border border-gray-400 dark:border-gray-700/50 rounded-lg transition-colors';
+  const sectionTitleClasses = 'text-2xl font-bold text-zinc-900 dark:text-white';
+  const sortButtonClasses = 'flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 border border-zinc-400 dark:border-zinc-700/50 rounded-lg transition-colors';
   const sortOptionClasses = (isActive: boolean) => `w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
     isActive 
       ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' 
-      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-700/50'
+      : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50'
   }`;
   const pinnedLabelClasses = 'flex items-center gap-2 mb-3';
   const pinnedTextClasses = 'text-sm font-medium text-yellow-600 dark:text-yellow-400';
@@ -206,7 +206,7 @@ const Comments = () => {
             isSubmitting={isSubmitting}
             currentUser={currentUser}
             placeholder="Share your thoughts..."
-            className="bg-white/50 dark:bg-gray-800/50 border border-gray-900 dark:border-gray-700/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+            className="bg-white/50 dark:bg-zinc-800/50 border border-zinc-900 dark:border-zinc-700/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
           />
         </div>
 
@@ -233,7 +233,7 @@ const Comments = () => {
               </button>
               
               {isSortOpen && (
-                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 overflow-hidden border border-gray-400 dark:border-gray-700/50">
+                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-lg z-10 overflow-hidden border border-zinc-400 dark:border-zinc-700/50">
                   <button
                     onClick={() => handleSortChange('newest')}
                     className={sortOptionClasses(sortBy === 'newest')}
@@ -623,7 +623,7 @@ const Comments = () => {
   return (
     <div className="space-y-6">
       {/* Comment Form */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
         <h2 className="text-xl font-semibold mb-4">Leave a Comment</h2>
         <CommentForm
           onSubmit={handleSubmit}
@@ -643,7 +643,7 @@ const Comments = () => {
         <div className="relative sort-container" ref={sortContainerRef}>
           <button
             onClick={() => setIsSortOpen(!isSortOpen)}
-            className="flex items-center gap-2 bg-gray-800/50 hover:bg-gray-800 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 bg-zinc-800/50 hover:bg-zinc-800 px-4 py-2 rounded-lg transition-colors"
           >
             {sortBy === 'newest' ? (
               <>
@@ -660,15 +660,15 @@ const Comments = () => {
           </button>
           
           {isSortOpen && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute right-0 mt-2 w-40 bg-gray-900 border border-gray-800 rounded-lg shadow-lg z-10 overflow-hidden"
+              className="absolute right-0 mt-2 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-10 overflow-hidden"
             >
               <button
                 onClick={() => handleSortChange('newest')}
-                className={`w-full text-left px-4 py-2 hover:bg-gray-800 flex items-center gap-2 ${sortBy === 'newest' ? 'text-blue-400' : ''}`}
+                className={`w-full text-left px-4 py-2 hover:bg-zinc-800 flex items-center gap-2 ${sortBy === 'newest' ? 'text-blue-400' : ''}`}
               >
                 <Clock size={16} />
                 <span>Newest</span>
@@ -676,13 +676,13 @@ const Comments = () => {
               </button>
               <button
                 onClick={() => handleSortChange('top')}
-                className={`w-full text-left px-4 py-2 hover:bg-gray-800 flex items-center gap-2 ${sortBy === 'top' ? 'text-blue-400' : ''}`}
+                className={`w-full text-left px-4 py-2 hover:bg-zinc-800 flex items-center gap-2 ${sortBy === 'top' ? 'text-blue-400' : ''}`}
               >
                 <Flame size={16} />
                 <span>Top</span>
                 {sortBy === 'top' && <Check size={16} className="ml-auto" />}
               </button>
-            </motion.div>
+            </m.div>
           )}
         </div>
       </div>
@@ -690,7 +690,7 @@ const Comments = () => {
       {/* Comments List */}
       <div className="space-y-4">
         {comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-zinc-400">
             No comments yet. Be the first to comment!
           </div>
         ) : (

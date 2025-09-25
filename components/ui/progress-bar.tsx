@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, m } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 interface ProgressBarProps {
@@ -23,7 +23,7 @@ export function ProgressBar({ isLoading }: ProgressBarProps) {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    let animationFrame: number;
+    let animationFrame: number | null = null;
 
     if (isLoading) {
       // Reset progress when loading starts
@@ -57,7 +57,7 @@ export function ProgressBar({ isLoading }: ProgressBarProps) {
 
     return () => {
       clearTimeout(timer);
-      if (animationFrame) {
+      if (animationFrame !== null) {
         cancelAnimationFrame(animationFrame);
       }
     };
@@ -66,14 +66,14 @@ export function ProgressBar({ isLoading }: ProgressBarProps) {
   return (
     <AnimatePresence>
       {(isLoading || progress > 0) && (
-        <motion.div
+        <m.div
           className="fixed top-0 left-0 right-0 h-1 z-[9999] bg-transparent"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <motion.div
+          <m.div
             className="h-full"
             style={{
               background: getGradient(),
@@ -92,7 +92,7 @@ export function ProgressBar({ isLoading }: ProgressBarProps) {
               repeatType: 'reverse',
             } : {}}
           />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

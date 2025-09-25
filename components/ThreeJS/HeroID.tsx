@@ -142,7 +142,7 @@ const InteractiveCard3DContent = () => {
           />
           <Lightformer 
             intensity={3} 
-            color="gray" 
+            color="zinc" 
             position={[-1, -1, 1]} 
             rotation={[0, 0, Math.PI / 3]} 
             scale={[100, 0.1, 1]} 

@@ -27,10 +27,10 @@ export default function ProfilePage() {
 
   // Show loading while redirecting
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-black">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Redirecting to your profile...</p>
+        <p className="text-zinc-600 dark:text-zinc-400">Redirecting to your profile...</p>
       </div>
     </div>
   );

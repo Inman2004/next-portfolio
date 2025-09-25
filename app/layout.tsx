@@ -6,67 +6,72 @@ import { PageLoadingProvider } from "@/components/providers/page-loading-provide
 import { NavigationLoading } from "@/components/ui/navigation-loading";
 import Header from "@/components/Header";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { elegantScript, pacifico } from './fonts';
-import WelcomePopup from '@/components/WelcomePopupClient';
-import { PerformanceMonitor } from '@/components/PerformanceMonitor';
-import { FontLoader } from '@/components/FontLoader';
+import { elegantScript, pacifico } from "./fonts";
+import WelcomePopup from "@/components/WelcomePopupClient";
+import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { FontLoader } from "@/components/FontLoader";
 import { BottomNav } from "@/components/BottomNav";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import ChatWidget from "@/components/ChatWidget";
+import ClickSpark from "@/components/ClickSpark";
 
 // Base URL for the site
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rvinman2004.vercel.app/';
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://rvinman2004.vercel.app/";
 
 // Default metadata
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Rv Imman',
-    template: '%s | Rv Imman',
+    default: "Rv Imman",
+    template: "%s | Rv Imman",
   },
-  description: 'Portfolio of rv imman - Full Stack Developer specializing in modern web technologies. Check out my projects and get in touch!',
+  description:
+    "Portfolio of rv imman - Full Stack Developer specializing in modern web technologies. Check out my projects and get in touch!",
   keywords: [
-    'rv imman',
-    'Full Stack Developer',
-    'Web Developer',
-    'React',
-    'Next.js',
-    'TypeScript',
-    'Node.js',
-    'Portfolio',
-    'Frontend Developer',
-    'Backend Developer',
+    "rv imman",
+    "Full Stack Developer",
+    "Web Developer",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Node.js",
+    "Portfolio",
+    "Frontend Developer",
+    "Backend Developer",
   ],
-  authors: [{ name: 'rv imman' }],
-  creator: 'rv imman',
-  publisher: 'rv imman',
+  authors: [{ name: "rv imman" }],
+  creator: "rv imman",
+  publisher: "rv imman",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
+    type: "website",
+    locale: "en_US",
     url: baseUrl,
-    siteName: 'rv imman',
-    title: 'rv imman | Full Stack Developer',
-    description: 'Portfolio of rv imman - Full Stack Developer specializing in modern web technologies.',
+    siteName: "rv imman",
+    title: "rv imman | Full Stack Developer",
+    description:
+      "Portfolio of rv imman - Full Stack Developer specializing in modern web technologies.",
     images: [
       {
         url: `${baseUrl}/images/web ui.png`,
         width: 1200,
         height: 630,
-        alt: 'rv imman - Full Stack Developer',
+        alt: "rv imman - Full Stack Developer",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'rv imman | Full Stack Developer',
-    description: 'Portfolio of rv imman - Full Stack Developer specializing in modern web technologies.',
+    card: "summary_large_image",
+    title: "rv imman | Full Stack Developer",
+    description:
+      "Portfolio of rv imman - Full Stack Developer specializing in modern web technologies.",
     images: [`${baseUrl}/images/web ui.png`],
-    creator: '@rvimman',
+    creator: "@rvimman",
   },
   robots: {
     index: true,
@@ -74,9 +79,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   verification: {
@@ -86,16 +91,16 @@ export const metadata: Metadata = {
     icon: "/favicon.png",
   },
   other: {
-    'google-adsense-account': 'ca-pub-6373066383987878'
+    "google-adsense-account": "ca-pub-6373066383987878",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
@@ -109,24 +114,23 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
-
 // Livvic font removed as it wasn't properly imported
 
 // Add JSON-LD structured data
 const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'rv imman',
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "rv imman",
   url: baseUrl,
   sameAs: [
-    'https://github.com/rvinman2004',
-    'https://linkedin.com/in/rv3d',
-    'https://twitter.com/rvimman_',
+    "https://github.com/rvinman2004",
+    "https://linkedin.com/in/rv3d",
+    "https://twitter.com/rvimman_",
   ],
-  jobTitle: 'Full Stack Developer',
+  jobTitle: "Full Stack Developer",
   worksFor: {
-    '@type': 'Organization',
-    name: 'Freelance',
+    "@type": "Organization",
+    name: "Freelance",
   },
 };
 
@@ -136,15 +140,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html 
-      lang="en" 
+    <html
+      lang="en"
       className={`${raleway.variable} ${elegantScript.variable} ${pacifico.variable}`}
       suppressHydrationWarning={true}
     >
       <head>
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6373066383987878"
-     crossOrigin="anonymous"></script>
-     <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6373066383987878"
+          crossOrigin="anonymous"
+        ></script>
+        <meta
+          name="google-site-verification"
+          content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -180,33 +190,45 @@ export default function RootLayout({
         />
         {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+
         {/* Preload critical resources */}
         <link rel="preload" as="image" href="/favicon.png" />
-        <link 
-          rel="preload" 
-          as="image" 
+        <link
+          rel="preload"
+          as="image"
           href="/images/avatar1.png"
           fetchPriority="high"
         />
-        
+
         {/* Add preload for critical images here */}
       </head>
-      <body 
+      <body
         suppressHydrationWarning
-        className={`${raleway.variable} font-sans antialiased min-h-screen bg-background text-foreground`}
+        className={`${raleway.variable} font-sans antialiased min-h-screen bg-zinc-100 dark:bg-zinc-900 text-foreground`}
       >
         <PageLoadingProvider>
           <Providers>
             <ErrorBoundary>
               <NavigationLoading />
               <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow" id="main-content">
-                  {children}
-                </main>
-                <BottomNav />
+                <ClickSpark
+                  sparkColor="#66ff99"
+                  sparkSize={10}
+                  sparkRadius={15}
+                  sparkCount={8}
+                  duration={400}
+                >
+                  <Header />
+                  <main className="flex-grow" id="main-content">
+                    {children}
+                  </main>
+                  <BottomNav />
+                </ClickSpark>
               </div>
               <WelcomePopup />
               <PerformanceMonitor />

@@ -1,7 +1,7 @@
 'use client';
 
 import { Metadata } from 'next';
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,7 +56,7 @@ const socialLinks = [
     icon: FaGithub, 
     href: 'https://github.com/rvimman', 
     label: 'GitHub', 
-    color: 'hover:text-gray-900 dark:hover:text-gray-100' 
+    color: 'hover:text-zinc-900 dark:hover:text-zinc-100' 
   },
   { 
     icon: FaLinkedin, 
@@ -68,7 +68,7 @@ const socialLinks = [
     icon: FaXTwitter, 
     href: 'https://twitter.com/rvimman_', 
     label: 'Twitter', 
-    color: 'hover:text-gray-900 dark:hover:text-gray-100' 
+    color: 'hover:text-zinc-900 dark:hover:text-zinc-100' 
   },
   { 
     icon: SiGmail, 
@@ -136,11 +136,11 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32">
         <div className="container mx-auto px-4">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -153,7 +153,7 @@ export default function ContactPage() {
               Have a project in mind or want to collaborate? I'd love to hear from you. 
               Let's create something amazing together.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -162,13 +162,13 @@ export default function ContactPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactMethods.map((method, index) => (
-              <motion.div
+              <m.div
                 key={method.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
               >
-                <Card className="text-center border border-slate-700/80 bg-gradient-to-br from-slate-50 to-slate-100 transition-all dark:from-slate-900 dark:to-slate-800 shadow-none">
+                <Card className="text-center border border-zinc-700/80 bg-gradient-to-br from-zinc-50 to-zinc-100 transition-all dark:from-zinc-900 dark:to-zinc-800 shadow-none">
                   <CardContent className="pt-6">
                     <method.icon className={`w-8 h-8 mx-auto mb-4 ${method.color}`} />
                     <h3 className="font-semibold mb-2">{method.title}</h3>
@@ -185,7 +185,7 @@ export default function ContactPage() {
                     )}
                   </CardContent>
                 </Card>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -272,7 +272,7 @@ export default function ContactPage() {
 
                     {/* Status Message */}
                     {submitStatus.type && (
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`flex items-center gap-2 p-3 rounded-lg ${
@@ -287,7 +287,7 @@ export default function ContactPage() {
                           <AlertCircle className="w-5 h-5" />
                         )}
                         <p className="text-sm">{submitStatus.message}</p>
-                      </motion.div>
+                      </m.div>
                     )}
 
                     <Button 
@@ -311,10 +311,10 @@ export default function ContactPage() {
                   </form>
                 </CardContent>
               </Card>
-            </motion.div>
+            </m.div>
 
             {/* Contact Info */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -389,7 +389,7 @@ export default function ContactPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -397,7 +397,7 @@ export default function ContactPage() {
       {/* FAQ Section */}
       <section className="py-16 bg-accent/5">
         <div className="container mx-auto px-4">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -407,7 +407,7 @@ export default function ContactPage() {
             <p className="text-muted-foreground">
               Quick answers to common questions about working with me
             </p>
-          </motion.div>
+          </m.div>
 
           <div className="max-w-3xl mx-auto space-y-4">
             {[
@@ -428,7 +428,7 @@ export default function ContactPage() {
                 a: "Yes, I offer ongoing support and maintenance packages. I believe in building long-term relationships with my clients and ensuring their projects continue to perform well."
               }
             ].map((faq, index) => (
-              <motion.div
+              <m.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -440,7 +440,7 @@ export default function ContactPage() {
                     <p className="text-sm text-muted-foreground">{faq.a}</p>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

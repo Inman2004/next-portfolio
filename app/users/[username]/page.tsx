@@ -271,7 +271,7 @@ export default function UserProfilePage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center p-6 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Error Loading Profile</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-6">{error}</p>
+          <p className="text-zinc-700 dark:text-zinc-300 mb-6">{error}</p>
           <Link 
             href="/" 
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -288,8 +288,8 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">User Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">The requested user could not be found.</p>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">User Not Found</h2>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-6">The requested user could not be found.</p>
           <Link 
             href="/" 
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -304,12 +304,12 @@ export default function UserProfilePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Profile Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8">
+      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden mb-8">
         <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700"></div>
         <div className="px-6 pb-6 relative -mt-16">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between">
             <div className="flex items-end">
-              <div className="h-32 w-32 rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-white">
+              <div className="h-32 w-32 rounded-full border-4 border-white dark:border-zinc-800 overflow-hidden bg-white">
                 <UserAvatar 
                   photoURL={user.photoURL} 
                   displayName={user.displayName}
@@ -317,10 +317,10 @@ export default function UserProfilePage() {
                 />
               </div>
               <div className="ml-6 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
                   {user.displayName || 'Anonymous User'}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-zinc-600 dark:text-zinc-400">
                   {user.username ? `@${user.username}` : `User ID: ${identifier}`}
                 </p>
               </div>
@@ -333,7 +333,7 @@ export default function UserProfilePage() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
+                  className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white"
                   aria-label={link.platform}
                 >
                   {link.icon}
@@ -343,12 +343,12 @@ export default function UserProfilePage() {
           </div>
 
           {user.bio && (
-            <p className="mt-4 text-gray-700 dark:text-gray-300">
+            <p className="mt-4 text-zinc-700 dark:text-zinc-300">
               {user.bio}
             </p>
           )}
 
-          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600 dark:text-zinc-400">
             {user.location && (
               <div className="flex items-center">
                 <FiMapPin className="mr-1.5 h-4 w-4 flex-shrink-0" />
@@ -394,9 +394,9 @@ export default function UserProfilePage() {
 
           {/* Tab Content */}
           <TabsContent value="about" className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden p-6">
+            <div className="bg-white dark:bg-zinc-800 rounded-lg shadow overflow-hidden p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About</h2>
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">About</h2>
                 {isOwnProfile && (
                   <Button variant="outline" size="sm">
                     <FiEdit3 className="w-4 h-4 mr-2" />
@@ -408,34 +408,34 @@ export default function UserProfilePage() {
             
             {user.bio ? (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Bio</h3>
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{user.bio}</p>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Bio</h3>
+                <p className="text-zinc-700 dark:text-zinc-300 whitespace-pre-line">{user.bio}</p>
               </div>
             ) : (
               <div className="mb-6">
-                <p className="text-gray-500 dark:text-gray-400 italic">No bio provided</p>
+                <p className="text-zinc-500 dark:text-zinc-400 italic">No bio provided</p>
               </div>
             )}
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Details</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Details</h3>
                 <div className="space-y-3">
                   {user.location && (
                     <div className="flex items-start">
-                      <FiMapPin className="h-5 w-5 text-gray-500 dark:text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+                      <FiMapPin className="h-5 w-5 text-zinc-500 dark:text-zinc-400 mt-0.5 mr-2 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Location</p>
-                        <p className="text-gray-900 dark:text-white">{user.location}</p>
+                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Location</p>
+                        <p className="text-zinc-900 dark:text-white">{user.location}</p>
                       </div>
                     </div>
                   )}
                   
                   {user.website && (
                     <div className="flex items-start">
-                      <FiGlobe className="h-5 w-5 text-gray-500 dark:text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+                      <FiGlobe className="h-5 w-5 text-zinc-500 dark:text-zinc-400 mt-0.5 mr-2 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Website</p>
+                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Website</p>
                         <a 
                           href={user.website.startsWith('http') ? user.website : `https://${user.website}`}
                           target="_blank" 
@@ -450,10 +450,10 @@ export default function UserProfilePage() {
                   
                   {joinDate && (
                     <div className="flex items-start">
-                      <FiCalendar className="h-5 w-5 text-gray-500 dark:text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+                      <FiCalendar className="h-5 w-5 text-zinc-500 dark:text-zinc-400 mt-0.5 mr-2 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Joined</p>
-                        <p className="text-gray-900 dark:text-white">{joinDate}</p>
+                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Joined</p>
+                        <p className="text-zinc-900 dark:text-white">{joinDate}</p>
                       </div>
                     </div>
                   )}
@@ -461,17 +461,17 @@ export default function UserProfilePage() {
               </div>
               
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Stats</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Stats</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Posts</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Posts</p>
+                    <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                       {posts.length}
                     </p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Views</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="bg-zinc-50 dark:bg-zinc-700 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Views</p>
+                    <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                       {user.views || 0}
                     </p>
                   </div>
@@ -479,7 +479,7 @@ export default function UserProfilePage() {
                 
                 {socialLinks.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Connect</h4>
+                    <h4 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">Connect</h4>
                     <div className="flex space-x-3">
                       {socialLinks.map((link) => (
                         <a
@@ -487,7 +487,7 @@ export default function UserProfilePage() {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                          className="text-zinc-700 hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
                           aria-label={link.platform}
                         >
                           <span className="sr-only">{link.platform}</span>
@@ -506,9 +506,9 @@ export default function UserProfilePage() {
             {posts.length > 0 ? (
               <div className="space-y-6">
                 {posts.map((post) => (
-                  <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                  <div key={post.id} className="bg-white dark:bg-zinc-800 rounded-lg shadow overflow-hidden">
                     {post.coverImage && (
-                      <div className="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                      <div className="h-48 bg-zinc-200 dark:bg-zinc-700 overflow-hidden">
                         <img 
                           src={post.coverImage} 
                           alt={post.title}
@@ -517,17 +517,17 @@ export default function UserProfilePage() {
                       </div>
                     )}
                     <div className="p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
                         <Link href={`/blog/${post.id}`} className="hover:text-blue-600 dark:hover:text-blue-400">
                           {post.title}
                         </Link>
                       </h3>
                       {post.excerpt && (
-                        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                        <p className="text-zinc-600 dark:text-zinc-300 mb-4 line-clamp-3">
                           {post.excerpt}
                         </p>
                       )}
-                      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
                         <span>
                           {post.createdAt?.toDate 
                             ? format(post.createdAt.toDate(), 'MMM dd, yyyy')
@@ -555,11 +555,11 @@ export default function UserProfilePage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-zinc-500 dark:text-zinc-400">
                   {posts.length === 0 && !isLoading ? 'No posts found.' : 'Loading posts...'}
                 </p>
                 {posts.length === 0 && !isLoading && (
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                  <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
                     This user hasn't published any posts yet.
                   </p>
                 )}
@@ -605,13 +605,13 @@ export default function UserProfilePage() {
                 <CardContent className="space-y-6">
                   <div>
                     <h3 className="text-sm font-medium mb-2">Email</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
                       {currentUser?.email}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium mb-2">Account Created</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
                       {currentUser?.metadata?.creationTime ? 
                         new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -622,9 +622,9 @@ export default function UserProfilePage() {
                     </p>
                   </div>
                   
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                  <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
                     <Button variant="destructive">Delete Account</Button>
-                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                       Permanently delete your account and all associated data
                     </p>
                   </div>

@@ -108,7 +108,7 @@ export default function CommentEditor({
     <div className="relative">
       <div 
         ref={editorRef}
-        className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden"
+        className="bg-zinc-800/50 border border-zinc-700 rounded-lg overflow-hidden"
       >
         <EditorContent 
           editor={editor} 
@@ -118,11 +118,11 @@ export default function CommentEditor({
         
         {editor && (
           <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
-            <div className="flex bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-1">
+            <div className="flex bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg p-1">
               <button
                 onClick={() => editor.chain().focus().toggleBold().run()}
                 className={`p-1 rounded ${
-                  editor.isActive('bold') ? 'bg-gray-700' : 'hover:bg-gray-700'
+                  editor.isActive('bold') ? 'bg-zinc-700' : 'hover:bg-zinc-700'
                 }`}
                 title="Bold"
               >
@@ -131,7 +131,7 @@ export default function CommentEditor({
               <button
                 onClick={() => editor.chain().focus().toggleItalic().run()}
                 className={`p-1 rounded mx-1 ${
-                  editor.isActive('italic') ? 'bg-gray-700' : 'hover:bg-gray-700'
+                  editor.isActive('italic') ? 'bg-zinc-700' : 'hover:bg-zinc-700'
                 }`}
                 title="Italic"
               >
@@ -140,7 +140,7 @@ export default function CommentEditor({
               <button
                 onClick={() => editor.chain().focus().toggleBulletList().run()}
                 className={`p-1 rounded ${
-                  editor.isActive('bulletList') ? 'bg-gray-700' : 'hover:bg-gray-700'
+                  editor.isActive('bulletList') ? 'bg-zinc-700' : 'hover:bg-zinc-700'
                 }`}
                 title="Bullet List"
               >
@@ -150,12 +150,12 @@ export default function CommentEditor({
           </BubbleMenu>
         )}
         
-        <div className="flex justify-between items-center p-2 border-t border-gray-700 bg-gray-800/50">
+        <div className="flex justify-between items-center p-2 border-t border-zinc-700 bg-zinc-800/50">
           <div className="relative">
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="p-1.5 rounded-full text-gray-400 hover:text-yellow-400 hover:bg-gray-700"
+              className="p-1.5 rounded-full text-zinc-400 hover:text-yellow-400 hover:bg-zinc-700"
               title="Add emoji"
             >
               <Smile className="w-5 h-5" />
@@ -182,7 +182,7 @@ export default function CommentEditor({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-3 py-1.5 text-sm text-gray-300 hover:text-white"
+                className="px-3 py-1.5 text-sm text-zinc-300 hover:text-white"
               >
                 Cancel
               </button>

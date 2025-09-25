@@ -70,7 +70,7 @@ export default function SendNotificationsPage() {
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Send Blog Notifications</h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-zinc-600 dark:text-zinc-400">
           Send email notifications to all subscribers when a new blog post is published.
         </p>
       </div>
@@ -156,7 +156,7 @@ export default function SendNotificationsPage() {
           <CardHeader>
             <CardTitle>How it works</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+          <CardContent className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
             <p>1. <strong>Blog Post ID:</strong> The unique identifier of the blog post (found in the URL)</p>
             <p>2. <strong>Creator ID:</strong> The user ID of the blog post author</p>
             <p>3. <strong>Creator Name:</strong> The display name that will appear in the email</p>

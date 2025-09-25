@@ -248,7 +248,7 @@ export default function CreatorDashboard() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Creator Profile Not Found</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-zinc-600 dark:text-zinc-400 mb-6">
             We couldn't load your creator profile. Please try refreshing the page.
           </p>
           <Button onClick={loadCreatorProfile}>Retry</Button>
@@ -261,7 +261,7 @@ export default function CreatorDashboard() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-zinc-600 dark:text-zinc-400">
           Manage your membership tiers and creator profile
         </p>
       </div>
@@ -290,7 +290,7 @@ export default function CreatorDashboard() {
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                   {profile.subscriptionCount}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400">Active Members</p>
+                <p className="text-zinc-600 dark:text-zinc-400">Active Members</p>
               </CardContent>
             </Card>
             
@@ -299,7 +299,7 @@ export default function CreatorDashboard() {
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
                   {profile.membershipTiers.length}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400">Membership Tiers</p>
+                <p className="text-zinc-600 dark:text-zinc-400">Membership Tiers</p>
               </CardContent>
             </Card>
             
@@ -308,7 +308,7 @@ export default function CreatorDashboard() {
                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                   {profile.membershipEnabled ? 'Active' : 'Inactive'}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400">Membership Status</p>
+                <p className="text-zinc-600 dark:text-zinc-400">Membership Status</p>
               </CardContent>
             </Card>
           </div>
@@ -459,9 +459,9 @@ export default function CreatorDashboard() {
             {profile.membershipTiers.length === 0 ? (
               <Card>
                 <CardContent className="pt-6 text-center">
-                  <Crown className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                  <Crown className="h-16 w-16 mx-auto text-zinc-400 mb-4" />
                   <h3 className="text-xl font-semibold mb-2">No Membership Tiers</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-zinc-600 dark:text-zinc-400 mb-4">
                     Create your first membership tier to start monetizing your content.
                   </p>
                   <Button onClick={() => setIsCreatingTier(true)}>
@@ -487,7 +487,7 @@ export default function CreatorDashboard() {
                           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                             ${tier.price}
                           </div>
-                          <div className="text-sm text-gray-500">per month</div>
+                          <div className="text-sm text-zinc-500">per month</div>
                         </div>
                       </div>
                     </CardHeader>
@@ -595,17 +595,17 @@ export default function CreatorDashboard() {
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Display Name</Label>
+                    <Label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Display Name</Label>
                     <p className="text-lg">{profile.displayName}</p>
                   </div>
                   
                   <div>
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Bio</Label>
+                    <Label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Bio</Label>
                     <p className="text-lg">{profile.bio || 'No bio set'}</p>
                   </div>
                   
                   <div>
-                    <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Membership Status</Label>
+                    <Label className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Membership Status</Label>
                     <Badge variant={profile.membershipEnabled ? 'default' : 'secondary'}>
                       {profile.membershipEnabled ? 'Enabled' : 'Disabled'}
                     </Badge>

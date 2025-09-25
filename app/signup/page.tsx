@@ -66,23 +66,23 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors duration-200">
-      <motion.div
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 p-4 transition-colors duration-200">
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white/90 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/70 dark:border-gray-700/50 shadow-xl dark:shadow-2xl">
+        <div className="bg-white/90 dark:bg-zinc-800/30 backdrop-blur-sm rounded-2xl p-8 border border-zinc-200/70 dark:border-zinc-700/50 shadow-xl dark:shadow-2xl">
           <div className="text-center mb-8">
-            <motion.h2 
+            <m.h2 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
               className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400"
             >
               Create Your Account
-            </motion.h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            </m.h2>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
               Already have an account?{' '}
               <Link 
                 href="/signin" 
@@ -95,7 +95,7 @@ export default function SignUp() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Email address
               </label>
               <input
@@ -103,14 +103,14 @@ export default function SignUp() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300/70 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-500/70 dark:placeholder-gray-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
                 placeholder="your@email.com"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Password
               </label>
               <input
@@ -118,14 +118,14 @@ export default function SignUp() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300/70 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-500/70 dark:placeholder-gray-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Confirm Password
               </label>
               <input
@@ -133,7 +133,7 @@ export default function SignUp() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300/70 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-500/70 dark:placeholder-gray-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
@@ -144,28 +144,28 @@ export default function SignUp() {
                 id="terms"
                 name="terms"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300/70 dark:border-gray-600/50 rounded bg-white/80 dark:bg-gray-800/50 transition-colors"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300/70 dark:border-zinc-600/50 rounded bg-white/80 dark:bg-zinc-800/50 transition-colors"
                 required
               />
               <label
                 htmlFor="terms"
-                className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+                className="ml-2 block text-sm text-zinc-700 dark:text-zinc-300"
               >
                 I agree to the <a href="#" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">Terms</a> and <a href="#" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">Privacy Policy</a>
               </label>
             </div>
 
             {error && (
-              <motion.div 
+              <m.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm"
               >
                 {error}
-              </motion.div>
+              </m.div>
             )}
 
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
@@ -178,25 +178,25 @@ export default function SignUp() {
                   Creating account...
                 </>
               ) : 'Create Account'}
-            </motion.button>
+            </m.button>
           </form>
 
           <div className="relative mt-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300/70 dark:border-gray-700/50"></div>
+              <div className="w-full border-t border-zinc-300/70 dark:border-zinc-700/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white/90 dark:bg-gray-800/30 text-gray-500 dark:text-gray-400">
+              <span className="px-2 bg-white/90 dark:bg-zinc-800/30 text-zinc-500 dark:text-zinc-400">
                 Or continue with
               </span>
             </div>
           </div>
 
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleGoogleSignIn}
-            className="mt-6 w-full px-6 py-2.5 border border-gray-300/70 dark:border-gray-600/50 rounded-lg bg-white/80 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-6 w-full px-6 py-2.5 border border-zinc-300/70 dark:border-zinc-600/50 rounded-lg bg-white/80 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 font-medium hover:bg-zinc-50/80 dark:hover:bg-zinc-700/50 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -218,9 +218,9 @@ export default function SignUp() {
               />
             </svg>
             Continue with Google
-          </motion.button>
+          </m.button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

@@ -356,5 +356,10 @@ export default function BlogPostLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}<ScrollProgress /></>;
+  return (
+    <div className="min-h-screen bg-zinc-100 dark:bg-zinc-900">
+      {children}
+      <ScrollProgress />
+    </div>
+  );
 }

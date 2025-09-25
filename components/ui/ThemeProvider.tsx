@@ -62,7 +62,7 @@ function ThemeInitializer({ children }: { children: React.ReactNode }) {
   // Don't render children until theme is initialized
   if (!isInitialized || !mounted) {
     return (
-      <div className="fixed inset-0 bg-white dark:bg-gray-900 transition-colors duration-200" />
+      <div className="fixed inset-0 bg-white dark:bg-zinc-900 transition-colors duration-200" />
     );
   }
 

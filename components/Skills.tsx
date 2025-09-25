@@ -1,4 +1,4 @@
-import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { motion as m, useInView, useReducedMotion } from 'framer-motion';
 import { useRef } from 'react';
 import { SkillBadge, getTechColor } from '@/components/skillColors';
 import React, { useMemo } from 'react';
@@ -90,7 +90,7 @@ const SkillCard = React.memo(({ skill, index }: { skill: Skill; index: number })
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
@@ -98,7 +98,7 @@ const SkillCard = React.memo(({ skill, index }: { skill: Skill; index: number })
       variants={containerVariants}
       className="h-full"
     >
-      <div className="h-full rounded-xl bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-900 dark:border-gray-700/50 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-gray-900/20">
+      <div className="h-full rounded-xl bg-zinc-100/80 dark:bg-zinc-800/80 backdrop-blur-sm border-2 border-zinc-900 dark:border-zinc-700/50 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-zinc-900/20">
         <div className="p-6 md:p-8 space-y-6">
           <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
             {skill.category}
@@ -112,8 +112,8 @@ const SkillCard = React.memo(({ skill, index }: { skill: Skill; index: number })
                     <span className="ml-1 text-xs opacity-80 dark:opacity-70">{item.level}%</span>
                   </SkillBadge>
                 </div>
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <motion.div
+                <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                  <m.div
                     variants={barVariants}
                     custom={item.level}
                     initial="hidden"
@@ -129,7 +129,7 @@ const SkillCard = React.memo(({ skill, index }: { skill: Skill; index: number })
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -155,7 +155,7 @@ const Skills = () => {
   return (
     <section id="skills" className="py-16 -mt-20 pt-32 bg-transparent">
       <div className="max-w-7xl mx-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.8 }}
@@ -164,13 +164,13 @@ const Skills = () => {
           <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
             Skills & Expertise
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">
             Here are the technologies and tools I specialize in, developed through years of hands-on experience
             and continuous learning.
           </p>
-        </motion.div>
+        </m.div>
 
-        <motion.div 
+        <m.div 
           ref={containerRef}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -182,7 +182,7 @@ const Skills = () => {
               <SkillCard key={`${skill.category}-${index}`} skill={skill} index={index} />
             ))}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

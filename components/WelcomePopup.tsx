@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as m, AnimatePresence } from 'framer-motion';
 import { X, Mail, Github, Sparkles, Check, Code, Palette, Zap, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
@@ -48,14 +48,14 @@ export default function WelcomePopup() {
 
   return (
     <AnimatePresence>
-      <motion.div 
+      <m.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 dark:bg-black/80 backdrop-blur-sm"
       >
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -65,7 +65,7 @@ export default function WelcomePopup() {
             stiffness: 300,
             delay: 0.1
           }}
-          className="relative w-full max-w-2xl bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700/50 overflow-hidden flex flex-col md:flex-row"
+          className="relative w-full max-w-2xl bg-white dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-800 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700/50 overflow-hidden flex flex-col md:flex-row"
         >
           {/* Left side - Decorative */}
           <div className="hidden md:block w-1/3 bg-gradient-to-b from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 p-8 relative overflow-hidden">
@@ -78,21 +78,21 @@ export default function WelcomePopup() {
                 <Sparkles className="w-8 h-8 text-yellow-400" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-yellow-400 dark:to-amber-500 bg-clip-text text-transparent">Welcome!</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Join our community</h3>
+              <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">Join our community</h3>
               <ul className="space-y-3">
                 {features.map((feature, index) => (
-                  <motion.li 
+                  <m.li 
                     key={index}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 + (index * 0.1) }}
-                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300"
+                    className="flex items-center gap-3 text-sm text-zinc-700 dark:text-zinc-300"
                   >
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white/80 dark:bg-white/5 border border-zinc-200 dark:border-white/10">
                       {feature.icon}
                     </span>
                     {feature.text}
-                  </motion.li>
+                  </m.li>
                 ))}
               </ul>
             </div>
@@ -102,23 +102,23 @@ export default function WelcomePopup() {
           <div className="w-full md:w-2/3 p-8 md:p-10 relative">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-white/5"
+              className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white transition-colors p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-white/5"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
             
             <div className="text-center md:text-left mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">Welcome to My Portfolio</h2>
-              <p className="text-gray-600 dark:text-gray-300">Sign in to unlock all features and personalize your experience.</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-3">Welcome to My Portfolio</h2>
+              <p className="text-zinc-600 dark:text-zinc-300">Sign in to unlock all features and personalize your experience.</p>
             </div>
 
             <div className="space-y-5">
-              <motion.button
+              <m.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-white dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
+                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-white dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
               >
                 <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                   <path
@@ -139,14 +139,14 @@ export default function WelcomePopup() {
                   />
                 </svg>
                 <span>Continue with Google</span>
-              </motion.button>
+              </m.button>
 
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+                  <div className="w-full border-t border-zinc-300 dark:border-zinc-700"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="px-4 bg-white dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">or explore without signing in</span>
+                  <span className="px-4 bg-white dark:bg-zinc-900 text-sm text-zinc-500 dark:text-zinc-400">or explore without signing in</span>
                 </div>
               </div>
 
@@ -157,7 +157,7 @@ export default function WelcomePopup() {
                 >
                   Continue as guest
                 </button>
-                <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">
                   By continuing, you agree to our{' '}
                   <button 
                     onClick={(e) => {
@@ -176,8 +176,8 @@ export default function WelcomePopup() {
               </div>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
       
       <AnimatePresence>
         {showTerms && (

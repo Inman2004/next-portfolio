@@ -29,10 +29,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
-          <div className="max-w-md w-full p-6 bg-gray-800 rounded-lg shadow-lg text-center">
+        <div className="min-h-screen flex items-center justify-center bg-zinc-900 p-4">
+          <div className="max-w-md w-full p-6 bg-zinc-800 rounded-lg shadow-lg text-center">
             <h1 className="text-2xl font-bold text-red-500 mb-4">Something went wrong</h1>
-            <p className="text-gray-300 mb-6">
+            <p className="text-zinc-300 mb-6">
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             <button

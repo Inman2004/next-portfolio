@@ -32,13 +32,13 @@ export function AdminSidebar() {
                     href={item.href}
                     className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                       isActive
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-zinc-100 text-zinc-900'
+                        : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
                     }`}
                   >
                     <item.icon
                       className={`mr-3 h-6 w-6 ${
-                        isActive ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'
+                        isActive ? 'text-zinc-500' : 'text-zinc-400 group-hover:text-zinc-500'
                       }`}
                       aria-hidden="true"
                     />
@@ -48,7 +48,7 @@ export function AdminSidebar() {
               })}
             </nav>
           </div>
-          <div className="flex-shrink-0 flex border-t dark:border-gray-700 border-gray-200 p-4">
+          <div className="flex-shrink-0 flex border-t dark:border-zinc-700 border-zinc-200 p-4">
             <button 
               onClick={async () => {
                 try {
@@ -59,9 +59,9 @@ export function AdminSidebar() {
                   console.error('Error signing out:', error);
                 }
               }}
-              className="flex items-center w-full text-left text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md p-2"
+              className="flex items-center w-full text-left text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 rounded-md p-2"
             >
-              <LogOut className="mr-3 h-5 w-5 dark:text-gray-500 text-gray-400 group-hover:text-gray-500" />
+              <LogOut className="mr-3 h-5 w-5 dark:text-zinc-500 text-zinc-400 group-hover:text-zinc-500" />
               Sign out
             </button>
           </div>

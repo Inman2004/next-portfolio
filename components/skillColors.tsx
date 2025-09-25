@@ -70,7 +70,7 @@ export const getTechColor = (tech: string): TechColor => {
 
   // Misc
   // Default
-  return { bg: 'bg-gray-500/15', text: 'text-gray-600 dark:text-gray-400', gradient: 'from-gray-500 to-gray-600', border: 'border-gray-500 dark:border-gray-400', hover: 'hover:bg-gray-500/20' };
+  return { bg: 'bg-zinc-500/15', text: 'text-zinc-600 dark:text-zinc-400', gradient: 'from-zinc-500 to-zinc-600', border: 'border-zinc-500 dark:border-zinc-400', hover: 'hover:bg-zinc-500/20' };
 };
 
 interface SkillBadgeProps {
@@ -110,7 +110,7 @@ export const SkillBadge: React.FC<SkillBadgeProps> = ({
         </span>
         {proficiency && (
           <div className="absolute bottom-0 left-0 w-full h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            <div className="absolute inset-0 bg-zinc-200 dark:bg-zinc-700 rounded-full" />
             <div 
               className={`absolute inset-0 bg-gradient-to-r ${gradient} transition-all duration-300 transform origin-left scale-x-0 group-hover:scale-x-100 ${proficiencyWidth} rounded-full`}
             />

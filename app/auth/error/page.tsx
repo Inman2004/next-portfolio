@@ -29,11 +29,11 @@ export default function AuthErrorPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4">
-      <div className="max-w-md w-full space-y-8 p-8 bg-gray-800 rounded-lg shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-900 text-white p-4">
+      <div className="max-w-md w-full space-y-8 p-8 bg-zinc-800 rounded-lg shadow-lg">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-red-500 mb-2">Authentication Error</h1>
-          <p className="text-gray-300 mb-6">
+          <p className="text-zinc-300 mb-6">
             {error === 'account-exists-with-different-credential'
               ? 'This email is already registered with a different provider.'
               : 'An error occurred during authentication. Please try again.'}
@@ -49,14 +49,14 @@ export default function AuthErrorPage() {
             
             <button
               onClick={() => router.push('/')}
-              className="w-full flex justify-center items-center px-4 py-2 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="w-full flex justify-center items-center px-4 py-2 border border-zinc-600 rounded-md shadow-sm text-sm font-medium text-zinc-300 bg-zinc-700 hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500"
             >
               Return to home page
             </button>
           </div>
           
           {error && (
-            <div className="mt-6 p-3 bg-gray-700 rounded text-xs text-gray-400 overflow-x-auto">
+            <div className="mt-6 p-3 bg-zinc-700 rounded text-xs text-zinc-400 overflow-x-auto">
               <p className="font-mono">Error: {error}</p>
             </div>
           )}

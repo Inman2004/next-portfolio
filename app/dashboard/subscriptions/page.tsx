@@ -128,7 +128,7 @@ export default function SubscriptionsDashboard() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">My Subscriptions</h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-zinc-600 dark:text-zinc-400">
           Manage your memberships and blog notifications
         </p>
       </div>
@@ -149,9 +149,9 @@ export default function SubscriptionsDashboard() {
           {memberships.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center">
-                <Crown className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <Crown className="h-16 w-16 mx-auto text-zinc-400 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No Memberships Yet</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-zinc-600 dark:text-zinc-400 mb-4">
                   You haven't subscribed to any creator memberships yet.
                 </p>
                 <Button asChild>
@@ -180,7 +180,7 @@ export default function SubscriptionsDashboard() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Status:</span>
+                      <span className="text-zinc-600 dark:text-zinc-400">Status:</span>
                       <Badge 
                         variant={membership.status === 'active' ? 'default' : 'secondary'}
                         className={membership.status === 'active' ? 'bg-green-500' : ''}
@@ -195,7 +195,7 @@ export default function SubscriptionsDashboard() {
                     </div>
                     
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Started:</span>
+                      <span className="text-zinc-600 dark:text-zinc-400">Started:</span>
                       <span>{new Date(membership.startDate).toLocaleDateString()}</span>
                     </div>
 
@@ -227,9 +227,9 @@ export default function SubscriptionsDashboard() {
           {blogSubscriptions.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center">
-                <Bell className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <Bell className="h-16 w-16 mx-auto text-zinc-400 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No Blog Notifications</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-zinc-600 dark:text-zinc-400 mb-4">
                   You haven't subscribed to any blog notifications yet.
                 </p>
                 <Button asChild>
@@ -247,10 +247,10 @@ export default function SubscriptionsDashboard() {
                         <Mail className="h-8 w-8 text-blue-500" />
                         <div>
                           <h3 className="font-semibold">{subscription.creatorName}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-zinc-600 dark:text-zinc-400">
                             {subscription.email}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-zinc-500">
                             Subscribed since {new Date(subscription.createdAt).toLocaleDateString()}
                           </p>
                         </div>
@@ -291,7 +291,7 @@ export default function SubscriptionsDashboard() {
             <CardContent className="pt-6 text-center">
               <Crown className="h-12 w-12 mx-auto text-blue-500 mb-4" />
               <h3 className="font-semibold mb-2">Find Creators</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
                 Discover new creators to support
               </p>
               <Button asChild size="sm">
@@ -304,7 +304,7 @@ export default function SubscriptionsDashboard() {
             <CardContent className="pt-6 text-center">
               <Bell className="h-12 w-12 mx-auto text-green-500 mb-4" />
               <h3 className="font-semibold mb-2">Manage Notifications</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
                 Control your email preferences
               </p>
               <Button asChild size="sm" variant="outline">
@@ -317,7 +317,7 @@ export default function SubscriptionsDashboard() {
             <CardContent className="pt-6 text-center">
               <Users className="h-12 w-12 mx-auto text-purple-500 mb-4" />
               <h3 className="font-semibold mb-2">Community</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
                 Connect with other members
               </p>
               <Button asChild size="sm" variant="outline">

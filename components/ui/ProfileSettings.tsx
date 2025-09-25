@@ -53,7 +53,7 @@ export default function ProfileSettings() {
   if (!user) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-md mx-auto"
@@ -72,7 +72,7 @@ export default function ProfileSettings() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="displayName" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                 Display Name
               </label>
               <input
@@ -80,21 +80,21 @@ export default function ProfileSettings() {
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-white/50 dark:bg-zinc-700/50 border border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Your display name"
                 disabled={isLoading}
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 value={user.email || ''}
-                className="w-full px-4 py-2 rounded-lg bg-gray-100/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
+                className="w-full px-4 py-2 rounded-lg bg-zinc-100/50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 cursor-not-allowed"
                 disabled
               />
             </div>
@@ -108,7 +108,7 @@ export default function ProfileSettings() {
             <p className="text-green-400 text-sm" role="alert">{success}</p>
           )}
 
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
@@ -117,9 +117,9 @@ export default function ProfileSettings() {
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             {isLoading ? 'Updating...' : 'Update Profile'}
-          </motion.button>
+          </m.button>
         </form>
       </div>
-    </motion.div>
+    </m.div>
   );
 } 

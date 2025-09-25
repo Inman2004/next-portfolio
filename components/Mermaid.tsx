@@ -38,15 +38,15 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
         edgeLabelBackground: 'rgba(15,23,42,0.7)',
 
         // nodes
-        primaryColor: 'hsl(219, 27%, 18%)', // slate-800
+        primaryColor: 'hsl(219, 27%, 18%)', // zinc-800
         primaryTextColor: 'hsl(210, 20%, 92%)',
         primaryBorderColor: 'hsl(200, 30%, 45%)',
 
-        secondaryColor: 'hsl(221, 39%, 23%)', // slate-700
+        secondaryColor: 'hsl(221, 39%, 23%)', // zinc-700
         secondaryTextColor: 'hsl(210, 20%, 92%)',
         secondaryBorderColor: 'hsl(199, 60%, 45%)',
 
-        tertiaryColor: 'hsl(217, 33%, 17%)', // slate-800ish
+        tertiaryColor: 'hsl(217, 33%, 17%)', // zinc-800ish
         tertiaryTextColor: 'hsl(210, 20%, 92%)',
         tertiaryBorderColor: 'hsl(200, 25%, 38%)',
 
@@ -85,7 +85,7 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
       secondBkg: 'hsl(220, 35%, 96%)',
 
       // text
-      textColor: 'hsl(222, 47%, 23%)', // slate-800
+      textColor: 'hsl(222, 47%, 23%)', // zinc-800
       titleColor: 'hsl(222, 47%, 18%)',
 
       // borders and lines
@@ -264,7 +264,7 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
     <div className="w-full overflow-x-auto my-4">
       <div 
         ref={containerRef} 
-        className={`mermaid bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-md transition-colors duration-200 inline-block min-w-full ${className}`}
+        className={`mermaid bg-white dark:bg-zinc-800 p-2 sm:p-4 rounded-md transition-colors duration-200 inline-block min-w-full ${className}`}
         style={{
           backgroundColor: resolvedTheme === 'dark' ? '#1f2937' : '#ffffff',
         }}

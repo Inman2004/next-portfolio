@@ -8,7 +8,7 @@ export const metadata = {
 export default function ProjectsPage() {
   return (
     <>
-    <main className="container mx-auto px-4 py-12 md:py-20">
+    <main className="container bg-zinc-100 dark:bg-zinc-950 mx-auto px-4 py-12 md:py-20">
       <div className="max-w-7xl mx-auto">
       <div className="relative py-2 md:py-4">
             <span 
@@ -23,7 +23,7 @@ export default function ProjectsPage() {
               My Projects
             </h1>
           </div>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-12 text-center max-w-2xl mx-auto">
+        <p className="text-lg text-zinc-600 dark:text-zinc-300 mb-12 text-center max-w-2xl mx-auto">
           A collection of my recent work and side projects. Each project comes with a detailed case study.
         </p>
         <Projects showAll={true} />

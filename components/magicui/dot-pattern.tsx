@@ -232,7 +232,7 @@ export function CssDotPattern({
             return (
               <div
                 key={index}
-                className="absolute rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                className="absolute rounded-full transform -tranzinc-x-1/2 -tranzinc-y-1/2"
                 style={{
                   width: `${size}px`,
                   height: `${size}px`,
@@ -258,13 +258,13 @@ export function CssDotPattern({
           @keyframes pulse {
             0%, 100% {
               opacity: ${isDarkMode ? 0.3 : 0.9};
-              transform: translate(-50%, -50%) scale(${isDarkMode ? 0.9 : 1}) 
+              transform: tranzinc(-50%, -50%) scale(${isDarkMode ? 0.9 : 1}) 
                          rotate(${isDarkMode ? '0deg' : '5deg'});
               filter: ${isDarkMode ? 'none' : 'drop-shadow(0 0 5px rgba(99, 102, 241, 0.5))'};
             }
             50% {
               opacity: ${isDarkMode ? 0.8 : 1};
-              transform: translate(-50%, -50%) scale(${isDarkMode ? 1.1 : 1.4}) 
+              transform: tranzinc(-50%, -50%) scale(${isDarkMode ? 1.1 : 1.4}) 
                          rotate(${isDarkMode ? '0deg' : '-5deg'});
               filter: ${isDarkMode ? 'none' : 'drop-shadow(0 0 15px rgba(99, 102, 241, 0.8))'};
             }

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, MessageCircle, Send, Loader2 } from "lucide-react";
+import { motion as m, AnimatePresence,  } from "framer-motion";
+import { X, MessageCircle, Send, Loader2, Mic, MicOff, Volume2, VolumeX, Square } from "lucide-react";
 import { getTechColor } from "@/components/skillColors";
 import { usePathname } from "next/navigation";
+import ElectricBorder from "./ElectricBorder";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -12,7 +13,7 @@ type ChatMessage = {
 };
 
 const initialAssistantMsg =
-  `Hi! I'm Mimir. Ask about skills, projects, experience, education, or contact.`;
+  `Hi! I'm Mimir. You can ask about me about Immanuvel and i will help you`;
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -24,6 +25,55 @@ export default function ChatWidget() {
     { role: "assistant", content: initialAssistantMsg },
   ]);
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [sessionId, setSessionId] = useState<string>("");
+  const [listening, setListening] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const saved = window.localStorage.getItem('chat_tts_enabled');
+      return saved ? saved === '1' : false;
+    } catch { return false; }
+  });
+  const recognitionRef = useRef<any>(null);
+  const sttBaseRef = useRef<string>("");
+  const sttInterimRef = useRef<string>("");
+
+  // Strip most Markdown/formatting for voice playback
+  const sanitizeForTTS = useCallback((md: string): string => {
+    let t = md || '';
+    // Remove code fences
+    t = t.replace(/```[\s\S]*?```/g, '');
+    // Remove inline code backticks
+    t = t.replace(/`([^`]+)`/g, '$1');
+    // Images -> alt text
+    t = t.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1');
+    // Links -> link text
+    t = t.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    // Bold/italic markers
+    t = t.replace(/\*\*([^*]+)\*\*/g, '$1');
+    t = t.replace(/\*([^*]+)\*/g, '$1');
+    t = t.replace(/__([^_]+)__/g, '$1');
+    t = t.replace(/_([^_]+)_/g, '$1');
+    // Headings: remove #'s, keep text
+    t = t.replace(/^\s{0,3}#{1,6}\s+/gm, '');
+    // Blockquotes
+    t = t.replace(/^\s*>\s?/gm, '');
+    // Lists: remove bullets but keep lines
+    t = t.replace(/^\s*[-*•]\s+/gm, '');
+    // Horizontal rules
+    t = t.replace(/^\s*(?:-{3,}|_{3,}|\*{3,})\s*$/gm, '');
+    // Tables: strip pipes and separator rows
+    t = t.replace(/^\s*\|/gm, '');
+    t = t.replace(/\|/g, ' ');
+    t = t.replace(/^\s*:?[-=]{2,}:?\s*(\|\s*:?[-=]{2,}:?\s*)*$/gm, '');
+    // HTML tags
+    t = t.replace(/<[^>]+>/g, '');
+    // Collapse whitespace
+    t = t.replace(/\s+\n/g, '\n');
+    t = t.replace(/\n{3,}/g, '\n\n');
+    t = t.replace(/[ \t]{2,}/g, ' ');
+    return t.trim();
+  }, []);
 
   // Compact assistant responses by default to avoid unnecessary long text
   const compactForDisplay = useCallback((text: string) => {
@@ -49,6 +99,80 @@ export default function ChatWidget() {
     return t;
   }, []);
 
+  // Initialize SpeechRecognition if available
+  useEffect(() => {
+    const SR: any = (typeof window !== 'undefined') && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+    if (!SR) return;
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+    rec.onresult = (event: any) => {
+      let interim = '';
+      let finalChunk = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalChunk += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      if (interim) {
+        sttInterimRef.current = interim.trim();
+        const composed = `${sttBaseRef.current} ${sttInterimRef.current}`.trim();
+        setInput(composed);
+      }
+      if (finalChunk) {
+        // Commit final chunk into base, clear interim
+        sttBaseRef.current = `${sttBaseRef.current} ${finalChunk}`.trim();
+        sttInterimRef.current = '';
+        setInput(sttBaseRef.current);
+      }
+    };
+    rec.onstart = () => setListening(true);
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    recognitionRef.current = rec;
+    return () => {
+      try { rec.abort(); } catch {}
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  const startListening = useCallback(() => {
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    // Snapshot the current input as the base; clear interim buffer
+    sttBaseRef.current = (typeof input === 'string' ? input : '').trim();
+    sttInterimRef.current = '';
+    try { rec.start(); } catch {}
+  }, [input]);
+
+  const stopListening = useCallback(() => {
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    try { rec.stop(); } catch {}
+  }, []);
+
+  // Text-to-speech playback for assistant replies
+  useEffect(() => {
+    if (!ttsEnabled) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== 'assistant' || !last.content) return;
+    try {
+      window.speechSynthesis.cancel();
+      const cleaned = sanitizeForTTS(last.content);
+      if (!cleaned) return;
+      const utter = new SpeechSynthesisUtterance(cleaned);
+      utter.rate = 1;
+      utter.pitch = 1;
+      utter.volume = 1;
+      window.speechSynthesis.speak(utter);
+    } catch {}
+  }, [messages, ttsEnabled, sanitizeForTTS]);
+
   // Subtle animation variants for assistant text
   const containerVariants = {
     hidden: { opacity: 1 },
@@ -73,6 +197,27 @@ export default function ChatWidget() {
     if (open) scrollToBottom();
   }, [open, messages, scrollToBottom]);
 
+  // Initialize a persistent session ID for the chat
+  useEffect(() => {
+    try {
+      const key = "chat_session_id";
+      let sid: string | null = typeof window !== "undefined" ? window.localStorage.getItem(key) : null;
+      if (!sid) {
+        // Prefer crypto.randomUUID when available, fallback to timestamp-rand
+        const gen: string = (typeof crypto !== "undefined" && (crypto as any).randomUUID)
+          ? (crypto as any).randomUUID()
+          : `sid_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+        sid = gen;
+        if (typeof window !== "undefined" && sid) window.localStorage.setItem(key, sid);
+      }
+      if (sid) setSessionId(sid);
+      else setSessionId(`sid_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
+    } catch {
+      // If localStorage is unavailable, create an ephemeral ID
+      setSessionId(`sid_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`);
+    }
+  }, []);
+
   const canSend = useMemo(() => input.trim().length > 0 && !loading, [input, loading]);
 
   async function sendMessage(e?: React.FormEvent) {
@@ -95,6 +240,7 @@ export default function ChatWidget() {
             .concat(userMsg)
             .map((m) => ({ role: m.role, content: m.content })),
           // Optional: you can pass a system prompt here if needed
+          sessionId,
         }),
       });
 
@@ -212,23 +358,23 @@ export default function ChatWidget() {
     function flushList() {
       if (listBuf.length) {
         blocks.push(
-          <motion.ul key={`ul-${blocks.length}`} className="list-disc ml-4 space-y-0.5" variants={containerVariants} initial="hidden" animate="show">
+          <m.ul key={`ul-${blocks.length}`} className="list-disc ml-4 space-y-0.5" variants={containerVariants} initial="hidden" animate="show">
             {listBuf.map((li, i) => {
               // If line is like "Category: a, b, c" (common in Skills), render badges for RHS
-              const m = li.match(/^([^:]+):\s*(.+)$/);
-              if (m && inSkillsSection) {
-                const label = m[1];
-                const rest = m[2];
+              const match = li.match(/^([^:]+):\s*(.+)$/);
+              if (match && inSkillsSection) {
+                const label = match[1];
+                const rest = match[2];
                 return (
-                  <motion.li key={`li-${i}`} variants={itemVariants}>
+                  <m.li key={`li-${i}`} variants={itemVariants}>
                     <span className="font-medium">{renderInline(label + ":", `li-l-${i}`)}</span>
                     {renderSkillBadges(rest)}
-                  </motion.li>
+                  </m.li>
                 );
               }
-              return <motion.li key={`li-${i}`} variants={itemVariants}>{renderInline(li, `li-${i}`)}</motion.li>;
+              return <m.li key={`li-${i}`} variants={itemVariants}>{renderInline(li, `li-${i}`)}</m.li>;
             })}
-          </motion.ul>
+          </m.ul>
         );
         listBuf = [];
       }
@@ -245,7 +391,7 @@ export default function ChatWidget() {
         currentSection = content.trim();
         inSkillsSection = /skill|technical\s+expertise/i.test(currentSection);
         const HeadingTag = (`h${level}` as keyof JSX.IntrinsicElements);
-        const MotionHeading: any = motion[HeadingTag as unknown as keyof typeof motion] || motion.h3;
+        const MotionHeading: any = (m as any)[HeadingTag] || (m as any).h3;
         blocks.push(
           <MotionHeading key={`h-${blocks.length}`} className="font-semibold text-foreground" variants={itemVariants} initial="hidden" animate="show">{renderInline(content, `h-${i}`)}</MotionHeading>
         );
@@ -264,11 +410,11 @@ export default function ChatWidget() {
       }
       flushList();
       blocks.push(
-        <motion.p key={`p-${blocks.length}`} className="leading-snug text-[13px]" variants={itemVariants} initial="hidden" animate="show">{renderInline(line, `p-${i}`)}</motion.p>
+        <m.p key={`p-${blocks.length}`} className="leading-snug text-[13px]" variants={itemVariants} initial="hidden" animate="show">{renderInline(line, `p-${i}`)}</m.p>
       );
     }
     flushList();
-    return <motion.div className="space-y-2" variants={containerVariants} initial="hidden" animate="show">{blocks}</motion.div>;
+    return <m.div className="space-y-2" variants={containerVariants} initial="hidden" animate="show">{blocks}</m.div>;
   }
 
   // Close when clicking outside
@@ -299,22 +445,30 @@ export default function ChatWidget() {
       {/* Panel */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            ref={containerRef}
-            key="chat-panel"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-20 right-5 z-40 flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white/80 shadow-2xl dark:border-gray-800 dark:bg-gray-900/80 backdrop-blur-lg"
-            role="dialog"
-            aria-label="Chat assistant"
+          <ElectricBorder
+            color="#2563eb"
+            speed={1}
+            chaos={0.5}
+            thickness={2}
+            className="fixed z-50 h-[70vh] w-[min(92vw,380px)] flex flex-col overflow-hidden rounded-xl "
+            style={{ position: 'fixed', right: '1.25rem', bottom: '5rem', left: 'auto', borderRadius: 16 }}
           >
-            <div className="flex items-center justify-between border-b border-gray-200 p-3 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
+            <m.div
+              ref={containerRef}
+              key="chat-panel"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl bg-white/80 shadow-2xl dark:bg-zinc-900/80 backdrop-blur-lg"
+              role="dialog"
+              aria-label="Chat assistant"
+            >
+            <div className="flex items-center justify-between border-b border-zinc-200 p-3 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50">
               <div className="text-sm font-semibold">Mimir</div>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                className="rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -323,27 +477,35 @@ export default function ChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 space-y-3 overflow-y-auto p-3">
-              {messages.map((m, i) => {
-                const isAssistant = m.role === "assistant";
-                const isLong = isAssistant && (m.content?.length || 0) > 600;
+              {/* Listening indicator */}
+              {listening && (
+                <div className="flex">
+                  <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600 dark:bg-red-900/30 dark:text-red-300">
+                    <Mic className="h-3.5 w-3.5" /> Listening...
+                  </div>
+                </div>
+              )}
+              {messages.map((msg, i) => {
+                const isAssistant = msg.role === "assistant";
+                const isLong = isAssistant && (msg.content?.length || 0) > 600;
                 const isExpanded = !!expanded[i];
                 return (
                   <div key={i} className="flex">
                     <div
                       className={
-                        m.role === "user"
+                        msg.role === "user"
                           ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"
-                          : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-gray-100 px-3 py-1.5 text-sm text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                          : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-1.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
                       }
                     >
                       <div className={(!isExpanded && isLong) ? "relative max-h-56 overflow-hidden" : undefined}>
                         {isAssistant ? (
-                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                            {renderMarkdown(isExpanded ? m.content : compactForDisplay(m.content))}
-                          </motion.div>
-                        ) : m.content}
+                          <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                            {renderMarkdown(isExpanded ? msg.content : compactForDisplay(msg.content))}
+                          </m.div>
+                        ) : msg.content}
                         {(!isExpanded && isLong) && (
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-gray-100 to-transparent dark:from-gray-800" />
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-100 to-transparent dark:from-zinc-800" />
                         )}
                       </div>
                       {isLong && (
@@ -363,7 +525,7 @@ export default function ChatWidget() {
               })}
               {loading && (
                 <div className="flex">
-                  <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                  <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Thinking...
                   </div>
@@ -373,7 +535,7 @@ export default function ChatWidget() {
             </div>
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="border-t border-gray-200 p-2 dark:border-gray-800">
+            <form onSubmit={sendMessage} className="border-t border-zinc-200 p-2 dark:border-zinc-800">
               <div className="flex items-center gap-2">
                 <input
                   value={input}
@@ -384,8 +546,39 @@ export default function ChatWidget() {
                     }
                   }}
                   placeholder="Type your message..."
-                  className="flex-1 rounded-md border border-gray-300 bg-white/90 px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-900/90 dark:text-gray-100 dark:focus:border-blue-500 backdrop-blur-xl"
+                  className="flex-1 rounded-md border border-zinc-300 bg-white/90 px-3 py-2 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-100 dark:focus:border-blue-500 backdrop-blur-xl"
                 />
+                {/* Mic button */}
+                <button
+                  type="button"
+                  onClick={() => (listening ? stopListening() : startListening())}
+                  className={`inline-flex items-center justify-center rounded-md border px-2.5 py-2 text-sm font-medium shadow-sm transition-colors ${
+                    listening
+                      ? 'border-red-300 bg-red-100 text-red-700 hover:bg-red-200 dark:border-red-600/50 dark:bg-red-900/30 dark:text-red-300'
+                      : 'border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
+                  }`}
+                  title={listening ? 'Stop voice input' : 'Start voice input'}
+                  aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+                >
+                  {listening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+                {/* TTS toggle */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !ttsEnabled;
+                    setTtsEnabled(next);
+                    try { window.localStorage.setItem('chat_tts_enabled', next ? '1' : '0'); } catch {}
+                    if (!next && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                      try { window.speechSynthesis.cancel(); } catch {}
+                    }
+                  }}
+                  className="inline-flex items-center justify-center rounded-md border border-zinc-300 bg-white px-2.5 py-2 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                  title={ttsEnabled ? 'Disable voice playback' : 'Enable voice playback'}
+                  aria-label={ttsEnabled ? 'Disable voice playback' : 'Enable voice playback'}
+                >
+                  {ttsEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </button>
                 <button
                   type="submit"
                   disabled={!canSend}
@@ -396,7 +589,8 @@ export default function ChatWidget() {
                 </button>
               </div>
             </form>
-          </motion.div>
+            </m.div>
+          </ElectricBorder>
         )}
       </AnimatePresence>
     </>

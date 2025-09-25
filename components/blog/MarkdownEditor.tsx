@@ -833,7 +833,7 @@ function MarkdownEditorComponent({
       style={{
         top: `${toolbarPosition.top}px`,
         left: `${toolbarPosition.left}px`,
-        transform: 'translateZ(0) translateY(0)',
+        transform: 'tranzincZ(0) tranzincY(0)',
         willChange: 'transform, opacity',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',

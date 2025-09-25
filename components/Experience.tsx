@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { Briefcase, Calendar, Clock, ExternalLink, MapPin, X, CheckCircle2, ChevronDown, ChevronRight, Loader2, FileSearch, FileCheck2, CalendarCheck2, CalendarClock, Smile } from 'lucide-react';
 import { SkillBadge } from '@/components/skillColors';
 import Image from 'next/image';
@@ -85,13 +85,13 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
       case 'resigned':
       case 'contract_ended':
         statusProps = {
-          className: 'bg-gray-100/50 text-gray-800 dark:bg-gray-700/50 dark:text-gray-300/50',
+          className: 'bg-zinc-100/50 text-zinc-800 dark:bg-zinc-700/50 dark:text-zinc-300/50',
           icon: <X className="w-3 h-3" />
         };
         break;
       default:
         statusProps = {
-          className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+          className: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-300',
           icon: <Clock className="w-3 h-3" />
         };
     }
@@ -103,8 +103,8 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
       // Add arrow connector after each status except the last one
       connector: index < total - 1 ? (
         <div className="relative h-full flex items-center px-1">
-          <div className="w-2 h-px bg-gray-300 dark:bg-gray-600"></div>
-          <ChevronRight className="w-3 h-3 text-gray-400 dark:text-gray-500 -ml-1 flex-shrink-0" />
+          <div className="w-2 h-px bg-zinc-300 dark:bg-zinc-600"></div>
+          <ChevronRight className="w-3 h-3 text-zinc-400 dark:text-zinc-500 -ml-1 flex-shrink-0" />
         </div>
       ) : null
     };
@@ -174,32 +174,32 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-400/20 to-purple-400/20 dark:from-blue-500/20 dark:to-purple-500/20 ml-6"></div>
       
       {/* Timeline dot */}
-      <div className="absolute left-0 w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 -translate-x-1/2 z-10 flex items-center justify-center">
-        <div className="w-3 h-3 bg-white dark:bg-gray-50 rounded-full"></div>
+      <div className="absolute left-0 w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 -tranzinc-x-1/2 z-10 flex items-center justify-center">
+        <div className="w-3 h-3 bg-white dark:bg-zinc-50 rounded-full"></div>
       </div>
 
       <div className="ml-12 w-full">
         {/* Date for mobile */}
-        <div className="md:hidden text-sm text-gray-600 dark:text-gray-400 mb-2">
+        <div className="md:hidden text-sm text-zinc-600 dark:text-zinc-400 mb-2">
           {exp.startDate} - {exp.endDate}
         </div>
 
-        <motion.div 
-          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-gray-900 hover:border-blue-500 transition-all duration-300 cursor-pointer"
+        <m.div 
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-zinc-900 hover:border-blue-500 transition-all duration-300 cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
           whileHover={{ y: -2 }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-100 dark:border-white/10">
+              <div className="w-12 h-12 bg-zinc-50 dark:bg-white/5 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-zinc-100 dark:border-white/10">
                 {renderLogo()}
                 <div className="logo-fallback w-full h-full hidden items-center justify-center">
-                  <Briefcase className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <Briefcase className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
                 </div>
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{exp.role}</h3>
+                  <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">{exp.role}</h3>
                   <div className="flex items-center">
                     {exp.status?.map((status, i, arr) => {
                       const { className, icon, text, connector } = getStatusBadgeProps(status, i, arr.length);
@@ -218,7 +218,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
                     })}
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 mt-1">
                   {exp.companyUrl ? (
                     <a 
                       href={exp.companyUrl} 
@@ -234,7 +234,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
                     <span>{exp.company}</span>
                   )}
                   <span>•</span>
-                  <span className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
+                  <span className="flex items-center gap-1 text-zinc-700 dark:text-zinc-300">
                     <MapPin className="w-3.5 h-3.5" />
                     {exp.location}
                   </span>
@@ -243,26 +243,26 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
             </div>
             
             {/* Date for desktop */}
-            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-white/5 rounded-full px-4 py-1.5">
+            <div className="hidden md:flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-white/5 rounded-full px-4 py-1.5">
               <Calendar className="w-4 h-4" />
               <span>{exp.startDate} - {exp.endDate}</span>
             </div>
             
-            <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`h-4 w-4 text-zinc-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
           </div>
           
-          <motion.div 
+          <m.div 
             className="overflow-hidden"
             initial={false}
             animate={{ height: isExpanded ? 'auto' : 0, marginTop: isExpanded ? '1rem' : 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="pt-4 border-t border-gray-100 dark:border-white/5">
-              <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+            <div className="pt-4 border-t border-zinc-100 dark:border-white/5">
+              <ul className="space-y-2 text-zinc-600 dark:text-zinc-300">
                 {exp.description.map((item, i) => (
                   <li key={`${exp.id}-desc-${i}`} className="flex items-start gap-2">
                     <span className="text-blue-500 dark:text-blue-400 mt-1">•</span>
-                    <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                    <span className="text-zinc-700 dark:text-zinc-300">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -277,8 +277,8 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
                 ))}
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </div>
     </div>
   );
@@ -324,9 +324,9 @@ export default function Experience() {
   }, []);
   
   return (
-    <section id="experience" className="py-16 md:py-24 rounded-lg bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-950">
+    <section id="experience" className="py-16 md:py-24 rounded-lg bg-white dark:bg-gradient-to-b dark:from-zinc-900 dark:to-zinc-950">
       <div className="container mx-auto px-4">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -336,15 +336,15 @@ export default function Experience() {
           <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 mb-4">
             Work Experience
           </h2>
-          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
             My professional journey and the companies I've worked with
           </p>
-        </motion.div>
+        </m.div>
 
         <div className="relative">
           {loading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-500 dark:text-gray-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-zinc-500 dark:text-zinc-400" />
             </div>
           ) : error ? (
             <div className="text-center py-8 text-red-400">
@@ -353,7 +353,7 @@ export default function Experience() {
           ) : (
             <div className="space-y-12">
               {experiences.map((exp, index) => (
-                <motion.div
+                <m.div
                   key={`exp-${exp.id}-${index}`}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -364,7 +364,7 @@ export default function Experience() {
                     exp={exp} 
                     isLast={index === experiences.length - 1} 
                   />
-                </motion.div>
+                </m.div>
               ))}
             </div>
           )}

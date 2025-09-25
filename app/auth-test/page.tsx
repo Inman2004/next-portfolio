@@ -33,9 +33,9 @@ export default function AuthTestPage() {
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Auth Test Page</h1>
       
-      <div className="bg-gray-900 p-6 rounded-lg">
+      <div className="bg-zinc-900 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Firebase Auth</h2>
-        <pre className="bg-gray-800 p-4 rounded overflow-auto text-sm">
+        <pre className="bg-zinc-800 p-4 rounded overflow-auto text-sm">
           {JSON.stringify({ firebaseUser }, null, 2)}
         </pre>
       </div>

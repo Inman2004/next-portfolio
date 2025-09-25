@@ -399,7 +399,7 @@ const ProfileImageUpload = ({
     <div className={`relative ${sizeClasses[size]} ${className}`}>
       <div 
         className={`relative w-full h-full rounded-full overflow-hidden border-2 border-dashed ${
-          isDragging ? 'border-blue-500 bg-blue-50' : 'border-blue-500 dark:border-gray-700'
+          isDragging ? 'border-blue-500 bg-blue-50' : 'border-blue-500 dark:border-zinc-700'
         } transition-colors duration-200 flex items-center justify-center cursor-pointer`}
         onClick={() => !isUploading && fileInputRef.current?.click()}
         onDragOver={handleDragOver}
@@ -407,9 +407,9 @@ const ProfileImageUpload = ({
         onDrop={handleDrop}
       >
         {isUploading ? (
-          <div className="flex flex-col items-center justify-center w-full h-full bg-gray-100 dark:bg-gray-800">
+          <div className="flex flex-col items-center justify-center w-full h-full bg-zinc-100 dark:bg-zinc-800">
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-            <span className="mt-2 text-sm text-gray-500">Uploading...</span>
+            <span className="mt-2 text-sm text-zinc-500">Uploading...</span>
           </div>
         ) : displayImage ? (
           <>
@@ -429,9 +429,9 @@ const ProfileImageUpload = ({
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center w-full h-full bg-gray-100 dark:bg-gray-800">
-            <User className="w-12 h-12 text-gray-400" />
-            <span className="mt-2 text-sm text-gray-500 text-center px-2">
+          <div className="flex flex-col items-center justify-center w-full h-full bg-zinc-100 dark:bg-zinc-800">
+            <User className="w-12 h-12 text-zinc-400" />
+            <span className="mt-2 text-sm text-zinc-500 text-center px-2">
               {isDragging ? 'Drop image here' : 'Click or drag image to upload'}
             </span>
           </div>

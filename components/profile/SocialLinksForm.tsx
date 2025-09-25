@@ -83,13 +83,13 @@ export function SocialLinksForm({ initialData }: { initialData: SocialLinksFormD
                 </svg>
               </div>
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900">Success!</p>
-                <p className="mt-1 text-sm text-gray-500">Your social links have been updated.</p>
+                <p className="text-sm font-medium text-zinc-900">Success!</p>
+                <p className="mt-1 text-sm text-zinc-500">Your social links have been updated.</p>
               </div>
               <div className="ml-4 flex-shrink-0 flex">
                 <button
                   onClick={() => toast.dismiss(t.id)}
-                  className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="bg-white rounded-md inline-flex text-zinc-400 hover:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <span className="sr-only">Close</span>
                   <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -177,12 +177,12 @@ export function SocialLinksForm({ initialData }: { initialData: SocialLinksFormD
     return (
       <div className="space-y-2 w-full">
         <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-gray-500 flex-shrink-0" />
+          <Icon className="w-4 h-4 text-zinc-500 flex-shrink-0" />
           <Label htmlFor={id} className="whitespace-nowrap">{label}</Label>
         </div>
         <div className="relative w-full">
           {prefix && (
-            <div className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm">
+            <div className="absolute inset-y-0 left-3 flex items-center text-zinc-500 text-sm">
               {prefix}
             </div>
           )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { X } from 'lucide-react';
 import Link from 'next/link';
 
@@ -11,10 +11,10 @@ type TermsAndConditionsProps = {
 
 export default function TermsAndConditions({ onClose, isModal = false }: TermsAndConditionsProps) {
   const content = (
-    <article className="max-w-4xl mx-auto p-6 space-y-10 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl">
+    <article className="max-w-4xl mx-auto p-6 space-y-10 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl">
       <header className="flex items-center justify-between">
         <h1 className="text-3xl text-primary font-bold mb-4">Terms and Conditions</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Last updated: {new Date().toLocaleDateString()}
         </p>
       </header>
@@ -86,8 +86,8 @@ export default function TermsAndConditions({ onClose, isModal = false }: TermsAn
         </p>
       </section>
 
-      <footer className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+      <footer className="mt-12 pt-6 border-t border-zinc-200 dark:border-zinc-700">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           By using this website, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions.
         </p>
       </footer>
@@ -97,22 +97,22 @@ export default function TermsAndConditions({ onClose, isModal = false }: TermsAn
   if (isModal) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 dark:bg-black/80 backdrop-blur-sm">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl"
+          className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl"
         >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-white/5"
+            className="absolute top-4 right-4 p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white transition-colors rounded-full hover:bg-zinc-100 dark:hover:bg-white/5"
             aria-label="Close terms"
           >
             <X className="w-5 h-5" />
           </button>
           {content}
-        </motion.div>
+        </m.div>
       </div>
     );
   }

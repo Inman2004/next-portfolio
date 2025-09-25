@@ -61,7 +61,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
               )}>
                 {project.status.replace('-', ' ')}
               </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 {formatDate(project.startDate)} - {formatDate(project.endDate)}
               </span>
             </div>
@@ -113,7 +113,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
           </header>
 
           <div className="space-y-12">
-            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+            <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
               <div className="relative h-64 md:h-96 w-full">
                 <Image
                   src={project.images[0]}
@@ -127,7 +127,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
 
             <div className="prose dark:prose-invert max-w-none">
               <h2>About This Project</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
+              <p className="text-lg text-zinc-600 dark:text-zinc-300">
                 {project.description}
               </p>
               
@@ -149,7 +149,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                 <h2>Gallery</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                   {project.images.slice(1).map((image, index) => (
-                    <div key={index} className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+                    <div key={index} className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
                       <div className="relative h-48 w-full">
                         <Image
                           src={image}

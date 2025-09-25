@@ -54,8 +54,8 @@ export default function MembershipNav() {
   if (isLoading) {
     return (
       <div className="flex items-center gap-4">
-        <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-20 rounded"></div>
-        <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-8 rounded-full"></div>
+        <div className="animate-pulse bg-zinc-200 dark:bg-zinc-700 h-8 w-20 rounded"></div>
+        <div className="animate-pulse bg-zinc-200 dark:bg-zinc-700 h-8 w-8 rounded-full"></div>
       </div>
     );
   }

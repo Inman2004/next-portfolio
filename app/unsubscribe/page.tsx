@@ -69,7 +69,7 @@ export default function UnsubscribePage() {
             <h2 className="text-2xl font-bold text-green-700 dark:text-green-300 mb-2">
               Successfully Unsubscribed
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
               {message}
             </p>
             <Button asChild>
@@ -85,7 +85,7 @@ export default function UnsubscribePage() {
             <h2 className="text-2xl font-bold text-red-700 dark:text-red-300 mb-2">
               Unsubscribe Failed
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
               {message}
             </p>
             <Button asChild>
@@ -97,11 +97,11 @@ export default function UnsubscribePage() {
       case 'not-found':
         return (
           <div className="text-center">
-            <Mail className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+            <Mail className="h-16 w-16 text-zinc-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-zinc-700 dark:text-zinc-300 mb-2">
               Invalid Unsubscribe Link
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
               {message}
             </p>
             <Button asChild>

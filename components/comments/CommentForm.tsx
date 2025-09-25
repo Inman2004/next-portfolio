@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { Smile, Image as ImageIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
@@ -78,16 +78,16 @@ export const CommentForm = ({
 
   const formClasses = [
     'w-full min-h-[100px] p-4 pr-12 rounded-lg border',
-    'bg-white/90 dark:bg-gray-900/50 border-gray-700/80 dark:border-blue-300/50 backdrop-blur-sm',
-    'text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400',
+    'bg-white/90 dark:bg-zinc-900/50 border-zinc-700/80 dark:border-blue-300/50 backdrop-blur-sm',
+    'text-zinc-800 dark:text-zinc-100 placeholder-zinc-500 dark:placeholder-zinc-400',
     'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent',
     'resize-none transition-all duration-200',
-    'border-gray-400/80 dark:border-gray-700/50',
+    'border-zinc-400/80 dark:border-zinc-700/50',
     'dark:focus:ring-blue-500/50',
     'shadow-sm hover:shadow-md transition-shadow',
     'text-base leading-relaxed',
     'font-normal tracking-normal',
-    'focus:bg-white dark:focus:bg-gray-900/60'
+    'focus:bg-white dark:focus:bg-zinc-900/60'
   ].join(' ');
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -119,19 +119,19 @@ export const CommentForm = ({
             <button
               type="button"
               onClick={toggleEmojiPicker}
-              className="p-1.5 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors"
+              className="p-1.5 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition-colors"
               aria-label="Add emoji"
               disabled={isSubmitting}
             >
-              <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Smile className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
             </button>
             <button
               type="button"
-              className="p-1.5 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors"
+              className="p-1.5 rounded-full hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition-colors"
               aria-label="Add image"
               disabled
             >
-              <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ImageIcon className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
             </button>
           </div>
         </div>
@@ -140,13 +140,13 @@ export const CommentForm = ({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
               disabled={isSubmitting}
             >
               Cancel
             </button>
           )}
-          <motion.button
+          <m.button
             type="submit"
             disabled={!content.trim() || isSubmitting}
             whileTap={{ scale: 0.98 }}
@@ -157,7 +157,7 @@ export const CommentForm = ({
             }`}
           >
             {isSubmitting ? 'Posting...' : 'Post Comment'}
-          </motion.button>
+          </m.button>
         </div>
       </form>
       

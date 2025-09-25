@@ -57,7 +57,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
     };
 
     return (
-      <motion.div
+      <m.div
         ref={ref}
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
@@ -69,7 +69,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
         })}
       >
         {renderChildren()}
-      </motion.div>
+      </m.div>
     );
   },
 );
@@ -118,7 +118,7 @@ const DockIcon = ({
   });
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       style={{ width: scaleSize, height: scaleSize, padding }}
       className={cn(
@@ -128,7 +128,7 @@ const DockIcon = ({
       {...props}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 };
 

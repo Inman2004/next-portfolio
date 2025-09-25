@@ -27,10 +27,10 @@
 
   @keyframes float {
     0%, 100% {
-      transform: translateY(0);
+      transform: tranzincY(0);
     }
     50% {
-      transform: translateY(-10px);
+      transform: tranzincY(-10px);
     }
   }
 }
@@ -38,24 +38,25 @@
 @layer base {
   :root {
     --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.141 0.005 285.823);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.141 0.005 285.823);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.141 0.005 285.823);
-    --primary: oklch(0.21 0.006 285.885);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.967 0.001 286.375);
-    --secondary-foreground: oklch(0.21 0.006 285.885);
-    --muted: oklch(0.967 0.001 286.375);
-    --muted-foreground: oklch(0.552 0.016 285.938);
-    --accent: oklch(0.967 0.001 286.375);
-    --accent-foreground: oklch(0.21 0.006 285.885);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.92 0.004 286.32);
-    --input: oklch(0.92 0.004 286.32);
-    --ring: oklch(0.705 0.015 286.067);
+    /* Light theme - zinc scale */
+    --background: 250 250 250; /* zinc-50 */
+    --foreground: 24 24 27;    /* zinc-900 */
+    --card: 255 255 255;       /* white */
+    --card-foreground: 24 24 27; /* zinc-900 */
+    --popover: 255 255 255;    /* white */
+    --popover-foreground: 24 24 27; /* zinc-900 */
+    --primary: 24 24 27;       /* zinc-900 */
+    --primary-foreground: 250 250 250; /* zinc-50 */
+    --secondary: 244 244 245;  /* zinc-100 */
+    --secondary-foreground: 24 24 27; /* zinc-900 */
+    --muted: 244 244 245;      /* zinc-100 */
+    --muted-foreground: 113 113 122; /* zinc-500 */
+    --accent: 244 244 245;     /* zinc-100 */
+    --accent-foreground: 24 24 27; /* zinc-900 */
+    --destructive: 220 38 38;  /* red-600 */
+    --border: 228 228 231;     /* zinc-200 */
+    --input: 228 228 231;      /* zinc-200 */
+    --ring: 161 161 170;       /* zinc-400 */
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -72,25 +73,26 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    /* Dark theme - zinc scale */
+    --background: 9 9 11;      /* zinc-950 */
+    --foreground: 244 244 245; /* zinc-100 */
+    --card: 24 24 27;          /* zinc-900 */
+    --card-foreground: 244 244 245; /* zinc-100 */
+    --popover: 24 24 27;       /* zinc-900 */
+    --popover-foreground: 244 244 245; /* zinc-100 */
+    --primary: 244 244 245;    /* zinc-100 */
+    --primary-foreground: 24 24 27; /* zinc-900 */
+    --secondary: 39 39 42;     /* zinc-800 */
+    --secondary-foreground: 244 244 245; /* zinc-100 */
+    --muted: 39 39 42;         /* zinc-800 */
+    --muted-foreground: 161 161 170; /* zinc-400 */
+    --accent: 39 39 42;        /* zinc-800 */
+    --accent-foreground: 244 244 245; /* zinc-100 */
+    --destructive: 239 68 68;  /* red-500 */
+    --destructive-foreground: 255 255 255; /* white */
+    --border: 63 63 70;        /* zinc-700 */
+    --input: 63 63 70;         /* zinc-700 */
+    --ring: 82 82 91;          /* zinc-600 */
 
     /* Additional dark theme specific variables */
     --sidebar: 222.2 84% 4.9%;
@@ -318,12 +320,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-700/50 rounded-full border-2 border-transparent bg-clip-padding;
+  @apply bg-zinc-700/50 rounded-full border-2 border-transparent bg-clip-padding;
   transition: background-color 0.2s ease-in-out;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-600/70;
+  @apply bg-zinc-600/70;
 }
 
 /* Thin variant */
@@ -333,7 +335,7 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  @apply bg-gray-700/50;
+  @apply bg-zinc-700/50;
 }
 
 .scrollbar-thumb-rounded-full::-webkit-scrollbar-thumb {
@@ -341,12 +343,12 @@
 }
 
 /* Color variants */
-.scrollbar-thumb-gray-700\/50::-webkit-scrollbar-thumb {
-  @apply bg-gray-700/50;
+.scrollbar-thumb-zinc-700\/50::-webkit-scrollbar-thumb {
+  @apply bg-zinc-700/50;
 }
 
-.hover\:scrollbar-thumb-gray-600\/50:hover::-webkit-scrollbar-thumb {
-  @apply bg-gray-600/50;
+.hover\:scrollbar-thumb-zinc-600\/50:hover::-webkit-scrollbar-thumb {
+  @apply bg-zinc-600/50;
 }
 
 .scrollbar-track-transparent::-webkit-scrollbar-track {
@@ -431,24 +433,24 @@
 }
 
 .dark {
-  --background: 17 24 39;    /* gray-900 */
-  --foreground: 243 244 246; /* gray-100 */
-  --card: 31 41 55;         /* gray-800 */
-  --card-foreground: 255 255 255; /* white */
+  --background: 17 24 39;    /* zinc-900 */
+  --foreground: 243 244 246; /* zinc-100 */
+  --card: 39 39 42;         /* zinc-800 */
+  --card-foreground: 244 244 245; /* zinc-100 */
   --popover: 240 10% 3.9%;
   --popover-foreground: 255 255 255; /* white */
   --primary: 191 219 254;    /* lighter blue-200 for dark mode */
-  --primary-foreground: 15 23 42; /* slate-900 */
-  --secondary: 55 65 81;    /* gray-700 */
+  --primary-foreground: 15 23 42; /* zinc-900 */
+  --secondary: 55 65 81;    /* zinc-700 */
   --secondary-foreground: 255 255 255; /* white */
-  --muted: 55 65 81;        /* gray-700 */
-  --muted-foreground: 156 163 175; /* gray-400 */
+  --muted: 55 65 81;        /* zinc-700 */
+  --muted-foreground: 156 163 175; /* zinc-400 */
   --accent: 191 219 254;    /* Match primary for dark mode */
   --accent-foreground: 255 255 255; /* white */
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 255 255 255; /* white */
-  --border: 55 65 81;       /* gray-700 */
-  --input: 55 65 81;        /* gray-700 */
+  --border: 55 65 81;       /* zinc-700 */
+  --input: 55 65 81;        /* zinc-700 */
   --ring: 191 219 254;      /* Match primary for dark mode */
 
   /* Dark Theme Gradients */
@@ -566,18 +568,18 @@
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   @keyframes marquee {
   from {
-    transform: translateX(0);
+    transform: tranzincX(0);
     }
   to {
-    transform: translateX(calc(-100% - var(--gap)));
+    transform: tranzincX(calc(-100% - var(--gap)));
     }
   }
   @keyframes marquee-vertical {
   from {
-    transform: translateY(0);
+    transform: tranzincY(0);
     }
   to {
-    transform: translateY(calc(-100% - var(--gap)));
+    transform: tranzincY(calc(-100% - var(--gap)));
     }
   }
   --animate-shine: shine var(--duration) infinite linear
@@ -610,6 +612,14 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
 

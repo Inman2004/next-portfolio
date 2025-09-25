@@ -54,6 +54,68 @@ async function generateHuggingFaceResponse(prompt: string): Promise<string> {
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 
+// In-memory per-session conversation memory
+type SessionMemory = {
+  summary: string;
+  turns: Msg[];
+  updatedAt: number;
+};
+
+const sessionStore = new Map<string, SessionMemory>();
+const MAX_TURNS = 12; // keep a short-term buffer
+const SUMMARY_TARGET_CHARS = 900; // running summary target length
+
+function getOrCreateSession(sessionId?: string | null): SessionMemory | null {
+  if (!sessionId) return null;
+  let mem = sessionStore.get(sessionId) || null;
+  if (!mem) {
+    mem = { summary: "", turns: [], updatedAt: Date.now() };
+    sessionStore.set(sessionId, mem);
+  }
+  return mem;
+}
+
+function clampTurns(turns: Msg[]): Msg[] {
+  return turns.slice(-MAX_TURNS);
+}
+
+function summarizeTurns(existingSummary: string, turns: Msg[]): string {
+  // Lightweight extractive summary: take key sentences from last few exchanges
+  const text = turns
+    .map((t) => `${t.role === 'user' ? 'User' : 'Assistant'}: ${t.content}`)
+    .join('\n');
+  const combined = existingSummary ? `${existingSummary}\n${text}` : text;
+  if (combined.length <= SUMMARY_TARGET_CHARS) return combined;
+  // Heuristic trimming: keep beginning context, last Q/A, and remove filler whitespace
+  const head = combined.slice(0, Math.floor(SUMMARY_TARGET_CHARS * 0.5));
+  const tail = combined.slice(-Math.floor(SUMMARY_TARGET_CHARS * 0.45));
+  return `${head}\n...\n${tail}`.replace(/\n{3,}/g, '\n\n');
+}
+
+function buildHistoryBlock(mem: SessionMemory, extraUser?: string): string {
+  const recent = extraUser
+    ? clampTurns(mem.turns.concat([{ role: 'user', content: extraUser }]))
+    : clampTurns(mem.turns);
+  const lines = recent.map((t) => `- ${t.role}: ${t.content}`);
+  const summary = mem.summary?.trim();
+  return [
+    summary ? `Conversation Summary:\n${summary}` : null,
+    lines.length ? `Recent Turns:\n${lines.join('\n')}` : null,
+  ].filter(Boolean).join('\n\n');
+}
+
+function updateSessionMemory(sessionId: string | undefined, userText: string, assistantText: string) {
+  if (!sessionId) return;
+  const mem = getOrCreateSession(sessionId)!;
+  mem.turns = clampTurns(mem.turns.concat(
+    { role: 'user', content: userText },
+    { role: 'assistant', content: assistantText },
+  ));
+  mem.summary = summarizeTurns(mem.summary, mem.turns.slice(-6));
+  mem.updatedAt = Date.now();
+  sessionStore.set(sessionId, mem);
+}
+
 // Response cache for common queries
 const responseCache = new Map<string, { response: string, timestamp: number }>();
 const RESPONSE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
@@ -111,16 +173,19 @@ function respond(reply: string, source?: string, cacheHit?: boolean) {
 }
 
 // RAG-based response system
-async function generateRAGReply(query: string): Promise<string> {
+async function generateRAGReply(query: string, historyBlock?: string): Promise<string> {
   try {
     // Get relevant context from vector database
     const context = getRelevantContext(query, 3);
     
     // Generate RAG prompt
     const prompt = generateRAGPrompt(query, context);
+    const finalPrompt = historyBlock && historyBlock.trim().length
+      ? `${historyBlock}\n\n${prompt}`
+      : prompt;
     
     // Generate response
-    let response = await generateHuggingFaceResponse(prompt);
+    let response = await generateHuggingFaceResponse(finalPrompt);
 
     // If Hugging Face fails, fall back to the rule-based system
     if (!response) {
@@ -795,7 +860,7 @@ function answerExperience() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as { messages: Msg[] };
+    const body = (await req.json()) as { messages: Msg[]; sessionId?: string };
     if (!body?.messages || !Array.isArray(body.messages)) {
       return new Response(JSON.stringify({ error: "Invalid request body" }), {
         status: 400,
@@ -805,6 +870,11 @@ export async function POST(req: NextRequest) {
 
     const query = lastUserMessage(body.messages) || "";
     const rawLower = query.toLowerCase().trim();
+
+    // Prepare session memory and history block
+    const sessionId = body.sessionId || undefined;
+    const mem = getOrCreateSession(sessionId);
+    const historyBlock = mem ? buildHistoryBlock(mem, query) : "";
     
     // Handle greetings first
     if (isGreeting(rawLower)) {
@@ -841,9 +911,11 @@ export async function POST(req: NextRequest) {
 
     // RAG-based reply system for all queries
     if (query.trim()) {
-      const ragReply = await generateRAGReply(query);
+      const ragReply = await generateRAGReply(query, historyBlock);
       if (ragReply) {
         cacheResponse(query, ragReply);
+        // Persist conversation memory
+        if (sessionId) updateSessionMemory(sessionId, query, ragReply);
         return respond(ragReply, "rag-system", false);
       }
     }
@@ -927,6 +999,7 @@ export async function POST(req: NextRequest) {
     }
 
     const final = `${reply}\n\nNeed details on skills, experience, projects, or contact?`;
+    if (sessionId) updateSessionMemory(sessionId, query, final);
     return new Response(JSON.stringify({ reply: final }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

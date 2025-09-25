@@ -70,10 +70,10 @@ function update(props: any) {
   if (!popup) return;
 
   popup.innerHTML = `
-    <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden w-64">
+    <div class="bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg overflow-hidden w-64">
       ${items.map((item: MentionItem) => `
         <button 
-          class="w-full text-left px-4 py-2 hover:bg-gray-700 flex items-center gap-2"
+          class="w-full text-left px-4 py-2 hover:bg-zinc-700 flex items-center gap-2"
           data-id="${item.id}"
         >
           ${item.avatar ? `
@@ -81,7 +81,7 @@ function update(props: any) {
           ` : ''}
           <div>
             <div class="text-sm font-medium text-white">${item.label}</div>
-            <div class="text-xs text-gray-400">${item.email}</div>
+            <div class="text-xs text-zinc-400">${item.email}</div>
           </div>
         </button>
       `).join('')}

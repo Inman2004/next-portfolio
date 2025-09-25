@@ -3,8 +3,8 @@ import Link from 'next/link';
 
 export default function UnauthorizedPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md space-y-6 rounded-lg bg-white dark:bg-gray-800 p-8 shadow-md">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4">
+      <div className="w-full max-w-md space-y-6 rounded-lg bg-white dark:bg-zinc-800 p-8 shadow-md">
         <div className="space-y-4 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/10">
             <svg
@@ -21,8 +21,8 @@ export default function UnauthorizedPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Access Denied</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Access Denied</h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             You don't have permission to access the admin dashboard. Only the main administrator account
             (rvimman) can access this area.
           </p>
@@ -32,7 +32,7 @@ export default function UnauthorizedPage() {
             <Link href="/">Return to Home</Link>
           </Button>
         </div>
-        <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-center text-sm text-zinc-500 dark:text-zinc-400">
           <p>If you believe this is a mistake, please contact support.</p>
         </div>
       </div>

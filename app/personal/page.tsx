@@ -104,10 +104,10 @@ const Personel = () => {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                   Immanuvel B
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 mt-2">
+                <p className="text-zinc-600 dark:text-zinc-300 mt-2">
                   Web Developer & Tech Enthusiast
                 </p>
-                <p className="mt-4 text-gray-700 dark:text-gray-200">
+                <p className="mt-4 text-zinc-700 dark:text-zinc-200">
                   Passionate about creating beautiful, functional web experiences.
                   Love learning new technologies and building cool stuff!
                 </p>
@@ -127,12 +127,12 @@ const Personel = () => {
                   { icon: <Briefcase size={18} className="text-lime-500" />, label: 'Work Status', value: 'Unemployed' },
                   { icon: <Languages size={18} className="text-teal-500" />, label: 'Languages', value: 'English, Tamil' },
                 ].map((item, index) => (
-                  <div key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                  <div key={index} className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-sm border border-zinc-100 dark:border-zinc-700">
                     <div className="flex items-center gap-2">
                       {item.icon}
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">{item.label}</p>
                     </div>
-                    <p className="font-medium text-gray-700/80 dark:text-gray-200/80">{item.value}</p>
+                    <p className="font-medium text-zinc-700/80 dark:text-zinc-200/80">{item.value}</p>
                   </div>
                 ))}
               </div>
@@ -143,7 +143,7 @@ const Personel = () => {
                 disabled={loading}
                 className={`inline-flex items-center px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
                   loading
-                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                    ? 'bg-zinc-400 dark:bg-zinc-600 cursor-not-allowed'
                     : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg'
                 }`}
               >
@@ -227,26 +227,26 @@ const Personel = () => {
                 items: ['Non-veg', 'Spicy', 'All Deserts'] 
               },
             ].map((section, index) => (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+              <div key={index} className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm overflow-hidden border border-zinc-100 dark:border-zinc-700">
                 <button
                   onClick={() => toggleSection(section.id)}
-                  className="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                 >
                   <h3 className="text-lg text-primary font-medium flex items-center gap-2">
                     {section.icon}
                     <span>{section.title}</span>
                   </h3>
                   {expandedSections[section.id] ? (
-                    <ChevronUp className="text-gray-400" />
+                    <ChevronUp className="text-zinc-400" />
                   ) : (
-                    <ChevronDown className="text-gray-400" />
+                    <ChevronDown className="text-zinc-400" />
                   )}
                 </button>
                 {expandedSections[section.id] && (
                   <div className="px-6 pb-4 pt-2">
                     <ul className="space-y-2">
                       {section.items.map((item, i) => (
-                        <li key={i} className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <li key={i} className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
                           <ArrowRight className="w-4 h-4 text-indigo-500" />
                           {item}
                         </li>
@@ -283,19 +283,19 @@ const Personel = () => {
                 }
               ].map((edu, index) => (
                 <div key={index} className="relative pl-16 pb-8">
-                  <div className="absolute left-5 top-1 w-3 h-3 rounded-full bg-indigo-500 -translate-x-1.5" />
-                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                  <div className="absolute left-5 top-1 w-3 h-3 rounded-full bg-indigo-500 -tranzinc-x-1.5" />
+                  <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-sm border border-zinc-100 dark:border-zinc-700">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-lg font-semibold">{edu.Degree}</h3>
-                        <h5 className="text-sm font-medium text-gray-500 mb-2">{edu.department}</h5>
+                        <h5 className="text-sm font-medium text-zinc-500 mb-2">{edu.department}</h5>
                         <a href={edu.website} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:font-medium mt-2 block">{edu.institution}</a>
                       </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-700 px-3 py-1 rounded-full">
                         {edu.year}
                       </span>
                     </div>
-                    <p className="mt-2 text-gray-600 dark:text-gray-300">{edu.description}</p>
+                    <p className="mt-2 text-zinc-600 dark:text-zinc-300">{edu.description}</p>
                   </div>
                 </div>
               ))}
@@ -307,7 +307,7 @@ const Personel = () => {
         return (
           <div className="space-y-6">
             <h3 className="text-xl text-primary font-semibold mb-4">My Music Player</h3>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-100 dark:border-zinc-700 p-6">
               <MusicPlayer />
             </div>
           </div>
@@ -317,7 +317,7 @@ const Personel = () => {
         return (
             <div className="space-y-6">
             <h3 className="text-xl text-primary font-semibold mb-4">My Favorite Shows</h3>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-100 dark:border-zinc-700 p-6">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {[
                 { 
@@ -359,14 +359,14 @@ const Personel = () => {
                     alt={show.title} 
                     className="w-full h-full object-cover" 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t dark:from-gray-800/80 from-gray-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t dark:from-zinc-800/80 from-zinc-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                     <div>
                       <h4 className="font-medium dark:text-white text-black">{show.title}</h4>
-                      <p className="text-sm dark:text-gray-300 text-gray-600">{show.type}</p>
+                      <p className="text-sm dark:text-zinc-300 text-zinc-600">{show.type}</p>
                     </div>
                   </div>
-                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <Film className="w-8 h-8 text-gray-400" />
+                  <div className="w-full h-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center">
+                    <Film className="w-8 h-8 text-zinc-400" />
                   </div>
                 </div>
               ))}
@@ -387,7 +387,7 @@ const Personel = () => {
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
           Personal Space
         </h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+        <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-300">
           Get to know me beyond the code
         </p>
       </div>
@@ -401,10 +401,10 @@ const Personel = () => {
           secondColor: "#6366f1" // indigo-600
         }}
       >
-        <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-white dark:bg-zinc-800 rounded-xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Sidebar */}
-            <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-zinc-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800">
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="relative w-12 h-12 rounded-full overflow-hidden border-4 border-indigo-500/20">
@@ -418,7 +418,7 @@ const Personel = () => {
                   </div>
                   <div>
                     <h2 className="font-semibold">rvimman</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Personal Space</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">Personal Space</p>
                   </div>
                 </div>
                 <nav className="space-y-1">
@@ -429,7 +429,7 @@ const Personel = () => {
                       className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                         activeTab === tab.id
                           ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                          : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                          : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700'
                       }`}
                     >
                       {tab.icon}

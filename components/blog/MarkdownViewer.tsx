@@ -81,9 +81,9 @@ const LazySyntaxHighlighter = dynamic<SyntaxHighlighterProps>(
   { 
     ssr: false,
     loading: () => (
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 animate-pulse">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-4 animate-pulse">
+        <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2"></div>
       </div>
     )
   }
@@ -484,10 +484,10 @@ const CustomCode: React.FC<CustomCodeProps> = ({
 
     // Enhanced toolbar component
     const Toolbar = useMemo(() => (
-      <div className="absolute top-3 right-3 z-20 flex items-center gap-1 p-1.5 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-600/50 shadow-lg transition-all duration-200 hover:bg-white/95 dark:hover:bg-gray-800/95">
+      <div className="absolute top-3 right-3 z-20 flex items-center gap-1 p-1.5 rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-600/50 shadow-lg transition-all duration-200 hover:bg-white/95 dark:hover:bg-zinc-800/95">
         <div className="flex items-center gap-1">
           <button
-            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleZoomOut}
             disabled={zoom <= (window.innerWidth < 768 ? 0.5 : 0.6)}
             aria-label="Zoom out"
@@ -495,11 +495,11 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
-          <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded text-gray-700 dark:text-gray-300 min-w-[3rem] text-center">
+          <span className="px-2 py-0.5 text-xs font-medium bg-zinc-100 dark:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300 min-w-[3rem] text-center">
             {Math.round(zoom * 100)}%
           </span>
           <button
-            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleZoomIn}
             disabled={zoom >= (window.innerWidth < 768 ? 2 : 3)}
             aria-label="Zoom in"
@@ -508,9 +508,9 @@ const CustomCode: React.FC<CustomCodeProps> = ({
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
         </div>
-        <div className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div className="w-px h-4 bg-zinc-300 dark:bg-zinc-600 mx-1"></div>
         <button
-          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+          className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150"
           onClick={handleResetZoom}
           aria-label="Reset zoom"
           title="Reset to fit"
@@ -518,7 +518,7 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           <RefreshCcw className="w-3.5 h-3.5" />
         </button>
         <button
-          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+          className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150"
           onClick={handleFitToWidth}
           aria-label="Fit to width"
           title="Fit to width"
@@ -529,12 +529,12 @@ const CustomCode: React.FC<CustomCodeProps> = ({
         </button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" aria-label="Full screen" title="Full screen">
+            <button className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150" aria-label="Full screen" title="Full screen">
               <Maximize2 className="w-3.5 h-3.5" />
             </button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[95vw] max-h-[95vh] p-0 overflow-hidden">
-            <DialogHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <DialogHeader className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
               <DialogTitle className="flex items-center gap-2 text-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -543,21 +543,21 @@ const CustomCode: React.FC<CustomCodeProps> = ({
               </DialogTitle>
             </DialogHeader>
             <div className="relative flex-1 overflow-hidden">
-              <div className="absolute top-3 right-3 z-20 flex items-center gap-1 p-1.5 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-600/50 shadow-lg">
-                <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" onClick={handleZoomOut} aria-label="Zoom out">
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-1 p-1.5 rounded-lg bg-white/90 dark:bg-zinc-800/90 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-600/50 shadow-lg">
+                <button className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150" onClick={handleZoomOut} aria-label="Zoom out">
                   <ZoomOut className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded text-gray-700 dark:text-gray-300 min-w-[3rem] text-center">
+                <span className="px-2 py-0.5 text-xs font-medium bg-zinc-100 dark:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300 min-w-[3rem] text-center">
                   {Math.round(zoom * 100)}%
                 </span>
-                <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" onClick={handleZoomIn} aria-label="Zoom in">
+                <button className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150" onClick={handleZoomIn} aria-label="Zoom in">
                   <ZoomIn className="w-3.5 h-3.5" />
                 </button>
-                <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150" onClick={handleResetZoom} aria-label="Reset zoom">
+                <button className="p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors duration-150" onClick={handleResetZoom} aria-label="Reset zoom">
                   <RefreshCcw className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <div ref={dialogScrollRef} className="overflow-auto h-full max-h-[calc(95vh-80px)] rounded-lg bg-white dark:bg-gray-900">
+              <div ref={dialogScrollRef} className="overflow-auto h-full max-h-[calc(95vh-80px)] rounded-lg bg-white dark:bg-zinc-900">
                 <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-4 origin-top-left">
                   {visible || open ? <Mermaid chart={code} /> : null}
                 </div>
@@ -583,20 +583,20 @@ const CustomCode: React.FC<CustomCodeProps> = ({
     }
 
     return (
-      <div ref={containerRef} className="relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+      <div ref={containerRef} className="relative rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
         {isLoading && (
-          <div className="absolute inset-0 bg-gray-50 dark:bg-gray-800 flex items-center justify-center z-10">
-            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+          <div className="absolute inset-0 bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center z-10">
+            <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
               <span className="text-sm">Loading diagram...</span>
             </div>
           </div>
         )}
         {Toolbar}
-        <div ref={scrollRef} className="overflow-auto max-h-80 md:max-h-96 touch-pan-y touch-pan-x bg-gray-50 dark:bg-gray-800/50">
+        <div ref={scrollRef} className="overflow-auto max-h-80 md:max-h-96 touch-pan-y touch-pan-x bg-zinc-50 dark:bg-zinc-800/50">
           <div ref={innerRef} style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }} className="min-w-max p-3 origin-top-left">
             {visible ? <Mermaid chart={code} /> : (
-              <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
+              <div className="h-40 flex items-center justify-center text-zinc-400 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                   Loading diagram...
@@ -620,7 +620,7 @@ const CustomCode: React.FC<CustomCodeProps> = ({
     return (
       <div className=" rounded-lg overflow-hidden ">
         <pre className="overflow-x-auto m-0 bg-white dark:bg-transparent">
-          <code className="text-sm font-mono text-teal-600 dark:text-gray-200" {...props}>
+          <code className="text-sm font-mono text-teal-600 dark:text-zinc-200" {...props}>
             {children}
           </code>
         </pre>
@@ -642,15 +642,15 @@ const CustomCode: React.FC<CustomCodeProps> = ({
   };
 
   return (
-    <div className="rounded-lg overflow-hidden bg-gray-400/40 dark:bg-gray-700 border border-gray-400/40 dark:border-gray-700 shadow-lg group">
-      <div className="bg-gradient-to-r from-gray-50 to-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-gray-300 text-xs px-3 sm:px-4 py-2 font-mono border-b border-gray-400/50 dark:border-gray-700 flex items-center justify-between">
+    <div className="rounded-lg overflow-hidden bg-zinc-400/40 dark:bg-zinc-700 border border-zinc-400/40 dark:border-zinc-700 shadow-lg group">
+      <div className="bg-gradient-to-r from-zinc-50 to-zinc-300 dark:bg-gradient-to-r dark:from-zinc-800 dark:to-zinc-900 text-zinc-900 dark:text-zinc-300 text-xs px-3 sm:px-4 py-2 font-mono border-b border-zinc-400/50 dark:border-zinc-700 flex items-center justify-between">
         <div className="flex items-center overflow-hidden">
           <div className="flex space-x-1.5 sm:space-x-2 mr-2 sm:mr-3 flex-shrink-0">
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500"></div>
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
           </div>
-          <span className="font-medium text-gray-900 dark:text-gray-200 truncate text-ellipsis max-w-[120px] sm:max-w-none">
+          <span className="font-medium text-zinc-900 dark:text-zinc-200 truncate text-ellipsis max-w-[120px] sm:max-w-none">
             {filename || (() => {
               const ext = extensionMap[language] || 'txt';
               return `${language}.${ext}`;
@@ -658,24 +658,24 @@ const CustomCode: React.FC<CustomCodeProps> = ({
           </span>
         </div>
         <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-          <span className="text-xs text-gray-800 dark:text-gray-300 hidden sm:inline">
+          <span className="text-xs text-zinc-800 dark:text-zinc-300 hidden sm:inline">
             {languageFromMatch || 'text'} • {codeString.split('\n').length} lines
           </span>
           <button
             onClick={handleCopy}
-            className="p-1.5 sm:p-1.5 rounded-md hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            className="p-1.5 sm:p-1.5 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             title="Copy to clipboard"
             aria-label="Copy code"
           >
             {copied ? (
               <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
             ) : (
-              <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" />
+              <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors" />
             )}
           </button>
         </div>
       </div>
-      <div className="bg-white dark:bg-gray-800 rounded-b-lg overflow-hidden">
+      <div className="bg-white dark:bg-zinc-800 rounded-b-lg overflow-hidden">
         <div className="relative">
           <ScrollArea className="w-full" type="always">
             <div className="min-w-max p-2 sm:p-3 md:p-4">
@@ -725,7 +725,7 @@ const CustomCode: React.FC<CustomCodeProps> = ({
                     }}
                     PreTag={({ children, ...preProps }: { children: ReactNode; [key: string]: any }) => (
                       <pre 
-                        className="!m-0 !p-0 bg-white dark:bg-gray-800 !text-gray-900 dark:!text-gray-200" 
+                        className="!m-0 !p-0 bg-white dark:bg-zinc-800 !text-zinc-900 dark:!text-zinc-200" 
                         {...preProps}
                         style={{ background: 'transparent' }}
                       >
@@ -806,7 +806,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
   }, []);
 
   return (
-    <div className={`prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 ${className}`}>
+    <div className={`prose dark:prose-invert max-w-none text-zinc-800 dark:text-zinc-200 ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeRaw, rehypeKatex]}
@@ -863,11 +863,11 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline group-hover:underline">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-sky-600 to-slate-700 dark:from-teal-400 dark:to-blue-400">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-sky-600 to-zinc-700 dark:from-teal-400 dark:to-blue-400">
                     {props.children}
                   </span>
                 </a>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-600 to-slate-700 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-600 to-zinc-700 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </h1>
             );
           },
@@ -883,7 +883,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
                   <span className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-slate-500 dark:from-teal-300 dark:to-blue-300">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-zinc-500 dark:from-teal-300 dark:to-blue-300">
                     {props.children}
                   </span>
                 </a>
@@ -901,10 +901,10 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
               {...props}
             >
               <a href={`#${id}`} className="no-underline hover:underline">
-                <span className="absolute left-0 top-1/2 -translate-y-1/3 w-6 h-6 rounded-full bg-sky-400/50 dark:bg-teal-900/50 flex items-center justify-center">
+                <span className="absolute left-0 top-1/2 -tranzinc-y-1/3 w-6 h-6 rounded-full bg-sky-400/50 dark:bg-teal-900/50 flex items-center justify-center">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600/80 dark:bg-teal-400"></span>
                 </span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-slate-600 dark:from-teal-400 dark:to-blue-400/80">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-zinc-600 dark:from-teal-400 dark:to-blue-400/80">
                   {props.children}
                 </span>
               </a>
@@ -922,8 +922,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 dark:from-gray-100 dark:to-gray-400">
+                  <span className="absolute left-0 top-1/2 -tranzinc-y-1/2 w-2 h-2 rounded-full bg-zinc-500 dark:bg-zinc-400"></span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-700 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400">
                     {props.children}
                   </span>
                 </a>
@@ -937,7 +937,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             return (
               <h5 
                 id={id}
-                className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-sky-600 dark:text-gray-300 scroll-mt-16"
+                className="text-lg md:text-xl font-medium mt-6 mb-2 pl-2 relative text-sky-600 dark:text-zinc-300 scroll-mt-16"
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
@@ -953,7 +953,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             return (
               <h6 
                 id={id}
-                className="text-base font-medium mt-4 mb-2 pl-2 text-teal-500 dark:text-gray-400 scroll-mt-16"
+                className="text-base font-medium mt-4 mb-2 pl-2 text-teal-500 dark:text-zinc-400 scroll-mt-16"
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
@@ -976,7 +976,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             }
             
             return (
-              <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...restProps}>
+              <p className="my-4 text-zinc-700 dark:text-zinc-300 leading-relaxed" {...restProps}>
                 {children}
               </p>
             );
@@ -996,7 +996,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                   className={`h-4 w-4 rounded border mr-2 mt-0.5 cursor-pointer transition-colors ${
                     isChecked 
                       ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' 
-                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                      : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600'
                   }`}
                   style={{
                     backgroundImage: isChecked ? checkmarkSvg : 'none',
@@ -1029,7 +1029,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             const isTaskItem = className?.includes('task-list-item');
             return (
               <li 
-                className={`relative pl-2 my-1 text-gray-700 dark:text-gray-300 ${
+                className={`relative pl-2 my-1 text-zinc-700 dark:text-zinc-300 ${
                   isTaskItem ? 'flex items-start' : ''
                 }`}
                 {...props} 
@@ -1038,35 +1038,35 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
 
           blockquote: (props) => (
-            <blockquote className="border-l-4 border-sky-400 dark:border-teal-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300 bg-sky-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
+            <blockquote className="border-l-4 border-sky-400 dark:border-teal-600 pl-4 italic my-4 text-zinc-700 dark:text-zinc-300 bg-sky-50 dark:bg-teal-700/10 px-4 py-2 rounded-r" {...props} />
           ),
           table: (props) => (
-            <div className="overflow-x-auto my-8 rounded-xl border border-slate-300 dark:border-teal-700/50 shadow-sm">
-              <table className="min-w-full divide-y divide-gray-400 dark:divide-gray-700" {...props} />
+            <div className="overflow-x-auto my-8 rounded-xl border border-zinc-300 dark:border-teal-700/50 shadow-sm">
+              <table className="min-w-full divide-y divide-zinc-400 dark:divide-zinc-700" {...props} />
             </div>
           ),
           thead: (props) => (
-            <thead className="bg-sky-50 dark:bg-teal-900/20 border-b border-gray-200 dark:border-gray-700" {...props} />
+            <thead className="bg-sky-50 dark:bg-teal-900/20 border-b border-zinc-200 dark:border-zinc-700" {...props} />
           ),
           tbody: (props) => (
-            <tbody className="divide-y divide-gray-400/50 dark:divide-gray-700/50" {...props} />
+            <tbody className="divide-y divide-zinc-400/50 dark:divide-zinc-700/50" {...props} />
           ),
           th: (props) => (
             <th 
-              className="px-6 py-4 text-left text-xs font-medium text-sky-700 dark:text-teal-300  border-b border-slate-300 dark:border-teal-700 uppercase tracking-wider"
+              className="px-6 py-4 text-left text-xs font-medium text-sky-700 dark:text-teal-300  border-b border-zinc-300 dark:border-teal-700 uppercase tracking-wider"
               style={{ whiteSpace: 'nowrap' }}
               {...props}
             />
           ),
           td: (props) => (
             <td 
-              className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap"
+              className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300 whitespace-nowrap"
               {...props}
             />
           ),
           tr: (props) => (
             <tr 
-              className="hover:bg-sky-400/10 dark:hover:bg-gray-800/30 transition-colors duration-150"
+              className="hover:bg-sky-400/10 dark:hover:bg-zinc-800/30 transition-colors duration-150"
               {...props}
             />
           ),
@@ -1077,7 +1077,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             const image = (
               <img 
                 {...imgProps}
-                className={`rounded-lg shadow-lg w-full max-w-full h-auto border border-gray-200 dark:border-gray-700 ${className}`}
+                className={`rounded-lg shadow-lg w-full max-w-full h-auto border border-zinc-200 dark:border-zinc-700 ${className}`}
                 alt={alt || 'Image'}
                 loading="lazy"
               />
@@ -1088,7 +1088,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
               return (
                 <figure className="my-6">
                   {image}
-                  <figcaption className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  <figcaption className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-2">
                     {alt}
                   </figcaption>
                 </figure>
@@ -1100,7 +1100,7 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
           },
           // Horizontal rule with gradient styling
           hr: () => (
-            <hr className="my-8 border-0 h-px bg-gray-400/50 dark:bg-gray-600/50" />
+            <hr className="my-8 border-0 h-px bg-zinc-400/50 dark:bg-zinc-600/50" />
           ),
         }}
       >

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { Send } from 'lucide-react';
 import { 
@@ -65,9 +65,9 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="bg-white dark:bg-gradient-to-b dark:from-gray-900 rounded-lg dark:to-gray-950 py-20">
+    <section id="contact" className="bg-white dark:bg-gradient-to-b dark:from-zinc-900 rounded-lg dark:to-zinc-950 py-20">
       <div className="max-w-6xl mx-auto px-4">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -76,14 +76,14 @@ const Contact = () => {
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
             Get in Touch
           </h2>
-          <p className="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
             Have a question or want to work together? Feel free to reach out!
           </p>
-        </motion.div>
+        </m.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -91,7 +91,7 @@ const Contact = () => {
           >
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="from_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="from_name" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Name
                 </label>
                 <input
@@ -101,11 +101,11 @@ const Contact = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-900 dark:border-gray-600 bg-gray-300 dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="reply_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="reply_to" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Email
                 </label>
                 <input
@@ -115,11 +115,11 @@ const Contact = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-900 dark:border-gray-600 bg-gray-300 dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="message" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Message
                 </label>
                 <textarea
@@ -129,7 +129,7 @@ const Contact = () => {
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-gray-900 dark:border-gray-600 bg-gray-300 dark:bg-gray-800/50 py-2 px-3 text-gray-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
 
@@ -145,22 +145,22 @@ const Contact = () => {
                 </div>
               )}
 
-              <motion.button
+              <m.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-tranzinc-y-0.5"
               >
                 {isSubmitting ? (
                   <>
                     Sending...
-                    <motion.div
+                    <m.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     >
                       <Send className="w-4 h-4" />
-                    </motion.div>
+                    </m.div>
                   </>
                 ) : (
                   <>
@@ -168,31 +168,31 @@ const Contact = () => {
                     <Send className="w-4 h-4" />
                   </>
                 )}
-              </motion.button>
+              </m.button>
             </form>
-          </motion.div>
+          </m.div>
 
           {/* Social Links & Info */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
             className="space-y-8"
           >
-            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-900 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-zinc-800 dark:to-zinc-900 p-8 rounded-xl border border-zinc-900 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Connect With Me
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 {socialLinks.map((link, index) => (
-                  <motion.a
+                  <m.a
                     key={index}
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors group border border-gray-900 dark:border-gray-700"
+                    className="flex items-center gap-3 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700/50 transition-colors group border border-zinc-900 dark:border-zinc-700"
                   >
                     <link.icon 
                       style={{
@@ -201,22 +201,22 @@ const Contact = () => {
                       } as React.CSSProperties}
                       className="w-5 h-5 group-hover:opacity-80 transition-opacity text-[color:var(--icon-color)] dark:text-[color:var(--icon-dark-color)]"
                     />
-                    <span className="text-gray-700 dark:text-gray-300">{link.label}</span>
-                  </motion.a>
+                    <span className="text-zinc-700 dark:text-zinc-300">{link.label}</span>
+                  </m.a>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl border border-gray-900 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-gradient-to-b dark:from-zinc-800 dark:to-zinc-900 p-8 rounded-xl border border-zinc-900 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Location
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-zinc-600 dark:text-zinc-400">
                 Based in <b className='text-blue-600 dark:text-blue-400 font-medium'>Bangalore, Chennai, India</b><br />
                 Available for <b className='text-blue-600 dark:text-blue-400 font-medium'>remote</b> work worldwide
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>

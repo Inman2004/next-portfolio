@@ -29,7 +29,7 @@ const AuthorAvatar = ({
   lazy = true,
   className = ''
 }: AuthorAvatarProps) => (
-  <div className={cn("w-10 h-10 rounded-full mx-right my-auto flex items-center justify-center text-gray-400 dark:text-gray-500", className)}>
+  <div className={cn("w-10 h-10 rounded-full mx-right my-auto flex items-center justify-center text-zinc-400 dark:text-zinc-500", className)}>
     <Image
       src={src || '/placeholder.png'}
       alt={alt}
@@ -54,8 +54,8 @@ const PostTitle = ({
 }: PostTitleProps) => (
   <div className="p-6 flex-1 flex flex-col">
     <p className={cn(
-      "text-xl font-thin bg-clip-text text-transparent bg-gradient-to-r from-gray-900/50 to-gray-700/50 dark:from-indigo-400/50 dark:to-violet-400/50 mb-3 line-clamp-2",
-      "group-hover:text-white dark:group-hover:text-gray-400 transition-colors",
+      "text-xl font-thin bg-clip-text text-transparent bg-gradient-to-r from-zinc-900/50 to-zinc-700/50 dark:from-indigo-400/50 dark:to-violet-400/50 mb-3 line-clamp-2",
+      "group-hover:text-white dark:group-hover:text-zinc-400 transition-colors",
       className
     )}>
       {children}
@@ -115,17 +115,17 @@ export default async function BlogPage({
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
         {/* Hero Section */}
       <div className="relative overflow-hidden">
         
         <div className="absolute inset-0 bg-[url('/images/ui/blog-hero.png')] bg-cover bg-center"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700 py-4 mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-700 py-4 mb-6">
               Blog & Insights
               </h1>
-            <p className="text-xl text-gray-900 max-w-3xl mx-auto">
+            <p className="text-xl text-zinc-900 max-w-3xl mx-auto">
               Explore my thoughts on technology, development, and the latest trends in the digital world.
             </p>
           </div>

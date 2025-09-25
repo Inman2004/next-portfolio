@@ -121,10 +121,10 @@ export default function MembershipCard({
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Support {creatorName}</h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-zinc-600 dark:text-zinc-400 mb-4">
           Get exclusive content and support your favorite creator
         </p>
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
           <Users className="h-4 w-4" />
           <span>{subscriptionCount} members</span>
         </div>
@@ -145,7 +145,7 @@ export default function MembershipCard({
               }`}
             >
               {isCurrentTier && isSubscribed && (
-                <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-blue-500">
+                <Badge className="absolute -top-2 left-1/2 transform -tranzinc-x-1/2 bg-blue-500">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Current Plan
                 </Badge>
@@ -160,7 +160,7 @@ export default function MembershipCard({
                 <CardDescription>{tier.description}</CardDescription>
                 <div className="text-3xl font-bold">
                   ${tier.price}
-                  <span className="text-sm font-normal text-gray-500">/month</span>
+                  <span className="text-sm font-normal text-zinc-500">/month</span>
                 </div>
               </CardHeader>
               

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { Share2, Twitter, Linkedin, Link2, Facebook, MessageSquare, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useEffect, useState, useMemo } from 'react';
@@ -141,7 +141,7 @@ export default function SocialShare({ url, title, description = '', isCompact = 
         setIsOpen(false);
       },
       label: 'Copy link',
-      className: 'h-12 w-12 rounded-full hover:bg-gray-500 dark:hover:bg-gray-700'
+      className: 'h-12 w-12 rounded-full hover:bg-zinc-500 dark:hover:bg-zinc-700'
     }
   ];
 
@@ -153,22 +153,22 @@ export default function SocialShare({ url, title, description = '', isCompact = 
     <div className="flex flex-wrap items-center gap-3">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 flex items-center gap-2 text-gray-800 dark:text-gray-300 hover:text-blue-500 transition-colors relative rounded-full"
+            className="p-2 flex items-center gap-2 text-zinc-800 dark:text-zinc-300 hover:text-blue-500 transition-colors relative rounded-full"
             aria-label="Share this post"
             title="Share this post"
           >
             <Share2 className="w-5 h-5" />
             <span>Share</span>
             <span className="sr-only">Share this post</span>
-          </motion.button>
+          </m.button>
         </DialogTrigger>
             
-            <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg">
+            <DialogContent className="sm:max-w-md bg-white dark:bg-zinc-800 p-6 rounded-lg">
               <DialogHeader>
-                <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                <DialogTitle className="text-xl font-semibold text-zinc-900 dark:text-white">
                   Share to
                 </DialogTitle>
               </DialogHeader>
@@ -181,7 +181,7 @@ export default function SocialShare({ url, title, description = '', isCompact = 
                       onClick={button.onClick}
                       variant="ghost"
                       size="icon"
-                      className={`h-12 w-12 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 ${button.className}`}
+                      className={`h-12 w-12 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-700 ${button.className}`}
                       aria-label={`Share on ${button.label}`}
                       title={`Share on ${button.label}`}
                     >

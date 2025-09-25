@@ -230,9 +230,9 @@ export default function ProjectsAdmin() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-white dark:bg-gray-900 min-h-screen">
+    <div className="container mx-auto px-4 py-12 bg-white dark:bg-zinc-900 min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Manage Projects</h1>
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Manage Projects</h1>
         <div className="flex gap-4">
           <Button asChild className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
             <Link href="/admin/projects/new" className="flex items-center text-white gap-2">
@@ -243,7 +243,7 @@ export default function ProjectsAdmin() {
           <Button 
             variant="outline" 
             onClick={handleLogout} 
-            className="flex items-center gap-2 border-gray-300 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+            className="flex items-center gap-2 border-zinc-300 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             <LogOut size={16} />
             Logout
@@ -251,31 +251,31 @@ export default function ProjectsAdmin() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+          <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+            <thead className="bg-zinc-50 dark:bg-zinc-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Title
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Technologies
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
+            <tbody className="bg-white divide-y divide-zinc-200 dark:divide-zinc-700 dark:bg-zinc-800">
               {projects.map((project) => (
-                <tr key={project.title} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <tr key={project.title} className="hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{project.title}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
+                    <div className="text-sm font-medium text-zinc-900 dark:text-white">{project.title}</div>
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-1">
                       {project.description}
                     </div>
                   </td>
@@ -284,7 +284,7 @@ export default function ProjectsAdmin() {
                       project.status === 'deployed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                       project.status === 'in-progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
                       project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                      'bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200'
                     }`}>
                       {project.status}
                     </span>
@@ -292,12 +292,12 @@ export default function ProjectsAdmin() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1 max-w-xs">
                       {project.technologies.slice(0, 3).map((tech) => (
-                        <span key={tech} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                        <span key={tech} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200">
                           {tech}
                         </span>
                       ))}
                       {project.technologies.length > 3 && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200">
                           +{project.technologies.length - 3} more
                         </span>
                       )}
@@ -308,7 +308,7 @@ export default function ProjectsAdmin() {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                        className="text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-700"
                         asChild
                       >
                         <Link href={`/projects/${project.title.toLowerCase().replace(/\s+/g, '-')}`} target="_blank">
@@ -319,7 +319,7 @@ export default function ProjectsAdmin() {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-gray-700"
+                        className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-zinc-700"
                         asChild
                       >
                         <Link href={`/admin/projects/edit/${encodeURIComponent(project.title)}`}>
@@ -330,7 +330,7 @@ export default function ProjectsAdmin() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700"
+                        className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-zinc-700"
                         onClick={() => handleDelete(project.title)}
                       >
                         <Trash2 className="h-4 w-4" />

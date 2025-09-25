@@ -181,7 +181,7 @@ export default function MusicPlayer() {
       <div className="flex justify-end mb-4">
         <button
           onClick={toggleMute}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors"
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         >
           {isMuted ? (
@@ -208,7 +208,7 @@ export default function MusicPlayer() {
             className={`relative group rounded-lg overflow-hidden transition-all duration-200 transform hover:scale-[1.02] ${
               activeSong === song.id 
                 ? 'ring-2 ring-indigo-500 dark:ring-indigo-400 shadow-md'
-                : 'shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700'
+                : 'shadow-sm hover:shadow-md border border-zinc-100 dark:border-zinc-700'
             }`}
             onMouseEnter={() => handleMouseEnter(song)}
             onMouseLeave={handleMouseLeave}
@@ -223,7 +223,7 @@ export default function MusicPlayer() {
             }}
           >
             {/* Album Art */}
-            <div className="relative aspect-square w-full bg-gray-100 dark:bg-gray-700/50">
+            <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-700/50">
               {song.imageUrl && (
                 <img 
                   src={song.imageUrl} 
@@ -255,9 +255,9 @@ export default function MusicPlayer() {
             </div>
             
             {/* Song Info */}
-            <div className="p-3 bg-white dark:bg-gray-800">
-              <h3 className="font-medium text-sm text-gray-900 dark:text-white truncate">{song.title}</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{song.artist}</p>
+            <div className="p-3 bg-white dark:bg-zinc-800">
+              <h3 className="font-medium text-sm text-zinc-900 dark:text-white truncate">{song.title}</h3>
+              <p className="text-zinc-500 dark:text-zinc-400 text-xs">{song.artist}</p>
             </div>
             
             <audio

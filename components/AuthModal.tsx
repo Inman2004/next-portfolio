@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as m, AnimatePresence } from 'framer-motion';
 import { X, Mail, Github } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
@@ -53,15 +53,15 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="relative w-full max-w-md bg-gray-900 rounded-2xl p-8 shadow-2xl border border-gray-800"
+          className="relative w-full max-w-md bg-zinc-900 rounded-2xl p-8 shadow-2xl border border-zinc-800"
         >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
             aria-label="Close"
           >
             <X className="w-6 h-6" />
@@ -71,7 +71,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
             <h2 className="text-2xl font-bold text-white mb-2">
               {isSignIn ? 'Welcome back' : 'Create an account'}
             </h2>
-            <p className="text-gray-400">
+            <p className="text-zinc-400">
               {isSignIn ? 'Sign in to your account' : 'Get started with your account'}
             </p>
           </div>
@@ -86,7 +86,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
             <button
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-gray-700 text-white transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-zinc-700 text-white transition-colors disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -111,21 +111,21 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
+                <div className="w-full border-t border-zinc-700"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-900 text-gray-400">Or continue with email</span>
+                <span className="px-2 bg-zinc-900 text-zinc-400">Or continue with email</span>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-1">
                   Email address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-zinc-400" />
                   </div>
                   <input
                     id="email"
@@ -135,7 +135,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="block w-full pl-10 pr-3 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="you@example.com"
                     disabled={isLoading}
                   />
@@ -143,7 +143,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-1">
                   Password
                 </label>
                 <input
@@ -155,7 +155,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="block w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="••••••••"
                   disabled={isLoading}
                 />
@@ -168,9 +168,9 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                       id="remember-me"
                       name="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600 rounded"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-zinc-300">
                       Remember me
                     </label>
                   </div>
@@ -204,7 +204,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-zinc-400">
               {isSignIn ? "Don't have an account?" : 'Already have an account?'}{' '}
               <button
                 onClick={() => setIsSignIn(!isSignIn)}
@@ -214,7 +214,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
               </button>
             </p>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

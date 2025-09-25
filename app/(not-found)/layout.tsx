@@ -31,7 +31,7 @@ export default function NotFoundLayout({
       <head>
         <meta name="google-site-verification" content="mPfU4gmz2hZbYQTnwbs8gbWsMCbLtWzzZ6l1uSqatAQ" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} font-sans bg-gray-950 text-white min-h-screen`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${livvic.variable} font-sans bg-zinc-950 text-white min-h-screen`}>
         <ErrorBoundary>
           <Providers>
             <Header />

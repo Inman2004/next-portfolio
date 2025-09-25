@@ -20,14 +20,14 @@ export function UserHeader({ user, socialLinks, joinDate }: UserHeaderProps) {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Profile Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8 my-12">
+      <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden mb-8 my-12">
         <div className="bg-gradient-to-r from-blue-500/50 to-purple-600/50 dark:from-blue-500/50 dark:to-purple-600/50 h-32">
           {/* Cover photo could go here */}
         </div>
         <div className="px-6 pb-6 -mt-16">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end">
-              <div className="h-32 w-32 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-700 overflow-hidden">
+              <div className="h-32 w-32 rounded-full border-4 border-white dark:border-zinc-800 bg-white dark:bg-zinc-700 overflow-hidden">
                 <UserAvatar
                   photoURL={user.photoURL || ''}
                   displayName={user.displayName || 'User'}
@@ -37,10 +37,10 @@ export function UserHeader({ user, socialLinks, joinDate }: UserHeaderProps) {
                 />
               </div>
               <div className="ml-6 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
                   {user.displayName}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300">@{user.username}</p>
+                <p className="text-zinc-600 dark:text-zinc-300">@{user.username}</p>
               </div>
             </div>
             
@@ -55,12 +55,12 @@ export function UserHeader({ user, socialLinks, joinDate }: UserHeaderProps) {
           {/* Bio */}
           {user.bio && (
             <div className="mt-4">
-              <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>
+              <p className="text-zinc-700 dark:text-zinc-300">{user.bio}</p>
             </div>
           )}
           
           {/* User Stats */}
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
             {user.location && (
               <div className="flex items-center">
                 <FiMapPin className="mr-1" />
@@ -85,7 +85,7 @@ export function UserHeader({ user, socialLinks, joinDate }: UserHeaderProps) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
                   aria-label={link.platform}
                 >
                   {link.icon}

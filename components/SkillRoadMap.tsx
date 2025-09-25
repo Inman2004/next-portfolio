@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion as m, useInView } from 'framer-motion';
 import { BookOpen, Code, Cpu, Database, GitBranch, Layout, Server, Terminal, CheckCircle, Lock, Globe, Box, Cloud, Code2, Network, Paintbrush2 } from 'lucide-react';
 import { SiNextdotjs, SiReact } from 'react-icons/si';
 
@@ -99,10 +99,10 @@ const steps = [
     description: 'Modern Server Side Rendering & Static Site Generation',
     category: 'FrameWork',
     status: 'completed',
-    color: 'bg-gray-800',
-    textColor: 'text-gray-900 dark:text-gray-50',
-    bgColor: 'bg-gray-50 dark:bg-gray-900/30',
-    borderColor: 'border-gray-400 dark:border-gray-600',
+    color: 'bg-zinc-800',
+    textColor: 'text-zinc-900 dark:text-zinc-50',
+    bgColor: 'bg-zinc-50 dark:bg-zinc-900/30',
+    borderColor: 'border-zinc-400 dark:border-zinc-600',
     icon: <SiNextdotjs className="w-5 h-5" />,
     checkpoint: true
   },
@@ -199,7 +199,7 @@ const StatusIcon = ({ status }: { status?: string }) => {
     case 'current':
       return <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />;
     case 'pending':
-      return <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />;
+      return <div className="w-4 h-4 border-2 border-zinc-300 rounded-full" />;
     default:
       return null;
   }
@@ -242,12 +242,12 @@ export default function RoadmapTimeline() {
            My Full Stack Development Journey 
           </span>
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-lg l max-w-3xl mx-auto">
+        <p className="text-zinc-600 dark:text-zinc-400 text-lg l max-w-3xl mx-auto">
           Each step is a checkpoint in my journey to becoming a modern full stack developer
         </p>
       </div>
 
-      <motion.div 
+      <m.div 
         ref={ref}
         variants={container}
         initial="hidden"
@@ -261,7 +261,7 @@ export default function RoadmapTimeline() {
           lg:grid-cols-3
         ">
           {steps.map((step, index) => (
-            <motion.div
+            <m.div
               key={step.id}
               variants={item}
               className="group relative min-w-[85%] snap-start shrink-0 md:min-w-0"
@@ -269,8 +269,8 @@ export default function RoadmapTimeline() {
               <div className={`
                 p-4 rounded-xl border-2 transition-all duration-300 h-full flex flex-col
                 ${step.bgColor} ${step.borderColor}
-                hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-800/50
-                hover:scale-[1.02] hover:-translate-y-1
+                hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-800/50
+                hover:scale-[1.02] hover:-tranzinc-y-1
                 ${step.status === 'current' ? 'ring-2 ring-blue-500/50 dark:ring-blue-500/50 ring-offset-2' : ''}
               `}>
                 <div className="absolute -top-2 -right-2">
@@ -280,7 +280,7 @@ export default function RoadmapTimeline() {
                 <div className="flex items-center mb-3">
                   <div className={`
                     p-1.5 rounded-lg ${step.color} text-white
-                    shadow-lg shadow-gray-900/20 mr-3
+                    shadow-lg shadow-zinc-900/20 mr-3
                   `}>
                     {React.cloneElement(step.icon, { className: 'w-4 h-4' })}
                   </div>
@@ -291,10 +291,10 @@ export default function RoadmapTimeline() {
 
                 {/* Content */}
                 <div className="flex-grow space-y-2">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 uppercase tracking-wide mb-1">
                     {step.category}
                   </p>
-                  <p className="text-xs text-gray-800 dark:text-gray-300 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-zinc-800 dark:text-zinc-300 leading-relaxed line-clamp-2">
                     {step.description}
                   </p>
                   {step.checkpoint && (
@@ -307,7 +307,7 @@ export default function RoadmapTimeline() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-3 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                <div className="mt-3 bg-zinc-200 dark:bg-zinc-700 rounded-full h-1.5 overflow-hidden">
                   <div 
                     className={`h-full ${step.color} transition-all duration-1000 ease-out`}
                     style={{ 
@@ -320,12 +320,12 @@ export default function RoadmapTimeline() {
                 {/* Hover Effect */}
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 dark:from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
 
         {/* Legend (hidden on mobile to reduce height) */}
-        <div className="mt-8 hidden md:flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-300">
+        <div className="mt-8 hidden md:flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-600 dark:text-zinc-300">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-500" />
             <span>Completed</span>
@@ -335,11 +335,11 @@ export default function RoadmapTimeline() {
             <span>In Progress</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+            <div className="w-4 h-4 border-2 border-zinc-300 rounded-full" />
             <span>Not Started</span>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

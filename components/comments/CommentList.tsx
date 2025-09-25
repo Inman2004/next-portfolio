@@ -287,7 +287,7 @@ const CommentListComponent = ({
       {regularComments.length > 0 && (
         <div className="space-y-4">
           {pinnedComments.length > 0 && (
-            <h3 className="text-sm font-medium text-gray-400 mb-3">
+            <h3 className="text-sm font-medium text-zinc-400 mb-3">
               All Comments
             </h3>
           )}
@@ -295,11 +295,11 @@ const CommentListComponent = ({
           <div 
             ref={parentRef}
             className={`
-              border border-gray-900 dark:border-gray-800/30 rounded-lg overflow-auto 
-              bg-white/80 dark:bg-gray-900/30 backdrop-blur-sm
-              scrollbar-thin scrollbar-thumb-gray-400/50 dark:scrollbar-thumb-gray-700/50 
-              scrollbar-track-transparent hover:scrollbar-thumb-gray-500/50 
-              dark:hover:scrollbar-thumb-gray-600/50 scrollbar-thumb-rounded-full
+              border border-zinc-900 dark:border-zinc-800/30 rounded-lg overflow-auto 
+              bg-white/80 dark:bg-zinc-900/30 backdrop-blur-sm
+              scrollbar-thin scrollbar-thumb-zinc-400/50 dark:scrollbar-thumb-zinc-700/50 
+              scrollbar-track-transparent hover:scrollbar-thumb-zinc-500/50 
+              dark:hover:scrollbar-thumb-zinc-600/50 scrollbar-thumb-rounded-full
               transition-colors duration-200 scroll-smooth
               p-4
             `}

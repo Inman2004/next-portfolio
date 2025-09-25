@@ -144,34 +144,34 @@ export default function AdminDataPage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           {currentData.length === 0 ? (
-            <div className="p-4 text-gray-500">No {activeTab} found</div>
+            <div className="p-4 text-zinc-500">No {activeTab} found</div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-zinc-200">
+              <thead className="bg-zinc-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
                     ID
                   </th>
                   {allKeys.map((key) => (
                     <th
                       key={key}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider"
                     >
                       {key}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-zinc-200">
                 {currentData.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500 font-mono">
                       {item.id}
                     </td>
                     {allKeys.map((key) => (
                       <td
                         key={key}
-                        className="px-6 py-4 whitespace-normal text-sm text-gray-500 max-w-xs overflow-hidden overflow-ellipsis"
+                        className="px-6 py-4 whitespace-normal text-sm text-zinc-500 max-w-xs overflow-hidden overflow-ellipsis"
                         title={formatValue(item[key])}
                       >
                         {formatValue(item[key])}

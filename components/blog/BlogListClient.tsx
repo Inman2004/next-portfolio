@@ -178,11 +178,11 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
             All Posts ({totalPosts})
           </h2>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Show:</span>
+            <span className="text-sm text-zinc-600 dark:text-zinc-400">Show:</span>
             <Select value={postsPerPage.toString()} onValueChange={(value) => {
               setPostsPerPage(Number(value));
               setCurrentPage(1); // Reset to first page
@@ -214,19 +214,19 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Newest</button>
-        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Oldest</button>
-        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>Most Popular</button>
+        <button onClick={() => { startLoading(); setSortBy('newest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'newest' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200'}`}>Newest</button>
+        <button onClick={() => { startLoading(); setSortBy('oldest'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'oldest' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200'}`}>Oldest</button>
+        <button onClick={() => { startLoading(); setSortBy('popular'); setTimeout(() => stopLoading(), 300); }} className={`px-3 py-1.5 rounded-md text-sm ${sortBy === 'popular' ? 'bg-lime-500 text-white dark:text-black font-medium' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200'}`}>Most Popular</button>
       </div>
 
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm text-gray-600 dark:text-gray-400 mr-1">Filter by tags:</span>
+          <span className="text-sm text-zinc-600 dark:text-zinc-400 mr-1">Filter by tags:</span>
           {allTags.map(({ name, count }) => (
             <button
               key={name}
               onClick={() => toggleTag(name)}
-              className={`px-3 py-1.5 rounded-full text-xs border ${selectedTags.has(name) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700'}`}
+              className={`px-3 py-1.5 rounded-full text-xs border ${selectedTags.has(name) ? 'bg-blue-600 text-white border-blue-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700'}`}
               aria-pressed={selectedTags.has(name) ? 'true' : 'false'}
             >
               {name}
@@ -240,12 +240,12 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
       )}
 
       {filteredAndSorted.length === 0 ? (
-        <div className="text-center text-gray-500 dark:text-gray-400 py-16">No blog posts found.</div>
+        <div className="text-center text-zinc-500 dark:text-zinc-400 py-16">No blog posts found.</div>
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {currentPosts.map((post) => (
-              <article key={post.id} className="group bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition-all overflow-hidden border border-gray-200 hover:border-gray-700 dark:border-gray-700">
+              <article key={post.id} className="group bg-white dark:bg-zinc-800 rounded-xl shadow hover:shadow-xl transition-all overflow-hidden border border-zinc-200 hover:border-zinc-700 dark:border-zinc-700">
                 {post.coverImage && (
                   <div className="relative h-48 overflow-hidden">
                     <Image src={post.coverImage} alt={post.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
@@ -257,7 +257,7 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
                   </div>
                 )}
                 <div className="p-6">
-                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="flex items-center text-sm text-zinc-500 dark:text-zinc-400 mb-3">
                     <div className="flex items-center mr-4">
                       <Calendar className="w-4 h-4 mr-1" />
                       <span>{new Date(post.createdAt).toLocaleDateString()}</span>
@@ -271,22 +271,22 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
                       <span>{formatNumber(post.views || 0)}</span>
                     </div>
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white group">
+                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-white group">
                     <span className="relative inline-block">
                       <span className="line-clamp-2">{post.title}</span>
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-current transition-all duration-300 group-hover:w-full"></span>
                     </span>
                   </h2>
-                  <div className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
+                  <div className="text-zinc-600 dark:text-zinc-300 text-sm mb-4 line-clamp-3">{post.excerpt || (post.content ? <Markdown>{post.content}</Markdown> : '')}</div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       {post.author?.photoURL ? (
                         <UserAvatar photoURL={post.author.photoURL} displayName={post.author.name || 'Anonymous'} size={32} className="h-8 w-8 mr-3" />
                       ) : null}
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{post.author?.name || 'Anonymous'}</p>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{post.author?.name || 'Anonymous'}</p>
                         {post.author?.bio && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{post.author.bio}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">{post.author.bio}</p>
                         )}
                       </div>
                     </div>
@@ -301,8 +301,8 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-200 dark:border-gray-700">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+              <div className="text-sm text-zinc-600 dark:text-zinc-400">
                 Showing {startIndex + 1}-{Math.min(endIndex, totalPosts)} of {totalPosts} posts
               </div>
               

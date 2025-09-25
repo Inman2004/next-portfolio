@@ -137,14 +137,14 @@ export default async function PostPage({ params }: PostPageProps) {
         />
       </div>
       <div className="mb-6 sm:mb-8">
-        <Link href="/blog" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+        <Link href="/blog" className="inline-flex items-center text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 mb-4">
           <span className="mr-2">←</span> Back to Blog
         </Link>
         
-        <h1 className="text-2xl sm:text-3xl md:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-slate-950 dark:from-gray-50 dark:to-gray-400 font-bold mb-3 sm:mb-4 leading-tight">{post.title}</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-zinc-700 to-zinc-950 dark:from-zinc-50 dark:to-zinc-400 font-bold mb-3 sm:mb-4 leading-tight">{post.title}</h1>
         
-        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-5 sm:mb-6">
-          <div className="flex items-center text-slate-900 dark:text-slate-400 mr-4">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-600 mb-5 sm:mb-6">
+          <div className="flex items-center text-zinc-900 dark:text-zinc-400 mr-4">
             <UserIcon className="h-4 w-4 mr-1" />
             <span>{author.name}</span>
           </div>
@@ -195,7 +195,7 @@ export default async function PostPage({ params }: PostPageProps) {
               creatorName={author.name}
             />
             
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-zinc-700">
               {/* Social links (if available on author) */}
               {/* @ts-ignore */}
               {author?.socials ? (
@@ -212,7 +212,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
         </div>
         
-        <div className="mt-8 pt-6 border-t border-gray-200">
+        <div className="mt-8 pt-6 border-t border-zinc-200">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
               {author.photoURL && (
@@ -228,7 +228,7 @@ export default async function PostPage({ params }: PostPageProps) {
               <div>
                 <p className="font-medium">{author.name}</p>
                 {author.bio && (
-                  <p className="text-sm text-gray-600">{author.bio}</p>
+                  <p className="text-sm text-zinc-600">{author.bio}</p>
                 )}
               </div>
             </div>

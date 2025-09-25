@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { X } from 'lucide-react';
 
 interface ConfirmationDialogProps {
@@ -22,7 +22,7 @@ export default function ConfirmationDialog({
   if (!isOpen) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -33,26 +33,26 @@ export default function ConfirmationDialog({
         }
       }}
     >
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-gray-100/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-6 shadow-2xl border border-gray-700/50 max-w-md w-full"
+        className="bg-zinc-100/90 dark:bg-zinc-800/90 backdrop-blur-sm rounded-lg p-6 shadow-2xl border border-zinc-700/50 max-w-md w-full"
       >
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-xl font-bold">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-white transition-colors"
+            className="text-zinc-400 dark:text-zinc-600 hover:text-zinc-600 dark:hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className="mb-6 text-gray-400 dark:text-gray-600">{message}</p>
+        <p className="mb-6 text-zinc-400 dark:text-zinc-600">{message}</p>
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-100 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 bg-zinc-100 dark:bg-zinc-600 text-white rounded-lg hover:bg-zinc-600 dark:hover:bg-zinc-700 transition-colors"
           >
             Cancel
           </button>
@@ -63,7 +63,7 @@ export default function ConfirmationDialog({
             Confirm
           </button>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

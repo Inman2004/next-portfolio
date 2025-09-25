@@ -169,7 +169,7 @@ export function UserAvatar({
   );
 
   const containerClass = `relative rounded-full overflow-hidden ${className} ${
-    compact ? 'ring-1 ring-white dark:ring-gray-800' : ''
+    compact ? 'ring-1 ring-white dark:ring-zinc-800' : ''
   }`;
 
   const containerStyle = {

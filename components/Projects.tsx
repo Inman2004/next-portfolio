@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as m, AnimatePresence } from 'framer-motion';  
 import { useState, useEffect, useMemo } from 'react';
 import { Github, ExternalLink, ChevronLeft, ChevronRight, BookOpen, Search, X as XIcon, Filter, ArrowRight, Flame, Eye, Play } from 'lucide-react';
 import Image from 'next/image';
@@ -28,8 +28,8 @@ const getTechColor = (tech: string): TechColor => {
     
     // Frontend Frameworks
     react: { bg: 'bg-cyan-500/10 dark:bg-cyan-500/20', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-500/20' },
-    next: { bg: 'bg-black/10 dark:bg-white/20', text: 'text-gray-800 dark:text-white', border: 'border-gray-400/20' },
-    'next.js': { bg: 'bg-black/10 dark:bg-white/20', text: 'text-gray-800 dark:text-white', border: 'border-gray-400/20' },
+    next: { bg: 'bg-black/10 dark:bg-white/20', text: 'text-zinc-800 dark:text-white', border: 'border-zinc-400/20' },
+    'next.js': { bg: 'bg-black/10 dark:bg-white/20', text: 'text-zinc-800 dark:text-white', border: 'border-zinc-400/20' },
     vue: { bg: 'bg-green-500/10 dark:bg-green-500/20', text: 'text-green-600 dark:text-green-400', border: 'border-green-500/20' },
     angular: { bg: 'bg-red-500/10 dark:bg-red-500/20', text: 'text-red-600 dark:text-red-400', border: 'border-red-500/20' },
     svelte: { bg: 'bg-orange-500/10 dark:bg-orange-500/20', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-500/20' },
@@ -37,7 +37,7 @@ const getTechColor = (tech: string): TechColor => {
     
     // Backend
     node: { bg: 'bg-lime-500/10 dark:bg-lime-500/20', text: 'text-lime-600 dark:text-lime-400', border: 'border-lime-500/20' },
-    express: { bg: 'bg-gray-500/10 dark:bg-gray-500/20', text: 'text-gray-600 dark:text-gray-300', border: 'border-gray-500/20' },
+    express: { bg: 'bg-zinc-500/10 dark:bg-zinc-500/20', text: 'text-zinc-600 dark:text-zinc-300', border: 'border-zinc-500/20' },
     php: { bg: 'bg-purple-500/10 dark:bg-purple-500/20', text: 'text-purple-600 dark:text-purple-400', border: 'border-purple-500/20' },
     laravel: { bg: 'bg-red-500/10 dark:bg-red-500/20', text: 'text-red-600 dark:text-red-400', border: 'border-red-500/20' },
     django: { bg: 'bg-emerald-500/10 dark:bg-emerald-500/20', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20' },
@@ -61,7 +61,7 @@ const getTechColor = (tech: string): TechColor => {
     git: { bg: 'bg-rose-500/10 dark:bg-rose-500/20', text: 'text-rose-600 dark:text-rose-400', border: 'border-rose-500/20' },
     api: { bg: 'bg-emerald-500/10 dark:bg-emerald-500/20', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20' },
     framer: { bg: 'bg-pink-500/10 dark:bg-pink-500/20', text: 'text-pink-600 dark:text-pink-400', border: 'border-pink-500/20' },
-    vercel: { bg: 'bg-black/10 dark:bg-white/20', text: 'text-gray-800 dark:text-white', border: 'border-gray-400/20' },
+    vercel: { bg: 'bg-black/10 dark:bg-white/20', text: 'text-zinc-800 dark:text-white', border: 'border-zinc-400/20' },
     tensorflow: { bg: 'bg-yellow-500/10 dark:bg-amber-500/20', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-500/20' },
     pytorch: { bg: 'bg-yellow-500/10 dark:bg-yellow-500/20', text: 'text-yellow-600 dark:text-yellow-400', border: 'border-yellow-500/20' },
     keras: { bg: 'bg-blue-500/10 dark:bg-blue-500/20', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20' },
@@ -81,9 +81,9 @@ const getTechColor = (tech: string): TechColor => {
 
   // Default fallback
   return { 
-    bg: 'bg-gray-500/10 dark:bg-gray-500/20', 
-    text: 'text-gray-600 dark:text-gray-300',
-    border: 'border-gray-500/20'
+    bg: 'bg-zinc-500/10 dark:bg-zinc-500/20', 
+    text: 'text-zinc-600 dark:text-zinc-300',
+    border: 'border-zinc-500/20'
   };
 };
 
@@ -185,12 +185,12 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
   // Only render the card when the image is loaded
   if (!isImageLoaded) {
     return (
-      <div className="h-full rounded-xl bg-gray-100 dark:bg-gray-800/50 animate-pulse" />
+      <div className="h-full rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse" />
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
@@ -208,8 +208,8 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
       <div className="h-full">
         {/* Card content */}
         <div 
-          className="h-full overflow-hidden rounded-xl bg-white dark:bg-gray-900 border-2 border-gray-900 dark:border-gray-800 
-                   transition-all duration-300 shadow-sm dark:shadow-gray-900/20 relative
+          className="h-full overflow-hidden rounded-xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 
+                   transition-all duration-300 shadow-sm dark:shadow-zinc-900/20 relative
                    hover:border-blue-500 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-500/20"
           onClick={(e) => {
             // Only handle card click if no button was clicked
@@ -219,13 +219,13 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
           }}
         >
         {/* Status Badge */}
-        <motion.div 
+        <m.div 
           className="absolute top-3 right-3 z-10"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <motion.span 
+          <m.span 
             className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full 
               shadow-lg transition-all duration-300 hover:scale-105 ${
               project.status === 'active' ? 
@@ -252,21 +252,21 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
                 'bg-gradient-to-r from-amber-500/30 to-orange-500/30 dark:from-amber-500/20 dark:to-orange-500/20 ' +
                 'text-amber-700 dark:text-amber-300 border border-amber-500/40 dark:border-amber-500/30 ' +
                 'shadow-amber-500/10 hover:shadow-amber-500/20' :
-                'bg-gradient-to-r from-gray-500/30 to-slate-500/30 dark:from-gray-500/20 dark:to-slate-500/20 ' +
-                'text-gray-700 dark:text-gray-300 border border-gray-500/40 dark:border-gray-500/30 ' +
-                'shadow-gray-500/10 hover:shadow-gray-500/20'
+                'bg-gradient-to-r from-zinc-500/30 to-zinc-500/30 dark:from-zinc-500/20 dark:to-zinc-500/20 ' +
+                'text-zinc-700 dark:text-zinc-300 border border-zinc-500/40 dark:border-zinc-500/30 ' +
+                'shadow-zinc-500/10 hover:shadow-zinc-500/20'
             }`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {project.status.replace('-', ' ')}
-          </motion.span>
-        </motion.div>
+          </m.span>
+        </m.div>
         
         {/* Image Slideshow */}
-        <div className="relative h-48 md:h-60 w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="relative h-48 md:h-60 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
           {!isImageLoaded ? (
-            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="w-full h-full bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
           ) : currentMedia?.type === 'video' ? (
             <div className="relative w-full h-full">
               <video
@@ -321,7 +321,7 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
                   e.stopPropagation();
                   handlePrev();
                 }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="absolute left-2 top-1/2 -tranzinc-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
                 aria-label="Previous media"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -331,7 +331,7 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
                   e.stopPropagation();
                   handleNext();
                 }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="absolute right-2 top-1/2 -tranzinc-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
                 aria-label="Next media"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -359,7 +359,7 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
           )}
         </div>
 
-        <motion.div
+        <m.div
           animate={isHovered ? { y: -8 } : { y: 0 }}
           transition={{ duration: 0.2 }}
           className="p-6 space-y-4"
@@ -376,15 +376,15 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
                 {project.title}
               </h3>
             </Link>
-            <div className="flex items-center text-sm text-gray-400 space-x-4">
+            <div className="flex items-center text-sm text-zinc-400 space-x-4">
               <span>
                 {safeFormatDate(project.startDate)} - {safeFormatDate(project.endDate)}
               </span>
-              <span className="h-1 w-1 rounded-full bg-gray-600"></span>
+              <span className="h-1 w-1 rounded-full bg-zinc-600"></span>
               <span>{safeCalculateDuration(project.startDate, project.endDate)}</span>
             </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-300 line-clamp-3 transition-colors duration-300">
+          <p className="text-zinc-600 dark:text-zinc-300 line-clamp-3 transition-colors duration-300">
             {project.description}
           </p>
           <div className="flex flex-wrap gap-2 transition-colors duration-300">
@@ -413,11 +413,11 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
           <div className="flex gap-4 pt-2 relative z-10" onClick={e => e.stopPropagation()}>
             {project.github && (
               <div className="relative">
-                <motion.a
+                <m.a
                   href={project.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-110 transition-colors"
+                  className="inline-block text-zinc-500 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-110 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   onClick={e => e.stopPropagation()}
                   whileTap={{ scale: 0.95 }}
@@ -425,66 +425,66 @@ const ProjectCard = ({ project, index }: { project: ProjectWithVideos; index: nu
                 >
                   <Github className="w-6 h-6" />
                   <span className="sr-only">GitHub</span>
-                </motion.a>
+                </m.a>
               </div>
             )}
             {project.live && (
               <div className="relative">
-                <motion.a
+                <m.a
                   href={project.live}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 transition-colors"
+                  className="inline-block text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   title="View Live Demo"
                 >
                   <ExternalLink className="w-6 h-6" />
                   <span className="sr-only">Live</span>
-                </motion.a>
+                </m.a>
               </div>
             )}
             {project.documentation && (
               <div className="relative">
-                <motion.a
+                <m.a
                   href={project.documentation}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block text-gray-500 hover:text-gray-900 dark:hover:text-white hover:scale-110 transition-colors"
+                  className="inline-block text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:scale-110 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   title="View Documentation"
                 >
                   <BookOpen className="w-6 h-6" />
                   <span className="sr-only">Documentation</span>
-                </motion.a>
+                </m.a>
               </div>
             )}
             {project.blogPost && (
               <div className="relative">
-                <motion.a
+                <m.a
                   href={project.blogPost}
                   target="_self"
                   rel="noopener noreferrer"
-                  className="inline-block text-gray-500 hover:text-orange-600 hover:fill-orange-600 dark:hover:text-orange-400 dark:hover:fill-orange-400 hover:scale-110 transition-colors"
+                  className="inline-block text-zinc-500 hover:text-orange-600 hover:fill-orange-600 dark:hover:text-orange-400 dark:hover:fill-orange-400 hover:scale-110 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   title="Read Blog Post"
                 >
                   <FaBlog className="w-6 h-6" />
                   <span className="sr-only">Blog Post</span>
-                </motion.a>
+                </m.a>
               </div>
             )}
             
           </div>
-        </motion.div>
+        </m.div>
       </div>
       
       {/* Background gradient effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-600/5 dark:to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
     </div>
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -498,7 +498,7 @@ const Projects = ({ showAll = false, maxItems = 3 }: ProjectsProps) => {
   return (
     <div id="projects" className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-20 -mt-20 transition-colors duration-300">
       {!showAll && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ 
@@ -511,15 +511,15 @@ const Projects = ({ showAll = false, maxItems = 3 }: ProjectsProps) => {
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent mb-4 transition-colors duration-300">
             Featured Projects
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto transition-colors duration-300">
+          <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto transition-colors duration-300">
             Here are some of my recent projects that showcase my skills and experience.
           </p>
-        </motion.div>
+        </m.div>
       )}
 
       <AnimatePresence mode="wait">
         <React.Fragment key={showAll ? 'all' : 'preview'}>
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -529,7 +529,7 @@ const Projects = ({ showAll = false, maxItems = 3 }: ProjectsProps) => {
             {displayedProjects.map((project: Project, index: number) => (
               <ProjectCard key={`${project.title}-${index}`} project={project} index={index} />
             ))}
-          </motion.div>
+          </m.div>
           
           {!showAll && projects.length > maxItems && (
             <div className="mt-12 text-center">

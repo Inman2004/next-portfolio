@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
+import { motion as m } from "framer-motion";
 import { CssDotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
 import Projects from "@/components/Projects";
@@ -20,15 +20,15 @@ export default function Home() {
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       className={cn(
         "min-h-screen overflow-x-hidden w-full transition-colors duration-200",
         isDark 
-          ? "bg-gradient-to-b from-gray-900 to-black text-white"
-          : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900"
+          ? "bg-gradient-to-b from-zinc-950 to-black text-white"
+          : "bg-gradient-to-b from-zinc-50 to-zinc-100 text-zinc-900"
       )}
     >
       <CssDotPattern 
@@ -60,6 +60,6 @@ export default function Home() {
       </main>
       
       <Footer />
-    </motion.div>
+    </m.div>
   );
 }

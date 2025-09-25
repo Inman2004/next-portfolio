@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, m } from 'framer-motion';
 import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench, Plus, Handshake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -166,7 +166,7 @@ function NavItem({
             'w-0 md:group-hover:w-auto',
             'overflow-hidden',
             'transform transition-transform duration-300 ease-out',
-            'md:group-hover:translate-x-0 -translate-x-1',
+            'md:group-hover:tranzinc-x-0 -tranzinc-x-1',
             isActive ? 'font-medium' : 'font-normal',
             'text-xl',
             'md:group-hover:mr-10',
@@ -182,11 +182,11 @@ function NavItem({
 
         {/* Hover Indicator */}
         <span className={cn(
-          'absolute right-3 top-1/2 -translate-y-1/2',
+          'absolute right-3 top-1/2 -tranzinc-y-1/2',
           'opacity-0 md:group-hover:opacity-100',
           'transition-all duration-300 ease-out',
           'transform transition-transform duration-300 ease-out',
-          'md:group-hover:translate-x-0 translate-x-2',
+          'md:group-hover:tranzinc-x-0 tranzinc-x-2',
           'text-sm text-muted-foreground',
           'hidden md:inline-block',
           'whitespace-nowrap',
@@ -296,7 +296,7 @@ export default function Header() {
       )}
     >
       <nav className="max-w-7xl h-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
@@ -346,7 +346,7 @@ export default function Header() {
               </>
             )}
           </Link>
-        </motion.div>
+        </m.div>
 
 
 
@@ -354,7 +354,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <AnimatedThemeToggler />
           <div className="relative">
-            <motion.button
+            <m.button
               onClick={() => setMenuOpen(!menuOpen)}
               className={cn(
                 "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-300",
@@ -368,7 +368,7 @@ export default function Header() {
             >
               <AnimatePresence mode="wait">
                 {menuOpen ? (
-                  <motion.div
+                  <m.div
                     key="close"
                     initial={{ opacity: 0, rotate: -90 }}
                     animate={{ opacity: 1, rotate: 0 }}
@@ -376,9 +376,9 @@ export default function Header() {
                     transition={{ duration: 0.2 }}
                   >
                     <X className="w-5 h-5" />
-                  </motion.div>
+                  </m.div>
                 ) : (
-                  <motion.div
+                  <m.div
                     key="menu"
                     initial={{ opacity: 0, rotate: 90 }}
                     animate={{ opacity: 1, rotate: 0 }}
@@ -386,15 +386,15 @@ export default function Header() {
                     transition={{ duration: 0.2 }}
                   >
                     <Menu className="w-5 h-5" />
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
-            </motion.button>
+            </m.button>
 
             {/* Mobile Dropdown Menu */}
             <AnimatePresence>
               {menuOpen && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -403,7 +403,7 @@ export default function Header() {
                 >
                   <div className="py-3">
                     {navigationLinks.map((link, index) => (
-                      <motion.div
+                      <m.div
                         key={link.href}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -430,14 +430,14 @@ export default function Header() {
                           {(pathname === link.href || 
                             (link.href.startsWith('#') && isHome && window.location.hash === link.href) ||
                             (link.href === '/blog' && pathname.startsWith('/blog'))) && (
-                            <motion.div
+                            <m.div
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               className="w-2 h-2 rounded-full bg-primary"
                             />
                           )}
                         </Link>
-                      </motion.div>
+                      </m.div>
                     ))}
                     
                     {user ? (
@@ -446,7 +446,7 @@ export default function Header() {
                         {dashboardLinks
                           .filter(link => !link.adminOnly || (user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL))
                           .map((link, index) => (
-                          <motion.div
+                          <m.div
                             key={link.href}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -460,9 +460,9 @@ export default function Header() {
                               {link.icon}
                               <span className="flex-1">{link.label}</span>
                             </Link>
-                          </motion.div>
+                          </m.div>
                         ))}
-                        <motion.div
+                        <m.div
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: (navigationLinks.length + dashboardLinks.length) * 0.05 }}
@@ -477,7 +477,7 @@ export default function Header() {
                             <LogOut className="w-5 h-5 mr-3" />
                             <span className="flex-1 text-left">Sign out</span>
                           </button>
-                        </motion.div>
+                        </m.div>
                       </>
                     ) : (
                       <div className="px-2 pb-2 pt-2 border-t border-border/30 mt-2">
@@ -500,7 +500,7 @@ export default function Header() {
                       </div>
                     )}
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -510,7 +510,7 @@ export default function Header() {
       {/* Click outside handler for mobile dropdown */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

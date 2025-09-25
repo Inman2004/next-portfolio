@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { InlineMarquee } from "@/components/magicui/marquee";
 import Image from "next/image";
-import { motion } from 'framer-motion';
+import { motion as m } from 'framer-motion';
 import { PopoverDemo } from "./CertificatePopover";
 
 export const awards = [
@@ -78,7 +78,7 @@ const ReviewCard = ({
   index
 }: ReviewCardProps) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -89,14 +89,14 @@ const ReviewCard = ({
       <div
         className={cn(
           "relative h-full flex flex-col overflow-hidden rounded-xl border p-5",
-          "bg-gray-50 ring-1 dark:ring-gray-700 dark:bg-gray-900/80 dark:backdrop-blur-sm",
-          "border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500/50",
+          "bg-zinc-50 ring-1 dark:ring-zinc-700 dark:bg-zinc-900/80 dark:backdrop-blur-sm",
+          "border-zinc-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500/50",
           "transition-all duration-300 shadow-sm hover:shadow-lg group/card"
         )}
       >
         <div className="flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
-            <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+            <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
               <Image 
                 src={img} 
                 alt={`${name} certification`} 
@@ -107,7 +107,7 @@ const ReviewCard = ({
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-start">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors">
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors">
                   {name}
                 </h3>
                 {date && (
@@ -122,7 +122,7 @@ const ReviewCard = ({
             </div>
           </div>
           <div className="w-full max-w-[16rem]">
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+            <p className="text-sm text-zinc-600 dark:text-zinc-300 mb-4 line-clamp-3">
               {body}
             </p>
           </div>
@@ -132,7 +132,7 @@ const ReviewCard = ({
               {skills.map((skill, i) => (
                 <span 
                   key={i}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
                 >
                   {skill}
                 </span>
@@ -145,15 +145,15 @@ const ReviewCard = ({
         {/* Hover effect */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover/card:opacity-100 dark:from-blue-900/10 dark:to-purple-900/10 transition-opacity duration-300" />
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="py-16 -mt-20 pt-32 bg-white rounded-lg dark:bg-gray-950">
+    <section id="testimonials" className="py-16 -mt-20 pt-32 bg-white rounded-lg dark:bg-zinc-950">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+        <m.div 
           className="text-center max-w-3xl mx-auto mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -163,14 +163,14 @@ export default function Testimonials() {
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
             Certifications & Courses
           </h2>
-          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
             A showcase of my professional certifications and the skills I've acquired through dedicated learning and hands-on experience.
           </p>
-        </motion.div>
+        </m.div>
 
         <div className="relative">
           <div className="w-full">
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -186,9 +186,9 @@ export default function Testimonials() {
                   </div>
                 ))}
               </InlineMarquee>
-            </motion.div>
+            </m.div>
             
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -206,24 +206,24 @@ export default function Testimonials() {
                   </div>
                 ))}
               </InlineMarquee>
-            </motion.div>
+            </m.div>
           </div>
           
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white dark:from-gray-950 to-transparent z-10"></div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white dark:from-gray-950 to-transparent z-10"></div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white dark:from-zinc-950 to-transparent z-10"></div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white dark:from-zinc-950 to-transparent z-10"></div>
         </div>
 
-        <motion.div 
+        <m.div 
           className="mt-12 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Click view certificate to see more
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

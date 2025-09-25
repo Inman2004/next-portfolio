@@ -58,12 +58,12 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
         <h1 className="text-4xl font-bold mb-4">{creatorProfile.displayName}</h1>
         
         {creatorProfile.bio && (
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+          <p className="text-xl text-zinc-600 dark:text-zinc-400 mb-6 max-w-2xl mx-auto">
             {creatorProfile.bio}
           </p>
         )}
         
-        <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+        <div className="flex items-center justify-center gap-6 text-sm text-zinc-500">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span>{creatorProfile.subscriptionCount} members</span>
@@ -91,14 +91,14 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
       ) : (
         <Card className="max-w-2xl mx-auto">
           <CardHeader className="text-center">
-            <Crown className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+            <Crown className="h-16 w-16 mx-auto text-zinc-400 mb-4" />
             <CardTitle>Membership Not Available</CardTitle>
             <CardDescription>
               {creatorProfile.displayName} hasn't set up membership tiers yet.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
               Check back later or follow {creatorProfile.displayName} to get notified when they launch their membership program.
             </p>
             <Button asChild>
@@ -120,7 +120,7 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                 {creatorProfile.subscriptionCount}
               </div>
-              <p className="text-gray-600 dark:text-gray-400">Active Members</p>
+              <p className="text-zinc-600 dark:text-zinc-400">Active Members</p>
             </CardContent>
           </Card>
           
@@ -129,7 +129,7 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
               <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
                 {creatorProfile.membershipTiers.length}
               </div>
-              <p className="text-gray-600 dark:text-gray-400">Membership Tiers</p>
+              <p className="text-zinc-600 dark:text-zinc-400">Membership Tiers</p>
             </CardContent>
           </Card>
           
@@ -138,7 +138,7 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
               <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                 {new Date(creatorProfile.createdAt).getFullYear()}
               </div>
-              <p className="text-gray-600 dark:text-gray-400">Year Started</p>
+              <p className="text-zinc-600 dark:text-zinc-400">Year Started</p>
             </CardContent>
           </Card>
         </div>
@@ -149,7 +149,7 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
         <Card className="max-w-2xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
           <CardContent className="pt-6">
             <h3 className="text-xl font-semibold mb-3">Ready to join the community?</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
               Subscribe to {creatorProfile.displayName}'s membership and unlock exclusive content, early access, and more.
             </p>
             <div className="flex gap-3 justify-center">
