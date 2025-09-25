@@ -445,30 +445,41 @@ export default function ChatWidget() {
       {/* Panel */}
       <AnimatePresence>
         {open && (
-          <ElectricBorder
-            color="#2563eb"
-            speed={1}
-            chaos={0.5}
-            thickness={2}
-            className="fixed z-50 h-[70vh] w-[min(92vw,380px)] flex flex-col overflow-hidden rounded-xl "
-            style={{ position: 'fixed', right: '1.25rem', bottom: '5rem', left: 'auto', borderRadius: 16 }}
+          // <ElectricBorder
+          //   color="#2563eb"
+          //   speed={1}
+          //   chaos={0.5}
+          //   thickness={2}
+          //   className="fixed z-50 h-[70vh] w-[min(92vw,380px)] flex flex-col overflow-hidden rounded-xl "
+          //   style={{ position: 'fixed', right: '1.25rem', bottom: '5rem', left: 'auto', borderRadius: 16 }}
+          // >
+            // <m.div
+            //   ref={containerRef}
+            //   key="chat-panel"
+            //   initial={{ opacity: 0, y: 20 }}
+            //   animate={{ opacity: 1, y: 0 }}
+            //   exit={{ opacity: 0, y: 20 }}
+            //   transition={{ duration: 0.2 }}
+            //   className="flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl bg-white/80 shadow-2xl dark:bg-zinc-900/80 backdrop-blur-lg"
+            //   role="dialog"
+            //   aria-label="Chat assistant"
+            // >
+          <m.div
+            ref={containerRef}
+            key="chat-panel"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-20 right-5 z-50 h-[70vh] w-[min(92vw,380px)] flex flex-col overflow-hidden rounded-xl bg-white/90 shadow-2xl dark:bg-zinc-900/90 backdrop-blur-lg border border-zinc-200/70 dark:border-zinc-800/70"
+            role="dialog"
+            aria-label="Chat assistant"
           >
-            <m.div
-              ref={containerRef}
-              key="chat-panel"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="flex h-[70vh] w-[min(92vw,380px)] flex-col overflow-hidden rounded-xl bg-white/80 shadow-2xl dark:bg-zinc-900/80 backdrop-blur-lg"
-              role="dialog"
-              aria-label="Chat assistant"
-            >
-            <div className="flex items-center justify-between border-b border-zinc-200 p-3 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50">
-              <div className="text-sm font-semibold">Mimir</div>
+            <div className="flex items-center justify-between border-b border-zinc-200/70 p-3 dark:border-zinc-800/70 bg-white/70 dark:bg-zinc-900/70">
+              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Mimir</div>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800/80 dark:hover:text-zinc-100 transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400/50"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -590,7 +601,7 @@ export default function ChatWidget() {
               </div>
             </form>
             </m.div>
-          </ElectricBorder>
+          // </ElectricBorder>
         )}
       </AnimatePresence>
     </>

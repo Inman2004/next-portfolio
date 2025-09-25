@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { motion, AnimatePresence, m } from 'framer-motion';
+import { motion as  m, AnimatePresence } from 'framer-motion';
 import { Menu, X, User2, Home, AppWindow, BriefcaseBusiness, Mail, LogOut, User, Settings, Flame, Wrench, Plus, Handshake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -291,8 +291,8 @@ export default function Header() {
         'backdrop-blur-md border-b shadow-sm',
         'lg:hidden', // Hide on desktop devices
         scrolled
-          ? 'bg-background/95 border-border/10 shadow-sm'
-          : 'bg-background/80 border-transparent',
+          ? 'bg-zinc-100/95 dark:bg-zinc-900/95 border-zinc-100/10 shadow-sm'
+          : 'bg-zinc-100/80 dark:bg-zinc-900/80 border-transparent',
       )}
     >
       <nav className="max-w-7xl h-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -399,7 +399,7 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute right-0 mt-3 w-64 rounded-2xl shadow-xl bg-background/95 backdrop-blur-xl border border-border overflow-hidden z-50"
+                  className="absolute right-0 mt-3 w-64 rounded-2xl shadow-xl bg-zinc-100/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-border overflow-hidden z-50"
                 >
                   <div className="py-3">
                     {navigationLinks.map((link, index) => (
