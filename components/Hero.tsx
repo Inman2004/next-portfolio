@@ -37,6 +37,7 @@ import { SkillBadge } from "./skillColors";
 import Link from "next/link";
 import ProfileCard from "./ProfileCard";
 import { useTheme } from "next-themes";
+import { Badge } from "./ui/badge";
 
 const InteractiveCard3D = dynamic(() => import("./ThreeJS/HeroID"), {
   ssr: false,
@@ -175,7 +176,7 @@ export default function Hero() {
 
                   <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-2">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-700 to-zinc-900 dark:from-zinc-200 dark:to-zinc-50">
-                      Hi, I&apos;m <AuroraText>Immanuvel</AuroraText>
+                      Hi, I&apos;m <AuroraText>Immanuvel</AuroraText> <span className="text-base font-extralight font-pacifico sm:text-sm">& I'm</span>
                     </span>
                   </h1>
 
@@ -221,20 +222,21 @@ export default function Hero() {
                       <p className="text-sm text-blue-600/80 dark:text-blue-300/80 mb-2 ml-2 font-livvic">
                         My current technical stack focuses on:
                       </p>
-                      <div className="flex flex-wrap gap-2 mb-1 ml-2">
-                        <SkillBadge skill="Next.js" proficiency="Advanced" />
+                      <div className="flex flex-wrap gap-2 mb-1 ml-2 cursor-pointer">
+                        {/* <SkillBadge skill="Next.js" proficiency="Advanced" />
                         <SkillBadge skill="React" proficiency="Advanced" />
                         <SkillBadge skill="JavaScript" proficiency="Advanced" />
                         <SkillBadge skill="Python" proficiency="Expert" />
-                        <SkillBadge
-                          skill="MongoDB"
-                          proficiency="Intermediate"
-                        />
-                        <SkillBadge
-                          skill="Tailwind CSS"
-                          proficiency="Advanced"
-                        />
-                        <SkillBadge skill="AI/ML" proficiency="Intermediate" />
+                        <SkillBadge skill="MongoDB"proficiency="Intermediate" />
+                        <SkillBadge skill="Tailwind CSS" proficiency="Advanced" />
+                        <SkillBadge skill="AI/ML" proficiency="Intermediate" /> */}
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">Next.js</Badge>
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">React</Badge>
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">JavaScript</Badge>
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">Python</Badge>
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">MongoDB</Badge>
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">Tailwind CSS</Badge>
+                        <Badge className="bg-zinc-50/80 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">AI/ML</Badge>
                       </div>
                     </div>
 
@@ -249,13 +251,13 @@ export default function Hero() {
                             New{" "}
                             <FaBlog className="inline text-lg text-orange-500 dark:text-orange-400" />
                           </span>
-                          <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
                             Latest Blog
                           </p>
                           <h3 className="font-medium text-zinc-900 dark:text-white mb-1 line-clamp-1">
                             {latestPost.title}
                           </h3>
-                          <p className="text-xs text-blue-600 dark:text-blue-300 group-hover:text-blue-700 dark:group-hover:text-blue-200 transition-colors">
+                          <p className="text-xs text-orange-600 dark:text-orange-300 group-hover:text-orange-700 dark:group-hover:text-orange-200 transition-colors">
                             {isClient && latestPost?.createdAt?.toDate
                               ? new Date(
                                   latestPost.createdAt.toDate()
@@ -307,7 +309,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-[rgb(109,40,217)] dark:text-[#a930d5] hover:bg-purple-500 dark:hover:bg-purple-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-purple-500 dark:hover:bg-purple-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <Github className="w-6 h-6" />
                       </m.a>
@@ -316,7 +318,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-[rgb(10,92,180)] dark:text-[#0A66C2] hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <Linkedin className="w-6 h-6" />
                       </m.a>
@@ -325,7 +327,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-[rgb(0,0,0)] dark:text-[#fff] hover:bg-black dark:hover:bg-black hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-black dark:hover:bg-black hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <FaXTwitter className="w-6 h-6" />
                       </m.a>
@@ -334,7 +336,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-[rgb(217,48,37)] dark:text-[#cf594e] hover:bg-red-500 dark:hover:bg-red-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-red-500 dark:hover:bg-red-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <SiGmail className="w-6 h-6" />
                       </m.a>
@@ -344,7 +346,7 @@ export default function Hero() {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         title="online resume"
-                        className="text-emerald-500 dark:text-emerald-500 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300 saturate-0 brightness-200 hover:saturate-100"
                       >
                         <img src="/images/favicon.png" className="w-6 h-6" />
                       </m.a>
