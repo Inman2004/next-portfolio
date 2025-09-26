@@ -314,11 +314,11 @@ export const resume: ResumeData = {
   ],
   publications: [
     {
-      title: 'Building Scalable React Applications: Best Practices',
-      publisher: 'Medium',
-      publishDate: '2024-08',
-      description: 'Comprehensive guide on React performance optimization and best practices',
-      link: 'https://medium.com/@yourusername/building-scalable-react-applications',
+      title: 'Building a Modern Portfolio with Next.js and Tailwind CSS',
+      publisher: 'Personal Blog',
+      publishDate: '2024-12-20',
+      description: 'Learn how to create a stunning portfolio website using Next.js 14, Tailwind CSS, and modern web technologies.',
+      link: 'https://rvimman-two.vercel.app/blog/building-modern-portfolio',
       type: 'blog'
     }
   ],

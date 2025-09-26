@@ -204,7 +204,11 @@ function generateSmartReply(query: string, context: string): string {
   const q = query.toLowerCase();
   
   // Self-introduction questions
-  if (/(introduce yourself|self intro|self introduction|explain yourself|about yourself|who are you)/i.test(q)) {
+  if (/(who are you|who is this|who made you|what are you|who is mimir)/i.test(q)) {
+    return `I am Mimir, an AI assistant created by Immanuvel. My purpose is to provide knowledge and answer questions about his skills and projects, drawing inspiration from the wise figure of Norse mythology. How may I assist you?`;
+  }
+
+  if (/(introduce yourself|self intro|self introduction|explain yourself|about yourself)/i.test(q)) {
     return `Hi! I'm ${resume.name}, ${resume.headline}. ${resume.about} I'm based in ${resume.location} and speak ${resume.languages.join(' and ')}.`;
   }
   
@@ -224,6 +228,35 @@ function generateSmartReply(query: string, context: string): string {
       return `I'm always learning and improving. I focus on staying current with technology trends and expanding my expertise in areas like cloud architecture and advanced AI integration.`;
     } else {
       return `My key strengths include ${resume.skills.slice(0,3).map(s => s.name.toLowerCase()).join(', ')}, and I'm particularly good at translating business requirements into scalable technical solutions.`;
+    }
+  }
+
+  // Skill rating questions
+  if (/(rate|rating|level|score|out of 10)/i.test(q)) {
+    const skillsWithLevels = resume.skillsWithLevels || [];
+    const skillRegex = new RegExp(skillsWithLevels.map(s => s.name).join('|'), 'i');
+    const match = q.match(skillRegex);
+    if (match) {
+      const skillName = match[0];
+      const skill = skillsWithLevels.find(s => s.name.toLowerCase() === skillName.toLowerCase());
+      if (skill) {
+        return `Immanuvel's proficiency in ${skill.name} is at an **${skill.level}** level. He has been working with it for ${skill.yearsOfExperience} years.`;
+      }
+    }
+    return `I can't provide a numerical rating, but I can tell you about Immanuvel's experience with specific technologies. What skill are you interested in?`;
+  }
+
+  // Handle questions about specific, unlisted technologies
+  if (/(redux|vue|angular|svelte|java|c#|c\+\+|swift|kotlin|ruby|php)/i.test(q)) {
+    const allTechnologies = new Set<string>();
+    resume.skills.forEach(skillCat => skillCat.items.forEach(item => allTechnologies.add(item.toLowerCase())));
+    projects.forEach(project => project.technologies.forEach(tech => allTechnologies.add(tech.toLowerCase())));
+
+    const mentionedTechMatch = q.match(/(redux|vue|angular|svelte|java|c#|c\+\+|swift|kotlin|ruby|php)/i);
+    const mentionedTech = mentionedTechMatch ? mentionedTechMatch[0] : '';
+
+    if (mentionedTech && !allTechnologies.has(mentionedTech.toLowerCase())) {
+        return `Immanuvel's profile does not include experience with ${mentionedTech}. His expertise is primarily in JavaScript/TypeScript ecosystems like React, Next.js, and Node.js, as well as Python for AI development.`;
     }
   }
   
