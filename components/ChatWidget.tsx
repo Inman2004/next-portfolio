@@ -13,7 +13,7 @@ type ChatMessage = {
 };
 
 const initialAssistantMsg =
-  `Hi! I'm Mimir. You can ask about me about Immanuvel and i will help you`;
+  "Greetings. I am Mimir, an AI assistant created by Immanuvel to share knowledge about his work. Like my namesake from the ancient tales, I draw from a well of information. Ask me about Immanuvel's skills, projects, or experience.";
 
 export default function ChatWidget() {
   const pathname = usePathname();

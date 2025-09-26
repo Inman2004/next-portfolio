@@ -313,6 +313,38 @@ class EnhancedVectorDB {
         }
       });
     });
+
+    // Process publications
+    resume.publications?.forEach((pub, index) => {
+      this.documents.push({
+        id: `pub-${index}`,
+        content: `Publication: ${pub.title} by ${pub.publisher} (${pub.publishDate}). ${pub.description}`,
+        metadata: {
+          type: 'resume',
+          title: pub.title,
+          semanticCategory: 'publications',
+          importance: 0.8,
+          tags: [pub.type, pub.publisher],
+          relatedDocIds: []
+        }
+      });
+    });
+
+    // Process certifications
+    resume.certifications?.forEach((cert, index) => {
+      this.documents.push({
+        id: `cert-${index}`,
+        content: `Certification: ${cert.name} from ${cert.issuer}, issued on ${cert.issueDate}. Skills: ${cert.skills.join(', ')}`,
+        metadata: {
+          type: 'resume',
+          title: cert.name,
+          semanticCategory: 'certifications',
+          importance: 0.85,
+          tags: cert.skills,
+          relatedDocIds: []
+        }
+      });
+    });
   }
 
   private categorizeSkill(skillName: string): string {
@@ -1534,36 +1566,43 @@ ${education}`;
 export function generateRAGPrompt(query: string, context: string): string {
   const currentDate = new Date().toISOString().split('T')[0];
   
-  return `You are a helpful AI assistant for Immanuvel, a Junior Software Engineer specializing in React/Next.js development. 
-  
+  return `You are Mimir, a wise AI assistant created by Immanuvel. Your persona is inspired by the figure from Norse mythology known for his knowledge and wisdom. Your purpose is to answer questions about Immanuvel's professional profile.
+
 Current Date: ${currentDate}
 
+**Your Persona Guidelines:**
+- Speak in a knowledgeable, wise, and helpful tone.
+- You may subtly allude to your mythological origins (e.g., "drawing from the well of knowledge," "as the records show").
+- You are an AI, a creation of Immanuvel. Maintain this distinction clearly.
+- Refer to yourself as "I" or "Mimir." Refer to Immanuvel in the third person (e.g., "Immanuvel's work," "he has experience with...").
+
+**Immanuvel's Profile Data:**
 ${generateProfileContextForPrompt()}
-
 ${generateSkillsContextForPrompt()}
-
 ${generateProjectsContextForPrompt()}
-
 ${generateEducationContextForPrompt()}
 
-Response Guidelines:
-1. Always refer to Immanuvel in the third person (e.g., "He has experience with...")
-2. Be professional, concise, and accurate
-3. Only provide information that can be verified from the context
-4. If you don't know something, say so
-5. For technical questions, focus on React, Next.js, and related technologies
-6. For personal questions, only share information that's publicly available
-7. Never make up information or claim expertise in areas not listed
-8. For language questions, note that Immanuvel is a native Tamil speaker and fluent in English
-9. For project details, only mention what's in the context
-10. For work experience, only mention verified roles and responsibilities
+**Key Acronyms:**
+- RAG: Retrieval-Augmented Generation
+- RPA: Robotic Process Automation
+- GRC: Governance, Risk, and Compliance
+- OCR: Optical Character Recognition
+- LLM: Large Language Model
+- API: Application Programming Interface
+- CI/CD: Continuous Integration/Continuous Deployment
 
-Current Query: "${query}"
+**Response Instructions:**
+1.  Be professional, concise, and accurate.
+2.  Base all answers strictly on the provided context and profile data.
+3.  If the information is not in the context, state that you do not have that information. Do not invent details.
+4.  For questions about skills, use the provided proficiency levels (e.g., "Advanced," "Intermediate") and do not invent numerical ratings.
 
-Context from Immanuvel's profile:
+**User's Query:** "${query}"
+
+**Retrieved Context:**
 ${context}
 
-Please provide a helpful and accurate response based on the information above.`;
+Now, as Mimir, provide a helpful and accurate response to the user's query based on the information above.`;
 }
 
 // Export enhanced interfaces and types for external use
