@@ -4,12 +4,12 @@ import { motion as m } from "framer-motion";
 import { CssDotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
 import Projects from "@/components/Projects";
-import Skills from "@/components/Skills";
-import Services from "@/components/Services";
+import Roadmap from "@/components/Roadmap";
 import Contact from "@/components/Contact";
 import Comments from "@/components/Comments";
 import Hero from "@/components/Hero";
 import Footer from '@/components/Footer';
+import BlurFade from "@/components/ui/blur-fade";
 import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
@@ -49,13 +49,22 @@ export default function Home() {
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
-          <Projects showAll={false} maxItems={3} />
-          <SkillRoadMap />
-          <Skills />
-          <Experience />
-          <Testimonials />
-          <Comments />
-          <Contact />
+          <BlurFade delay={0.25 * 2} inView>
+            <Projects showAll={false} maxItems={3} />
+          </BlurFade>
+          <Roadmap />
+          <BlurFade delay={0.25 * 4} inView>
+            <Experience />
+          </BlurFade>
+          <BlurFade delay={0.25 * 5} inView>
+            <Testimonials />
+          </BlurFade>
+          <BlurFade delay={0.25 * 6} inView>
+            <Comments />
+          </BlurFade>
+          <BlurFade delay={0.25 * 7} inView>
+            <Contact />
+          </BlurFade>
         </div>
       </main>
       
