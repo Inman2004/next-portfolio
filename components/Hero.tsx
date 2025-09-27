@@ -38,8 +38,8 @@ import Link from "next/link";
 import ProfileCard from "./ProfileCard";
 import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
-import BlurFade from "./ui/blur-fade";
-import NumberTicker from "@/components/ui/number-ticker";
+import { BlurFade } from "./ui/blur-fade";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 const InteractiveCard3D = dynamic(() => import("./ThreeJS/HeroID"), {
   ssr: false,
