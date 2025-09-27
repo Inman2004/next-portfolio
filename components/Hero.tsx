@@ -38,6 +38,8 @@ import Link from "next/link";
 import ProfileCard from "./ProfileCard";
 import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
+import BlurFade from "./ui/blur-fade";
+import NumberTicker from "@/components/ui/number-ticker";
 
 const InteractiveCard3D = dynamic(() => import("./ThreeJS/HeroID"), {
   ssr: false,
@@ -144,11 +146,12 @@ export default function Hero() {
 
           {/* Content Container */}
           <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-            <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-16 pt-8 lg:pt-12">
-              {/* Left Content - Text */}
-              <div className="w-full lg:max-w-[60%] xl:max-w-[60%]">
-                {/* Left Content */}
-                <m.div
+            <BlurFade delay={0.25} inView>
+              <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-16 pt-8 lg:pt-12">
+                {/* Left Content - Text */}
+                <div className="w-full lg:max-w-[60%] xl:max-w-[60%]">
+                  {/* Left Content */}
+                  <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                   transition={{
@@ -199,21 +202,21 @@ export default function Hero() {
                     <div className="flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-300 mb-4">
                       <div className="flex items-center gap-1 bg-zinc-50/80 dark:bg-zinc-800/60 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-700">
                         <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                          Hands-on
+                          <NumberTicker value={4} />+
                         </span>{" "}
-                        experience
+                        Years of Experience
                       </div>
                       <div className="flex items-center gap-1 bg-zinc-50/80 dark:bg-zinc-800/60 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-700">
                         <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                          15+
+                          <NumberTicker value={10} />+
                         </span>{" "}
-                        projects
+                        Projects Completed
                       </div>
                       <div className="flex items-center gap-1 bg-zinc-50/80 dark:bg-zinc-800/60 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-700">
                         <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                          High Activity
+                          <NumberTicker value={15} />+
                         </span>{" "}
-                        in GitHub
+                        Technologies Mastered
                       </div>
                     </div>
 
@@ -372,7 +375,8 @@ export default function Hero() {
                 onContactClick={() => window.open("https://rvimman-two.vercel.app", "_blank")}
               />
             </div>
-          </div>
+          </BlurFade>
+        </div>
 
           {/* Scroll Indicator */}
           <m.div
