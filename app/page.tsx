@@ -9,7 +9,7 @@ import Contact from "@/components/Contact";
 import Comments from "@/components/Comments";
 import Hero from "@/components/Hero";
 import Footer from '@/components/Footer';
-import BlurFade from "@/components/ui/blur-fade";
+import { BlurFade } from "@/components/ui/blur-fade";
 import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";

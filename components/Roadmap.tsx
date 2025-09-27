@@ -7,7 +7,7 @@ import {
   SiPostgresql,
   SiDocker,
 } from "react-icons/si";
-import BlurFade from "./ui/blur-fade";
+import { BlurFade } from "./ui/blur-fade";
 import { AnimatedBeam } from "./ui/animated-beam";
 
 const Circle = forwardRef<
@@ -17,7 +17,7 @@ const Circle = forwardRef<
   return (
     <div
       ref={ref}
-      className={`z-10 flex h-16 w-16 items-center justify-center rounded-full border-2 bg-white p-3 text-3xl text-black shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] dark:bg-zinc-800 dark:text-white ${className}`}
+      className={`z-10 flex h-16 w-16 items-center justify-center rounded-full border-2 bg-card p-3 text-3xl text-card-foreground shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] dark:bg-card dark:text-card-foreground ${className}`}
     >
       {children}
     </div>
