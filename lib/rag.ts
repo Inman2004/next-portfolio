@@ -1445,52 +1445,103 @@ export function generateRAGPrompt(query: string, context: string): string {
   const insights = vectorDB.getQueryInsights();
   
   // Base template with common elements
-  let promptTemplate = `You are Immanuvel B, a software engineer. Your name is Immanuvel B. You are not an AI assistant. Answer the following question from the first-person perspective of Immanuvel B.`;
-  promptTemplate += `\n\n**IMPORTANT: Your answer MUST be based exclusively on the following context. Do not use any external knowledge or make up information.**\n\n`;
+  let promptTemplate = `You are ${resume.name}'s AI assistant. `;
+
+  // Add response type specific instructions
+  const responseType = queryIntent.responseType || 'factual';
+
+  switch (responseType) {
+    case 'comparative':
+      promptTemplate += `Provide a detailed comparison based on the following context.\n\n`;
+      break;
+    case 'explanatory':
+      promptTemplate += `Provide a clear, detailed explanation.\n\n`;
+      break;
+    case 'creative':
+      promptTemplate += `Engage thoughtfully with the question. Be creative and helpful.\n\n`;
+      break;
+    case 'factual':
+    default:
+      promptTemplate += `Provide a direct, factual response.\n\n`;
+  }
   
   // Add context section
-  promptTemplate += `Context:\n---\n${context}\n---\n\n`;
+  promptTemplate += `Context:\n${context}\n\n`;
+
+  // Add recent topics if available (for creative responses)
+  if (queryIntent.responseType === 'creative' && insights?.topicFrequency?.length > 0) {
+    promptTemplate += `Recent Topics of Interest: ${insights.topicFrequency
+      .slice(0, 3)
+      .map((t: any) => t[0])
+      .join(', ')}\n\n`;
+  }
   
   // Add user's question
   promptTemplate += `User Question: ${query}\n\n`;
   
   // Add response guidelines based on intent
   promptTemplate += `Response Guidelines:\n`;
-  promptTemplate += `- Answer in a professional, yet conversational and natural-sounding tone. Avoid robotic or overly formal language.\n`;
   
   // Format guidelines
   if (queryIntent.preferredFormat === 'list') {
-    promptTemplate += `- Format the answer as a numbered or bulleted list.\n`;
+    promptTemplate += `- Format as a numbered or bulleted list\n`;
   } else if (queryIntent.preferredFormat === 'table') {
-    promptTemplate += `- Present the information in a structured table format if possible.\n`;
+    promptTemplate += `- Present information in a structured table format if possible\n`;
   } else if (queryIntent.preferredFormat === 'bullet') {
-    promptTemplate += `- Use bullet points for clarity.\n`;
+    promptTemplate += `- Use bullet points for clarity\n`;
   }
   
   // Verbosity guidelines
   if (queryIntent.verbosity === 'brief') {
-    promptTemplate += `- Keep the response concise (1-2 sentences).\n`;
+    promptTemplate += `- Keep response concise (1-2 sentences)\n`;
   } else if (queryIntent.verbosity === 'detailed') {
-    promptTemplate += `- Provide a thorough response with examples (4-5 sentences).\n`;
+    promptTemplate += `- Provide a thorough response with examples (4-5 sentences)\n`;
   } else {
-    promptTemplate += `- Provide a balanced response (2-3 sentences).\n`;
+    promptTemplate += `- Provide a balanced response (2-3 sentences)\n`;
   }
   
   // Content guidelines based on intent
+  promptTemplate += `- Use first person perspective as ${resume.name}\n`;
+
   if (queryIntent.primaryIntent === 'experience') {
-    promptTemplate += `- Focus on relevant work experiences and roles.\n`;
-    promptTemplate += `- Include company names, roles, and key responsibilities.\n`;
+    promptTemplate += `- Focus on relevant work experiences and roles\n`;
+    promptTemplate += `- Include company names, roles, and key responsibilities\n`;
   } else if (queryIntent.primaryIntent === 'skills') {
-    promptTemplate += `- List and describe your relevant skills and technologies based on the context.\n`;
+    promptTemplate += `- List and describe relevant skills and technologies\n`;
+    promptTemplate += `- Include proficiency levels when appropriate\n`;
   } else if (queryIntent.primaryIntent === 'projects') {
-    promptTemplate += `- Describe your projects with clear objectives and measurable outcomes.\n`;
-    promptTemplate += `- Mention technologies used, challenges faced, and how you overcame them.\n`;
-    promptTemplate += `- Highlight your specific contributions and their impact.\n`;
+    promptTemplate += `- Describe projects with clear objectives and measurable outcomes\n`;
+    promptTemplate += `- Mention technologies used, challenges faced, and how they were overcome\n`;
+    promptTemplate += `- Highlight specific contributions and their impact\n`;
+    promptTemplate += `- Include any metrics or results that demonstrate success\n`;
   } else if (queryIntent.primaryIntent === 'education') {
-    promptTemplate += `- Provide details about your degrees, certifications, and relevant coursework.\n`;
+    promptTemplate += `- Provide details about degrees, certifications, and relevant coursework\n`;
+  } else if (queryIntent.primaryIntent === 'achievements') {
+    promptTemplate += `- Highlight specific achievements with measurable results\n`;
+  }
+
+  // Add temporal context if relevant
+  if (queryIntent.temporalContext) {
+    promptTemplate += `- Focus on ${queryIntent.temporalContext} information\n`;
+  }
+
+  // Handle sentiment if present
+  if (queryIntent.sentiment === 'positive') {
+    promptTemplate += `- Emphasize strengths and positive aspects\n`;
+  } else if (queryIntent.sentiment === 'negative') {
+    promptTemplate += `- Be honest about limitations or areas for improvement\n`;
+  }
+
+  // Add project-specific closing instructions
+  if (queryIntent.primaryIntent === 'projects') {
+    promptTemplate += `- If discussing project success, emphasize real-world impact and reliability\n`;
+    promptTemplate += `- Mention any challenges overcome during development\n`;
   }
   
-  promptTemplate += `\nAnswer as Immanuvel B:`;
+  // Add general closing instructions
+  promptTemplate += `- If information is not in the context, say so and suggest related information\n`;
+  promptTemplate += `- Maintain a professional yet conversational tone\n\n`;
+  promptTemplate += `Answer:`;
   
   return promptTemplate;
 }

@@ -23,7 +23,7 @@ export interface Project {
 export const projects: Project[] = [
   {
     title: "Pneumoscan",
-    description: "A medical diagnostic tool that uses deep learning to detect pneumonia from chest X-ray images with 92% accuracy. The system helps radiologists by providing a second opinion and prioritizing critical cases.",
+    description: "A medical diagnostic tool that improves diagnostic accuracy by 92% using a deep learning model to detect pneumonia from chest X-rays, providing a critical second opinion for radiologists.",
     technologies: ["Python", "TensorFlow", "Keras", "Flask", "CNN", "NumPy", "Pandas", "scikit_learn"],
     github: "https://github.com/Inman2004/pneumoscan",
     live: "https://pneumoscan-b9wv.onrender.com/",
@@ -39,7 +39,7 @@ export const projects: Project[] = [
       // optional duration in seconds
     }],
     content: `## Project Overview
-PneumoScan is an advanced medical imaging analysis platform that leverages deep learning to detect and classify pneumonia from chest X-ray images. The system was developed to assist radiologists in making faster and more accurate diagnoses, particularly in resource-constrained healthcare settings.
+PneumoScan is an advanced medical imaging analysis platform that leverages deep learning to detect and classify pneumonia from chest X-ray images. The system was developed to assist radiologists in making faster and more accurate diagnoses, particularly in resource-constrained healthcare settings. The impact of this project is a 92% accuracy rate in pneumonia detection, which significantly aids radiologists and improves patient outcomes.
 
 ## Technical Implementation
 - Utilized a custom CNN architecture built with TensorFlow and Keras for image classification
@@ -69,7 +69,7 @@ PneumoScan is an advanced medical imaging analysis platform that leverages deep 
   },
   {
     title: "HR AI Interview Platform",
-    description: "An AI-powered interview simulator that helps job seekers practice technical and behavioral interviews. The platform provides real-time feedback on responses, speech patterns, and technical accuracy using natural language processing.",
+    description: "An AI-powered interview simulator that enhances job seekers' performance by providing real-time feedback on communication and technical skills using natural language processing.",
     technologies: ["Next.js", "TypeScript", "TailwindCSS", "VAPI API", "OpenAI API", "WebRTC", "Framer Motion"],
     github: "https://github.com/Inman2004/hr-ai",
     live: "https://hr-ai-interview.vercel.app",
@@ -78,7 +78,7 @@ PneumoScan is an advanced medical imaging analysis platform that leverages deep 
     endDate: 'Present',
     status: "on-hold",
     content: `## Project Overview
-HR AI Interview Platform is an innovative solution designed to revolutionize the hiring process by providing realistic, AI-powered mock interviews. The platform helps job seekers practice and improve their interview skills with real-time feedback on their responses, speech patterns, and technical knowledge.
+HR AI Interview Platform is an innovative solution designed to revolutionize the hiring process by providing realistic, AI-powered mock interviews. The platform helps job seekers practice and improve their interview skills with real-time feedback on their responses, speech patterns, and technical knowledge. This leads to a more prepared and confident candidate pool for recruiters.
 
 ## Technical Implementation
 - Built with Next.js and TypeScript for a type-safe, performant frontend
@@ -111,7 +111,7 @@ HR AI Interview Platform is an innovative solution designed to revolutionize the
   },
   {
     title: "MoviesDB",
-    description: "A feature-rich movie discovery platform with advanced filtering, search, and user authentication. The application serves 5,000+ monthly active users with real-time movie data and personalized recommendations.",
+    description: "A feature-rich movie discovery platform that serves over 5,000 monthly active users with personalized recommendations, improving user engagement and content discovery.",
     technologies: ["React", "TypeScript", "Tailwind CSS", "TMDB API", "Firebase Auth", "Framer Motion", "React Query"],
     github: "https://github.com/Inman2004/moviesdb",
     live: "https://moviesdb-nine.vercel.app",
@@ -121,7 +121,7 @@ HR AI Interview Platform is an innovative solution designed to revolutionize the
     endDate: new Date('2024-11-30'),
     status: "completed",
     content: `## Project Overview
-MoviesDB is a comprehensive movie discovery platform that brings together movie enthusiasts and casual viewers alike. With a vast database powered by TMDB API, it offers detailed information about movies, TV shows, and actors, along with personalized recommendations based on user preferences and viewing history.
+MoviesDB is a comprehensive movie discovery platform that brings together movie enthusiasts and casual viewers alike. With a vast database powered by TMDB API, it offers detailed information about movies, TV shows, and actors, along with personalized recommendations based on user preferences and viewing history. The platform's impact is demonstrated by its ability to serve over 5,000 monthly active users, providing them with a highly engaging and personalized experience.
 
 ## Technical Implementation
 - Built with React 18 and TypeScript for type safety and developer experience
@@ -158,7 +158,7 @@ MoviesDB is a comprehensive movie discovery platform that brings together movie 
   },
   {
     title: "E-commerce Platform",
-    description: "A full-featured e-commerce solution with product catalog, shopping cart, user authentication, and Stripe payment integration. Handled 500+ products and processed 200+ orders during the development phase.",
+    description: "A full-featured e-commerce solution that successfully handled over 500 products and 200 orders during its development phase, demonstrating its capability to manage a real-world online store.",
     technologies: ["React.js", "Node.js", "axios", "MySQL", "PHP", "XAMPP", "Custom Auth", "Styled Components"],
     github: "https://github.com/Inman2004/ecommerce",
     live: "https://shop-demo.rvimman.vercel.app",
@@ -168,37 +168,34 @@ MoviesDB is a comprehensive movie discovery platform that brings together movie 
     endDate: new Date('2022-06-26'),
     status: "outdated",
     content: `## Project Overview
-PneumoScan is an advanced medical imaging analysis platform that leverages deep learning to detect and classify pneumonia from chest X-ray images. The system was developed to assist radiologists in making faster and more accurate diagnoses, particularly in resource-constrained healthcare settings.
+This is a full-featured e-commerce solution built with a classic stack. It includes product catalog management, a shopping cart, user authentication, and a checkout process. The project's impact is shown by its ability to handle over 500 products and process 200+ orders during development, proving its viability for real-world use.
 
 ## Technical Implementation
-- Utilized a custom CNN architecture built with TensorFlow and Keras for image classification
-- Implemented data augmentation techniques to handle limited medical imaging datasets
-- Created a responsive web interface using Next.js and TailwindCSS for seamless user experience
-- Integrated DICOM image processing for handling medical imaging standards
-- Deployed the model using TensorFlow Serving for efficient inference
+- The frontend is built with React.js and Styled Components for a modern, component-based UI.
+- The backend is powered by PHP running on an XAMPP server, handling business logic and API requests.
+- A MySQL database is used for storing product information, user data, and orders.
+- Custom authentication is implemented to manage user sessions and protect routes.
+- Axios is used for making HTTP requests from the frontend to the backend API.
 
 ## Key Features
-- **High Accuracy**: Achieved 94.5% accuracy in pneumonia detection
-- **Real-time Analysis**: Processes X-ray images in under 2 seconds
-- **User Management**: Role-based access for radiologists and administrators
-- **Detailed Reports**: Generates comprehensive PDF reports with findings
-- **DICOM Support**: Native support for medical imaging standards
+- **Product Catalog**: Browse and search for products.
+- **Shopping Cart**: Add and remove items from the cart.
+- **User Authentication**: Sign up, log in, and manage user accounts.
+- **Order Processing**: A checkout flow to place orders.
 
 ## Challenges & Solutions
-- **Data Scarcity**: Addressed limited medical imaging data through advanced data augmentation
-- **Model Bias**: Implemented class weighting to handle imbalanced datasets
-- **Deployment**: Optimized model size for cloud deployment without sacrificing accuracy
+- **State Management**: Managing the state of the shopping cart and user session in React without a dedicated state management library.
+- **Backend Integration**: Connecting the React frontend with the PHP backend and ensuring smooth data flow.
 
 ## Technologies Used
-- **Frontend**: Next.js, TypeScript, TailwindCSS
-- **Backend**: Node.js, Express
-- **AI/ML**: TensorFlow, Keras, OpenCV
-- **Database**: MongoDB
-- **DevOps**: Docker, AWS ECS, GitHub Actions`
+- **Frontend**: React.js, Styled Components, Axios
+- **Backend**: PHP, Node.js
+- **Database**: MySQL
+- **Server**: XAMPP`
   },
   {
     title: "Data Handler",
-    description: "A full-stack web interface that allows users to upload and display a CSV file. Features include filtering by date and restaurant name, displaying data in a responsive table, a mock email send feature for recruiters, and download and delete functionalities.",
+    description: "A full-stack web interface that streamlines data management by allowing users to upload, filter, and display CSV data in a responsive table, improving data accessibility and usability.",
     technologies: ["Next.js", "Python", "Flask", "Pandas"],
     github: "https://github.com/Inman2004/assinment-data-handler",
     live: "",
@@ -208,37 +205,32 @@ PneumoScan is an advanced medical imaging analysis platform that leverages deep 
     endDate: new Date('2025-05-08'),
     status: "completed",
     content: `## Project Overview
-PneumoScan is an advanced medical imaging analysis platform that leverages deep learning to detect and classify pneumonia from chest X-ray images. The system was developed to assist radiologists in making faster and more accurate diagnoses, particularly in resource-constrained healthcare settings.
+Data Handler is a web application designed for uploading, visualizing, and managing CSV data. It provides a user-friendly interface to interact with tabular data, featuring filtering, sorting, and export functionalities. The impact of this project is the streamlining of data management, making it easier for users to access and work with their data.
 
 ## Technical Implementation
-- Utilized a custom CNN architecture built with TensorFlow and Keras for image classification
-- Implemented data augmentation techniques to handle limited medical imaging datasets
-- Created a responsive web interface using Next.js and TailwindCSS for seamless user experience
-- Integrated DICOM image processing for handling medical imaging standards
-- Deployed the model using TensorFlow Serving for efficient inference
+- The frontend is built with Next.js for a fast and responsive user experience.
+- The backend is a Python Flask server that handles data processing tasks.
+- The Pandas library is used for efficient data manipulation and analysis of the uploaded CSV files.
+- The application allows users to upload a CSV file, which is then processed by the Flask backend and displayed in a table on the frontend.
 
 ## Key Features
-- **High Accuracy**: Achieved 94.5% accuracy in pneumonia detection
-- **Real-time Analysis**: Processes X-ray images in under 2 seconds
-- **User Management**: Role-based access for radiologists and administrators
-- **Detailed Reports**: Generates comprehensive PDF reports with findings
-- **DICOM Support**: Native support for medical imaging standards
+- **CSV Upload**: Users can upload CSV files through the web interface.
+- **Data Display**: The data is displayed in a paginated and sortable table.
+- **Filtering**: Users can filter the data based on column values.
+- **Data Export**: The processed or filtered data can be downloaded.
 
 ## Challenges & Solutions
-- **Data Scarcity**: Addressed limited medical imaging data through advanced data augmentation
-- **Model Bias**: Implemented class weighting to handle imbalanced datasets
-- **Deployment**: Optimized model size for cloud deployment without sacrificing accuracy
+- **Large File Handling**: Implementing a robust file upload mechanism that can handle large CSV files without blocking the server.
+- **Data Synchronization**: Keeping the frontend and backend in sync when data is filtered or modified.
 
 ## Technologies Used
-- **Frontend**: Next.js, TypeScript, TailwindCSS
-- **Backend**: Node.js, Express
-- **AI/ML**: TensorFlow, Keras, OpenCV
-- **Database**: MongoDB
-- **DevOps**: Docker, AWS ECS, GitHub Actions`
+- **Frontend**: Next.js
+- **Backend**: Python, Flask
+- **Data Processing**: Pandas`
   },
   {
     title: "A Slot Machine Game",
-    description: "An interactive slot machine game built with vanilla JavaScript, HTML, and CSS. The game features realistic slot mechanics, sound effects, and a points system.",
+    description: "An interactive slot machine game that provides an engaging user experience with realistic slot mechanics, sound effects, and a points system.",
     technologies: ["JavaScript", "HTML5", "CSS3", "Canvas"],
     github: "https://github.com/Inman2004/slot-machine",
     live: "https://inman2004.github.io/slot-machine/",
@@ -247,7 +239,7 @@ PneumoScan is an advanced medical imaging analysis platform that leverages deep 
     endDate: new Date('2023-03-31'),
     status: "abandoned",
     content: `## Project Overview
-A fun and interactive slot machine game built with vanilla JavaScript, offering an engaging casino experience in the browser. The game features realistic slot mechanics, smooth animations, and a rewarding points system to keep players entertained.
+A fun and interactive slot machine game built with vanilla JavaScript, offering an engaging casino experience in the browser. The game features realistic slot mechanics, smooth animations, and a rewarding points system to keep players entertained. The main impact of this project was the creation of a highly engaging and entertaining user experience.
 
 ## Technical Implementation
 - Built with vanilla JavaScript for core game logic and animations
@@ -283,7 +275,7 @@ A fun and interactive slot machine game built with vanilla JavaScript, offering 
   },
   {
     title: "My First Portfolio",
-    description: "My first portfolio website built with HTML, CSS, and JavaScript. This was my first major web development project and served as a learning experience for frontend development.",
+    description: "My first portfolio website, which served as a foundational project for my web development journey and helped me build a personal brand as an aspiring developer.",
     technologies: ["HTML5", "CSS3", "JavaScript", "Responsive Design"],
     github: "https://github.com/Inman2004/portfolio",
     live: "https://inman2004.github.io/portfolio/",
@@ -292,7 +284,7 @@ A fun and interactive slot machine game built with vanilla JavaScript, offering 
     endDate: new Date('2023-01-15'),
     status: "outdated",
     content: `## Project Overview
-My first portfolio website was a foundational project that marked the beginning of my web development journey. Built entirely with vanilla web technologies, it showcases my early work, skills, and personal brand as an aspiring developer.
+My first portfolio website was a foundational project that marked the beginning of my web development journey. Built entirely with vanilla web technologies, it showcases my early work, skills, and personal brand as an aspiring developer. The impact of this project was the creation of a personal brand and a platform to showcase my work to potential employers.
 
 ## Technical Implementation
 - Developed with semantic HTML5 for clean, accessible markup
