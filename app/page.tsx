@@ -14,6 +14,7 @@ import Testimonials from "@/components/Testimonials";
 import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
 import SkillRoadMap from "@/components/SkillRoadMap";
+import { LangCloud } from "@/components/LangCloud";
 
 export default function Home() {
   const { resolvedTheme } = useTheme();
@@ -49,10 +50,11 @@ export default function Home() {
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
+          <Projects showAll={false} maxItems={3} />
           <BlurFade delay={0.25 * 2} inView>
-            <Projects showAll={false} maxItems={3} />
-          </BlurFade>
           <Roadmap />
+          <LangCloud />
+          </BlurFade>
           <BlurFade delay={0.25 * 4} inView>
             <Experience />
           </BlurFade>

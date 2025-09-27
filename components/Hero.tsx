@@ -312,7 +312,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-foreground hover:bg-purple-500 dark:hover:bg-purple-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-purple-500/50 hover:text-white dark:hover:text-white p-2 rounded-full transition-all duration-300"
                       >
                         <Github className="w-6 h-6" />
                       </m.a>
@@ -321,7 +321,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-foreground hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-blue-500/50 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <Linkedin className="w-6 h-6" />
                       </m.a>
@@ -330,7 +330,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-foreground hover:bg-black dark:hover:bg-black hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-black/50 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <FaXTwitter className="w-6 h-6" />
                       </m.a>
@@ -339,7 +339,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-foreground hover:bg-red-500 dark:hover:bg-red-500 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-red-500/50 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <SiGmail className="w-6 h-6" />
                       </m.a>
@@ -349,7 +349,7 @@ export default function Hero() {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         title="online resume"
-                        className="text-foreground hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300 saturate-0 brightness-200 hover:saturate-100"
+                        className="text-foreground hover:bg-emerald-500/20 dark:hover:bg-emerald-500/10 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300 saturate-0 dark:brightness-200 hover:saturate-100"
                       >
                         <img src="/images/favicon.png" className="w-6 h-6" />
                       </m.a>
