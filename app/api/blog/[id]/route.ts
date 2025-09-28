@@ -4,8 +4,9 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/firebase-server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getBlogPost } from '@/lib/blogUtils';
-import { incrementViewCount } from '@/lib/views';
+import { incrementViewCount, getViewCount } from '@/lib/views';
 import { blogPostSchema } from '@/lib/schemas/blog';
+import { calculateReadingTime } from '@/lib/readingTime';
 import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
@@ -24,10 +25,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return new NextResponse('Post not found', { status: 404 });
     }
     
-    // Asynchronously increment view count. No need to await.
+    const views = await getViewCount(id);
+
+    // Asynchronously increment view count for the next load. No need to await.
     incrementViewCount(id);
 
-    return NextResponse.json(post);
+    return NextResponse.json({ ...post, views });
   } catch (error) {
     console.error(`Error fetching post ${params.id}:`, error);
     return new NextResponse('Internal Server Error', { status: 500 });
@@ -61,10 +64,25 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const json = await request.json();
     const parsedData = blogPostSchema.partial().parse(json);
     
-    const updateData = {
+    const updateData: { [key: string]: any } = {
       ...parsedData,
       updatedAt: FieldValue.serverTimestamp(),
     };
+
+    // If title is updated, regenerate slug
+    if (parsedData.title) {
+      updateData.slug = parsedData.title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+
+    // If content is updated, recalculate reading time
+    if (parsedData.content) {
+      updateData.readingTime = calculateReadingTime(parsedData.content).text;
+    }
 
     await postRef.update(updateData);
 

@@ -1,67 +1,51 @@
 import 'server-only';
 import admin from 'firebase-admin';
-import { getApps, getApp } from 'firebase-admin/app';
-import { getFirestore, Firestore } from 'firebase-admin/firestore';
-import { getAuth, Auth } from 'firebase-admin/auth';
-import { getStorage, Storage } from 'firebase-admin/storage';
+import { App, getApp, getApps } from 'firebase-admin/app';
+import { Auth, getAuth } from 'firebase-admin/auth';
+import { Firestore, getFirestore } from 'firebase-admin/firestore';
+import { Storage, getStorage } from 'firebase-admin/storage';
 
+// Define the service account credentials directly from environment variables.
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
 };
 
-// Use a symbol to ensure the global variable is unique and won't conflict.
-const FIREBASE_ADMIN_INSTANCE = Symbol.for('firebaseAdminInstance');
+// A global symbol is used to store the initialized Firebase app,
+// preventing re-initialization across hot-reloads and module re-imports in Next.js.
+const FIREBASE_ADMIN_APP_KEY = Symbol.for('firebaseAdminApp');
 
-interface FirebaseAdminServices {
-  app: admin.app.App;
-  db: Firestore;
-  auth: Auth;
-  storage: Storage;
+interface GlobalWithFirebase {
+  [FIREBASE_ADMIN_APP_KEY]?: App;
 }
 
-// Extend the NodeJS.Global interface to include our custom symbol.
-interface GlobalWithFirebase extends NodeJS.Global {
-  [FIREBASE_ADMIN_INSTANCE]?: FirebaseAdminServices;
-}
-
-/**
- * Initializes and returns the Firebase Admin services, using a global cache
- * to ensure that the app is initialized only once per process.
- */
-function getFirebaseAdmin(): FirebaseAdminServices {
+function getAdminApp(): App {
   const globalWithFirebase = global as GlobalWithFirebase;
 
-  if (globalWithFirebase[FIREBASE_ADMIN_INSTANCE]) {
-    return globalWithFirebase[FIREBASE_ADMIN_INSTANCE];
+  if (globalWithFirebase[FIREBASE_ADMIN_APP_KEY]) {
+    return globalWithFirebase[FIREBASE_ADMIN_APP_KEY];
   }
 
   if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
-    throw new Error('Missing Firebase Admin SDK credentials in environment variables.');
+    throw new Error('Firebase Admin SDK credentials are not set in environment variables. Please check your .env.local file.');
   }
 
-  const app = !getApps().length
-    ? admin.initializeApp({
+  const app = getApps().length
+    ? getApp()
+    : admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
         storageBucket: `${serviceAccount.projectId}.appspot.com`,
-      })
-    : getApp();
+      });
 
-  const services: FirebaseAdminServices = {
-    app,
-    db: getFirestore(app),
-    auth: getAuth(app),
-    storage: getStorage(app),
-  };
-
-  globalWithFirebase[FIREBASE_ADMIN_INSTANCE] = services;
-
+  globalWithFirebase[FIREBASE_ADMIN_APP_KEY] = app;
   console.log('Firebase Admin SDK initialized successfully.');
-
-  return services;
+  return app;
 }
 
-const { db, auth, storage } = getFirebaseAdmin();
+const app: App = getAdminApp();
+const db: Firestore = getFirestore(app);
+const auth: Auth = getAuth(app);
+const storage: Storage = getStorage(app);
 
 export { db, auth, storage };

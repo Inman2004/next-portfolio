@@ -17,31 +17,21 @@ export async function batchQuery<T = any>(
   const results: T[] = [];
   const BATCH_SIZE = 30;
 
-  console.log(`Processing ${values.length} values for ${collectionName}.${String(field)} in ${Math.ceil(values.length / BATCH_SIZE)} batches`);
-
   for (let i = 0; i < values.length; i += BATCH_SIZE) {
     const batch = values.slice(i, i + BATCH_SIZE);
-    const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
-
     if (batch.length === 0) continue;
 
     try {
-      console.log(`Processing batch ${batchNumber}/${Math.ceil(values.length / BATCH_SIZE)} with ${batch.length} items`);
-
       const q = db.collection(collectionName).where(field, 'in', batch);
       const snapshot = await q.get();
-      console.log(`Batch ${batchNumber} returned ${snapshot.size} documents`);
 
       snapshot.forEach(doc => {
         results.push({ id: doc.id, ...doc.data() } as T);
       });
     } catch (batchError) {
-      console.error(`Error processing batch ${batchNumber} for ${collectionName}.${String(field)}:`, batchError);
-      console.error(`Batch values:`, batch);
+      console.error(`Error processing batch for ${collectionName}.${String(field)}:`, batchError);
     }
   }
-
-  console.log(`Total results returned: ${results.length}`);
   return results;
 }
 

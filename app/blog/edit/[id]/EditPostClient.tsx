@@ -32,7 +32,7 @@ export default function EditPostClient({ post }: EditPostClientProps) {
     }
   };
 
-  // Prepare initial data for the form, ensuring tags are an array.
+  // Prepare initial data for the form, ensuring tags are always an array.
   const initialData = {
     ...post,
     tags: Array.isArray(post.tags) ? post.tags : [],

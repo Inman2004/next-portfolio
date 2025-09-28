@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,6 +42,7 @@ export default function BlogPostForm({
       published: true,
       tags: [],
       ...initialData,
+      // Ensure tags are always an array, even if initialData.tags is undefined
       tags: Array.isArray(initialData?.tags) ? initialData.tags : [],
     },
   });
@@ -88,6 +89,7 @@ export default function BlogPostForm({
     try {
       const formData = new FormData();
       formData.append('file', file);
+      // Ensure you have this preset configured in your Cloudinary account
       formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_BLOG || 'blog-covers');
 
       const response = await fetch(

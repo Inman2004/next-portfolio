@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/firebase-server';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getBlogPosts } from '@/lib/blogUtils';
 import { getViewCounts } from '@/lib/views';
 import { blogPostSchema } from '@/lib/schemas/blog';
@@ -18,8 +18,21 @@ export async function POST(request: Request) {
     }
     const { user } = session;
 
+    // Use a partial schema for creation, as some fields are generated on the server.
+    const createSchema = blogPostSchema.omit({
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      slug: true,
+      readingTime: true,
+      viewCount: true,
+      authorId: true,
+      authorName: true,
+      authorPhotoURL: true,
+    });
+
     const json = await request.json();
-    const parsedData = blogPostSchema.parse(json);
+    const parsedData = createSchema.parse(json);
 
     const slug = parsedData.title
       .toLowerCase()
@@ -60,10 +73,15 @@ export async function GET() {
     const postIds = posts.map(post => post.id);
     const viewCounts = await getViewCounts(postIds);
 
-    const postsWithViews = posts.map(post => ({
-      ...post,
-      views: viewCounts[post.id] || 0,
-    }));
+    const postsWithViews = posts.map(post => {
+      const { createdAt, updatedAt, ...rest } = post;
+      return {
+        ...rest,
+        views: viewCounts[post.id] || 0,
+        createdAt: (createdAt instanceof Timestamp) ? createdAt.toDate().toISOString() : createdAt,
+        updatedAt: (updatedAt instanceof Timestamp) ? updatedAt.toDate().toISOString() : updatedAt,
+      };
+    });
 
     return NextResponse.json({ posts: postsWithViews });
 

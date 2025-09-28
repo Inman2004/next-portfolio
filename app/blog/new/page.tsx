@@ -23,9 +23,12 @@ export default function NewBlogPostPage() {
 
     setIsSubmitting(true);
     try {
+      // The new createBlogPost function now correctly calls our secure API
       const newPost = await createBlogPost(data);
       toast.success('Post created successfully');
-      router.push(`/blog/${newPost.id}`); // Navigate to the new post
+
+      // Navigate to the blog index as the new post will appear at the top.
+      router.push(`/blog`);
       router.refresh();
     } catch (error) {
       console.error('Error creating post:', error);
