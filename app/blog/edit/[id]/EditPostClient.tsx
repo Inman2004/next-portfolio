@@ -2,49 +2,53 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { BlogPostFormValues } from '@/lib/schemas/blog';
+import { updateBlogPost } from '@/lib/blog';
 import BlogPostForm from '@/components/blog/BlogPostForm';
 import { MarkdownEditorProvider } from '@/components/blog/MarkdownEditorContext';
-import { createBlogPost } from '@/lib/blog';
-import { BlogPostFormValues } from '@/lib/schemas/blog';
+import { BlogPost } from '@/types/blog';
 
-export default function NewBlogPostPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+interface EditPostClientProps {
+  post: BlogPost;
+}
+
+export default function EditPostClient({ post }: EditPostClientProps) {
   const router = useRouter();
-  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (data: BlogPostFormValues) => {
-    if (!user) {
-      toast.error('You must be logged in to create a post');
-      router.push('/signin?callbackUrl=/blog/new');
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      const newPost = await createBlogPost(data);
-      toast.success('Post created successfully');
-      router.push(`/blog/${newPost.id}`); // Navigate to the new post
+      await updateBlogPost(post.id, data);
+      toast.success('Post updated successfully');
+      router.push(`/blog/${post.id}`);
       router.refresh();
     } catch (error) {
-      console.error('Error creating post:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to create post');
+      console.error('Error updating post:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to update post');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Prepare initial data for the form, ensuring tags are an array.
+  const initialData = {
+    ...post,
+    tags: Array.isArray(post.tags) ? post.tags : [],
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-blue-500 dark:to-blue-400 font-bold mb-6">
-        Create New Post
+        Edit Post
       </h1>
       <MarkdownEditorProvider>
-        <BlogPostForm 
+        <BlogPostForm
+          initialData={initialData}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          isEditing={false}
+          isEditing={true}
         />
       </MarkdownEditorProvider>
     </div>

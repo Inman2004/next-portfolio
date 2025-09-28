@@ -1,100 +1,67 @@
 import 'server-only';
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
-import { getStorage, FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
+import admin from 'firebase-admin';
+import { getApps, getApp } from 'firebase-admin/app';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
+import { getAuth, Auth } from 'firebase-admin/auth';
+import { getStorage, Storage } from 'firebase-admin/storage';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
 };
 
-// Initialize Firebase for server-side usage
-let firebaseApp: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
-let storage: FirebaseStorage;
+// Use a symbol to ensure the global variable is unique and won't conflict.
+const FIREBASE_ADMIN_INSTANCE = Symbol.for('firebaseAdminInstance');
 
-const initializeFirebase = () => {
-  const requestId = Math.random().toString(36).substring(2, 10);
-  const logContext = `[${requestId}]`;
-  
-  // Return existing instances if already initialized
-  if (firebaseApp) {
-    console.log(`${logContext} Using existing Firebase instance`);
-    return { firebaseApp, auth, db, storage };
+interface FirebaseAdminServices {
+  app: admin.app.App;
+  db: Firestore;
+  auth: Auth;
+  storage: Storage;
+}
+
+// Extend the NodeJS.Global interface to include our custom symbol.
+interface GlobalWithFirebase extends NodeJS.Global {
+  [FIREBASE_ADMIN_INSTANCE]?: FirebaseAdminServices;
+}
+
+/**
+ * Initializes and returns the Firebase Admin services, using a global cache
+ * to ensure that the app is initialized only once per process.
+ */
+function getFirebaseAdmin(): FirebaseAdminServices {
+  const globalWithFirebase = global as GlobalWithFirebase;
+
+  if (globalWithFirebase[FIREBASE_ADMIN_INSTANCE]) {
+    return globalWithFirebase[FIREBASE_ADMIN_INSTANCE];
   }
 
-  try {
-    console.log(`${logContext} Initializing Firebase`);
-    
-    // Initialize Firebase
-    firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-    
-    // Initialize services
-    console.log(`${logContext} Initializing Auth service`);
-    auth = getAuth(firebaseApp);
-    
-    console.log(`${logContext} Initializing Firestore`);
-    db = getFirestore(firebaseApp);
-    
-    console.log(`${logContext} Initializing Storage`);
-    storage = getStorage(firebaseApp);
-
-    // Configure emulators in development
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
-      try {
-        // Only connect to emulators if not already connected
-        const emulatorConnected = (global as any)._emulatorConnected;
-        if (!emulatorConnected) {
-          console.log(`${logContext} Connecting to emulators`);
-          
-          // Connect to Firestore emulator
-          connectFirestoreEmulator(db, 'localhost', 8080);
-          
-          // Connect to Auth emulator
-          connectAuthEmulator(auth, 'http://localhost:9099');
-          
-          // Connect to Storage emulator
-          connectStorageEmulator(storage, 'localhost', 9199);
-          
-          (global as any)._emulatorConnected = true;
-          console.log(`${logContext} Connected to all emulators`);
-        }
-      } catch (emulatorError) {
-        console.error(`${logContext} Error connecting to emulators:`, emulatorError);
-        // Don't throw, continue without emulators
-      }
-    }
-
-    console.log(`${logContext} Firebase initialized successfully`);
-    return { firebaseApp, auth, db, storage };
-    
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`${logContext} Firebase initialization failed:`, error);
-    
-    // Log the full error for debugging
-    console.error('Firebase initialization error details:', {
-      error,
-      stack: error instanceof Error ? error.stack : undefined,
-      config: {
-        ...firebaseConfig,
-        apiKey: firebaseConfig.apiKey ? '***' : 'MISSING',
-      }
-    });
-    
-    throw new Error(`Failed to initialize Firebase: ${errorMessage}`);
+  if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
+    throw new Error('Missing Firebase Admin SDK credentials in environment variables.');
   }
-};
 
-// Export initialized services
-export { auth, db, storage, firebaseApp as app, initializeFirebase };
+  const app = !getApps().length
+    ? admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        storageBucket: `${serviceAccount.projectId}.appspot.com`,
+      })
+    : getApp();
 
-// Initialize Firebase automatically when this module is imported
-initializeFirebase();
+  const services: FirebaseAdminServices = {
+    app,
+    db: getFirestore(app),
+    auth: getAuth(app),
+    storage: getStorage(app),
+  };
+
+  globalWithFirebase[FIREBASE_ADMIN_INSTANCE] = services;
+
+  console.log('Firebase Admin SDK initialized successfully.');
+
+  return services;
+}
+
+const { db, auth, storage } = getFirebaseAdmin();
+
+export { db, auth, storage };

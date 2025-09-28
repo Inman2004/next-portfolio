@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db, auth } from '@/lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { toast } from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { deleteBlogPost, updateBlogPost } from '@/lib/blog';
 import { Trash2, Edit, Share2, MoreHorizontal, Lock, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
@@ -20,41 +19,34 @@ interface BlogPostActionsProps {
   postId: string;
   authorId?: string;
   initialPublished?: boolean;
-  isAdmin?: boolean; // backward compat
-  onDelete?: () => void;
 }
 
-export default function BlogPostActions({ postId, authorId, initialPublished, isAdmin, onDelete }: BlogPostActionsProps) {
+export default function BlogPostActions({ postId, authorId, initialPublished }: BlogPostActionsProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [canManage, setCanManage] = useState<boolean>(!!isAdmin);
   const [published, setPublished] = useState<boolean>(initialPublished ?? true);
 
   useEffect(() => {
     setIsClient(true);
-    const unsub = onAuthStateChanged(auth!, (user) => {
-      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'rvimman@gmail.com';
-      const userIsAdmin = !!user?.email && user.email === adminEmail;
-      const isOwner = !!user?.uid && !!authorId && user.uid === authorId;
-      setCanManage(userIsAdmin || isOwner || !!isAdmin);
-    });
-    return () => unsub();
   }, []);
+
+  const canManage = user && (user.uid === authorId || (user as any).role === 'admin');
 
   const handleDelete = async () => {
     if (!canManage) return;
     
     setIsDeleting(true);
     try {
-      await deleteDoc(doc(db, 'blogPosts', postId));
+      await deleteBlogPost(postId);
       toast.success('Post deleted successfully');
-      onDelete?.();
       router.push('/blog');
+      router.refresh();
     } catch (error) {
       console.error('Error deleting post:', error);
-      toast.error('Failed to delete post');
+      toast.error(error instanceof Error ? error.message : 'Failed to delete post');
     } finally {
       setIsDeleting(false);
       setIsConfirmOpen(false);
@@ -65,12 +57,13 @@ export default function BlogPostActions({ postId, authorId, initialPublished, is
     if (!canManage) return;
     try {
       const next = !published;
-      await updateDoc(doc(db, 'blogPosts', postId), { published: next });
+      await updateBlogPost(postId, { published: next });
       setPublished(next);
-      toast.success(next ? 'Post is now public' : 'Post is now private');
+      toast.success(next ? 'Post published successfully' : 'Post moved to drafts');
+      router.refresh();
     } catch (error) {
       console.error('Error updating visibility:', error);
-      toast.error('Failed to update visibility');
+      toast.error(error instanceof Error ? error.message : 'Failed to update visibility');
     }
   };
 
@@ -112,7 +105,7 @@ export default function BlogPostActions({ postId, authorId, initialPublished, is
               ) : (
                 <Globe className="h-4 w-4 mr-2" />
               )}
-              {published ? 'Make Private' : 'Make Public'}
+              {published ? 'Unpublish (Draft)' : 'Publish'}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setIsConfirmOpen(true)} className="text-red-600 focus:text-red-600">
               <Trash2 className="h-4 w-4 mr-2" /> Delete
