@@ -10,6 +10,7 @@ import UniqueId from '@tiptap/extension-unique-id';
 import { SlashCommand } from './suggestion';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import toast from 'react-hot-toast';
+import { slugify } from '@/utils/slugify';
 
 const TiptapEditor = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
   const editor = useEditor({
@@ -22,7 +23,12 @@ const TiptapEditor = ({ value, onChange }: { value: string; onChange: (value: st
       SlashCommand,
       UniqueId.configure({
         types: ['heading'],
-        generateID: () => `heading-${Math.random().toString(36).substr(2, 9)}`,
+        generateID: (attributes) => {
+          // Get the text content of the heading
+          const text = attributes.text || '';
+          // Slugify the text to create a URL-friendly ID
+          return slugify(text);
+        },
       }),
     ],
     content: value,
