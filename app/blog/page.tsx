@@ -80,8 +80,8 @@ export default async function BlogPage({
   }
   
   // Parse pagination parameters from URL
-  const currentPage = parseInt(searchParams.page || '1', 10);
-  const postsPerPage = parseInt(searchParams.perPage || '9', 10);
+  const currentPage = parseInt(searchParams?.page ?? '1', 10);
+  const postsPerPage = parseInt(searchParams?.perPage ?? '9', 10);
   
   // Normalize dates safely for client list
   const toIsoStringSafe = (value: any): string => {

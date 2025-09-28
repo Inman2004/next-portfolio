@@ -10,7 +10,6 @@ import { TableOfContents } from '@/components/blog/TableOfContents';
 import { Eye, Calendar, User as UserIcon, Clock } from 'lucide-react';
 import BlogPostActions from '@/components/blog/BlogPostActions';
 import BlogFloatingBar from '@/components/blog/BlogFloatingBar';
-import { TableOfContents } from '@/components/blog/TableOfContents';
 import { getBlogPost } from '@/lib/blogUtils';
 import { getViewCount } from '@/lib/views';
 import { SocialLinks } from '@/components/blog/SocialLinks';
