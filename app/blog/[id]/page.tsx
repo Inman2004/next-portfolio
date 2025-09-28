@@ -3,9 +3,10 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatNumber } from '@/lib/formatNumber';
-import MarkdownViewer from '@/components/blog/MarkdownViewer';
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import TiptapViewer from '@/components/blog/TiptapViewer';
+import { TableOfContents } from '@/components/blog/TableOfContents';
 import { Eye, Calendar, User as UserIcon, Clock } from 'lucide-react';
 import BlogPostActions from '@/components/blog/BlogPostActions';
 import BlogFloatingBar from '@/components/blog/BlogFloatingBar';
@@ -176,7 +177,6 @@ export default async function PostPage({ params }: PostPageProps) {
         
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-10">
           <div className="prose max-w-none min-w-0 prose-img:rounded-xl prose-headings:scroll-mt-28">
-            {/* Use MemberOnlyContent component for conditional rendering */}
             <MemberOnlyContent
               isMembersOnly={post.isMembersOnly || false}
               membershipTier={post.membershipTier}
@@ -189,24 +189,18 @@ export default async function PostPage({ params }: PostPageProps) {
             />
           </div>
           <div className="hidden lg:block w-[320px] min-w-0 space-y-4">
-            {/* Blog Subscription */}
             <BlogSubscription
               blogId={id}
               creatorName={author.name}
             />
-            
             <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-zinc-700">
-              {/* Social links (if available on author) */}
               {/* @ts-ignore */}
-              {author?.socials ? (
-                // @ts-ignore
+              {author?.socials && (
                 <div className="flex flex-wrap gap-3 justify-start items-center">
-                  <UserAvatar photoURL={author.photoURL} displayName={author.name} size={40} className="h-10 w-10" /> 
-                  {/* We reuse the SocialLinks component if you prefer: */}
+                  <UserAvatar photoURL={author.photoURL} displayName={author.name} size={40} className="h-10 w-10" />
                   <SocialLinks socials={author.socials} authorName={author.name} className="justify-start" />
                 </div>
-                
-              ) : null}
+              )}
             </div>
             <TableOfContents content={post.content} />
           </div>

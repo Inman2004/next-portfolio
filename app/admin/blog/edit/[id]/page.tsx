@@ -1,29 +1,43 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { BlogEditor } from '@/components/admin/BlogEditor';
-
-// Mock function to fetch blog post by ID
-async function getBlogPost(id: string) {
-  // In a real app, you would fetch this from your API
-  return {
-    id,
-    title: 'Getting Started with Next.js',
-    slug: 'getting-started-with-nextjs',
-    excerpt: 'Learn how to get started with Next.js and build amazing web applications.',
-    content: '# Getting Started with Next.js\n\nNext.js is a React framework that enables server-side rendering and generating static websites.\n\n## Why Next.js?\n\n- **Performance**: Automatic code splitting and optimized production builds.\n- **SEO Friendly**: Server-side rendering out of the box.\n- **Developer Experience**: Hot code reloading and a great development experience.\n\n## Installation\n\n```bash\nnpx create-next-app@latest my-app\ncd my-app\nnpm run dev\n```',
-    published: true,
-    featuredImage: 'https://example.com/nextjs-cover.jpg',
-    tags: ['nextjs', 'react', 'javascript']
-  };
-}
+import { getBlogPostClient } from '@/lib/client/blog';
+import { BlogPost } from '@/types/blog';
+import { Loader2 } from 'lucide-react';
 
 export default function EditBlogPostPage() {
   const params = useParams();
   const postId = Array.isArray(params.id) ? params.id[0] : params.id;
-  
-  // In a real app, you would fetch the blog post data here
-  const post = getBlogPost(postId);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (postId) {
+      getBlogPostClient(postId)
+        .then((data) => {
+          setPost(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch blog post', error);
+          setLoading(false);
+        });
+    }
+  }, [postId]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!post) {
+    return <div>Blog post not found.</div>;
+  }
 
   return (
     <div>

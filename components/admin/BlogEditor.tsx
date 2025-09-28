@@ -2,37 +2,27 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
-
-// Dynamically import the MD editor to avoid SSR issues
-const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor'),
-  { ssr: false }
-);
+import TiptapEditor from './TiptapEditor';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { saveBlogPost } from '@/lib/client/blog';
+import toast from 'react-hot-toast';
+import { BlogPost } from '@/types/blog';
 
 interface BlogEditorProps {
-  initialData?: {
-    id?: string;
-    title: string;
-    content: string;
-    excerpt: string;
-    slug: string;
-    published: boolean;
-    featuredImage?: string;
-    tags?: string[];
-  };
+  initialData?: BlogPost;
 }
 
 export function BlogEditor({ initialData }: BlogEditorProps) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     slug: initialData?.slug || '',
@@ -45,39 +35,51 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleContentChange = useCallback((value: string | undefined) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      content: value || ''
+      content: value || '',
     }));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent, publish: boolean = false) => {
     e.preventDefault();
-    
+
     if (publish) {
       setIsPublishing(true);
     } else {
       setIsSaving(true);
     }
 
+    const postData = {
+      ...formData,
+      tags: formData.tags.split(',').map((tag) => tag.trim()),
+      published: publish,
+      id: initialData?.id,
+    };
+
+    const promise = saveBlogPost(postData).then((postId) => {
+      if (!initialData?.id) {
+        router.push(`/admin/blog/edit/${postId}`);
+      }
+    });
+
+    toast.promise(promise, {
+      loading: 'Saving post...',
+      success: 'Post saved successfully!',
+      error: 'Failed to save post.',
+    });
+
     try {
-      // Here you would typically make an API call to save the post
-      console.log('Saving post:', { ...formData, published: publish });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirect to blog posts list after successful save
-      router.push('/admin/blog');
+      await promise;
     } catch (error) {
-      console.error('Error saving post:', error);
+      // The toast will already show the error.
     } finally {
       setIsSaving(false);
       setIsPublishing(false);
@@ -140,14 +142,10 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
           <div className="space-y-2">
             <Label>Content</Label>
             <div className="rounded-md border">
-              <div data-color-mode="light">
-                <MDEditor
-                  value={formData.content}
-                  onChange={handleContentChange}
-                  height={500}
-                  className="min-h-[500px] rounded-md border"
-                />
-              </div>
+              <TiptapEditor
+                value={formData.content}
+                onChange={handleContentChange}
+              />
             </div>
           </div>
         </div>
@@ -204,10 +202,9 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
             <CardContent>
               <div className="space-y-2">
                 <Label htmlFor="excerpt">A short excerpt for preview</Label>
-                <Input
+                <Textarea
                   id="excerpt"
                   name="excerpt"
-                  as="textarea"
                   rows={3}
                   value={formData.excerpt}
                   onChange={handleChange}

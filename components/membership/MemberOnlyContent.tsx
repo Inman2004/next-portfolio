@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Star, Users } from 'lucide-react';
 import Link from 'next/link';
-import MarkdownViewer from '../blog/MarkdownViewer';
+import TiptapViewer from '../blog/TiptapViewer';
 
 interface MemberOnlyContentProps {
   isMembersOnly: boolean;
@@ -37,7 +37,7 @@ export default function MemberOnlyContent({
   const [showPreview, setShowPreview] = useState(!canAccess);
 
   if (!isMembersOnly) {
-    return <MarkdownViewer content={fullContent} />;
+    return <TiptapViewer content={fullContent} />;
   }
 
   if (canAccess) {
@@ -54,7 +54,9 @@ export default function MemberOnlyContent({
             </Badge>
           )}
         </div>
-        <div className="prose max-w-none">{fullContent}</div>
+        <div className="prose max-w-none">
+          <TiptapViewer content={fullContent} />
+        </div>
       </div>
     );
   }
@@ -68,7 +70,7 @@ export default function MemberOnlyContent({
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
               <strong>Preview:</strong> Here's a glimpse of what members get to see:
             </p>
-            <div dangerouslySetInnerHTML={{ __html: previewContent }} />
+            <TiptapViewer content={previewContent} />
           </div>
         </div>
       )}
@@ -120,7 +122,7 @@ export default function MemberOnlyContent({
                 View Membership Options
               </Link>
             </Button>
-            
+
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               Already a member? <Link href="/signin" className="text-blue-600 dark:text-blue-400 hover:underline">Sign in</Link>
             </p>
