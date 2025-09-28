@@ -6,7 +6,7 @@ export const blogPostSchema = z.object({
   content: z.string().min(1, 'Content is required'),
   coverImage: z.string().nullable().optional(),
   published: z.boolean().default(true),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
 });
 
 export type BlogPostFormValues = z.infer<typeof blogPostSchema>;
