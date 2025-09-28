@@ -209,9 +209,9 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-900/50 dark:border-zinc-700 w-full', className)}>
-      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4 flex items-center">
-        <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <div className={cn('sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto p-4 bg-zinc-50/80 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200 dark:border-zinc-700 w-full backdrop-blur-sm', className)}>
+      <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 flex items-center">
+        <svg className="w-5 h-5 mr-2 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
         </svg>
         Table of Contents
@@ -246,8 +246,12 @@ const TocList = ({ nodes, activeId, className = '', level = 0, setActiveId }: To
             }}
             className={cn(
               'group flex items-center py-1.5 text-sm transition-all duration-200 w-full text-left',
-              'relative rounded dark:hover:bg-accent/10 hover:bg-zinc-900/10 px-3 -ml-2',
+              'relative rounded px-3 -ml-2',
               'border-l-2 cursor-pointer',
+              // Base colors (neutral for readability)
+              'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200',
+              // Subtle hover background for focus without overpowering
+              'hover:bg-zinc-900/5 dark:hover:bg-zinc-50/5',
               {
                 // Base styles for all levels
                 'pl-4': level === 0,
@@ -256,16 +260,10 @@ const TocList = ({ nodes, activeId, className = '', level = 0, setActiveId }: To
                 'pl-10': level >= 3,
                 // Active state
                 'scale-[1.02] font-medium': activeId === node.id,
-                // Color variations based on level
-                'border-l-indigo-500 text-indigo-700/80 dark:text-indigo-200/80 font-bold hover:text-indigo-700 dark:hover:text-indigo-200': level === 0,
-                'border-l-blue-500 text-blue-700/70 dark:text-blue-200/60 hover:text-blue-700 dark:hover:text-blue-200': level === 1,
-                'border-l-teal-500 text-teal-950/60 dark:text-teal-700 hover:text-teal-700 dark:hover:text-teal-200': level === 2,
-                'border-l-sky-500 text-sky-600/50 dark:text-sky-300/50 hover:text-sky-700 dark:hover:text-sky-200': level >= 3,
-                // Active state colors
-                '!text-indigo-700 dark:!text-indigo-200 !border-l-indigo-700 dark:!border-l-indigo-300': activeId === node.id && level === 0,
-                '!text-blue-700 dark:!text-blue-200 !border-l-blue-700 dark:!border-l-blue-300': activeId === node.id && level === 1,
-                '!text-teal-700 dark:!text-teal-200 !border-l-teal-700 dark:!border-l-teal-300': activeId === node.id && level === 2,
-                '!text-purple-700 dark:!text-purple-200 !border-l-purple-700 dark:!border-l-purple-300': activeId === node.id && level >= 3,
+                // Neutral border by default
+                'border-l-zinc-200 dark:border-l-zinc-700': activeId !== node.id,
+                // Indigo accent for active to match site theme accents
+                '!text-indigo-700 dark:!text-indigo-200 !border-l-indigo-600 dark:!border-l-indigo-400': activeId === node.id,
               }
             )}
             style={{

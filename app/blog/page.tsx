@@ -9,8 +9,8 @@ import { getViewCounts } from '@/lib/views';
 import FeaturedPosts from '@/components/blog/FeaturedPosts';
  
 
-// Revalidate the page every 60 seconds
-export const revalidate = 60;
+// Revalidate the page frequently so 'Continue Reading' updates quickly
+export const revalidate = 15;
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
@@ -66,8 +66,9 @@ const PostTitle = ({
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: { page?: string; perPage?: string };
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const sp = await searchParams;
   // Get posts without network calls during prerender
   let posts = await getBlogPosts({ publishedOnly: true });
   // Attach view counts, but don't fail build if unavailable
@@ -80,8 +81,14 @@ export default async function BlogPage({
   }
   
   // Parse pagination parameters from URL
-  const currentPage = parseInt(searchParams.page || '1', 10);
-  const postsPerPage = parseInt(searchParams.perPage || '9', 10);
+  const currentPage = parseInt(
+    (Array.isArray(sp.page) ? sp.page[0] : sp.page) ?? '1',
+    10
+  );
+  const postsPerPage = parseInt(
+    (Array.isArray(sp.perPage) ? sp.perPage[0] : sp.perPage) ?? '9',
+    10
+  );
   
   // Normalize dates safely for client list
   const toIsoStringSafe = (value: any): string => {
@@ -108,18 +115,32 @@ export default async function BlogPage({
     }
   };
 
-  const normalizedPosts = posts.map((p: any) => ({
+  let normalizedPosts = posts.map((p: any) => ({
     ...p,
     createdAt: toIsoStringSafe(p.createdAt),
     updatedAt: toIsoStringSafe(p.updatedAt ?? p.createdAt),
+    // Ensure BlogListClient receives a consistent author object
+    author: typeof p.author === 'object' && p.author !== null
+      ? {
+          name: p.author.name || p.authorName || 'Anonymous',
+          photoURL: p.author.photoURL || p.authorPhotoURL || '',
+          bio: p.author.bio,
+        }
+      : {
+          name: p.authorName || (typeof p.author === 'string' ? p.author : 'Anonymous'),
+          photoURL: p.authorPhotoURL || '',
+        },
   }));
+
+  // Ensure newest first after normalization
+  normalizedPosts.sort((a: any, b: any) => (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
         {/* Hero Section */}
       <div className="relative overflow-hidden">
         
-        <div className="absolute inset-0 bg-[url('/images/ui/blog-hero.png')] bg-cover bg-center"></div>
+        <div className="absolute inset-0 z-0 bg-[url('/images/ui/blog-hero.png')] bg-cover bg-center"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-700 py-4 mb-6">
@@ -133,7 +154,7 @@ export default async function BlogPage({
             </div>
 
       {/* Blog Posts controls and grid (client) */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-10 sm:py-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-10 sm:py-16">
         <div className="mb-6">
         <FeaturedPosts posts={normalizedPosts} />
         </div>

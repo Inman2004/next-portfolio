@@ -9,21 +9,25 @@ import { Eye, Calendar, User as UserIcon, Clock } from 'lucide-react';
 import BlogPostActions from '@/components/blog/BlogPostActions';
 import BlogFloatingBar from '@/components/blog/BlogFloatingBar';
 import { TableOfContents } from '@/components/blog/TableOfContents';
-import { getBlogPostById as getBlogPost } from '@/lib/blog'; // Now using the client-side API wrapper
+import { getBlogPost } from '@/lib/blogUtils';
+import { getViewCount } from '@/lib/views';
 import { SocialLinks } from '@/components/blog/SocialLinks';
 import BlogMobileBar from '@/components/blog/BlogMobileBar';
 import ViewCountHandler from '@/components/blog/ViewCountHandler';
+import ReadingProgressTracker from '@/components/blog/ReadingProgressTracker';
 import { canAccessMemberContent, getCreatorProfile } from '@/lib/membership';
 import MemberOnlyContent from '@/components/membership/MemberOnlyContent';
 import BlogSubscription from '@/components/membership/BlogSubscription';
 import { auth } from '@/lib/auth';
+import RelatedPosts from '@/components/blog/RelatedPosts';
+import { getRelatedPosts } from '@/lib/blogUtils';
 
 export const revalidate = 60;
 
 interface PostPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // This function will fetch all data needed for the page using our new API wrappers
@@ -50,7 +54,7 @@ async function getPageData(id: string) {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const { id } = params;
+  const { id } = await params;
   const { post, creatorProfile, canAccess } = await getPageData(id);
 
   if (!post) {
@@ -58,19 +62,94 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   // The `views` property is now directly on the post object from the API
-  const views = post.views || 0;
-  const createdAtDate = new Date(post.createdAt);
-  const formattedDate = !isNaN(createdAtDate.getTime())
-    ? format(createdAtDate, 'MMMM d, yyyy')
-    : 'Unknown date';
+  let views = 0;
+  try {
+    views = await getViewCount(id);
+  } catch {
+    views = 0;
+  }
+  // Robust date parsing for Firestore Timestamp | Date | string
+  const asDate = (val: any): Date => {
+    try {
+      if (!val) return new Date(NaN);
+      if (typeof val?.toDate === 'function') return val.toDate();
+      if (val instanceof Date) return val;
+      if (typeof val === 'string' || typeof val === 'number') return new Date(val);
+      return new Date(NaN);
+    } catch {
+      return new Date(NaN);
+    }
+  };
+
+  const createdAtDate = asDate((post as any).createdAt);
+  const updatedAtDate = asDate((post as any).updatedAt ?? (post as any).createdAt);
+  const formattedDate = !isNaN(createdAtDate.getTime()) ? format(createdAtDate, 'MMMM d, yyyy') : 'Unknown date';
+  const formattedUpdated = !isNaN(updatedAtDate.getTime()) ? format(updatedAtDate, 'MMMM d, yyyy') : null;
 
   const readTime = post.readingTime || '5 min read';
 
-  // The `author` object is now consistently enriched by the backend.
-  const author = post.author || { name: 'Anonymous' };
+  // Normalize author to an object (post.author can be string or object)
+  const author = ((): { name: string; photoURL?: string; socials?: Record<string, string>; bio?: string } => {
+    if (post && typeof (post as any).author === 'object' && (post as any).author) {
+      const a = (post as any).author as { name?: string; photoURL?: string; socials?: Record<string, string>; bio?: string };
+      return {
+        name: a.name || 'Anonymous',
+        photoURL: a.photoURL ?? (post as any).authorPhotoURL,
+        socials: a.socials,
+        bio: a.bio,
+      };
+    }
+    if (typeof (post as any).author === 'string') {
+      return {
+        name: (post as any).author as string,
+        photoURL: (post as any).authorPhotoURL,
+      };
+    }
+    return { name: 'Anonymous', photoURL: (post as any).authorPhotoURL };
+  })();
+
+  // Compute related posts on the server
+  const related = await getRelatedPosts(id, {
+    tags: Array.isArray((post as any).tags) ? (post as any).tags : [],
+    authorId: (post as any).authorId,
+    limit: 6,
+  });
+
+  // Serialize dates for client component props (avoid Firestore Timestamp objects)
+  const toIsoStringSafe = (value: any): string => {
+    try {
+      if (!value) return new Date().toISOString();
+      if (typeof value?.toDate === 'function') {
+        const d = value.toDate();
+        return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+      }
+      if (value instanceof Date) {
+        return isNaN(value.getTime()) ? new Date().toISOString() : value.toISOString();
+      }
+      if (typeof value === 'string') {
+        const t = Date.parse(value);
+        return isNaN(t) ? new Date().toISOString() : new Date(t).toISOString();
+      }
+      if (typeof value === 'number') {
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+      }
+      return new Date().toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
+
+  const relatedForClient = related.map((p: any) => ({
+    ...p,
+    createdAt: toIsoStringSafe(p.createdAt),
+    updatedAt: toIsoStringSafe(p.updatedAt ?? p.createdAt),
+  }));
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      {/* Track reading progress client-side for Continue Reading */}
+      <ReadingProgressTracker postId={id} contentSelector=".prose" />
       <ViewCountHandler postId={id} />
       <script
         type="application/ld+json"
@@ -117,7 +196,12 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
           <div className="flex items-center mr-4">
             <Calendar className="h-4 w-4 mr-1" />
-            <span>{formattedDate}</span>
+            <span>
+              {formattedDate}
+              {formattedUpdated && formattedUpdated !== formattedDate && (
+                <span className="text-zinc-500 dark:text-zinc-400"> • Updated {formattedUpdated}</span>
+              )}
+            </span>
           </div>
           <div className="flex items-center">
             <Clock className="h-4 w-4 mr-1" />
@@ -178,6 +262,9 @@ export default async function PostPage({ params }: PostPageProps) {
             <BlogPostActions postId={id} authorId={post.authorId} initialPublished={post.published} />
           </div>
         </div>
+
+        {/* Related posts */}
+        <RelatedPosts posts={relatedForClient} currentPostId={id} className="mt-12" />
       </div>
     </div>
   );

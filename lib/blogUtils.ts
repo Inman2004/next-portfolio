@@ -1,105 +1,135 @@
 import 'server-only';
 import { db } from './firebase-server';
-import { Timestamp } from 'firebase-admin/firestore';
-import { 
-  BlogPost, 
-  EnrichedBlogPost, 
-  BaseBlogPost, 
-} from '@/types/blog';
-import { batchQueryAsMap } from './firebase-utils';
+import type { BlogPost } from '@/types/blog';
 
-function serializeTimestamps(data: any): any {
-  if (data === null || typeof data !== 'object') {
-    return data;
-  }
-  if (data instanceof Timestamp) {
-    return data.toDate().toISOString();
-  }
-  if (Array.isArray(data)) {
-    return data.map(serializeTimestamps);
-  }
-  const newObj: { [key: string]: any } = {};
-  for (const key in data) {
-    newObj[key] = serializeTimestamps(data[key]);
-  }
-  return newObj;
-}
-
-export const enrichBlogPosts = async <T extends BaseBlogPost>(
-  posts: T[],
-): Promise<Array<T & EnrichedBlogPost>> => {
-  if (!posts || posts.length === 0) return [];
-  
+// Get multiple blog posts (optionally only published), newest first
+export async function getBlogPosts(options: { limit?: number; publishedOnly?: boolean } = {}): Promise<BlogPost[]> {
+  const { limit: take, publishedOnly } = options;
   try {
-    const userIds = [...new Set(posts.map(post => post.authorId).filter(Boolean))];
-    if (!userIds.length) {
-      return posts.map(post => ({
-        ...post,
-        author: { name: post.authorName || 'Anonymous', photoURL: post.authorPhotoURL || '' },
-      })) as Array<T & EnrichedBlogPost>;
-    }
-    
-    const userDataMap = await batchQueryAsMap<{
-      displayName?: string;
-      photoURL?: string;
-      socials?: Record<string, string>;
-    }>('users', '__name__', userIds);
-    
-    return posts.map(post => {
-      const userData = userDataMap.get(post.authorId);
-      const author = {
-        id: post.authorId,
-        name: userData?.displayName || post.authorName || 'Anonymous',
-        photoURL: userData?.photoURL || post.authorPhotoURL || '',
-        socials: userData?.socials || {},
-      };
-      return { ...post, author } as T & EnrichedBlogPost;
+    let ref = db.collection('blogPosts').orderBy('createdAt', 'desc');
+    if (typeof take === 'number') ref = ref.limit(take);
+    const snap = await ref.get();
+    const posts: BlogPost[] = [];
+    snap.forEach((doc) => {
+      const data = doc.data() as any;
+      if (publishedOnly && data?.published === false) return;
+      posts.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
     });
-  } catch (error) {
-    console.error('Error enriching blog posts:', error);
-    return posts.map(post => ({
-      ...post,
-      author: { name: post.authorName || 'Anonymous', photoURL: post.authorPhotoURL || '' },
-    })) as Array<T & EnrichedBlogPost>;
-  }
-};
-
-export const getBlogPost = async (postId: string): Promise<(BlogPost & { user?: any }) | null> => {
-  try {
-    const postDoc = await db.collection('blogPosts').doc(postId).get();
-    if (!postDoc.exists) return null;
-    
-    const postData = { id: postDoc.id, ...postDoc.data() } as BlogPost;
-    const [enrichedPost] = await enrichBlogPosts([postData]);
-    
-    return serializeTimestamps(enrichedPost);
-  } catch (error) {
-    console.error('Error fetching blog post:', error);
-    return null;
-  }
-};
-
-export const getBlogPosts = async (options: {
-  limit?: number;
-  publishedOnly?: boolean;
-} = {}): Promise<Array<BlogPost & { user?: any }>> => {
-  try {
-    let query: admin.firestore.Query = db.collection('blogPosts');
-    if (options.publishedOnly) {
-      query = query.where('published', '==', true);
-    }
-    query = query.orderBy('createdAt', 'desc');
-    if (options.limit) {
-      query = query.limit(options.limit);
-    }
-    
-    const snapshot = await query.get();
-    const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as BlogPost[];
-    const enrichedPosts = await enrichBlogPosts(posts);
-
-    return serializeTimestamps(enrichedPosts);
-  } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    return posts;
+  } catch (e) {
+    console.error('Error fetching blog posts:', e);
     return [];
   }
-};
+}
+
+// Get a single blog post by ID (Admin SDK)
+export async function getBlogPost(postId: string): Promise<BlogPost | null> {
+  try {
+    const snap = await db.collection('blogPosts').doc(postId).get();
+    if (!snap.exists) return null;
+    const data = snap.data() || {};
+    return { id: snap.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost;
+  } catch (e) {
+    console.error('Error fetching blog post:', e);
+    return null;
+  }
+}
+
+// Get related posts using Admin SDK queries
+export async function getRelatedPosts(
+  currentPostId: string,
+  options: { tags?: string[]; authorId?: string; limit?: number } = {}
+): Promise<BlogPost[]> {
+  const { tags = [], authorId, limit = 6 } = options;
+
+  try {
+    const candidates: BlogPost[] = [];
+
+    // By tags overlap
+    if (tags.length) {
+      try {
+        const tagSnap = await db
+          .collection('blogPosts')
+          .where('tags', 'array-contains-any', tags.slice(0, 10))
+          .get();
+        tagSnap.forEach((doc) => {
+          const data = doc.data();
+          if (doc.id !== currentPostId && data?.published !== false) {
+            candidates.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
+          }
+        });
+      } catch (e) {
+        console.error('Related by tags error:', e);
+      }
+    }
+
+    // By same author (recent)
+    if (authorId) {
+      try {
+        // Avoid requiring a composite index by not ordering here; we'll score/sort in memory
+        const authorSnap = await db
+          .collection('blogPosts')
+          .where('authorId', '==', authorId)
+          .limit(20)
+          .get();
+        authorSnap.forEach((doc) => {
+          const data = doc.data();
+          if (doc.id !== currentPostId && data?.published !== false) {
+            candidates.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
+          }
+        });
+      } catch (e) {
+        console.error('Related by author error:', e);
+      }
+    }
+
+    // Fallback to recent
+    if (candidates.length === 0) {
+      try {
+        const recentSnap = await db
+          .collection('blogPosts')
+          .orderBy('createdAt', 'desc')
+          .limit(20)
+          .get();
+        recentSnap.forEach((doc) => {
+          const data = doc.data();
+          if (doc.id !== currentPostId && data?.published !== false) {
+            candidates.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
+          }
+        });
+      } catch (e) {
+        console.error('Related recent fallback error:', e);
+      }
+    }
+
+    // Dedupe
+    const dedup = new Map<string, BlogPost>();
+    for (const p of candidates) {
+      const pid = (p as any).id as string | undefined;
+      if (!pid) continue;
+      if (!dedup.has(pid)) dedup.set(pid, p);
+    }
+    const items = Array.from(dedup.values());
+
+    // Score
+    const tagSet = new Set(tags.map((t) => (t || '').toLowerCase()));
+    const now = Date.now();
+    const scored = items.map((p) => {
+      const pTags: string[] = Array.isArray((p as any).tags) ? (p as any).tags : [];
+      const overlap = pTags.reduce((acc, t) => acc + (tagSet.has((t || '').toLowerCase()) ? 1 : 0), 0);
+      const sameAuthor = authorId && p.authorId === authorId ? 1 : 0;
+      const createdAtVal: any = (p as any).createdAt;
+      const createdDate = createdAtVal?.toDate ? createdAtVal.toDate() : new Date(createdAtVal || 0);
+      const ageDays = Math.max(1, (now - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+      const recency = Math.max(0, 10 - Math.log10(ageDays + 1));
+      const score = overlap * 2 + sameAuthor * 3 + recency;
+      return { p, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, limit).map((s) => s.p);
+  } catch (e) {
+    console.error('Error computing related posts:', e);
+    return [];
+  }
+}
