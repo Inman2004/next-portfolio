@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, Image as ImageIcon, X } from 'lucide-react';
 import { BlogPostFormInput, blogPostFormSchema } from '@/lib/schemas/blog';
@@ -39,10 +40,8 @@ export default function BlogPostForm({
       content: '',
       coverImage: null,
       published: true,
-      tags: [],
-      ...initialData,
-      // Ensure tags are always an array, even if initialData.tags is undefined
       tags: Array.isArray(initialData?.tags) ? initialData.tags : [],
+      ...initialData,
     },
   });
 
