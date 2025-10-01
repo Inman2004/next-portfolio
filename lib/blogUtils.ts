@@ -1,18 +1,30 @@
 import 'server-only';
 import { db } from './firebase-server';
 import type { BlogPost } from '@/types/blog';
+import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 // Get multiple blog posts (optionally only published), newest first
 export async function getBlogPosts(options: { limit?: number; publishedOnly?: boolean } = {}): Promise<BlogPost[]> {
   const { limit: take, publishedOnly } = options;
   try {
-    let ref = db.collection('blogPosts').orderBy('createdAt', 'desc');
-    if (typeof take === 'number') ref = ref.limit(take);
-    const snap = await ref.get();
+    // Note: This query requires a composite index on 'published' (boolean) and 'createdAt' (descending).
+    // The Firestore error message will provide a link to create it.
+    let query: any = db.collection('blogPosts');
+
+    if (publishedOnly) {
+      query = query.where('published', '==', true);
+    }
+
+    query = query.orderBy('createdAt', 'desc');
+
+    if (typeof take === 'number') {
+      query = query.limit(take);
+    }
+
+    const snap = await query.get();
     const posts: BlogPost[] = [];
-    snap.forEach((doc) => {
-      const data = doc.data() as any;
-      if (publishedOnly && data?.published === false) return;
+    snap.forEach((doc: QueryDocumentSnapshot) => {
+      const data = doc.data();
       posts.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
     });
     return posts;
@@ -50,11 +62,12 @@ export async function getRelatedPosts(
       try {
         const tagSnap = await db
           .collection('blogPosts')
+          .where('published', '==', true)
           .where('tags', 'array-contains-any', tags.slice(0, 10))
           .get();
-        tagSnap.forEach((doc) => {
+        tagSnap.forEach((doc: QueryDocumentSnapshot) => {
           const data = doc.data();
-          if (doc.id !== currentPostId && data?.published !== false) {
+          if (doc.id !== currentPostId) {
             candidates.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
           }
         });
@@ -66,15 +79,17 @@ export async function getRelatedPosts(
     // By same author (recent)
     if (authorId) {
       try {
-        // Avoid requiring a composite index by not ordering here; we'll score/sort in memory
+        // This query requires a composite index on authorId (asc), published (asc), and createdAt (desc)
         const authorSnap = await db
           .collection('blogPosts')
           .where('authorId', '==', authorId)
+          .where('published', '==', true)
+          .orderBy('createdAt', 'desc')
           .limit(20)
           .get();
-        authorSnap.forEach((doc) => {
+        authorSnap.forEach((doc: QueryDocumentSnapshot) => {
           const data = doc.data();
-          if (doc.id !== currentPostId && data?.published !== false) {
+          if (doc.id !== currentPostId) {
             candidates.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
           }
         });
@@ -88,12 +103,13 @@ export async function getRelatedPosts(
       try {
         const recentSnap = await db
           .collection('blogPosts')
+          .where('published', '==', true)
           .orderBy('createdAt', 'desc')
           .limit(20)
           .get();
-        recentSnap.forEach((doc) => {
+        recentSnap.forEach((doc: QueryDocumentSnapshot) => {
           const data = doc.data();
-          if (doc.id !== currentPostId && data?.published !== false) {
+          if (doc.id !== currentPostId) {
             candidates.push({ id: doc.id, ...(data as Omit<BlogPost, 'id'>) } as BlogPost);
           }
         });
