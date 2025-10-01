@@ -4,20 +4,19 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Loader2, Image as ImageIcon, X } from 'lucide-react';
-import { BlogPostFormValues, blogPostSchema } from '@/lib/schemas/blog';
+import { BlogPostFormInput, blogPostFormSchema } from '@/lib/schemas/blog';
 import { useMarkdownEditor } from './MarkdownEditorContext';
 import MarkdownEditor from './MarkdownEditor';
 import TagInput from '@/components/ui/TagInput';
 
 interface BlogPostFormProps {
-  initialData?: Partial<BlogPostFormValues>;
-  onSubmit: (data: BlogPostFormValues) => Promise<void>;
+  initialData?: Partial<BlogPostFormInput>;
+  onSubmit: (data: BlogPostFormInput) => Promise<void>;
   isSubmitting: boolean;
   isEditing?: boolean;
 }
@@ -32,8 +31,8 @@ export default function BlogPostForm({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const form = useForm<BlogPostFormValues>({
-    resolver: zodResolver(blogPostSchema),
+  const form = useForm<BlogPostFormInput>({
+    resolver: zodResolver(blogPostFormSchema),
     defaultValues: {
       title: '',
       excerpt: '',
@@ -116,7 +115,7 @@ export default function BlogPostForm({
     setUploadError(null);
   };
 
-  const handleFormSubmit = async (formData: BlogPostFormValues) => {
+  const handleFormSubmit = async (formData: BlogPostFormInput) => {
     try {
       await onSubmit(formData);
     } catch (error) {
