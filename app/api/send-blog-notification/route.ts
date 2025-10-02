@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { render } from '@react-email/render';
 import { BlogNotificationEmail } from '@/app/emails/BlogNotificationEmail';
 import { getBlogSubscribers } from '@/lib/membership';
 import { getBlogPost } from '@/lib/blogUtils';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface NotificationRequest {
   blogId: string;
@@ -37,9 +35,9 @@ export async function POST(request: Request) {
 
     // Get all subscribers for this blog
     const subscribers = await getBlogSubscribers(blogId);
-    
+
     if (subscribers.length === 0) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'No subscribers found for this blog',
         subscribersCount: 0
       });
@@ -68,7 +66,7 @@ export async function POST(request: Request) {
         });
 
         const isProduction = process.env.NODE_ENV === 'production';
-        const fromEmail = isProduction 
+        const fromEmail = isProduction
           ? `${creatorName} <${process.env.NEXT_PUBLIC_ADMIN_EMAIL}>`
           : 'onboarding@resend.dev';
 
@@ -81,7 +79,7 @@ export async function POST(request: Request) {
         };
 
         const { data, error } = await resend.emails.send(emailData);
-        
+
         if (error) {
           console.error(`Error sending email to ${subscriber.email}:`, error);
           return { success: false, email: subscriber.email, error };
@@ -96,7 +94,7 @@ export async function POST(request: Request) {
 
     // Wait for all emails to be sent
     const results = await Promise.all(emailPromises);
-    
+
     const successfulEmails = results.filter(r => r.success);
     const failedEmails = results.filter(r => !r.success);
 

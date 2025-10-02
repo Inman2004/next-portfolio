@@ -5,26 +5,30 @@ import { Auth, getAuth } from 'firebase-admin/auth';
 import { Firestore, getFirestore } from 'firebase-admin/firestore';
 import { Storage, getStorage } from 'firebase-admin/storage';
 
-// Define the service account credentials directly from environment variables.
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
 };
 
-// A global symbol is used to store the initialized Firebase app,
-// preventing re-initialization across hot-reloads and module re-imports in Next.js.
-const FIREBASE_ADMIN_APP_KEY = Symbol.for('firebaseAdminApp');
+const FIREBASE_ADMIN_INSTANCES_KEY = Symbol.for('firebaseAdminInstances');
 
-interface GlobalWithFirebase {
-  [FIREBASE_ADMIN_APP_KEY]?: App;
+interface FirebaseAdminInstances {
+    app: App;
+    db: Firestore;
+    auth: Auth;
+    storage: Storage;
 }
 
-function getAdminApp(): App {
+interface GlobalWithFirebase {
+  [FIREBASE_ADMIN_INSTANCES_KEY]?: FirebaseAdminInstances;
+}
+
+function initializeAdmin(): FirebaseAdminInstances {
   const globalWithFirebase = global as GlobalWithFirebase;
 
-  if (globalWithFirebase[FIREBASE_ADMIN_APP_KEY]) {
-    return globalWithFirebase[FIREBASE_ADMIN_APP_KEY];
+  if (globalWithFirebase[FIREBASE_ADMIN_INSTANCES_KEY]) {
+    return globalWithFirebase[FIREBASE_ADMIN_INSTANCES_KEY];
   }
 
   if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
@@ -38,14 +42,18 @@ function getAdminApp(): App {
         storageBucket: `${serviceAccount.projectId}.appspot.com`,
       });
 
-  globalWithFirebase[FIREBASE_ADMIN_APP_KEY] = app;
-  console.log('Firebase Admin SDK initialized successfully.');
-  return app;
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const storage = getStorage(app);
+
+  const instances = { app, db, auth, storage };
+  globalWithFirebase[FIREBASE_ADMIN_INSTANCES_KEY] = instances;
+
+  return instances;
 }
 
-const app: App = getAdminApp();
-const db: Firestore = getFirestore(app);
-const auth: Auth = getAuth(app);
-const storage: Storage = getStorage(app);
+const db = new Proxy({}, { get: (_, prop) => Reflect.get(initializeAdmin().db, prop) }) as Firestore;
+const auth = new Proxy({}, { get: (_, prop) => Reflect.get(initializeAdmin().auth, prop) }) as Auth;
+const storage = new Proxy({}, { get: (_, prop) => Reflect.get(initializeAdmin().storage, prop) }) as Storage;
 
 export { db, auth, storage };

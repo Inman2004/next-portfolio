@@ -1,37 +1,11 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import ProjectForm from '@/components/admin/ProjectForm';
-import { Loader2 } from 'lucide-react';
+import { createProject } from '../actions';
+import { ProjectForm } from '../ProjectForm';
 
 export default function NewProjectPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!loading && !user && mounted) {
-      router.push('/signin?redirect=/admin/projects/new');
-    }
-  }, [user, loading, router, mounted]);
-
-  if (loading || !mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  return <ProjectForm />;
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Add New Project</h1>
+      <ProjectForm action={createProject} />
+    </div>
+  );
 }
