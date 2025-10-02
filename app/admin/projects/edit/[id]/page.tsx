@@ -1,81 +1,48 @@
-'use client';
+import { getFirestore } from 'firebase-admin/firestore';
+import * as admin from 'firebase-admin';
+import { Project } from '@/types/project';
+import { updateProject } from '../../actions';
+import { ProjectForm } from '../../ProjectForm';
+import { getAuthenticatedUser } from '@/lib/auth/getAuthenticatedUser';
+import { redirect } from 'next/navigation';
+import { ADMIN_EMAIL } from '@/types/blog';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import ProjectForm from '@/components/admin/ProjectForm';
-import { Loader2 } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
-export default function EditProjectPage() {
-  const { id } = useParams();
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  const [error, setError] = useState('');
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+  });
+}
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+const db = getFirestore();
 
-  useEffect(() => {
-    if (!authLoading && !user && mounted) {
-      router.push(`/signin?redirect=/admin/projects/edit/${id}`);
-    }
-  }, [user, authLoading, router, id, mounted]);
+async function getProject(id: string): Promise<Project | null> {
+  const doc = await db.collection('projects').doc(id).get();
+  if (!doc.exists) {
+    return null;
+  }
+  return { id: doc.id, ...doc.data() } as Project;
+}
 
-  useEffect(() => {
-    if (!id || !mounted) return;
-
-    const fetchProject = async () => {
-      try {
-        const response = await fetch(`/api/admin/projects/${id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setProject(data);
-        } else {
-          const error = await response.json();
-          setError(error.error || 'Failed to load project');
-        }
-      } catch (err) {
-        console.error('Error fetching project:', err);
-        setError('Failed to load project');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProject();
-  }, [id, mounted]);
-
-  if (authLoading || loading || !mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+export default async function EditProjectPage({ params }: { params: { id: string } }) {
+  const user = await getAuthenticatedUser();
+  if (!user || user.email !== ADMIN_EMAIL) {
+    redirect('/signin');
   }
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      </div>
-    );
-  }
+  const project = await getProject(params.id);
 
   if (!project) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
-          Project not found
-        </div>
-      </div>
-    );
+    return <div>Project not found</div>;
   }
 
-  return <ProjectForm projectId={project.title} initialData={project} />;
+  const updateProjectWithId = updateProject.bind(null, project.id);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Project</h1>
+      <ProjectForm action={updateProjectWithId} project={project} />
+    </div>
+  );
 }

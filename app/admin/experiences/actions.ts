@@ -5,6 +5,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as admin from 'firebase-admin';
 import { ExperienceType } from '@/data/experiences';
 import { getAuthenticatedUser } from '@/lib/auth/getAuthenticatedUser';
+import { ADMIN_EMAIL } from '@/types/blog';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -17,7 +18,7 @@ const db = getFirestore();
 
 export async function createExperience(formData: FormData) {
   const user = await getAuthenticatedUser();
-  if (!user || user.email !== 'rvimman@gmail.com') {
+  if (!user || user.email !== ADMIN_EMAIL) {
     throw new Error('Unauthorized');
   }
 
@@ -40,13 +41,13 @@ export async function createExperience(formData: FormData) {
 
   await experiencesRef.doc(String(newId)).set({ ...newExperience, id: newId });
 
-  revalidatePath('/admin');
+  revalidatePath('/admin/experiences');
   revalidatePath('/'); // Also revalidate home page if experiences are shown there
 }
 
 export async function updateExperience(id: number, formData: FormData) {
   const user = await getAuthenticatedUser();
-  if (!user || user.email !== 'rvimman@gmail.com') {
+  if (!user || user.email !== ADMIN_EMAIL) {
     throw new Error('Unauthorized');
   }
 
@@ -63,18 +64,18 @@ export async function updateExperience(id: number, formData: FormData) {
 
   await db.collection('experiences').doc(String(id)).update(updatedExperience);
 
-  revalidatePath('/admin');
+  revalidatePath('/admin/experiences');
   revalidatePath('/');
 }
 
 export async function deleteExperience(id: number) {
   const user = await getAuthenticatedUser();
-  if (!user || user.email !== 'rvimman@gmail.com') {
+  if (!user || user.email !== ADMIN_EMAIL) {
     throw new Error('Unauthorized');
   }
 
   await db.collection('experiences').doc(String(id)).delete();
 
-  revalidatePath('/admin');
+  revalidatePath('/admin/experiences');
   revalidatePath('/');
 }
