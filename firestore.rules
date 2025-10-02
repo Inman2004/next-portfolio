@@ -156,5 +156,41 @@ service cloud.firestore {
       // Users can delete their own blog subscriptions
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
+
+    // Experiences collection rules
+    match /experiences/{experienceId} {
+      // Allow public read access
+      allow read: if true;
+
+      // Only allow admins to create, update, or delete experiences
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Projects collection rules
+    match /projects/{projectId} {
+      // Allow public read access
+      allow read: if true;
+
+      // Only allow admins to create, update, or delete projects
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Skills collection rules
+    match /skills/{skillId} {
+      // Allow public read access
+      allow read: if true;
+
+      // Only allow admins to create, update, or delete skills
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Resume collection rules
+    match /resume/{resumeId} {
+      // Allow public read access
+      allow read: if true;
+
+      // Only allow admins to create, update, or delete resume data
+      allow create, update, delete: if isAdmin();
+    }
   }
 }
