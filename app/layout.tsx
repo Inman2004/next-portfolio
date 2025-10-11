@@ -12,8 +12,15 @@ import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { FontLoader } from "@/components/FontLoader";
 import { BottomNav } from "@/components/BottomNav";
 import { Toaster } from "react-hot-toast";
-import ChatWidget from "@/components/ChatWidget";
+import dynamic from 'next/dynamic';
 import ClickSpark from "@/components/ClickSpark";
+
+const DynamicChatWidget = dynamic(() => import('@/components/ChatWidget'), {
+  ssr: false,
+  // You can add a loading component here if you want
+  // loading: () => <p>Loading...</p>,
+});
+
 
 // Base URL for the site
 const baseUrl =
@@ -234,7 +241,7 @@ export default function RootLayout({
               <PerformanceMonitor />
               <FontLoader />
               <Toaster position="top-center" />
-              <ChatWidget />
+              <DynamicChatWidget />
             </ErrorBoundary>
           </Providers>
         </PageLoadingProvider>
