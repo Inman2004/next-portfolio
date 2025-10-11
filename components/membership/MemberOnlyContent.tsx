@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Star, Users } from 'lucide-react';
 import Link from 'next/link';
+import AdInjector from '../ads/AdInjector';
 import MarkdownViewer from '../blog/MarkdownViewer';
 
 interface MemberOnlyContentProps {
@@ -37,7 +38,7 @@ export default function MemberOnlyContent({
   const [showPreview, setShowPreview] = useState(!canAccess);
 
   if (!isMembersOnly) {
-    return <MarkdownViewer content={fullContent} />;
+    return <AdInjector content={fullContent} />;
   }
 
   if (canAccess) {
@@ -54,7 +55,9 @@ export default function MemberOnlyContent({
             </Badge>
           )}
         </div>
-        <div className="prose max-w-none">{fullContent}</div>
+        <div className="prose max-w-none">
+          <MarkdownViewer content={fullContent} />
+        </div>
       </div>
     );
   }
@@ -120,7 +123,7 @@ export default function MemberOnlyContent({
                 View Membership Options
               </Link>
             </Button>
-            
+
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               Already a member? <Link href="/signin" className="text-blue-600 dark:text-blue-400 hover:underline">Sign in</Link>
             </p>
