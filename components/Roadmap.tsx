@@ -18,7 +18,6 @@ import {
   SiCss3,
 } from "react-icons/si";
 import { AnimatedBeam } from "./ui/animated-beam";
-import { BlurFade } from "./ui/blur-fade";
 import { motion as m } from "framer-motion";
 
 const Circle = forwardRef<
@@ -66,11 +65,10 @@ const Roadmap = () => {
 
   return (
     <section id="roadmap" className="py-24 sm:py-32">
-      <BlurFade delay={0.25} inView>
-        <div className="container mx-auto max-w-4xl px-4">
-        <div className="flex flex-col items-center mb-16">
-          <m.h2
-            initial={{ opacity: 0, y: 20 }}
+      <div className="container mx-auto max-w-4xl px-4">
+      <div className="flex flex-col items-center mb-16">
+        <m.h2
+          initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
@@ -194,7 +192,6 @@ const Roadmap = () => {
             />
           </div>
         </div>
-      </BlurFade>
     </section>
   );
 };

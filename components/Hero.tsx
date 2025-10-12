@@ -38,7 +38,6 @@ import Link from "next/link";
 import ProfileCard from "./ProfileCard";
 import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
-import { BlurFade } from "./ui/blur-fade";
 import { NumberTicker } from "@/components/ui/number-ticker";
 
 const InteractiveCard3D = dynamic(() => import("./ThreeJS/HeroID"), {
@@ -146,10 +145,9 @@ export default function Hero() {
 
           {/* Content Container */}
           <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-            <BlurFade delay={0.25} inView>
-              <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-16 pt-8 lg:pt-12">
-                {/* Left Content - Text */}
-                <div className="w-full lg:max-w-[60%] xl:max-w-[60%]">
+            <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-16 pt-8 lg:pt-12">
+              {/* Left Content - Text */}
+              <div className="w-full lg:max-w-[60%] xl:max-w-[60%]">
                   {/* Left Content */}
                   <m.div
                   initial={{ opacity: 0, y: 20 }}
@@ -375,7 +373,6 @@ export default function Hero() {
                 onContactClick={() => window.open("https://rvimman-two.vercel.app", "_blank")}
               />
             </div>
-          </BlurFade>
         </div>
 
           {/* Scroll Indicator */}
