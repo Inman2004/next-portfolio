@@ -1,20 +1,21 @@
 "use client";
 import React from "react";
+import dynamic from "next/dynamic";
 import { motion as m } from "framer-motion";
 import { CssDotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
 import Projects from "@/components/Projects";
-import Roadmap from "@/components/Roadmap";
-import Contact from "@/components/Contact";
-import Comments from "@/components/Comments";
 import Hero from "@/components/Hero";
-import Footer from '@/components/Footer';
-import { BlurFade } from "@/components/ui/blur-fade";
-import Testimonials from "@/components/Testimonials";
-import Experience from "@/components/Experience";
 import { useTheme } from "next-themes";
 import SkillRoadMap from "@/components/SkillRoadMap";
-import { LangCloud } from "@/components/LangCloud";
+
+const Roadmap = dynamic(() => import("@/components/Roadmap"));
+const LangCloud = dynamic(() => import("@/components/LangCloud"));
+const Experience = dynamic(() => import("@/components/Experience"));
+const Testimonials = dynamic(() => import("@/components/Testimonials"));
+const Comments = dynamic(() => import("@/components/Comments"));
+const Contact = dynamic(() => import("@/components/Contact"));
+const Footer = dynamic(() => import("@/components/Footer"));
 
 export default function Home() {
   const { resolvedTheme } = useTheme();
@@ -51,22 +52,12 @@ export default function Home() {
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
           <Projects showAll={false} maxItems={3} />
-          <BlurFade delay={0.25 * 2} inView>
           <Roadmap />
           <LangCloud />
-          </BlurFade>
-          <BlurFade delay={0.25 * 4} inView>
-            <Experience />
-          </BlurFade>
-          <BlurFade delay={0.25 * 5} inView>
-            <Testimonials />
-          </BlurFade>
-          <BlurFade delay={0.25 * 6} inView>
-            <Comments />
-          </BlurFade>
-          <BlurFade delay={0.25 * 7} inView>
-            <Contact />
-          </BlurFade>
+          <Experience />
+          <Testimonials />
+          <Comments />
+          <Contact />
         </div>
       </main>
       
