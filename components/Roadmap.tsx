@@ -72,7 +72,7 @@ const Roadmap = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-sky-600 dark:from-emerald-400 dark:to-sky-500 bg-clip-text text-transparent p-2 mb-4"
+            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-violet-500 to-purple-600 dark:from-violet-400 dark:to-violet-500 bg-clip-text text-transparent p-2 mb-4"
           >
            My Full Stack 
           </m.h2>

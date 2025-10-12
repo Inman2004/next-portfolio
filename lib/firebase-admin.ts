@@ -21,9 +21,19 @@ const initializeFirebaseAdmin = () => {
     try {
       serviceAccount = JSON.parse(serviceAccountKey);
     } catch (e) {
-      // If direct parse fails, try base64 decode
+      // If direct parse fails, try manual base64 decode that's webpack-compatible
       try {
-        const decoded = Buffer.from(serviceAccountKey, 'base64').toString('utf-8');
+        // Use a pure JavaScript base64 decode function
+        const base64Decode = (str: string) => {
+          // Simple base64 decode using atob (available in Node.js and browsers)
+          try {
+            return decodeURIComponent(escape(atob(str)));
+          } catch (error) {
+            throw new Error('Invalid base64 string');
+          }
+        };
+
+        const decoded = base64Decode(serviceAccountKey);
         serviceAccount = JSON.parse(decoded);
       } catch (innerError) {
         throw new Error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY. It should be a valid JSON or base64-encoded JSON string.');
@@ -31,7 +41,7 @@ const initializeFirebaseAdmin = () => {
     }
 
     return initializeApp({
-      credential: cert(serviceAccount),
+      credential: cert(serviceAccount as any),
       databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
     });
   } catch (error) {
