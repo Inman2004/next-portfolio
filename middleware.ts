@@ -21,19 +21,27 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith('/blog/edit')) {
 
     try {
-      // Import server auth functions dynamically for edge runtime compatibility
-      const { requireAdmin } = await import('./lib/server-auth');
+      const adminCheckUrl = new URL('/api/auth/check-admin', request.url);
+      const response = await fetch(adminCheckUrl, {
+        headers: {
+          'Cookie': `session=${sessionCookie}`
+        }
+      });
 
-      const { user, isAdmin } = await requireAdmin();
+      if (!response.ok) {
+        throw new Error(`Admin check failed with status: ${response.status}`);
+      }
 
-      if (!user || !isAdmin) {
+      const { isAdmin } = await response.json();
+
+      if (!isAdmin) {
         console.log('User is not admin, redirecting to signin');
         const signInUrl = new URL('/signin', request.url);
         signInUrl.searchParams.set('callbackUrl', pathname);
         return NextResponse.redirect(signInUrl);
       }
 
-      console.log('Admin access granted for user:', user.email);
+      console.log('Admin access granted.');
     } catch (error) {
       console.error('Error checking admin status:', error);
       const signInUrl = new URL('/signin', request.url);
