@@ -39,7 +39,7 @@ export default function LangCloud() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-sky-600 dark:from-emerald-400 dark:to-sky-500 bg-clip-text text-transparent p-2 mb-4"
+            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-500 to-violet-600 dark:from-purple-400 dark:to-violet-500 bg-clip-text text-transparent p-2 mb-4"
           >
            Skills 
           </m.h2>

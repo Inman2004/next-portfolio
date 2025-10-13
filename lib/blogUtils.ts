@@ -149,3 +149,38 @@ export async function getRelatedPosts(
     return [];
   }
 }
+
+// Get view counts for multiple blog posts
+export async function getViewCounts(postIds: string[]): Promise<Record<string, number>> {
+  try {
+    if (postIds.length === 0) return {};
+
+    // Fetch view counts for the specified post IDs
+    const viewCountsPromises = postIds.map(async (postId) => {
+      try {
+        const doc = await db.collection('blogPosts').doc(postId).get();
+        if (doc.exists) {
+          const data = doc.data();
+          return { postId, viewCount: data?.viewCount || 0 };
+        }
+        return { postId, viewCount: 0 };
+      } catch (error) {
+        console.error(`Error fetching view count for post ${postId}:`, error);
+        return { postId, viewCount: 0 };
+      }
+    });
+
+    const viewCountsResults = await Promise.all(viewCountsPromises);
+
+    // Convert array of results to a record object
+    const viewCounts: Record<string, number> = {};
+    viewCountsResults.forEach(({ postId, viewCount }) => {
+      viewCounts[postId] = viewCount;
+    });
+
+    return viewCounts;
+  } catch (error) {
+    console.error('Error fetching view counts:', error);
+    return {};
+  }
+}

@@ -19,17 +19,46 @@ const Footer = dynamic(() => import("@/components/Footer"));
 export default function Home() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
+  const [mounted, setMounted] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className={cn(
-        "min-h-screen overflow-x-hidden w-full transition-colors duration-200",
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className={cn(
+        "min-h-screen w-full",
         isDark 
           ? "bg-gradient-to-b from-zinc-950 to-black text-white"
           : "bg-gradient-to-b from-zinc-50 to-zinc-100 text-zinc-900"
+      )} />
+    );
+  }
+
+  return (
+    <div className={cn(
+      "min-h-screen overflow-x-hidden w-full transition-colors duration-200",
+      isDark 
+        ? "bg-gradient-to-b from-zinc-950 to-black text-white"
+        : "bg-gradient-to-b from-zinc-50 to-zinc-100 text-zinc-900"
+    )}>
+      {!shouldReduceMotion && (
+        <CssDotPattern 
+          className={cn(
+            "fixed inset-0 pointer-events-none transition-opacity duration-300",
+            isDark 
+              ? "opacity-100 [mask-image:radial-gradient(750px_circle_at_center,white,transparent)]"
+              : "opacity-30 [mask-image:radial-gradient(750px_circle_at_center,black,transparent)]"
+          )}
+          width={20}
+          height={20}
+          dotSize={1.2}
+          glow={true}
+          glowDotsPercentage={0.5}
+          glowColor={isDark ? "rgba(63, 13, 163, 0.3)" : "rgba(99, 102, 241, 0.2)"}
+        />
       )}
     >
       <main className="flex flex-col items-center w-full relative z-10">
@@ -45,7 +74,9 @@ export default function Home() {
         </div>
       </main>
       
-      <Footer />
-    </m.div>
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import { X, MessageCircle, Send, Loader2, Mic, MicOff, Volume2, VolumeX, Square 
 import { getTechColor } from "@/components/skillColors";
 import { usePathname } from "next/navigation";
 import ElectricBorder from "./ElectricBorder";
+import ShinyText from "./ShinyText";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -538,7 +539,7 @@ export default function ChatWidget() {
                 <div className="flex">
                   <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Thinking...
+                    <ShinyText speed={1} disabled={false} text="Thinking..." />
                   </div>
                 </div>
               )}

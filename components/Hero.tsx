@@ -248,17 +248,17 @@ export default function Hero() {
                           whileHover={{ scale: 1.02 }}
                           className="group relative mt-6 p-4 rounded-xl bg-gradient-to-r from-zinc-50 to-zinc-50 dark:from-zinc-800/50 dark:to-zinc-900/20 border border-zinc-200 dark:border-zinc-900/50 cursor-pointer transition-all duration-300 hover:shadow-lg"
                         >
-                          <span className="absolute -top-2 -right-2 bg-zinc-100 dark:bg-zinc-900/50 text-orange-800 dark:text-zinc-200 border border-zinc-900 dark:border-zinc-700 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                          <span className="absolute -top-2 -right-2 bg-zinc-100 dark:bg-zinc-900/50 text-emerald-800 dark:text-zinc-200 border border-zinc-900 dark:border-zinc-700 text-sm font-medium px-2.5 py-0.5 rounded-full">
                             New{" "}
-                            <FaBlog className="inline text-lg text-orange-500 dark:text-orange-400" />
+                            <FaBlog className="inline text-lg text-emerald-500 dark:text-emerald-400" />
                           </span>
-                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200 mb-1">
                             Latest Blog
                           </p>
                           <h3 className="font-medium text-zinc-900 dark:text-white mb-1 line-clamp-1">
                             {latestPost.title}
                           </h3>
-                          <p className="text-xs text-orange-600 dark:text-orange-300 group-hover:text-orange-700 dark:group-hover:text-orange-200 transition-colors">
+                          <p className="text-xs text-emerald-600 dark:text-emerald-300 group-hover:text-emerald-700 dark:group-hover:text-emerald-200 transition-colors">
                             {isClient && latestPost?.createdAt?.toDate
                               ? new Date(
                                   latestPost.createdAt.toDate()
@@ -363,7 +363,7 @@ export default function Hero() {
                 handle="rvimman"
                 status="Online"
                 contactText="Online Resume"
-                avatarUrl="/images/person_sw.png"
+                avatarUrl="/images/person-work.png"
                 miniAvatarUrl="/images/favicon.png"
                 grainUrl="/images/grain.webp"
                 theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
