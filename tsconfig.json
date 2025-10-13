@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "server-only": ["./scripts/server-only.mock.js"]
     },
     "typeRoots": [
       "./node_modules/@types",

@@ -60,7 +60,6 @@ export default function Home() {
           glowColor={isDark ? "rgba(63, 13, 163, 0.3)" : "rgba(99, 102, 241, 0.2)"}
         />
       )}
-    >
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
