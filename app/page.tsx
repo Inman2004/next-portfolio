@@ -2,7 +2,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { motion as m } from "framer-motion";
-import { CssDotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
 import Projects from "@/components/Projects";
 import Hero from "@/components/Hero";
@@ -33,21 +32,6 @@ export default function Home() {
           : "bg-gradient-to-b from-zinc-50 to-zinc-100 text-zinc-900"
       )}
     >
-      <CssDotPattern 
-        className={cn(
-          "fixed inset-0 pointer-events-none transition-opacity duration-300",
-          isDark 
-            ? "opacity-100 [mask-image:radial-gradient(750px_circle_at_center,white,transparent)]"
-            : "opacity-30 [mask-image:radial-gradient(750px_circle_at_center,black,transparent)]"
-        )}
-        width={20}
-        height={20}
-        dotSize={1.2}
-        glow={true}
-        glowDotsPercentage={1}
-        glowColor={isDark ? "rgba(63, 13, 163, 0.5)" : "rgba(99, 102, 241, 0.3)"}
-      />
-      
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Hero />
