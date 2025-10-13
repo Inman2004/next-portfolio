@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
-import { motion as m } from "framer-motion";
+import { motion as m, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Projects from "@/components/Projects";
 import Hero from "@/components/Hero";
