@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { BlogCacheProvider } from '@/contexts/BlogCacheContext';
 import { LoadingProvider } from '@/hooks/useLoadingState';
+import { ChatProvider } from '@/contexts/ChatContext';
 import emailjs from '@emailjs/browser';
 
 export default function Providers({
@@ -37,9 +38,11 @@ export default function Providers({
           themes={['light', 'dark', 'system']}
         >
           <ThemeProvider>
-            <LoadingProvider>
-              {children}
-            </LoadingProvider>
+            <ChatProvider>
+              <LoadingProvider>
+                {children}
+              </LoadingProvider>
+            </ChatProvider>
           </ThemeProvider>
         </NextThemesProvider>
       </BlogCacheProvider>
