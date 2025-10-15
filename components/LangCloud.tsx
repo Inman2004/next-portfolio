@@ -26,7 +26,7 @@ const slugs = [
   "figma",
 ]
 
-export function LangCloud() {
+export default function LangCloud() {
   const images = slugs.map(
     (slug) => `https://cdn.simpleicons.org/${slug}/${slug}`
   )
