@@ -90,7 +90,7 @@ const ReviewCard = ({
         className={cn(
           "relative h-full flex flex-col overflow-hidden rounded-xl border p-5",
           "bg-zinc-50 ring-1 dark:ring-zinc-700 dark:bg-zinc-900/80 dark:backdrop-blur-sm",
-          "border-zinc-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500/50",
+          "border-zinc-200 dark:border-zinc-700 hover:border-emerald-400 dark:hover:border-emerald-500/50",
           "transition-all duration-300 shadow-sm hover:shadow-lg group/card"
         )}
       >
@@ -107,16 +107,16 @@ const ReviewCard = ({
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-start">
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors">
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white group-hover/card:text-emerald-600 dark:group-hover/card:text-emerald-400 transition-colors">
                   {name}
                 </h3>
                 {date && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
                     {date}
                   </span>
                 )}
               </div>
-              <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-0.5">
+              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-0.5">
                 {provider}
               </p>
             </div>
@@ -143,7 +143,7 @@ const ReviewCard = ({
         </div>
         
         {/* Hover effect */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover/card:opacity-100 dark:from-blue-900/10 dark:to-purple-900/10 transition-opacity duration-300" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-50 to-purple-50 opacity-0 group-hover/card:opacity-100 dark:from-emerald-900/10 dark:to-purple-900/10 transition-opacity duration-300" />
       </div>
     </m.div>
   );
@@ -160,7 +160,7 @@ export default function Testimonials() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent">
             Certifications & Courses
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">

@@ -17,7 +17,7 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
 
   // Unified palette for light/dark themes
   const getThemeVariables = (isDark: boolean) => {
-    // Cohesive indigo/blue/teal palette, tuned for contrast and harmony
+    // Cohesive indigo/emerald/teal palette, tuned for contrast and harmony
     if (isDark) {
       return {
         // backgrounds
@@ -67,7 +67,7 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
 
         // cScales for pies / class colors
         cScale0: 'hsl(199, 89%, 48%)',   // sky-500
-        cScale1: 'hsl(217, 91%, 60%)',   // blue-500
+        cScale1: 'hsl(217, 91%, 60%)',   // emerald-500
         cScale2: 'hsl(174, 72%, 56%)',   // teal-400
         cScale3: 'hsl(262, 83%, 58%)',   // violet-500
         cScale4: 'hsl(142, 70%, 45%)',   // green-500
@@ -91,13 +91,13 @@ export default function Mermaid({ chart, className = '' }: MermaidProps) {
       // borders and lines
       border1: 'hsl(220, 14%, 80%)',
       border2: 'hsl(220, 16%, 85%)',
-      lineColor: 'hsl(217, 91%, 60%)', // blue-500
+      lineColor: 'hsl(217, 91%, 60%)', // emerald-500
       nodeBorder: 'hsl(220, 14%, 75%)',
       clusterBorder: 'hsl(220, 16%, 80%)',
       edgeLabelBackground: 'rgba(255,255,255,0.85)',
 
       // nodes
-      primaryColor: 'hsl(210, 100%, 97%)', // light blue tint
+      primaryColor: 'hsl(210, 100%, 97%)', // light emerald tint
       primaryTextColor: 'hsl(222, 47%, 23%)',
       primaryBorderColor: 'hsl(217, 91%, 60%)',
 

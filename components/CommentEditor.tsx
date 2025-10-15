@@ -190,7 +190,7 @@ export default function CommentEditor({
             <button
               type="button"
               onClick={handleSubmit}
-              className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+              className="px-3 py-1.5 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-md"
               disabled={!editor.getText().trim()}
             >
               {isEditing ? 'Update' : 'Comment'}

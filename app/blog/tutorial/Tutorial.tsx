@@ -176,7 +176,7 @@ export function Tutorial() {
                     title="Link"
                     example="[Example](https://example.com)"
                     preview="Example"
-                    className="text-blue-600 hover:underline"
+                    className="text-emerald-600 hover:underline"
                   />
                   <MarkdownExample
                     title="Image"

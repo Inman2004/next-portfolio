@@ -22,7 +22,7 @@ export default function AuthTestPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
           <p>Loading auth state...</p>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function AuthTestPage() {
         </pre>
       </div>
 
-      <div className="mt-6 p-6 bg-blue-900/20 rounded-lg">
+      <div className="mt-6 p-6 bg-emerald-900/20 rounded-lg">
         <h2 className="text-xl font-semibold mb-2">Current Auth State</h2>
         <p className="mb-2">
           <span className="font-medium">Is Authenticated:</span>{' '}
@@ -57,7 +57,7 @@ export default function AuthTestPage() {
         <div className="flex gap-4">
           <a 
             href="/blog/new" 
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white"
           >
             Try Create Post
           </a>

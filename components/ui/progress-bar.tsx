@@ -18,7 +18,7 @@ export function ProgressBar({ isLoading }: ProgressBarProps) {
     if (resolvedTheme === 'dark') {
       return 'linear-gradient(90deg, #6366f1, #06b6d4, #10b981, #06b6d4, #6366f1)'; // Indigo to cyan to teal to purple to indigo
     }
-    return 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #8b5cf6, #3b82f6)'; // Blue to purple to pink to purple to blue
+    return 'linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #8b5cf6, #3b82f6)'; // emerald to purple to pink to purple to emerald
   };
 
   useEffect(() => {

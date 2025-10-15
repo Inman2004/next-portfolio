@@ -9,8 +9,8 @@ import Image from 'next/image';
 const InteractiveCard3D = dynamic(() => import('./HeroID').then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-      <div className="animate-pulse text-blue-400">Loading 3D Avatar...</div>
+    <div className="w-full h-full bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center">
+      <div className="animate-pulse text-emerald-400">Loading 3D Avatar...</div>
     </div>
   )
 });
@@ -20,7 +20,7 @@ const AvatarSection = () => {
   return (
     <div className="relative w-full h-full">
       <m.div 
-        className="relative w-full h-full overflow-hidden border-2 border-blue-300/40 dark:border-blue-500/30 shadow-[0_0_25px_-10px_rgba(99,102,241,0.2)] dark:shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)] bg-black/80 dark:bg-black/60 backdrop-blur-sm"
+        className="relative w-full h-full overflow-hidden border-2 border-emerald-300/40 dark:border-emerald-500/30 shadow-[0_0_25px_-10px_rgba(99,102,241,0.2)] dark:shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)] bg-black/80 dark:bg-black/60 backdrop-blur-sm"
         initial={{
           borderRadius: '50%'
         }}
@@ -58,7 +58,7 @@ const AvatarSection = () => {
         }}
       >
         <Suspense fallback={
-          <div className="w-full h-full bg-gradient-to-br from-blue-900/30 to-purple-900/30 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-emerald-900/30 to-purple-900/30 flex items-center justify-center">
             {/* Fallback to original image while 3D loads */}
             <Image
               src="/images/avatar1.png"
@@ -77,7 +77,7 @@ const AvatarSection = () => {
 
       {/* Optional overlay for better integration */}
       <m.div 
-        className="absolute inset-0 bg-gradient-to-t from-blue-600/20 via-transparent to-purple-600/20 pointer-events-none"
+        className="absolute inset-0 bg-gradient-to-t from-emerald-600/20 via-transparent to-purple-600/20 pointer-events-none"
         initial={{ opacity: 0 }}
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -88,7 +88,7 @@ const AvatarSection = () => {
         {[...Array(6)].map((_, i) => (
           <m.div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/60 rounded-full"
+            className="absolute w-1 h-1 bg-emerald-400/60 rounded-full"
             style={{
               left: `${20 + i * 15}%`,
               top: `${30 + (i % 3) * 20}%`,
@@ -115,7 +115,7 @@ const AvatarCard3D = () => {
   return (
     <div className="relative w-full h-full">
       <m.div 
-        className="relative w-full h-full overflow-hidden border-2 border-blue-300/40 dark:border-blue-500/30 shadow-[0_0_25px_-10px_rgba(99,102,241,0.2)] dark:shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)] bg-black/80 backdrop-blur-sm rounded-3xl"
+        className="relative w-full h-full overflow-hidden border-2 border-emerald-300/40 dark:border-emerald-500/30 shadow-[0_0_25px_-10px_rgba(99,102,241,0.2)] dark:shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)] bg-black/80 backdrop-blur-sm rounded-3xl"
         whileHover={{ 
           scale: 1.02,
           boxShadow: "0 0 50px -10px rgba(99,102,241,0.6)",
@@ -123,10 +123,10 @@ const AvatarCard3D = () => {
         transition={{ duration: 0.3 }}
       >
         <Suspense fallback={
-          <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center rounded-3xl">
+          <div className="w-full h-full bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center rounded-3xl">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-2"></div>
-              <p className="text-blue-400 text-sm">Loading Interactive Avatar...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-2"></div>
+              <p className="text-emerald-400 text-sm">Loading Interactive Avatar...</p>
             </div>
           </div>
         }>

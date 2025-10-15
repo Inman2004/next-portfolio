@@ -439,7 +439,7 @@
   --card-foreground: 244 244 245; /* zinc-100 */
   --popover: 240 10% 3.9%;
   --popover-foreground: 255 255 255; /* white */
-  --primary: 191 219 254;    /* lighter blue-200 for dark mode */
+  --primary: 191 219 254;    /* lighter emerald-200 for dark mode */
   --primary-foreground: 15 23 42; /* zinc-900 */
   --secondary: 55 65 81;    /* zinc-700 */
   --secondary-foreground: 255 255 255; /* white */

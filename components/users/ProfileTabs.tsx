@@ -11,7 +11,7 @@ export default function ProfileTabs({ activeTab, onTabChange }: ProfileTabsProps
           onClick={() => onTabChange('posts')}
           className={`py-4 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'posts'
-              ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+              ? 'border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400'
               : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-200'
           }`}
         >
@@ -21,7 +21,7 @@ export default function ProfileTabs({ activeTab, onTabChange }: ProfileTabsProps
           onClick={() => onTabChange('about')}
           className={`py-4 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'about'
-              ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+              ? 'border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400'
               : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-200'
           }`}
         >

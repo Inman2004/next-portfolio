@@ -23,7 +23,7 @@ const contactMethods = [
     description: 'Send me an email anytime',
     value: 'rvimman@gmail.com',
     href: 'mailto:rvimman@gmail.com',
-    color: 'text-blue-500',
+    color: 'text-emerald-500',
   },
   {
     icon: Phone,
@@ -62,7 +62,7 @@ const socialLinks = [
     icon: FaLinkedin, 
     href: 'https://linkedin.com/in/rv3d', 
     label: 'LinkedIn', 
-    color: 'hover:text-blue-600' 
+    color: 'hover:text-emerald-600' 
   },
   { 
     icon: FaXTwitter, 
@@ -146,7 +146,7 @@ export default function ContactPage() {
             transition={{ duration: 0.8 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent mb-6">
               Get In Touch
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">

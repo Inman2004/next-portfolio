@@ -63,7 +63,7 @@ const DATA: { navbar: NavItem[]; contact: { email: string; social: NavItem[] } }
     { 
       href: "#home", 
       label: "Intro", 
-      icon: (props: IconProps) => <User2 {...props} className="w-4 h-4 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" /> 
+      icon: (props: IconProps) => <User2 {...props} className="w-4 h-4 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" /> 
     },
     { 
       href: "#projects", 
@@ -257,7 +257,7 @@ export function BottomNav() {
         href: '/',
         label: 'Home',
         icon: (props: IconProps) => <HomeIcon {...props} className="w-5 h-5" />,
-        className: 'text-zinc-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 transition-colors'
+        className: 'text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors'
       },
       {
         href: '/blog',
@@ -375,7 +375,7 @@ export function BottomNav() {
                     'flex items-center p-3 rounded-xl transition-all duration-200 w-full',
                     'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white',
                     'hover:bg-zinc-100 dark:hover:bg-zinc-800',
-                    isActive && 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+                    isActive && 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
                     item.className
                   )}
                   whileHover={{ x: 5 }}

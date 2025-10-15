@@ -40,7 +40,7 @@ export default function EditPostClient({ post }: EditPostClientProps) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-blue-500 dark:to-blue-400 font-bold mb-6">
+      <h1 className="text-3xl text-transparent bg-clip-text bg-gradient-to-tr from-purple-600 to-indigo-600 dark:from-emerald-500 dark:to-emerald-400 font-bold mb-6">
         Edit Post
       </h1>
       <MarkdownEditorProvider>

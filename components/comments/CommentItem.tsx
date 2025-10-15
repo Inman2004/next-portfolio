@@ -59,12 +59,12 @@ export const CommentItem = memo(({
   const metaClasses = 'text-sm text-zinc-600 dark:text-zinc-400';
   const contentClasses = 'mt-3 text-zinc-800 dark:text-zinc-200 leading-relaxed break-words text-base';
   const actionClasses = 'flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors px-2 py-1.5 rounded-md hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50';
-  const buttonClasses = 'flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-2 py-1.5 rounded-md hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50';
-  const iconClasses = (isActive: boolean) => `w-4 h-4 flex-shrink-0 ${isActive ? 'fill-blue-600 dark:fill-blue-400' : ''} ${isActive && userVote === 'down' ? 'fill-red-500 dark:fill-red-400' : ''}`;
+  const buttonClasses = 'flex items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors px-2 py-1.5 rounded-md hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50';
+  const iconClasses = (isActive: boolean) => `w-4 h-4 flex-shrink-0 ${isActive ? 'fill-emerald-600 dark:fill-emerald-400' : ''} ${isActive && userVote === 'down' ? 'fill-red-500 dark:fill-red-400' : ''}`;
   const voteButtonClasses = (isActive: boolean) => `flex items-center gap-1.5 text-sm px-2 py-1.5 rounded-md transition-colors ${
     isActive 
-      ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20' 
-      : 'text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50'
+      ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/20' 
+      : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50'
   }`;
   
   const userVote = useMemo(() => {
@@ -131,7 +131,7 @@ export const CommentItem = memo(({
                   });
                   e?.stopPropagation();
                 }}
-                className={`group ${isClickable ? 'hover:ring-2 hover:ring-blue-500 hover:ring-opacity-50 cursor-pointer hover:scale-105 transition-all duration-200' : 'cursor-default opacity-75'}`}
+                className={`group ${isClickable ? 'hover:ring-2 hover:ring-emerald-500 hover:ring-opacity-50 cursor-pointer hover:scale-105 transition-all duration-200' : 'cursor-default opacity-75'}`}
                 title={isClickable ? `View ${comment.user?.displayName || comment.displayName || 'user'}'s profile` : 'User profile not available'}
               />
               {!isClickable && (
@@ -140,7 +140,7 @@ export const CommentItem = memo(({
                 </div>
               )}
               {isLoadingUsername && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full border border-white dark:border-zinc-800 animate-pulse" 
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border border-white dark:border-zinc-800 animate-pulse" 
                      title="Loading profile...">
                 </div>
               )}
@@ -152,7 +152,7 @@ export const CommentItem = memo(({
                 {isClickable ? (
                   <Link 
                     href={profileLink!}
-                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-semibold hover:underline"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-semibold hover:underline"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {comment.user?.displayName || comment.displayName || 'Anonymous'}

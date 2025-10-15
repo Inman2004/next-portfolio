@@ -57,7 +57,7 @@ export default function UnsubscribePage() {
       case 'loading':
         return (
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
             <p>Processing your unsubscribe request...</p>
           </div>
         );

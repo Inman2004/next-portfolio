@@ -16,7 +16,7 @@ export const ScrollProgress = React.forwardRef<
     <m.div
       ref={ref}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 h-1 origin-left bg-gradient-to-r from-zinc-700 via-sky-700 to-sky-600 dark:from-teal-400 dark:to-blue-400",
+        "fixed inset-x-0 top-0 z-50 h-1 origin-left bg-gradient-to-r from-zinc-700 via-sky-700 to-sky-600 dark:from-teal-400 dark:to-emerald-400",
         className,
       )}
       style={{

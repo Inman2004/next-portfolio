@@ -40,7 +40,7 @@ export default function WelcomePopup() {
 
   // Features list with icons
   const features = [
-    { icon: <Code className="w-5 h-5 text-blue-400" />, text: 'Exclusive content' },
+    { icon: <Code className="w-5 h-5 text-emerald-400" />, text: 'Exclusive content' },
     { icon: <Palette className="w-5 h-5 text-purple-400" />, text: 'Custom themes' },
     { icon: <Zap className="w-5 h-5 text-yellow-400" />, text: 'Markdown Blog support' },
     { icon: <Heart className="w-5 h-5 text-pink-400" />, text: 'Support my work' },
@@ -68,15 +68,15 @@ export default function WelcomePopup() {
           className="relative w-full max-w-2xl bg-white dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-800 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700/50 overflow-hidden flex flex-col md:flex-row"
         >
           {/* Left side - Decorative */}
-          <div className="hidden md:block w-1/3 bg-gradient-to-b from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 p-8 relative overflow-hidden">
+          <div className="hidden md:block w-1/3 bg-gradient-to-b from-emerald-50 to-purple-50 dark:from-emerald-900/30 dark:to-purple-900/30 p-8 relative overflow-hidden">
             <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full -mr-32 -mt-32"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 rounded-full -mr-32 -mt-32"></div>
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/20 rounded-full -ml-40 -mb-40"></div>
             </div>
             <div className="relative z-10 h-full flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-6">
                 <Sparkles className="w-8 h-8 text-yellow-400" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-yellow-400 dark:to-amber-500 bg-clip-text text-transparent">Welcome!</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-purple-600 dark:from-yellow-400 dark:to-amber-500 bg-clip-text text-transparent">Welcome!</span>
               </div>
               <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4">Join our community</h3>
               <ul className="space-y-3">
@@ -118,7 +118,7 @@ export default function WelcomePopup() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-white dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
+                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-white dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white transition-all hover:shadow-lg hover:shadow-emerald-500/10 group"
               >
                 <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                   <path
@@ -153,7 +153,7 @@ export default function WelcomePopup() {
               <div className="text-center">
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors"
+                  className="text-sm text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 hover:underline transition-colors"
                 >
                   Continue as guest
                 </button>
@@ -164,12 +164,12 @@ export default function WelcomePopup() {
                       e.preventDefault();
                       setShowTerms(true);
                     }}
-                    className="text-blue-600 dark:text-blue-400 hover:underline focus:outline-none"
+                    className="text-emerald-600 dark:text-emerald-400 hover:underline focus:outline-none"
                   >
                     Terms and Conditions
                   </button>
                   {' '}and{' '}
-                  <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                  <a href="/privacy" className="text-emerald-600 dark:text-emerald-400 hover:underline">
                     Privacy Policy
                   </a>.
                 </p>

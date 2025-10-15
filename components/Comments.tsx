@@ -170,7 +170,7 @@ const Comments = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
-        <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
+        <Loader2 className="animate-spin h-8 w-8 text-emerald-500" />
       </div>
     );
   }
@@ -189,7 +189,7 @@ const Comments = () => {
   const sortButtonClasses = 'flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 border border-zinc-400 dark:border-zinc-700/50 rounded-lg transition-colors';
   const sortOptionClasses = (isActive: boolean) => `w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
     isActive 
-      ? 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' 
+      ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' 
       : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/50 dark:hover:bg-zinc-700/50'
   }`;
   const pinnedLabelClasses = 'flex items-center gap-2 mb-3';
@@ -668,7 +668,7 @@ const Comments = () => {
             >
               <button
                 onClick={() => handleSortChange('newest')}
-                className={`w-full text-left px-4 py-2 hover:bg-zinc-800 flex items-center gap-2 ${sortBy === 'newest' ? 'text-blue-400' : ''}`}
+                className={`w-full text-left px-4 py-2 hover:bg-zinc-800 flex items-center gap-2 ${sortBy === 'newest' ? 'text-emerald-400' : ''}`}
               >
                 <Clock size={16} />
                 <span>Newest</span>
@@ -676,7 +676,7 @@ const Comments = () => {
               </button>
               <button
                 onClick={() => handleSortChange('top')}
-                className={`w-full text-left px-4 py-2 hover:bg-zinc-800 flex items-center gap-2 ${sortBy === 'top' ? 'text-blue-400' : ''}`}
+                className={`w-full text-left px-4 py-2 hover:bg-zinc-800 flex items-center gap-2 ${sortBy === 'top' ? 'text-emerald-400' : ''}`}
               >
                 <Flame size={16} />
                 <span>Top</span>

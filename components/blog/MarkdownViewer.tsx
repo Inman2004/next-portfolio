@@ -103,7 +103,7 @@ const CustomLink = memo(({ node, children, ...props }: CustomLinkProps) => {
   return (
     <a 
       {...props} 
-      className="text-sky-600 hover:text-sky-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-4 transition-colors inline-flex items-center gap-1"
+      className="text-sky-600 hover:text-sky-800 dark:text-emerald-400 dark:hover:text-emerald-300 underline underline-offset-4 transition-colors inline-flex items-center gap-1"
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
     >
@@ -849,11 +849,11 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline group-hover:underline">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-sky-600 to-zinc-700 dark:from-teal-400 dark:to-blue-400">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-700 via-sky-600 to-zinc-700 dark:from-teal-400 dark:to-emerald-400">
                     {props.children}
                   </span>
                 </a>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-600 to-zinc-700 dark:from-teal-500 dark:to-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-600 to-zinc-700 dark:from-teal-500 dark:to-emerald-500 transition-all duration-300 group-hover:w-full"></span>
               </h1>
             );
           },
@@ -868,8 +868,8 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
                 {...props}
               >
                 <a href={`#${id}`} className="no-underline hover:underline">
-                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-blue-400 rounded-full"></span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-zinc-500 dark:from-teal-300 dark:to-blue-300">
+                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 dark:bg-gradient-to-b dark:from-teal-400 dark:to-emerald-400 rounded-full"></span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-zinc-500 dark:from-teal-300 dark:to-emerald-300">
                     {props.children}
                   </span>
                 </a>
@@ -888,9 +888,9 @@ function MarkdownViewer({ content, className = '' }: MarkdownViewerProps) {
             >
               <a href={`#${id}`} className="no-underline hover:underline">
                 <span className="absolute left-0 top-1/2 -tranzinc-y-1/3 w-6 h-6 rounded-full bg-sky-400/50 dark:bg-teal-900/50 flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600/80 dark:bg-teal-400"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600/80 dark:bg-teal-400"></span>
                 </span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-zinc-600 dark:from-teal-400 dark:to-blue-400/80">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-zinc-600 dark:from-teal-400 dark:to-emerald-400/80">
                   {props.children}
                 </span>
               </a>

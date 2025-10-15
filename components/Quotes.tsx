@@ -27,7 +27,7 @@ const Quotes = () => {
           transition={{ duration: 0.8 }}
           className="text-right mb-16"
         >
-          <h2 className="text-lg md:text-xl italic font-pacifico bg-gradient-to-r from-blue-100 to-blue-100 dark:from-blue-200 dark:to-blue-200 bg-clip-text text-transparent mr-2">
+          <h2 className="text-lg md:text-xl italic font-pacifico bg-gradient-to-r from-emerald-100 to-emerald-100 dark:from-emerald-200 dark:to-emerald-200 bg-clip-text text-transparent mr-2">
             A quote for you
           </h2>
           {quote ? (

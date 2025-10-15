@@ -39,7 +39,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
         <div className="mb-8">
           <Link 
             href="/projects" 
-            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+            className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Projects
@@ -53,7 +53,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                 'px-3 py-1 text-sm font-medium rounded-full',
                 {
                   'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': project.status === 'deployed',
-                  'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400': project.status === 'active' || project.status === 'in-progress',
+                  'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400': project.status === 'active' || project.status === 'in-progress',
                   'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400': project.status === 'completed',
                   'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': project.status === 'on-hold',
                   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': project.status === 'abandoned',
@@ -136,7 +136,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                   <h3>Related Blog Post</h3>
                   <Link 
                     href={project.blogPost}
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                    className="inline-flex items-center text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 font-medium"
                   >
                     Read the blog post <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>

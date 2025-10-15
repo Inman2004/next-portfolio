@@ -78,12 +78,12 @@ export const CommentForm = ({
 
   const formClasses = [
     'w-full min-h-[100px] p-4 pr-12 rounded-lg border',
-    'bg-white/90 dark:bg-zinc-900/50 border-zinc-700/80 dark:border-blue-300/50 backdrop-blur-sm',
+    'bg-white/90 dark:bg-zinc-900/50 border-zinc-700/80 dark:border-emerald-300/50 backdrop-blur-sm',
     'text-zinc-800 dark:text-zinc-100 placeholder-zinc-500 dark:placeholder-zinc-400',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent',
+    'focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent',
     'resize-none transition-all duration-200',
     'border-zinc-400/80 dark:border-zinc-700/50',
-    'dark:focus:ring-blue-500/50',
+    'dark:focus:ring-emerald-500/50',
     'shadow-sm hover:shadow-md transition-shadow',
     'text-base leading-relaxed',
     'font-normal tracking-normal',
@@ -152,8 +152,8 @@ export const CommentForm = ({
             whileTap={{ scale: 0.98 }}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               !content.trim() || isSubmitting
-                ? 'bg-blue-300 dark:bg-blue-500/30 text-blue-700 dark:text-blue-300 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                ? 'bg-emerald-300 dark:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 cursor-not-allowed'
+                : 'bg-emerald-500 hover:bg-emerald-600 text-white'
             }`}
           >
             {isSubmitting ? 'Posting...' : 'Post Comment'}

@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   if (loading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       </div>
     );
   }
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
     {
       title: 'Manage Projects',
       description: 'View, add, edit, or delete projects',
-      icon: <FileText className="h-6 w-6 text-blue-500" />,
+      icon: <FileText className="h-6 w-6 text-emerald-500" />,
       href: '/admin/projects',
     },
     {
@@ -123,7 +123,7 @@ export default function AdminDashboard() {
     <div className="space-y-6 ml-12">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <Button asChild className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white dark:text-black">
+        <Button asChild className="bg-emerald-500 dark:bg-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-700 text-white dark:text-black">
           <Link href="/admin/blog/new">
             <Plus className="mr-2 h-4 w-4" />
             New Post

@@ -135,7 +135,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="block w-full pl-10 pr-3 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     placeholder="you@example.com"
                     disabled={isLoading}
                   />
@@ -155,7 +155,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="block w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   placeholder="••••••••"
                   disabled={isLoading}
                 />
@@ -168,7 +168,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                       id="remember-me"
                       name="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-600 rounded"
+                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-zinc-600 rounded"
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-zinc-300">
                       Remember me
@@ -178,7 +178,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
 
                 {isSignIn && (
                   <div className="text-sm">
-                    <a href="#" className="font-medium text-blue-400 hover:text-blue-300">
+                    <a href="#" className="font-medium text-emerald-400 hover:text-emerald-300">
                       Forgot password?
                     </a>
                   </div>
@@ -189,7 +189,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     'Loading...'
@@ -208,7 +208,7 @@ export default function AuthModal({ isOpen, onClose, onSwitchToSignUp }: AuthMod
               {isSignIn ? "Don't have an account?" : 'Already have an account?'}{' '}
               <button
                 onClick={() => setIsSignIn(!isSignIn)}
-                className="font-medium text-blue-400 hover:text-blue-300"
+                className="font-medium text-emerald-400 hover:text-emerald-300"
               >
                 {isSignIn ? 'Sign up' : 'Sign in'}
               </button>

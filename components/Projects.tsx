@@ -45,9 +45,9 @@ const getTechColor = (tech: string): TechColor => {
       border: "border-orange-500/20",
     },
     css: {
-      bg: "bg-blue-500/10 dark:bg-blue-500/20",
-      text: "text-blue-600 dark:text-blue-400",
-      border: "border-blue-500/20",
+      bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
+      text: "text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-500/20",
     },
 
     // Frontend Frameworks
@@ -131,9 +131,9 @@ const getTechColor = (tech: string): TechColor => {
       border: "border-yellow-500/20",
     },
     postgres: {
-      bg: "bg-blue-500/10 dark:bg-blue-500/20",
-      text: "text-blue-600 dark:text-blue-400",
-      border: "border-blue-500/20",
+      bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
+      text: "text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-500/20",
     },
     mongodb: {
       bg: "bg-green-500/10 dark:bg-green-500/20",
@@ -148,9 +148,9 @@ const getTechColor = (tech: string): TechColor => {
 
     // Languages
     typescript: {
-      bg: "bg-blue-500/10 dark:bg-blue-500/20",
-      text: "text-blue-600 dark:text-blue-400",
-      border: "border-blue-500/20",
+      bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
+      text: "text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-500/20",
     },
     javascript: {
       bg: "bg-yellow-500/10 dark:bg-yellow-500/20",
@@ -159,7 +159,7 @@ const getTechColor = (tech: string): TechColor => {
     },
     python: {
       bg: "bg-amber-500/20 dark:bg-amber-500/20",
-      text: "text-blue-600 dark:text-blue-400/80",
+      text: "text-emerald-600 dark:text-emerald-400/80",
       border: "border-yellow-500/20",
     },
     java: {
@@ -170,9 +170,9 @@ const getTechColor = (tech: string): TechColor => {
 
     // Tools & Others
     docker: {
-      bg: "bg-blue-500/10 dark:bg-blue-500/20",
-      text: "text-blue-600 dark:text-blue-400",
-      border: "border-blue-500/20",
+      bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
+      text: "text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-500/20",
     },
     git: {
       bg: "bg-rose-500/10 dark:bg-rose-500/20",
@@ -205,9 +205,9 @@ const getTechColor = (tech: string): TechColor => {
       border: "border-yellow-500/20",
     },
     keras: {
-      bg: "bg-blue-500/10 dark:bg-blue-500/20",
-      text: "text-blue-600 dark:text-blue-400",
-      border: "border-blue-500/20",
+      bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
+      text: "text-emerald-600 dark:text-emerald-400",
+      border: "border-emerald-500/20",
     },
     matplotlib: {
       bg: "bg-cyan-500/10 dark:bg-cyan-500/20",
@@ -390,7 +390,7 @@ const ProjectCard = React.memo(({
         <div
           className="h-full overflow-hidden rounded-xl bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-800 
                    transition-all duration-300 shadow-sm dark:shadow-zinc-900/20 relative
-                   hover:border-blue-500 dark:hover:border-blue-500 hover:ring-2 hover:ring-blue-500/20"
+                   hover:border-emerald-500 dark:hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/20"
           onClick={(e) => {
             // Only handle card click if no button was clicked
             if (!(e.target as HTMLElement).closest("a, button")) {
@@ -413,11 +413,11 @@ const ProjectCard = React.memo(({
                     "text-green-700 dark:text-green-300 border border-green-500/40 dark:border-green-500/30 " +
                     "shadow-green-500/10 hover:shadow-green-500/20"
                   : project.status === "completed"
-                    ? "bg-gradient-to-r from-blue-500/30 to-indigo-500/30 dark:from-blue-500/20 dark:to-indigo-500/20 " +
-                      "text-blue-700 dark:text-blue-300 border border-blue-500/40 dark:border-blue-500/30 " +
-                      "shadow-blue-500/10 hover:shadow-blue-500/20"
+                    ? "bg-gradient-to-r from-emerald-500/30 to-indigo-500/30 dark:from-emerald-500/20 dark:to-indigo-500/20 " +
+                      "text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 dark:border-emerald-500/30 " +
+                      "shadow-emerald-500/10 hover:shadow-emerald-500/20"
                     : project.status === "deployed"
-                      ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 dark:from-purple-500/20 dark:to-blue-500/20 " +
+                      ? "bg-gradient-to-r from-purple-500/30 to-emerald-500/30 dark:from-purple-500/20 dark:to-emerald-500/20 " +
                         "text-purple-700 dark:text-purple-300 border border-purple-500/40 dark:border-purple-500/30 " +
                         "shadow-purple-500/10 hover:shadow-purple-500/20"
                       : project.status === "outdated"
@@ -529,7 +529,7 @@ const ProjectCard = React.memo(({
                       className={`h-1.5 rounded-full transition-all ${
                         i === currentMediaIndex
                           ? allMedia[i].type === "video"
-                            ? "w-6 bg-blue-400"
+                            ? "w-6 bg-emerald-400"
                             : "w-6 bg-white"
                           : "w-3 bg-white/50 hover:bg-white/75"
                       }`}
@@ -556,7 +556,7 @@ const ProjectCard = React.memo(({
                 onClick={(e) => e.stopPropagation()}
                 className="group"
               >
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-purple-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity">
                   {project.title}
                 </h3>
               </Link>
@@ -624,7 +624,7 @@ const ProjectCard = React.memo(({
                     href={project.live}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 transition-colors"
+                    className="inline-block text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:scale-110 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     title="View Live Demo"
@@ -671,7 +671,7 @@ const ProjectCard = React.memo(({
         </div>
 
         {/* Background gradient effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-600/5 dark:to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50 to-purple-50 dark:from-emerald-600/5 dark:to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
       </div>
     </m.div>
   );
@@ -738,7 +738,7 @@ const Projects = ({ showAll = false, maxItems = 3 }: ProjectsProps) => {
           }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent mb-4 transition-colors duration-300">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent mb-4 transition-colors duration-300">
             Featured Projects
           </h2>
           <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto transition-colors duration-300">

@@ -140,12 +140,12 @@ export default function MembershipCard({
               key={tier.id} 
               className={`relative ${
                 isCurrentTier && isSubscribed 
-                  ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-950/20' 
+                  ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-950/20' 
                   : ''
               }`}
             >
               {isCurrentTier && isSubscribed && (
-                <Badge className="absolute -top-2 left-1/2 transform -tranzinc-x-1/2 bg-blue-500">
+                <Badge className="absolute -top-2 left-1/2 transform -tranzinc-x-1/2 bg-emerald-500">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Current Plan
                 </Badge>
@@ -154,7 +154,7 @@ export default function MembershipCard({
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center gap-2">
                   {tier.name === 'premium' && <Crown className="h-5 w-5 text-yellow-500" />}
-                  {tier.name === 'basic' && <Star className="h-5 w-5 text-blue-500" />}
+                  {tier.name === 'basic' && <Star className="h-5 w-5 text-emerald-500" />}
                   {tier.name}
                 </CardTitle>
                 <CardDescription>{tier.description}</CardDescription>

@@ -116,14 +116,14 @@ export default function SocialShare({ url, title, description = '', isCompact = 
       icon: <Facebook className="w-6 h-6" />,
       onClick: () => shareOnPlatform('facebook'),
       label: 'Facebook',
-      className: 'h-12 w-12 rounded-full hover:bg-blue-500 dark:hover:bg-blue-700'
+      className: 'h-12 w-12 rounded-full hover:bg-emerald-500 dark:hover:bg-emerald-700'
     },
     {
       name: 'LinkedIn',
       icon: <Linkedin className="w-6 h-6" />,
       onClick: () => shareOnPlatform('linkedin'),
       label: 'LinkedIn',
-      className: 'h-12 w-12 rounded-full hover:bg-blue-500 dark:hover:bg-blue-500'
+      className: 'h-12 w-12 rounded-full hover:bg-emerald-500 dark:hover:bg-emerald-500'
     },
     {
       name: 'WhatsApp',
@@ -156,7 +156,7 @@ export default function SocialShare({ url, title, description = '', isCompact = 
           <m.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 flex items-center gap-2 text-zinc-800 dark:text-zinc-300 hover:text-blue-500 transition-colors relative rounded-full"
+            className="p-2 flex items-center gap-2 text-zinc-800 dark:text-zinc-300 hover:text-emerald-500 transition-colors relative rounded-full"
             aria-label="Share this post"
             title="Share this post"
           >

@@ -78,7 +78,7 @@ export default function SignUp() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400"
+              className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-purple-600 to-pink-600 dark:from-emerald-400 dark:via-purple-400 dark:to-pink-400"
             >
               Create Your Account
             </m.h2>
@@ -86,7 +86,7 @@ export default function SignUp() {
               Already have an account?{' '}
               <Link 
                 href="/signin" 
-                className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                className="font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
               >
                 Sign in
               </Link>
@@ -103,7 +103,7 @@ export default function SignUp() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm transition-all duration-200"
                 placeholder="your@email.com"
                 disabled={isLoading}
               />
@@ -118,7 +118,7 @@ export default function SignUp() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm transition-all duration-200"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
@@ -133,7 +133,7 @@ export default function SignUp() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all duration-200"
+                className="w-full px-4 py-2.5 rounded-lg border border-zinc-300/70 dark:border-zinc-600/50 bg-white/80 dark:bg-zinc-800/50 text-zinc-900 dark:text-white placeholder-zinc-500/70 dark:placeholder-zinc-400/70 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm transition-all duration-200"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
@@ -144,14 +144,14 @@ export default function SignUp() {
                 id="terms"
                 name="terms"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300/70 dark:border-zinc-600/50 rounded bg-white/80 dark:bg-zinc-800/50 transition-colors"
+                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-zinc-300/70 dark:border-zinc-600/50 rounded bg-white/80 dark:bg-zinc-800/50 transition-colors"
                 required
               />
               <label
                 htmlFor="terms"
                 className="ml-2 block text-sm text-zinc-700 dark:text-zinc-300"
               >
-                I agree to the <a href="#" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">Terms</a> and <a href="#" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">Privacy Policy</a>
+                I agree to the <a href="#" className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300">Terms</a> and <a href="#" className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300">Privacy Policy</a>
               </label>
             </div>
 
@@ -169,7 +169,7 @@ export default function SignUp() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-white font-medium hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
+              className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-purple-600 rounded-lg text-white font-medium hover:from-emerald-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
               disabled={isLoading}
             >
               {isLoading ? (

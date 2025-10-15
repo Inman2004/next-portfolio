@@ -237,7 +237,7 @@ export default function Hero() {
 
                     {/* Technical Stack with Hover Effects */}
                     <div>
-                      <p className="text-sm text-blue-600/80 dark:text-blue-300/80 mb-2 ml-2 font-livvic">
+                      <p className="text-sm text-emerald-600/80 dark:text-emerald-300/80 mb-2 ml-2 font-livvic">
                         My current technical stack focuses on:
                       </p>
                       <div className="flex flex-wrap gap-2 mb-1 ml-2 cursor-pointer">
@@ -336,7 +336,7 @@ export default function Hero() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.1 }}
-                        className="text-foreground hover:bg-blue-500/50 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
+                        className="text-foreground hover:bg-emerald-500/50 hover:text-white dark:hover:text-white p-2 rounded transition-all duration-300"
                       >
                         <Linkedin className="w-6 h-6" />
                       </m.a>

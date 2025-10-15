@@ -16,7 +16,7 @@ export function PopoverDemo({ index }: CertificatePopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="mt-auto inline-flex items-center text-sm font-medium bg-transparent hover:bg-transparent border-none hover:border-none hover:ring-0 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors group/link">
+        <Button className="mt-auto inline-flex items-center text-sm font-medium bg-transparent hover:bg-transparent border-none hover:border-none hover:ring-0 text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors group/link">
             View Certificate
             <PictureInPicture2 className="w-3.5 h-3.5 ml-1 transition-transform group-hover/link:tranzinc-y-[-1px]" />
         </Button>
@@ -33,7 +33,7 @@ export function PopoverDemo({ index }: CertificatePopoverProps) {
         </div>
         <div className="p-4 bg-white dark:bg-zinc-900/80 dark:backdrop-blur-sm border-t">
           <h4 className="font-medium text-lg">{awards[index]?.name || 'Certificate'}</h4>
-          <p className="text-sm text-blue-600 dark:text-blue-400">
+          <p className="text-sm text-emerald-600 dark:text-emerald-400">
             {awards[index]?.provider}
           </p>
           {awards[index]?.date && (

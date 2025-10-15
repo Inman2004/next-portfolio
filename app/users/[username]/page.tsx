@@ -260,7 +260,7 @@ export default function UserProfilePage() {
   if (isLoading && page === 1) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -274,7 +274,7 @@ export default function UserProfilePage() {
           <p className="text-zinc-700 dark:text-zinc-300 mb-6">{error}</p>
           <Link 
             href="/" 
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
           >
             Return to Home
           </Link>
@@ -292,7 +292,7 @@ export default function UserProfilePage() {
           <p className="text-zinc-600 dark:text-zinc-400 mb-6">The requested user could not be found.</p>
           <Link 
             href="/" 
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
           >
             Return to Home
           </Link>
@@ -305,7 +305,7 @@ export default function UserProfilePage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Profile Header */}
       <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden mb-8">
-        <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700"></div>
+        <div className="h-32 bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-600 dark:to-purple-700"></div>
         <div className="px-6 pb-6 relative -mt-16">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between">
             <div className="flex items-end">
@@ -440,7 +440,7 @@ export default function UserProfilePage() {
                           href={user.website.startsWith('http') ? user.website : `https://${user.website}`}
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline dark:text-blue-400"
+                          className="text-emerald-600 hover:underline dark:text-emerald-400"
                         >
                           {user.website.replace(/^https?:\/\//, '')}
                         </a>
@@ -487,7 +487,7 @@ export default function UserProfilePage() {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-zinc-700 hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
+                          className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400"
                           aria-label={link.platform}
                         >
                           <span className="sr-only">{link.platform}</span>
@@ -518,7 +518,7 @@ export default function UserProfilePage() {
                     )}
                     <div className="p-6">
                       <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
-                        <Link href={`/blog/${post.id}`} className="hover:text-blue-600 dark:hover:text-blue-400">
+                        <Link href={`/blog/${post.id}`} className="hover:text-emerald-600 dark:hover:text-emerald-400">
                           {post.title}
                         </Link>
                       </h3>
@@ -546,7 +546,7 @@ export default function UserProfilePage() {
                     <button
                       onClick={loadMorePosts}
                       disabled={isLoading}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? 'Loading...' : 'Load More Posts'}
                     </button>

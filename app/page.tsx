@@ -4,6 +4,7 @@ import { motion as m, useReducedMotion } from "framer-motion";
 // import { CssDotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import SkillLoop from "@/components/SkillLoop";
 
 // Lazy load components with proper type annotations
 const Hero = lazy(() => import("@/components/Hero").then(module => ({ default: module.default })));
@@ -118,7 +119,7 @@ export default function Home() {
 
           <BlurFadeWrapper delay={0.2}>
             <Suspense fallback={null}>
-              <LangCloud />
+              <SkillLoop />
             </Suspense>
           </BlurFadeWrapper>
 

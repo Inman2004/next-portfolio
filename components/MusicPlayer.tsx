@@ -60,10 +60,10 @@ export default function MusicPlayer() {
     },
     {
       id: '4',
-      title: 'Blue',
+      title: 'emerald',
       artist: 'Yung kai',
-      previewUrl: '/songs/Blue.mp3',
-      imageUrl: '/images/songCover/blue.jpg',
+      previewUrl: '/songs/emerald.mp3',
+      imageUrl: '/images/songCover/emerald.jpg',
     }
     // Add more songs as needed
   ]);

@@ -16,6 +16,9 @@ import {
   SiGit,
   SiHtml5,
   SiCss3,
+  SiVercel,
+  SiAmazonaws,
+  SiGithub,
 } from "react-icons/si";
 import { AnimatedBeam } from "./ui/animated-beam";
 import { motion as m } from "framer-motion";
@@ -62,10 +65,12 @@ const Roadmap = () => {
   const mongodbRef = useRef<HTMLDivElement>(null);
   const postgresqlRef = useRef<HTMLDivElement>(null);
   const devopsRef = useRef<HTMLDivElement>(null);
+  const vercelRef = useRef<HTMLDivElement>(null);
+
 
   return (
     <section id="roadmap" className="py-24 sm:py-32">
-      <div className="container mx-auto max-w-4xl px-4">
+      <div className="container mx-auto max-w-5xl px-4">
       <div className="flex flex-col items-center mb-16">
         <m.h2
           initial={{ opacity: 0, y: 20 }}
@@ -97,7 +102,7 @@ const Roadmap = () => {
               <LabeledCircle className="hover:!bg-orange-500/20 border-orange-500/50" ref={htmlRef} label="HTML5">
                 <SiHtml5 />
               </LabeledCircle>
-              <LabeledCircle className="hover:!bg-blue-500/20 border-blue-500/50" ref={cssRef} label="CSS3">
+              <LabeledCircle className="hover:!bg-emerald-500/20 border-emerald-500/50" ref={cssRef} label="CSS3">
                 <SiCss3 />
               </LabeledCircle>
               <LabeledCircle className="hover:!bg-cyan-500/30 border-cyan-500/50" ref={reactRef} label="React + Redux">
@@ -119,7 +124,7 @@ const Roadmap = () => {
               <SiNodedotjs />
               <SiFastapi />
             </LabeledCircle>
-            <div className="flex flex-col gap-1 sm:gap-1.5 items-center">
+            <div className="flex flex-col gap-12 sm:gap-4.5 items-center">
               <LabeledCircle className="hover:!bg-sky-600/20 border-sky-600/50" ref={postgresqlRef} label="PostgreSQL">
                 <SiPostgresql />
               </LabeledCircle>
@@ -127,9 +132,13 @@ const Roadmap = () => {
                 <SiMongodb />
               </LabeledCircle>
             </div>
-            <LabeledCircle className="hover:!bg-cyan-500/20 border-cyan-500/50" ref={devopsRef} label="Docker + Git">
+            <LabeledCircle className="hover:!bg-violet-500/20 border-violet-500/50" ref={devopsRef} label="Docker + GitHub">
               <SiDocker />
-              <SiGit />
+              <SiGithub />
+            </LabeledCircle>
+            <LabeledCircle className="hover:!bg-orange-500/20 border-orange-500/50" ref={vercelRef} label="Vercel + AWS">
+              <SiVercel />
+              <SiAmazonaws />
             </LabeledCircle>
 
             <AnimatedBeam
@@ -148,7 +157,7 @@ const Roadmap = () => {
               containerRef={containerRef}
               fromRef={reactRef}
               toRef={nextRef}
-              pathWidth={1}
+              pathWidth={1.5}
             />
             <AnimatedBeam
               containerRef={containerRef}
@@ -166,7 +175,8 @@ const Roadmap = () => {
               containerRef={containerRef}
               fromRef={nextRef}
               toRef={backendRef}
-              pathWidth={1.5}
+              duration={5}
+              pathWidth={2}
             />
             <AnimatedBeam
               containerRef={containerRef}
@@ -188,7 +198,14 @@ const Roadmap = () => {
               fromRef={backendRef}
               toRef={devopsRef}
               delay={5}
-              pathWidth={1.5}
+              pathWidth={2}
+            />
+            <AnimatedBeam
+              containerRef={containerRef}
+              fromRef={devopsRef}
+              toRef={vercelRef}
+              delay={3}
+              pathWidth={2}
             />
           </div>
         </div>

@@ -118,7 +118,7 @@ export default function SubscriptionsDashboard() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
         </div>
       </div>
     );
@@ -244,7 +244,7 @@ export default function SubscriptionsDashboard() {
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Mail className="h-8 w-8 text-blue-500" />
+                        <Mail className="h-8 w-8 text-emerald-500" />
                         <div>
                           <h3 className="font-semibold">{subscription.creatorName}</h3>
                           <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -289,7 +289,7 @@ export default function SubscriptionsDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardContent className="pt-6 text-center">
-              <Crown className="h-12 w-12 mx-auto text-blue-500 mb-4" />
+              <Crown className="h-12 w-12 mx-auto text-emerald-500 mb-4" />
               <h3 className="font-semibold mb-2">Find Creators</h3>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
                 Discover new creators to support

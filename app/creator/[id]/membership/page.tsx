@@ -117,7 +117,7 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
                 {creatorProfile.subscriptionCount}
               </div>
               <p className="text-zinc-600 dark:text-zinc-400">Active Members</p>
@@ -146,7 +146,7 @@ export default async function CreatorMembershipPage({ params }: CreatorMembershi
 
       {/* Call to Action */}
       <div className="mt-16 text-center">
-        <Card className="max-w-2xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+        <Card className="max-w-2xl mx-auto bg-gradient-to-r from-emerald-50 to-indigo-50 dark:from-emerald-950/20 dark:to-indigo-950/20">
           <CardContent className="pt-6">
             <h3 className="text-xl font-semibold mb-3">Ready to join the community?</h3>
             <p className="text-zinc-600 dark:text-zinc-400 mb-4">

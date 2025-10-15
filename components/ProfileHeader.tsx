@@ -25,7 +25,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
   return (
     <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 mb-8">
       <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-100 dark:border-zinc-700">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-emerald-100 dark:border-zinc-700">
           {user.photoURL ? (
             <Image
               src={user.photoURL}
@@ -41,7 +41,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
               }}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center">
               <span className="text-4xl font-bold text-white">
                 {user.displayName?.[0]?.toUpperCase() || 'U'}
               </span>
@@ -87,7 +87,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                 href={user.website.startsWith('http') ? user.website : `https://${user.website}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
+                className="flex items-center text-emerald-600 dark:text-emerald-400 hover:underline"
               >
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />

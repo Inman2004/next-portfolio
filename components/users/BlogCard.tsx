@@ -35,7 +35,7 @@ export default function BlogCard({ post, className = '' }: BlogCardProps) {
         </div>
         <div className="flex justify-between items-center text-sm text-zinc-500 dark:text-zinc-400">
           <span>{format(new Date(post.createdAt || new Date()), 'MMM d, yyyy')}</span>
-          <Link href={`/blog/${post.id}`} className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href={`/blog/${post.id}`} className="text-emerald-600 dark:text-emerald-400 hover:underline">
             Read more →
           </Link>
         </div>

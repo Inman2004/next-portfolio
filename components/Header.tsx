@@ -24,7 +24,7 @@ interface NavLink {
 // Main navigation links with better responsive support
 const getNavigationLinks = (isHome: boolean): NavLink[] => {
   const homeLinks: NavLink[] = [
-    { href: '#home', label: 'Intro', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+    { href: '#home', label: 'Intro', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-all duration-300" /> },
     { href: '#projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
     { href: '#experience', label: 'Experience', icon: <BriefcaseBusiness className="w-4 h-4 group-hover:scale-110 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-all duration-300" /> },
     { href: '#skills', label: 'Skills', icon: <Wrench className="w-4 h-4 group-hover:scale-110 group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-all duration-300" /> },
@@ -32,8 +32,8 @@ const getNavigationLinks = (isHome: boolean): NavLink[] => {
   ];
 
   const globalLinks: NavLink[] = [
-    { href: '/', label: 'Home', icon: <Home className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
-    { href: '/about', label: 'About', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all duration-300" /> },
+    { href: '/', label: 'Home', icon: <Home className="w-4 h-4 group-hover:scale-110 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-all duration-300" /> },
+    { href: '/about', label: 'About', icon: <User2 className="w-4 h-4 group-hover:scale-110 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-all duration-300" /> },
     { href: '/projects', label: 'Projects', icon: <AppWindow className="w-4 h-4 group-hover:scale-110 group-hover:text-green-500 dark:group-hover:text-green-400 transition-all duration-300" /> },
     { href: '/contact', label: 'Contact', icon: <Mail className="w-4 h-4 group-hover:scale-110 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-all duration-300" /> },
     {

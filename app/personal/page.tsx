@@ -101,7 +101,7 @@ const Personel = () => {
                 />
               </div>
               <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-emerald-500 to-purple-500 bg-clip-text text-transparent">
                   Immanuvel B
                 </h2>
                 <p className="text-zinc-600 dark:text-zinc-300 mt-2">
@@ -122,7 +122,7 @@ const Personel = () => {
                 {[
                   { icon: <MapPin size={18} className="text-rose-500" />, label: 'Location', value: 'Tamil Nadu, India' },
                   { icon: <Mail size={18} className="text-indigo-500" />, label: 'Email', value: 'rvimman@gmail.com' },
-                  { icon: <BookOpen size={18} className="text-blue-500" />, label: 'Education', value: 'B.E in Computer Science' },
+                  { icon: <BookOpen size={18} className="text-emerald-500" />, label: 'Education', value: 'B.E in Computer Science' },
                   { icon: <Music size={18} className="text-amber-500" />, label: 'Interests', value: 'Tech, Music, Games, Phycology' },
                   { icon: <Briefcase size={18} className="text-lime-500" />, label: 'Work Status', value: 'Unemployed' },
                   { icon: <Languages size={18} className="text-teal-500" />, label: 'Languages', value: 'English, Tamil' },
@@ -144,7 +144,7 @@ const Personel = () => {
                 className={`inline-flex items-center px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
                   loading
                     ? 'bg-zinc-400 dark:bg-zinc-600 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg'
+                    : 'bg-gradient-to-r from-emerald-600 to-purple-600 hover:from-emerald-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg'
                 }`}
               >
                 {loading ? (
@@ -384,7 +384,7 @@ const Personel = () => {
     <>
     <div className="max-w-full mx-auto my-12 py-12 px-4 sm:px-6 lg:px-8 ml-16">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-emerald-500 to-purple-500 bg-clip-text text-transparent">
           Personal Space
         </h1>
         <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-300">

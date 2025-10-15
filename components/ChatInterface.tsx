@@ -152,13 +152,13 @@ export default function ChatInterface() {
         const text = g1;
         const href = g2 as string;
         parts.push(
-          <a key={`${keyPrefix}-lnk-${idx++}`} href={href} target="_blank" rel="noopener noreferrer" className="underline text-blue-600 dark:text-blue-400">{text}</a>
+          <a key={`${keyPrefix}-lnk-${idx++}`} href={href} target="_blank" rel="noopener noreferrer" className="underline text-emerald-600 dark:text-emerald-400">{text}</a>
         );
       } else if (nm.type === "bold") {
         parts.push(
           <strong
             key={`${keyPrefix}-b-${idx++}`}
-            className="text-blue-700 dark:text-blue-300"
+            className="text-emerald-700 dark:text-emerald-300"
           >
             {g1}
           </strong>
@@ -287,7 +287,7 @@ export default function ChatInterface() {
               <div
                 className={
                   msg.role === "user"
-                    ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"
+                    ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white"
                     : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-1.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
                 }
               >
@@ -305,7 +305,7 @@ export default function ChatInterface() {
                   <div className="mt-1 flex justify-end">
                     <button
                       type="button"
-                      className="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                      className="text-xs text-emerald-600 hover:underline dark:text-emerald-400"
                       onClick={() => setExpanded(prev => ({ ...prev, [i]: !prev[i] }))}
                     >
                       {isExpanded ? "Show less" : "Show more"}
@@ -339,7 +339,7 @@ export default function ChatInterface() {
               }
             }}
             placeholder="Type your message..."
-            className="flex-1 rounded-md border border-zinc-300 bg-white/90 px-3 py-2 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-100 dark:focus:border-blue-500 backdrop-blur-xl"
+            className="flex-1 rounded-md border border-zinc-300 bg-white/90 px-3 py-2 text-sm outline-none placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-100 dark:focus:border-emerald-500 backdrop-blur-xl"
           />
           {/* Mic button */}
           <button
@@ -375,7 +375,7 @@ export default function ChatInterface() {
           <button
             type="submit"
             disabled={!canSend}
-            className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white shadow hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Send className="h-4 w-4" />
             Send

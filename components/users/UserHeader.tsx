@@ -21,7 +21,7 @@ export function UserHeader({ user, socialLinks, joinDate }: UserHeaderProps) {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Profile Header */}
       <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden mb-8 my-12">
-        <div className="bg-gradient-to-r from-blue-500/50 to-purple-600/50 dark:from-blue-500/50 dark:to-purple-600/50 h-32">
+        <div className="bg-gradient-to-r from-emerald-500/50 to-purple-600/50 dark:from-emerald-500/50 dark:to-purple-600/50 h-32">
           {/* Cover photo could go here */}
         </div>
         <div className="px-6 pb-6 -mt-16">
@@ -46,7 +46,7 @@ export function UserHeader({ user, socialLinks, joinDate }: UserHeaderProps) {
             
             {/* Follow/Edit Profile Button */}
             <div className="mt-4 sm:mt-0">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+              <button className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors">
                 Follow
               </button>
             </div>

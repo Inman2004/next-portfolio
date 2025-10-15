@@ -98,9 +98,9 @@ const SkillCard = React.memo(({ skill, index }: { skill: Skill; index: number })
       variants={containerVariants}
       className="h-full"
     >
-      <div className="h-full rounded-xl bg-zinc-100/80 dark:bg-zinc-800/80 backdrop-blur-sm border-2 border-zinc-900 dark:border-zinc-700/50 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-zinc-900/20">
+      <div className="h-full rounded-xl bg-zinc-100/80 dark:bg-zinc-800/80 backdrop-blur-sm border-2 border-zinc-900 dark:border-zinc-700/50 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-zinc-900/20">
         <div className="p-6 md:p-8 space-y-6">
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent">
             {skill.category}
           </h3>
           <div className="space-y-5">
@@ -161,7 +161,7 @@ const Skills = () => {
           transition={{ duration: prefersReducedMotion ? 0 : 0.8 }}
           className="text-center space-y-6 px-4 sm:px-6 lg:px-8"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent">
             Skills & Expertise
           </h2>
           <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">

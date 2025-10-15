@@ -59,8 +59,8 @@ function hexToRgb(hex: string): number[] {
   const hexInt = parseInt(hex, 16);
   const red = (hexInt >> 16) & 255;
   const green = (hexInt >> 8) & 255;
-  const blue = hexInt & 255;
-  return [red, green, blue];
+  const emerald = hexInt & 255;
+  return [red, green, emerald];
 }
 
 type Circle = {

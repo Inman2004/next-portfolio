@@ -329,7 +329,7 @@ function MarkdownEditorComponent({
         { token: 'delimiter.bracket', foreground: '1F2937' },
         { token: 'delimiter', foreground: '1F2937' },
         { token: 'identifier', foreground: '1F2937' },
-        { token: 'type', foreground: '2563EB' }, // blue-600
+        { token: 'type', foreground: '2563EB' }, // emerald-600
         { token: 'tag', foreground: 'D97706' }, // amber-600
         { token: 'attribute.name', foreground: '7C3AED' }, // violet-600
         { token: 'attribute.value', foreground: '059669' }, // green-600

@@ -113,7 +113,7 @@ export default function AdminDataPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -132,7 +132,7 @@ export default function AdminDataPage() {
           <button
             key={key}
             className={`py-2 px-4 ${
-              activeTab === key ? 'border-b-2 border-blue-500' : ''
+              activeTab === key ? 'border-b-2 border-emerald-500' : ''
             }`}
             onClick={() => setActiveTab(key as keyof CollectionData)}
           >

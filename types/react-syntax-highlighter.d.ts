@@ -61,7 +61,7 @@ declare module 'react-syntax-highlighter' {
   export const solarizedLight: Record<string, CSSProperties>;
   export const tomorrow: Record<string, CSSProperties>;
   export const tomorrowNight: Record<string, CSSProperties>;
-  export const tomorrowNightBlue: Record<string, CSSProperties>;
+  export const tomorrowNightemerald: Record<string, CSSProperties>;
   export const tomorrowNightBright: Record<string, CSSProperties>;
   export const tomorrowNightEighties: Record<string, CSSProperties>;
   export const twilight: Record<string, CSSProperties>;
@@ -97,7 +97,7 @@ declare module 'react-syntax-highlighter' {
     solarizedLight,
     tomorrow,
     tomorrowNight,
-    tomorrowNightBlue,
+    tomorrowNightemerald,
     tomorrowNightBright,
     tomorrowNightEighties,
     twilight,

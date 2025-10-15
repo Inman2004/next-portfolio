@@ -67,7 +67,7 @@ export default function MemberOnlyContent({
       {/* Preview Content */}
       {previewContent && (
         <div className="prose max-w-none">
-          <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border-l-4 border-blue-500">
+          <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg border-l-4 border-emerald-500">
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
               <strong>Preview:</strong> Here's a glimpse of what members get to see:
             </p>
@@ -77,10 +77,10 @@ export default function MemberOnlyContent({
       )}
 
       {/* Membership CTA */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+      <Card className="bg-gradient-to-r from-emerald-50 to-indigo-50 dark:from-emerald-950/20 dark:to-indigo-950/20 border-emerald-200 dark:border-emerald-800">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-2">
-            <Lock className="h-12 w-12 text-blue-500" />
+            <Lock className="h-12 w-12 text-emerald-500" />
           </div>
           <CardTitle className="text-xl">This is Member-Only Content</CardTitle>
           <CardDescription>
@@ -97,17 +97,17 @@ export default function MemberOnlyContent({
               >
                 <div className="flex items-center gap-2 mb-2">
                   {tier.name === 'premium' && <Crown className="h-4 w-4 text-yellow-500" />}
-                  {tier.name === 'basic' && <Star className="h-4 w-4 text-blue-500" />}
+                  {tier.name === 'basic' && <Star className="h-4 w-4 text-emerald-500" />}
                   <span className="font-semibold capitalize">{tier.name}</span>
                 </div>
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                   ${tier.price}
                   <span className="text-sm font-normal text-zinc-500">/month</span>
                 </div>
                 <ul className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 space-y-1">
                   {tier.features.slice(0, 3).map((feature, index) => (
                     <li key={index} className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 bg-blue-500 rounded-full" />
+                      <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full" />
                       {feature}
                     </li>
                   ))}
@@ -125,7 +125,7 @@ export default function MemberOnlyContent({
             </Button>
 
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Already a member? <Link href="/signin" className="text-blue-600 dark:text-blue-400 hover:underline">Sign in</Link>
+              Already a member? <Link href="/signin" className="text-emerald-600 dark:text-emerald-400 hover:underline">Sign in</Link>
             </p>
           </div>
         </CardContent>

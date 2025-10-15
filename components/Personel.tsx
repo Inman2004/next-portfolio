@@ -47,7 +47,7 @@
 //                 />
 //               </div>
 //               <div className="text-center md:text-left">
-//                 <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+//                 <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 via-emerald-500 to-purple-500 bg-clip-text text-transparent">
 //                   Rv Imman
 //                 </h2>
 //                 <p className="text-zinc-600 dark:text-zinc-300 mt-2">
@@ -252,7 +252,7 @@
 //   return (
 //     <div className="max-w-5xl mx-auto my-12 py-12 px-4 sm:px-6 lg:px-8">
 //       <div className="text-center mb-12">
-//         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+//         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-emerald-500 to-purple-500 bg-clip-text text-transparent">
 //           Personal Space
 //         </h1>
 //         <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-300">

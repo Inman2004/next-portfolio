@@ -73,7 +73,7 @@ const Contact = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent">
             Get in Touch
           </h2>
           <p className="mt-4 text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
@@ -101,7 +101,7 @@ const Contact = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-emerald-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
@@ -115,7 +115,7 @@ const Contact = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-emerald-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
@@ -129,7 +129,7 @@ const Contact = () => {
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-blue-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-colors"
+                  className="mt-1 block w-full rounded-md border border-zinc-900 dark:border-zinc-600 bg-zinc-300 dark:bg-zinc-800/50 py-2 px-3 text-zinc-900 dark:text-white shadow-sm focus:border-emerald-500 dark:focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:focus:ring-indigo-500 transition-colors"
                 />
               </div>
 
@@ -150,7 +150,7 @@ const Contact = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-tranzinc-y-0.5"
+                className="w-full px-8 py-4 bg-gradient-to-r from-emerald-600 to-purple-600 rounded-lg font-medium text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-tranzinc-y-0.5"
               >
                 {isSubmitting ? (
                   <>
@@ -180,7 +180,7 @@ const Contact = () => {
             className="space-y-8"
           >
             <div className="bg-white dark:bg-gradient-to-b dark:from-zinc-800 dark:to-zinc-900 p-8 rounded-xl border border-zinc-900 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+              <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Connect With Me
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -208,12 +208,12 @@ const Contact = () => {
             </div>
 
             <div className="bg-white dark:bg-gradient-to-b dark:from-zinc-800 dark:to-zinc-900 p-8 rounded-xl border border-zinc-900 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 bg-clip-text text-transparent">
                 Location
               </h3>
               <p className="text-zinc-600 dark:text-zinc-400">
-                Based in <b className='text-blue-600 dark:text-blue-400 font-medium'>Bangalore, Chennai, India</b><br />
-                Available for <b className='text-blue-600 dark:text-blue-400 font-medium'>remote</b> work worldwide
+                Based in <b className='text-emerald-600 dark:text-emerald-400 font-medium'>Bangalore, Chennai, India</b><br />
+                Available for <b className='text-emerald-600 dark:text-emerald-400 font-medium'>remote</b> work worldwide
               </p>
             </div>
           </m.div>

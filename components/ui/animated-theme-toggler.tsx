@@ -68,7 +68,7 @@ export const AnimatedThemeToggler = ({ className }: props) => {
       aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
       title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {isDarkMode ? <SunDim className="w-5 h-5 hover:text-yellow-500 transition-colors" /> : <Moon className="w-5 h-5 hover:text-blue-500 transition-colors" />}
+      {isDarkMode ? <SunDim className="w-5 h-5 hover:text-yellow-500 transition-colors" /> : <Moon className="w-5 h-5 hover:text-emerald-500 transition-colors" />}
     </button>
   );
 };

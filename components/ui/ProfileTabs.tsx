@@ -21,7 +21,7 @@ export default function ProfileTabs({ activeTab, onTabChange }: ProfileTabsProps
             onClick={() => onTabChange(tab.id)}
             className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === tab.id
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400'
                 : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 dark:text-zinc-400 dark:hover:text-zinc-300'
             }`}
           >

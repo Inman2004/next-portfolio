@@ -226,7 +226,7 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
             <button
               key={name}
               onClick={() => toggleTag(name)}
-              className={`px-3 py-1.5 rounded-full text-xs border ${selectedTags.has(name) ? 'bg-blue-600 text-white border-blue-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700'}`}
+              className={`px-3 py-1.5 rounded-full text-xs border ${selectedTags.has(name) ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700'}`}
               aria-pressed={selectedTags.has(name) ? 'true' : 'false'}
             >
               {name}
@@ -234,7 +234,7 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
             </button>
           ))}
           {selectedTags.size > 0 && (
-            <button onClick={clearTags} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Clear</button>
+            <button onClick={clearTags} className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">Clear</button>
           )}
         </div>
       )}
@@ -290,7 +290,7 @@ export default function BlogListClient({ posts, initialPage = 1, initialPostsPer
                         )}
                       </div>
                     </div>
-                    <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 hover:text-sky-700 dark:text-blue-400 dark:hover:text-sky-300 font-medium text-sm transition-colors">
+                    <Link href={`/blog/${post.id}`} className="inline-flex items-center text-emerald-600 hover:text-sky-700 dark:text-emerald-400 dark:hover:text-sky-300 font-medium text-sm transition-colors">
                       Read More <ArrowRight className="w-4 h-4 ml-1" />
                     </Link>
                   </div>

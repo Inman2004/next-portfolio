@@ -54,7 +54,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
         break;
       case 'interview':
         statusProps = {
-          className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+          className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
           icon: <FileSearch className="w-3 h-3" />
         };
         break;
@@ -171,10 +171,10 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
   return (
     <div className="relative flex group">
       {/* Timeline line */}
-      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-400/20 to-purple-400/20 dark:from-blue-500/20 dark:to-purple-500/20 ml-6"></div>
+      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-400/20 to-purple-400/20 dark:from-emerald-500/20 dark:to-purple-500/20 ml-6"></div>
       
       {/* Timeline dot */}
-      <div className="absolute left-0 w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 -tranzinc-x-1/2 z-10 flex items-center justify-center">
+      <div className="absolute left-0 w-5 h-5 rounded-full bg-gradient-to-r from-emerald-500 to-purple-600 -tranzinc-x-1/2 z-10 flex items-center justify-center">
         <div className="w-3 h-3 bg-white dark:bg-zinc-50 rounded-full"></div>
       </div>
 
@@ -185,7 +185,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
         </div>
 
         <m.div 
-          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-zinc-900 hover:border-blue-500 transition-all duration-300 cursor-pointer"
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-zinc-900 hover:border-emerald-500 transition-all duration-300 cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
           whileHover={{ y: -2 }}
         >
@@ -224,7 +224,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
                       href={exp.companyUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 hover:text-blue-400 transition-colors"
+                      className="flex items-center gap-1 hover:text-emerald-400 transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {exp.company}
@@ -261,7 +261,7 @@ const ExperienceCard = ({ exp, isLast }: ExperienceCardProps) => {
               <ul className="space-y-2 text-zinc-600 dark:text-zinc-300">
                 {exp.description.map((item, i) => (
                   <li key={`${exp.id}-desc-${i}`} className="flex items-start gap-2">
-                    <span className="text-blue-500 dark:text-blue-400 mt-1">•</span>
+                    <span className="text-emerald-500 dark:text-emerald-400 mt-1">•</span>
                     <span className="text-zinc-700 dark:text-zinc-300">{item}</span>
                   </li>
                 ))}
@@ -333,7 +333,7 @@ export default function Experience() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-purple-600 dark:from-emerald-400 dark:to-purple-500 mb-4">
             Work Experience
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">

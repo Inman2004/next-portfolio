@@ -237,7 +237,7 @@ export default function CreatorDashboard() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
         </div>
       </div>
     );
@@ -287,7 +287,7 @@ export default function CreatorDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
                   {profile.subscriptionCount}
                 </div>
                 <p className="text-zinc-600 dark:text-zinc-400">Active Members</p>
@@ -484,7 +484,7 @@ export default function CreatorDashboard() {
                           <CardDescription>{tier.description}</CardDescription>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                             ${tier.price}
                           </div>
                           <div className="text-sm text-zinc-500">per month</div>
@@ -495,7 +495,7 @@ export default function CreatorDashboard() {
                       <ul className="space-y-2">
                         {tier.features.map((feature, index) => (
                           <li key={index} className="flex items-center gap-2 text-sm">
-                            <div className="h-1.5 w-1.5 bg-blue-500 rounded-full" />
+                            <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full" />
                             {feature}
                           </li>
                         ))}

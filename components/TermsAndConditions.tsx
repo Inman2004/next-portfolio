@@ -80,7 +80,7 @@ export default function TermsAndConditions({ onClose, isModal = false }: TermsAn
         <h2 className="text-2xl font-semibold mb-4">7. Contact Information</h2>
         <p className="mb-4">
           If you have any questions about these terms, please contact us at 
-          <a href="mailto:contact@example.com" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <a href="mailto:contact@example.com" className="text-emerald-600 dark:text-emerald-400 hover:underline">
             contact@example.com
           </a>.
         </p>

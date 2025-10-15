@@ -77,7 +77,7 @@ export default function BlogCard({ post, className = '' }: BlogCardProps) {
                   className="rounded-full h-10 w-10 object-cover"
                 />
               ) : (
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center text-white font-semibold">
                   {post.authorName?.[0]?.toUpperCase() || 'A'}
                 </div>
               )}

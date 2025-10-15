@@ -123,7 +123,7 @@ export default function SettingsPage() {
                       value="light"
                       checked={formData.theme === 'light'}
                       onChange={handleChange}
-                      className="h-4 w-4 text-blue-600"
+                      className="h-4 w-4 text-emerald-600"
                     />
                     <Label htmlFor="light">Light</Label>
                   </div>
@@ -135,7 +135,7 @@ export default function SettingsPage() {
                       value="dark"
                       checked={formData.theme === 'dark'}
                       onChange={handleChange}
-                      className="h-4 w-4 text-blue-600"
+                      className="h-4 w-4 text-emerald-600"
                     />
                     <Label htmlFor="dark">Dark</Label>
                   </div>
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                       value="system"
                       checked={formData.theme === 'system'}
                       onChange={handleChange}
-                      className="h-4 w-4 text-blue-600"
+                      className="h-4 w-4 text-emerald-600"
                     />
                     <Label htmlFor="system">System</Label>
                   </div>

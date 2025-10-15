@@ -194,7 +194,7 @@ const CommentListComponent = ({
             transform: `translateY(${virtualRow.start}px)`,
           }}
         >
-          <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
         </div>
       ) : null;
     }
@@ -329,7 +329,7 @@ const CommentListComponent = ({
       {/* Loading indicator */}
       {isLoadingMore && (
         <div className="flex justify-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
         </div>
       )}
 

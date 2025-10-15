@@ -13,10 +13,10 @@ const steps = [
     category: 'Frontend Basics',
     description: 'Learn the structure and styling of web pages',
     icon: <Layout className="w-5 h-5" />,
-    color: 'bg-blue-500',
-    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-    borderColor: 'border-blue-200 dark:border-blue-800',
-    textColor: 'text-blue-700 dark:text-blue-300',
+    color: 'bg-emerald-500',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+    borderColor: 'border-emerald-200 dark:border-emerald-800',
+    textColor: 'text-emerald-700 dark:text-emerald-300',
     status: 'completed',
     checkpoint: 'Static Webpages'
   },
@@ -197,7 +197,7 @@ const StatusIcon = ({ status }: { status?: string }) => {
     case 'completed':
       return <CheckCircle className="w-4 h-4 text-green-500" />;
     case 'current':
-      return <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />;
+      return <div className="w-4 h-4 bg-emerald-500 rounded-full animate-pulse" />;
     case 'pending':
       return <div className="w-4 h-4 border-2 border-zinc-300 rounded-full" />;
     default:
@@ -238,7 +238,7 @@ export default function RoadmapTimeline() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-emerald-600 to-purple-600 bg-clip-text text-transparent">
            My Full Stack Development Journey 
           </span>
         </h1>
@@ -271,7 +271,7 @@ export default function RoadmapTimeline() {
                 ${step.bgColor} ${step.borderColor}
                 hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-800/50
                 hover:scale-[1.02] hover:-tranzinc-y-1
-                ${step.status === 'current' ? 'ring-2 ring-blue-500/50 dark:ring-blue-500/50 ring-offset-2' : ''}
+                ${step.status === 'current' ? 'ring-2 ring-emerald-500/50 dark:ring-emerald-500/50 ring-offset-2' : ''}
               `}>
                 <div className="absolute -top-2 -right-2">
                   <StatusIcon status={step.status} />
@@ -299,7 +299,7 @@ export default function RoadmapTimeline() {
                   </p>
                   {step.checkpoint && (
                     <div className="mt-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
                         Checkpoint: {step.checkpoint}
                       </span>
                     </div>
@@ -331,7 +331,7 @@ export default function RoadmapTimeline() {
             <span>Completed</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />
+            <div className="w-4 h-4 bg-emerald-500 rounded-full animate-pulse" />
             <span>In Progress</span>
           </div>
           <div className="flex items-center gap-2">

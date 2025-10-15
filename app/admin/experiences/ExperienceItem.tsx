@@ -18,7 +18,7 @@ export function ExperienceItem({ experience }: { experience: ExperienceType }) {
           <h4 className="text-lg font-bold">{experience.role} at {experience.company}</h4>
           <p className="text-sm text-gray-500 dark:text-gray-400">{experience.startDate} - {experience.endDate}</p>
           <div className="mt-4 space-x-2">
-            <button onClick={() => setIsEditing(true)} className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+            <button onClick={() => setIsEditing(true)} className="px-3 py-1 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700">
               Edit
             </button>
             <button onClick={() => deleteExperience(experience.id)} className="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
