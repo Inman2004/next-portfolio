@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import Image from 'next/image';
 
 // Dynamically import the 3D component
-const InteractiveCard3D = dynamic(() => import('./HeroID'), {
+const InteractiveCard3D = dynamic(() => import('./HeroID').then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">

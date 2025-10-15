@@ -23,7 +23,7 @@ const MonacoEditor = dynamic(
 );
 
 // Lazy load the MarkdownViewer to reduce initial bundle size
-const LazyMarkdownViewer = dynamic(() => import('./MarkdownViewer'), {
+const LazyMarkdownViewer = dynamic(() => import('./MarkdownViewer').then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => <div className="p-4 flex items-center justify-center">
     <LoadingSpinner />

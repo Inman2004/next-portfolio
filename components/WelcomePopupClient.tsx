@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
-const WelcomePopup = dynamic(() => import('./WelcomePopup'), { ssr: false });
+const WelcomePopup = dynamic(() => import('./WelcomePopup').then(mod => ({ default: mod.default })), { ssr: false });
 
 export default function WelcomePopupClient() {
   const [mounted, setMounted] = useState(false);

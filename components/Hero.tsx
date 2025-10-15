@@ -40,7 +40,7 @@ import { useTheme } from "next-themes";
 import { Badge } from "./ui/badge";
 import { NumberTicker } from "@/components/ui/number-ticker";
 
-const InteractiveCard3D = dynamic(() => import("./ThreeJS/HeroID"), {
+const InteractiveCard3D = dynamic(() => import("./ThreeJS/HeroID").then(mod => ({ default: mod.default })), {
   ssr: false,
   loading: () => (
     <div className="w-full max-w-md h-72 md:h-96 rounded-2xl bg-zinc-200/70 dark:bg-zinc-800/60 animate-pulse" />
@@ -74,17 +74,34 @@ export default function Hero() {
       const now = new Date().getTime();
 
       if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        if (now - timestamp < CACHE_DURATION) {
-          setLatestPost(data);
-          setIsLoading(false);
-          return;
+        try {
+          const { data, timestamp } = JSON.parse(cachedData);
+          if (now - timestamp < CACHE_DURATION) {
+            setLatestPost(data);
+            setIsLoading(false);
+            return;
+          }
+        } catch (parseError) {
+          // Clear corrupted cache data
+          localStorage.removeItem(CACHE_KEY);
+          console.warn('Corrupted cache data cleared:', parseError);
         }
       }
 
       // If no valid cache, fetch fresh data via API
       const res = await fetch("/api/blog");
-      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      
+      let json;
+      try {
+        json = await res.json();
+      } catch (parseError) {
+        console.error('Failed to parse API response:', parseError);
+        throw new Error('Invalid API response format');
+      }
+      
       const posts = Array.isArray(json?.posts) ? json.posts : [];
 
       if (posts.length > 0) {

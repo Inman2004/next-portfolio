@@ -1,24 +1,8 @@
 "use client";
-<<<<<<< Updated upstream
-import React from "react";
-import { motion as m, useReducedMotion } from "framer-motion";
-import { useState, useEffect, Suspense } from "react";
-import { cn } from "@/lib/utils";
-import Projects from "@/components/Projects";
-import Roadmap from "@/components/Roadmap";
-import Contact from "@/components/Contact";
-import Comments from "@/components/Comments";
-import Hero from "@/components/Hero";
-import Footer from '@/components/Footer';
-import { BlurFade } from "@/components/ui";
-import Testimonials from "@/components/Testimonials";
-import Experience from "@/components/Experience";
-=======
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { motion as m, useReducedMotion } from "framer-motion";
-import { CssDotPattern } from "@/components/magicui/dot-pattern";
+// import { CssDotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
->>>>>>> Stashed changes
 import { useTheme } from "next-themes";
 
 // Lazy load components with proper type annotations
@@ -31,7 +15,7 @@ const Footer = lazy(() => import('@/components/Footer').then(module => ({ defaul
 const Testimonials = lazy(() => import("@/components/Testimonials").then(module => ({ default: module.default })));
 const Experience = lazy(() => import("@/components/Experience").then(module => ({ default: module.default })));
 const SkillRoadMap = lazy(() => import("@/components/SkillRoadMap").then(module => ({ default: module.default })));
-const LangCloud = lazy(() => import("@/components/LangCloud").then(module => ({ default: module.LangCloud })));
+const LangCloud = lazy(() => import("@/components/LangCloud").then(module => ({ default: module.default })));
 
 // Simple loader component
 const Loader = () => (
@@ -115,26 +99,7 @@ export default function Home() {
         ? "bg-gradient-to-b from-zinc-950 to-black text-white"
         : "bg-gradient-to-b from-zinc-50 to-zinc-100 text-zinc-900"
     )}>
-<<<<<<< Updated upstream
-=======
-      {!shouldReduceMotion && (
-        <CssDotPattern 
-          className={cn(
-            "fixed inset-0 pointer-events-none transition-opacity duration-300",
-            isDark 
-              ? "opacity-100 [mask-image:radial-gradient(750px_circle_at_center,white,transparent)]"
-              : "opacity-30 [mask-image:radial-gradient(750px_circle_at_center,black,transparent)]"
-          )}
-          width={20}
-          height={20}
-          dotSize={1.2}
-          glow={true}
-          glowDotsPercentage={0.5}
-          glowColor={isDark ? "rgba(63, 13, 163, 0.3)" : "rgba(99, 102, 241, 0.2)"}
-        />
-      )}
       
->>>>>>> Stashed changes
       <main className="flex flex-col items-center w-full relative z-10">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6">
           <Suspense fallback={<Loader />}>
@@ -145,41 +110,41 @@ export default function Home() {
             <Projects showAll={false} maxItems={3} />
           </Suspense>
 
-          <Suspense fallback={null}>
-            <BlurFadeWrapper delay={0.1}>
+          <BlurFadeWrapper delay={0.1}>
+            <Suspense fallback={null}>
               <Roadmap />
-            </BlurFadeWrapper>
-          </Suspense>
+            </Suspense>
+          </BlurFadeWrapper>
 
-          <Suspense fallback={null}>
-            <BlurFadeWrapper delay={0.2}>
+          <BlurFadeWrapper delay={0.2}>
+            <Suspense fallback={null}>
               <LangCloud />
-            </BlurFadeWrapper>
-          </Suspense>
+            </Suspense>
+          </BlurFadeWrapper>
 
-          <Suspense fallback={null}>
-            <BlurFadeWrapper delay={0.3}>
+          <BlurFadeWrapper delay={0.3}>
+            <Suspense fallback={null}>
               <Experience />
-            </BlurFadeWrapper>
-          </Suspense>
+            </Suspense>
+          </BlurFadeWrapper>
 
-          <Suspense fallback={null}>
-            <BlurFadeWrapper delay={0.4}>
+          <BlurFadeWrapper delay={0.4}>
+            <Suspense fallback={null}>
               <Testimonials />
-            </BlurFadeWrapper>
-          </Suspense>
+            </Suspense>
+          </BlurFadeWrapper>
 
-          <Suspense fallback={null}>
-            <BlurFadeWrapper delay={0.5}>
+          <BlurFadeWrapper delay={0.5}>
+            <Suspense fallback={null}>
               <Comments />
-            </BlurFadeWrapper>
-          </Suspense>
+            </Suspense>
+          </BlurFadeWrapper>
 
-          <Suspense fallback={null}>
-            <BlurFadeWrapper delay={0.6}>
+          <BlurFadeWrapper delay={0.6}>
+            <Suspense fallback={null}>
               <Contact />
-            </BlurFadeWrapper>
-          </Suspense>
+            </Suspense>
+          </BlurFadeWrapper>
         </div>
       </main>
       

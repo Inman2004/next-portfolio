@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-const DynamicChatWidget = dynamic(() => import('@/components/ChatWidget'), {
+const DynamicChatWidget = dynamic(() => import('@/components/ChatWidget').then(mod => ({ default: mod.default })), {
   ssr: false,
 });
 

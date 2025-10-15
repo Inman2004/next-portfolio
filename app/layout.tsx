@@ -5,7 +5,7 @@ import Providers from "./providers";
 import { PageLoadingProvider } from "@/components/providers/page-loading-provider";
 import { NavigationLoading } from "@/components/ui/navigation-loading";
 import Header from "@/components/Header";
-import ErrorBoundary from "@/components/ErrorBoundary";
+// import ErrorBoundaryClient from "@/components/ErrorBoundaryClient";
 import { elegantScript, pacifico } from "./fonts";
 import WelcomePopup from "@/components/WelcomePopupClient";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
@@ -214,29 +214,27 @@ export default function RootLayout({
       >
         <PageLoadingProvider>
           <Providers>
-            <ErrorBoundary>
-              <NavigationLoading />
-              <div className="flex flex-col min-h-screen">
-                <ClickSpark
-                  sparkColor="#66ff99"
-                  sparkSize={10}
-                  sparkRadius={15}
-                  sparkCount={8}
-                  duration={400}
-                >
-                  <Header />
-                  <main className="flex-grow" id="main-content">
-                    {children}
-                  </main>
-                  <BottomNav />
-                </ClickSpark>
-              </div>
-              <WelcomePopup />
-              <PerformanceMonitor />
-              <FontLoader />
-              <Toaster position="top-center" />
-              <ChatWidgetClient />
-            </ErrorBoundary>
+            <NavigationLoading />
+            <div className="flex flex-col min-h-screen">
+              <ClickSpark
+                sparkColor="#66ff99"
+                sparkSize={10}
+                sparkRadius={15}
+                sparkCount={8}
+                duration={400}
+              >
+                <Header />
+                <main className="flex-grow" id="main-content">
+                  {children}
+                </main>
+                <BottomNav />
+              </ClickSpark>
+            </div>
+            <WelcomePopup />
+            <PerformanceMonitor />
+            <FontLoader />
+            <Toaster position="top-center" />
+            <ChatWidgetClient />
           </Providers>
         </PageLoadingProvider>
       </body>

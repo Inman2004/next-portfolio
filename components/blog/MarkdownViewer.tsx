@@ -75,22 +75,8 @@ const ThemedSyntaxHighlighter = ({ children, ...props }: SyntaxHighlighterProps)
   );
 };
 
-// Lazy load the syntax highlighter with code splitting
-const LazySyntaxHighlighter = dynamic<SyntaxHighlighterProps>(
-  () => Promise.resolve(ThemedSyntaxHighlighter),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-4 animate-pulse">
-        <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2"></div>
-      </div>
-    )
-  }
-);
-
-// Export the lazy-loaded syntax highlighter
-const SyntaxHighlighter = LazySyntaxHighlighter;
+// Use the themed syntax highlighter directly
+const SyntaxHighlighter = ThemedSyntaxHighlighter;
 
 // Import remark and rehype plugins
 import remarkGfm from 'remark-gfm';
