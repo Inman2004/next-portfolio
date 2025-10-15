@@ -7,6 +7,7 @@ import { getTechColor } from "@/components/skillColors";
 import { usePathname } from "next/navigation";
 import ElectricBorder from "./ElectricBorder";
 import ShinyText from "./ShinyText";
+import { useChat } from "@/contexts/ChatContext";
 
 type ChatMessage = {
   role: "user" | "assistant";
