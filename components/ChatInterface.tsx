@@ -7,7 +7,6 @@ import { getTechColor } from "@/components/skillColors";
 import { usePathname } from "next/navigation";
 import ElectricBorder from "./ElectricBorder";
 import ShinyText from "./ShinyText";
-import { useChat } from "@/contexts/ChatContext";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -18,19 +17,8 @@ const initialAssistantMsg =
   "Greetings. I am Mimir, an AI assistant created by Immanuvel to share knowledge about his work. Like my namesake from the ancient tales, I draw from a well of information. Ask me about Immanuvel's skills, projects, or experience.";
 
 export default function ChatInterface() {
-  const { messages, input, loading, setInput, sendMessage } = useChat();
+  const { messages, input, loading, listening, ttsEnabled, setInput, sendMessage, startListening, stopListening, setTtsEnabled } = useChat();
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
-  const [listening, setListening] = useState(false);
-  const [ttsEnabled, setTtsEnabled] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      const saved = window.localStorage.getItem('chat_tts_enabled');
-      return saved ? saved === '1' : false;
-    } catch { return false; }
-  });
-  const recognitionRef = useRef<any>(null);
-  const sttBaseRef = useRef<string>("");
-  const sttInterimRef = useRef<string>("");
 
   // Strip most Markdown/formatting for voice playback
   const sanitizeForTTS = useCallback((md: string): string => {
@@ -93,79 +81,6 @@ export default function ChatInterface() {
     return t;
   }, []);
 
-  // Initialize SpeechRecognition if available
-  useEffect(() => {
-    const SR: any = (typeof window !== 'undefined') && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
-    if (!SR) return;
-    const rec = new SR();
-    rec.continuous = false;
-    rec.interimResults = true;
-    rec.lang = 'en-US';
-    rec.onresult = (event: any) => {
-      let interim = '';
-      let finalChunk = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalChunk += transcript;
-        } else {
-          interim += transcript;
-        }
-      }
-      if (interim) {
-        sttInterimRef.current = interim.trim();
-        const composed = `${sttBaseRef.current} ${sttInterimRef.current}`.trim();
-        setInput(composed);
-      }
-      if (finalChunk) {
-        // Commit final chunk into base, clear interim
-        sttBaseRef.current = `${sttBaseRef.current} ${finalChunk}`.trim();
-        sttInterimRef.current = '';
-        setInput(sttBaseRef.current);
-      }
-    };
-    rec.onstart = () => setListening(true);
-    rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
-    recognitionRef.current = rec;
-    return () => {
-      try { rec.abort(); } catch {}
-      recognitionRef.current = null;
-    };
-  }, []);
-
-  const startListening = useCallback(() => {
-    const rec = recognitionRef.current;
-    if (!rec) return;
-    // Snapshot the current input as the base; clear interim buffer
-    sttBaseRef.current = (typeof input === 'string' ? input : '').trim();
-    sttInterimRef.current = '';
-    try { rec.start(); } catch {}
-  }, [input]);
-
-  const stopListening = useCallback(() => {
-    const rec = recognitionRef.current;
-    if (!rec) return;
-    try { rec.stop(); } catch {}
-  }, []);
-
-  // Text-to-speech playback for assistant replies
-  useEffect(() => {
-    if (!ttsEnabled) return;
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    const last = messages[messages.length - 1];
-    if (!last || last.role !== 'assistant' || !last.content) return;
-    try {
-      window.speechSynthesis.cancel();
-      const cleaned = sanitizeForTTS(last.content);
-      if (!cleaned) return;
-      const utter = new SpeechSynthesisUtterance(cleaned);
-      utter.rate = 1;
-      utter.pitch = 1;
-      utter.volume = 1;
-      window.speechSynthesis.speak(utter);
-    } catch {}
-  }, [messages, ttsEnabled, sanitizeForTTS]);
 
   // Subtle animation variants for assistant text
   const containerVariants = {
@@ -351,55 +266,111 @@ export default function ChatInterface() {
     return <m.div className="space-y-2" variants={containerVariants} initial="hidden" animate="show">{blocks}</m.div>;
   }
 
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-      }
-    }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
-
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex-1 space-y-3 overflow-y-auto p-3">
-        {messages.map((msg, i) => (
-          <div key={i} className="flex">
-            <div
-              className={
-                msg.role === "user"
-                  ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"
-                  : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-1.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
-              }
-            >
-              {msg.role === "assistant" ? renderMarkdown(msg.content) : msg.content}
+        {/* Listening indicator */}
+        {listening && (
+          <div className="flex">
+            <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600 dark:bg-red-900/30 dark:text-red-300">
+              <Mic className="h-3.5 w-3.5" /> Listening...
             </div>
           </div>
-        ))}
+        )}
+        {messages.map((msg, i) => {
+          const isAssistant = msg.role === "assistant";
+          const isLong = isAssistant && (msg.content?.length || 0) > 600;
+          const isExpanded = !!expanded[i];
+          return (
+            <div key={i} className="flex">
+              <div
+                className={
+                  msg.role === "user"
+                    ? "ml-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-blue-600 px-3 py-2 text-sm text-white"
+                    : "mr-auto max-w-[80%] whitespace-pre-wrap rounded-lg bg-zinc-100 px-3 py-1.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+                }
+              >
+                <div className={(!isExpanded && isLong) ? "relative max-h-56 overflow-hidden" : undefined}>
+                  {isAssistant ? (
+                    <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                      {renderMarkdown(isExpanded ? msg.content : compactForDisplay(msg.content))}
+                    </m.div>
+                  ) : msg.content}
+                  {(!isExpanded && isLong) && (
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-100 to-transparent dark:from-zinc-800" />
+                  )}
+                </div>
+                {isLong && (
+                  <div className="mt-1 flex justify-end">
+                    <button
+                      type="button"
+                      className="text-xs text-blue-600 hover:underline dark:text-blue-400"
+                      onClick={() => setExpanded(prev => ({ ...prev, [i]: !prev[i] }))}
+                    >
+                      {isExpanded ? "Show less" : "Show more"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
         {loading && (
           <div className="flex">
             <div className="mr-auto inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Thinking...
+              <ShinyText speed={1} disabled={false} text="Thinking..." />
             </div>
           </div>
         )}
         <div ref={listEndRef} />
       </div>
 
-            <form onSubmit={handleSendMessage} className="border-t border-zinc-200 p-2 dark:border-zinc-800">
+      {/* Input */}
+      <form onSubmit={handleSendMessage} className="border-t border-zinc-200 p-2 dark:border-zinc-800">
         <div className="flex items-center gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                      handleSendMessage();
+                handleSendMessage();
               }
             }}
             placeholder="Type your message..."
-            className="flex-1 rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:text-zinc-100 dark:focus:border-blue-500"
+            className="flex-1 rounded-md border border-zinc-300 bg-white/90 px-3 py-2 text-sm outline-none placeholder:text-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-100 dark:focus:border-blue-500 backdrop-blur-xl"
           />
+          {/* Mic button */}
+          <button
+            type="button"
+            onClick={() => (listening ? stopListening() : startListening())}
+            className={`inline-flex items-center justify-center rounded-md border px-2.5 py-2 text-sm font-medium shadow-sm transition-colors ${
+              listening
+                ? 'border-red-300 bg-red-100 text-red-700 hover:bg-red-200 dark:border-red-600/50 dark:bg-red-900/30 dark:text-red-300'
+                : 'border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
+            }`}
+            title={listening ? 'Stop voice input' : 'Start voice input'}
+            aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+          >
+            {listening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </button>
+          {/* TTS toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              const next = !ttsEnabled;
+              setTtsEnabled(next);
+              try { window.localStorage.setItem('chat_tts_enabled', next ? '1' : '0'); } catch {}
+              if (!next && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                try { window.speechSynthesis.cancel(); } catch {}
+              }
+            }}
+            className="inline-flex items-center justify-center rounded-md border border-zinc-300 bg-white px-2.5 py-2 text-sm text-zinc-700 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+            title={ttsEnabled ? 'Disable voice playback' : 'Enable voice playback'}
+            aria-label={ttsEnabled ? 'Disable voice playback' : 'Enable voice playback'}
+          >
+            {ttsEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+          </button>
           <button
             type="submit"
             disabled={!canSend}
