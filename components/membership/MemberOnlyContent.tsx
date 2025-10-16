@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 import AdInjector from '../ads/AdInjector';
+import HtmlRenderer from '../blog/HtmlRenderer';
 
 interface MemberOnlyContentProps {
   isMembersOnly: boolean;
@@ -60,7 +61,9 @@ export default function MemberOnlyContent({
             </Badge>
           )}
         </div>
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: fullContent }} />
+        <div className="prose max-w-none">
+          <HtmlRenderer content={fullContent} />
+        </div>
       </div>
     );
   }
