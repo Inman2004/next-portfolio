@@ -3,7 +3,7 @@
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
-import { lowlight } from 'lowlight/lib/core';
+import { lowlight } from 'lowlight';
 import 'highlight.js/styles/atom-one-dark.css';
 import mermaid from 'lowlight-mermaid';
 
