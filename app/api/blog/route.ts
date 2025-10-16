@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/firebase-server';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import { getBlogPosts } from '@/lib/blogUtils';
+import { getBlogPosts, getViewCounts } from '@/lib/blogUtils';
 import { blogPostSchema } from '@/lib/schemas/blog';
 import { calculateReadingTime } from '@/lib/readingTime';
 

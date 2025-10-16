@@ -17,8 +17,7 @@ export async function middleware(request: NextRequest) {
 
   // For admin routes, check if user is actually an admin
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin') ||
-      pathname.startsWith('/dashboard') || pathname.startsWith('/blog/new') ||
-      pathname.startsWith('/blog/edit')) {
+      pathname.startsWith('/dashboard')) {
 
     try {
       const adminCheckUrl = new URL('/api/auth/check-admin', request.url);

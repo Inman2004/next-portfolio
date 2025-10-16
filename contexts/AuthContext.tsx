@@ -171,6 +171,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
+  // Helper function to create session cookie
+  const createSessionCookie = async (idToken: string) => {
+    try {
+      console.log('AuthContext: Creating session cookie...');
+      const response = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create session cookie');
+      }
+      console.log('AuthContext: Session cookie created successfully');
+    } catch (error) {
+      console.error('AuthContext: Error creating session cookie:', error);
+    }
+  };
+
+  // Helper function to delete session cookie
+  const deleteSessionCookie = async () => {
+    try {
+      await fetch('/api/auth/session', {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.error('Error deleting session cookie:', error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -179,6 +211,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           (provider) => provider.providerId === 'google.com'
         );
         setIsGoogleUser(isGoogle);
+
+        // Create session cookie for server-side authentication
+        try {
+          const idToken = await firebaseUser.getIdToken();
+          await createSessionCookie(idToken);
+        } catch (error) {
+          console.error('Error creating session cookie:', error);
+        }
 
         // Get additional user data from Firestore
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
@@ -222,6 +262,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } else {
         setUser(null);
+        // Delete session cookie when user signs out
+        await deleteSessionCookie();
       }
       setLoading(false);
     });
@@ -423,6 +465,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
+      // Delete session cookie first
+      await deleteSessionCookie();
+      // Then sign out from Firebase
       await signOut(auth);
     } catch (error) {
       console.error('Error signing out:', error);
