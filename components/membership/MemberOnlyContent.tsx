@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import mermaid from 'mermaid';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 import AdInjector from '../ads/AdInjector';
-import MarkdownViewer from '../blog/MarkdownViewer';
 
 interface MemberOnlyContentProps {
   isMembersOnly: boolean;
@@ -37,6 +37,11 @@ export default function MemberOnlyContent({
 }: MemberOnlyContentProps) {
   const [showPreview, setShowPreview] = useState(!canAccess);
 
+  useEffect(() => {
+    mermaid.initialize({ startOnLoad: true });
+    mermaid.contentLoaded();
+  }, []);
+
   if (!isMembersOnly) {
     return <AdInjector content={fullContent} />;
   }
@@ -55,9 +60,7 @@ export default function MemberOnlyContent({
             </Badge>
           )}
         </div>
-        <div className="prose max-w-none">
-          <MarkdownViewer content={fullContent} />
-        </div>
+        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: fullContent }} />
       </div>
     );
   }

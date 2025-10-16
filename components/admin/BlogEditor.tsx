@@ -2,18 +2,12 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
-
-// Dynamically import the MD editor to avoid SSR issues
-const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor'),
-  { ssr: false }
-);
+import WysiwygEditor from './WysiwygEditor';
 
 interface BlogEditorProps {
   initialData?: {
@@ -51,10 +45,10 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
     }));
   };
 
-  const handleContentChange = useCallback((value: string | undefined) => {
+  const handleContentChange = useCallback((html: string) => {
     setFormData(prev => ({
       ...prev,
-      content: value || ''
+      content: html
     }));
   }, []);
 
@@ -139,16 +133,10 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
 
           <div className="space-y-2">
             <Label>Content</Label>
-            <div className="rounded-md border">
-              <div data-color-mode="light">
-                <MDEditor
-                  value={formData.content}
-                  onChange={handleContentChange}
-                  height={500}
-                  className="min-h-[500px] rounded-md border"
-                />
-              </div>
-            </div>
+            <WysiwygEditor
+              content={formData.content}
+              onChange={handleContentChange}
+            />
           </div>
         </div>
 
