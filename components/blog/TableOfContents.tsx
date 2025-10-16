@@ -12,6 +12,8 @@ interface HeadingNode {
   children: HeadingNode[];
 }
 
+import { parse } from 'node-html-parser';
+
 interface TableOfContentsProps {
   content: string;
   className?: string;
@@ -75,49 +77,24 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
     return root.children;
   };
 
-  // Build TOC from the rendered DOM to guarantee IDs/text match
+  // Build TOC from the HTML content string
   useEffect(() => {
-    let cancelled = false;
+    const root = parse(content);
+    const headingElements = root.querySelectorAll('h1, h2, h3, h4, h5, h6');
     const regenIds = createHeadingIdGenerator();
-    const selector = '.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6';
 
-    const scan = () => {
-      if (cancelled) return;
-      const elements = Array.from(document.querySelectorAll(selector)) as HTMLElement[];
-      if (!elements.length) {
-        setHeadings([]);
-        return;
+    const flatHeadings = headingElements.map((el) => {
+      const text = el.textContent.trim();
+      const level = Number(el.tagName.substring(1));
+      const id = el.id || regenIds(text);
+      if (!el.id) {
+        el.setAttribute('id', id);
       }
-      const flat = elements.map((el) => {
-        const level = Number(el.tagName.substring(1)) || 1;
-        const text = (el.textContent || '').trim();
-        let id = el.id;
-        if (!id) {
-          id = regenIds(text);
-          el.id = id;
-        }
-        return { id, text, level };
-      });
-      const tree = buildHeadingTree(flat);
-      if (!cancelled) setHeadings(tree);
-    };
+      return { id, text, level };
+    });
 
-    // Wait until after Markdown renders/hydrates
-    const raf = requestAnimationFrame(() => setTimeout(scan, 0));
-
-    // Observe DOM changes under the article to keep TOC in sync
-    const container = document.querySelector('.prose');
-    let observer: MutationObserver | null = null;
-    if (container) {
-      observer = new MutationObserver(() => scan());
-      observer.observe(container, { childList: true, subtree: true, characterData: true });
-    }
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf);
-      observer?.disconnect();
-    };
+    const tree = buildHeadingTree(flatHeadings);
+    setHeadings(tree);
   }, [content]);
 
   // Helper: flatten the heading tree to a list of IDs

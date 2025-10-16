@@ -8,6 +8,8 @@ import { incrementViewCount, getViewCount } from '@/lib/views';
 import { blogPostSchema } from '@/lib/schemas/blog';
 import { calculateReadingTime } from '@/lib/readingTime';
 import { v2 as cloudinary } from 'cloudinary';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -79,9 +81,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         .replace(/-+/g, '-');
     }
 
-    // If content is updated, recalculate reading time
+    // If content is updated, sanitize it and recalculate reading time
     if (parsedData.content) {
-      updateData.readingTime = calculateReadingTime(parsedData.content).text;
+      const window = new JSDOM('').window;
+      const purify = DOMPurify(window);
+      const sanitizedContent = purify.sanitize(parsedData.content);
+      updateData.content = sanitizedContent;
+
+      const textContent = sanitizedContent.replace(/<[^>]*>?/gm, '');
+      updateData.readingTime = calculateReadingTime(textContent).text;
     }
 
     await postRef.update(updateData);

@@ -6,6 +6,8 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getBlogPosts, getViewCounts } from '@/lib/blogUtils';
 import { blogPostSchema } from '@/lib/schemas/blog';
 import { calculateReadingTime } from '@/lib/readingTime';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 export const revalidate = 60;
 
@@ -77,10 +79,18 @@ export async function POST(request: Request) {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
 
-    const readingTime = calculateReadingTime(parsedData.content).text;
+    // Sanitize HTML content
+    const window = new JSDOM('').window;
+    const purify = DOMPurify(window);
+    const sanitizedContent = purify.sanitize(parsedData.content);
+
+    // Calculate reading time from sanitized content
+    const textContent = sanitizedContent.replace(/<[^>]*>?/gm, '');
+    const readingTime = calculateReadingTime(textContent).text;
 
     const postData = {
       ...parsedData,
+      content: sanitizedContent,
       slug,
       readingTime,
       authorId: user.id,
