@@ -2,28 +2,49 @@
 
 import { useParams } from 'next/navigation';
 import { BlogEditor } from '@/components/admin/BlogEditor';
-
-// Mock function to fetch blog post by ID
-async function getBlogPost(id: string) {
-  // In a real app, you would fetch this from your API
-  return {
-    id,
-    title: 'Getting Started with Next.js',
-    slug: 'getting-started-with-nextjs',
-    excerpt: 'Learn how to get started with Next.js and build amazing web applications.',
-    content: '# Getting Started with Next.js\n\nNext.js is a React framework that enables server-side rendering and generating static websites.\n\n## Why Next.js?\n\n- **Performance**: Automatic code splitting and optimized production builds.\n- **SEO Friendly**: Server-side rendering out of the box.\n- **Developer Experience**: Hot code reloading and a great development experience.\n\n## Installation\n\n```bash\nnpx create-next-app@latest my-app\ncd my-app\nnpm run dev\n```',
-    published: true,
-    featuredImage: 'https://example.com/nextjs-cover.jpg',
-    tags: ['nextjs', 'react', 'javascript']
-  };
-}
+import { useEffect, useState } from 'react';
+import { BlogPost } from '@/types/blog';
 
 export default function EditBlogPostPage() {
   const params = useParams();
   const postId = Array.isArray(params.id) ? params.id[0] : params.id;
   
-  // In a real app, you would fetch the blog post data here
-  const post = getBlogPost(postId);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (postId) {
+      const fetchPost = async () => {
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/blog/${postId}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch blog post');
+          }
+          const data = await response.json();
+          setPost(data);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchPost();
+    }
+  }, [postId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!post) {
+    return <div>Post not found</div>;
+  }
 
   return (
     <div>
