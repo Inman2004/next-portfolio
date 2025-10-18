@@ -7,14 +7,48 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, ArrowLeft } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, Copy, Mic } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { coldarkDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 // Dynamically import the MD editor to avoid SSR issues
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor'),
   { ssr: false }
 );
+
+const CodeBlock = ({ children = [], className, ...props }) => {
+  const [isCopied, setIsCopied] = useState(false);
+  const language = className?.replace(/language-/, '') || 'text';
+
+  const handleCopy = () => {
+    if (children && typeof children === 'string') {
+      navigator.clipboard.writeText(children);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <SyntaxHighlighter
+        language={language}
+        style={coldarkDark}
+        {...props}
+      >
+        {String(children).replace(/\n$/, '')}
+      </SyntaxHighlighter>
+      <Button
+        size="sm"
+        className="absolute top-2 right-2"
+        onClick={handleCopy}
+      >
+        {isCopied ? 'Copied!' : <Copy className="w-4 h-4" />}
+      </Button>
+    </div>
+  );
+};
 
 interface BlogEditorProps {
   initialData?: {
@@ -151,7 +185,61 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>Content</Label>
+            <div className="flex justify-between">
+              <Label>Content</Label>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const recognition = new (window as any).webkitSpeechRecognition();
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+                    recognition.onresult = (event: any) => {
+                      let transcript = '';
+                      for (let i = event.resultIndex; i < event.results.length; i++) {
+                        if (event.results[i].isFinal) {
+                          transcript += event.results[i][0].transcript;
+                        }
+                      }
+                      setFormData((prev) => ({
+                        ...prev,
+                        content: prev.content + transcript,
+                      }));
+                    };
+                    recognition.start();
+                  }}
+                >
+                  <Mic className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    document.getElementById('markdown-importer')?.click()
+                  }
+                >
+                  Import Markdown
+                </Button>
+                <input
+                  type="file"
+                  id="markdown-importer"
+                  className="hidden"
+                  accept=".md"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        const content = e.target?.result as string;
+                        setFormData((prev) => ({ ...prev, content }));
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
+                />
+              </div>
+            </div>
             <div className="rounded-md border">
               <div data-color-mode="light">
                 <MDEditor
@@ -159,6 +247,9 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
                   onChange={handleContentChange}
                   height={500}
                   className="min-h-[500px] rounded-md border"
+                  components={{
+                    code: CodeBlock,
+                  }}
                 />
               </div>
             </div>
