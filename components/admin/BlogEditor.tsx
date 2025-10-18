@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 // Dynamically import the MD editor to avoid SSR issues
 const MDEditor = dynamic(
@@ -68,13 +69,25 @@ export function BlogEditor({ initialData }: BlogEditorProps) {
     }
 
     try {
-      // Here you would typically make an API call to save the post
-      console.log('Saving post:', { ...formData, published: publish });
+      const { tags, ...rest } = formData;
+      const payload = {
+        ...rest,
+        published: publish,
+        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      };
+
+      const response = await fetch(`/api/blog/${initialData?.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save post');
+      }
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirect to blog posts list after successful save
       router.push('/admin/blog');
     } catch (error) {
       console.error('Error saving post:', error);
